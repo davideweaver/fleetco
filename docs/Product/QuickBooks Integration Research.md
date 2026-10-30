@@ -1,7 +1,7 @@
 ---
 created: 2026-10-30
 tags: [fleetco, otc, v1, quickbooks, accounting, integration, research]
-source: Web research (Intuit developer docs and blog via search, FullBay marketing pages, vendor help centers), the 2026-10-23 walkthrough transcript, and Cameron's 2026-10-30 reply
+source: FullBay's QuickBooks explainer PDFs (read in full), Intuit developer docs and blog (via search), vendor help centers, the 2026-10-23 walkthrough transcript, and Cameron's 2026-10-30 reply
 status: research complete. Decision pending — export at launch vs. FullBay-equivalent push in V1
 ---
 
@@ -17,7 +17,7 @@ add to V1?
    payments happen. It pushes customers, invoices, credits, payments and vendor bills into QuickBooks
    for accounting. Nothing in the evidence shows QuickBooks changes flowing back, and Cameron
    described it the same way: *"payments and stuff happens… here. It's just for reporting."* Our
-   earlier docs called it "two-way". That was wrong, or at least unsupported.
+   earlier docs called it "two-way". That was wrong: FullBay's own explainer describes export only.
 2. **Two systems feeding one QuickBooks company is normal and safe** if four rules hold: separate
    invoice numbers, a shared customer list matched rather than duplicated, a fixed class, and each
    system only ever touching its own transactions.
@@ -46,28 +46,55 @@ From the 2026-10-23 walkthrough (`00:43:38`–`00:46:46`) and [[Open Questions]]
 
 ## 2. What FullBay's integration actually does
 
-FullBay's help centre is behind a login, so this comes from FullBay's public pages, their
-integration explainer (seen through search summaries; the PDF itself could not be opened from this
-session) and review sites. **Confidence is medium.** Section 9 lists how to confirm it in ten
-minutes.
+From FullBay's own integration explainers (two PDFs on `www2.fullbay.com`, read in full) and its
+QuickBooks product page. FullBay's help centre is behind a login. **Confidence is high on what
+syncs and in which direction.** Section 9 covers the details only OTC's own setup can show.
 
-| What | Direction | Detail |
+FullBay describes itself as *"a managerial accounting system, not a financial accounting system."*
+That is the whole design: FullBay runs the shop, QuickBooks keeps the books, and transactions
+**export** one way. With QuickBooks Online, *"any Fullbay transactions created will immediately
+export into your QuickBooks company file upon creation."*
+
+| What | Direction | Detail, in FullBay's words where quoted |
 |---|---|---|
-| Customers | FullBay → QBO | Customer lists are **linked** with a button once both exist. New FullBay customers can be created in QBO automatically |
-| Vendors | FullBay → QBO | Same linking as customers |
-| Invoices | FullBay → QBO | Sent with repair detail and vehicle info. Lines use **QBO items** mapped from FullBay (e.g. labor income, parts income). Appear in QBO immediately |
-| Credits | FullBay → QBO | Credit memos |
-| Payments | FullBay → QBO | *"Customer payments automatically apply and reconcile open invoices"* |
-| Vendor bills | FullBay → QBO | From received POs. Mapped to **accounts**, not items |
-| Inventory data | FullBay → QBO | Listed on the integration page. Not relevant to graphics (no stock counts in V1) |
-| Anything back from QBO | **None found** | No evidence that QBO edits or payments update FullBay |
+| Customers | Linked, optionally created | Lists are *"directly linked or mapped"* once QBO lists are imported into FullBay, *"with the click of a button."* New customers get a **Create In QuickBooks** option, which is *"permission based and can be turned on or off"* by user role. Not automatic |
+| Vendors | Linked | Same linking as customers. No create option mentioned |
+| Customer invoices | FullBay → QBO | *"with full repair detail and vehicle information."* Lines use QBO **items** |
+| Customer payments | FullBay → QBO | *"automatically applies and reconciles open invoices"* |
+| Customer credits | FullBay → QBO | Credit memos |
+| Vendor bills | FullBay → QBO | Lines use QBO **accounts** |
+| Vendor credits | FullBay → QBO | |
+| Inventory adjustments | FullBay → QBO | *"Creates a journal entry to adjust accounts to record when inventory is used."* Not relevant to graphics |
+| Anything back from QBO | **None** | Every FullBay description is export only |
 
-Setup on FullBay's side is a mapping screen behind the integration card's gear icon:
-**items control what appears on customer invoices, accounts control what appears on vendor bills.**
+**Mapping.** *"Fullbay accounts drive what goes on a vendor bill, while items drive what goes on a
+customer invoice."* FullBay's suggested setup:
 
-**Not found anywhere public:** how FullBay sets the class per shop, how it sends sales tax, which
-account payments are deposited to, and whether card processing fees are posted. All four matter for
-us and all four are answerable by looking at a FullBay invoice and payment inside QBO.
+- **Income accounts:** labor, parts, sublet, shop supplies, service call
+- **Cost of goods sold:** labor, parts, parts (tax), sublet, shop supplies, service call
+- **Functional accounts:** Accounts Receivable, **Undeposited Funds**, Inventory Asset
+- **Default invoice items:** Labor, Parts, Sublet labor, Sublet parts, Shop Supplies, Service Call,
+  Mileage, Miscellaneous
+
+**Undeposited Funds is on the required list, so FullBay payments almost certainly land there.**
+Someone then groups them into bank deposits in QBO. That's the bookkeeper's existing routine, and
+ours should feed the same one.
+
+**Class and location.** FullBay can *"track classes using a hierarchy applied to specific
+transactions,"* with location tracking as an option on QBO. That's how each shop's work lands in
+its own class today.
+
+**Sales tax. FullBay calculates tax itself; it does not let QuickBooks do it.** It keeps its own
+*"tax locations… to match any tax rates set up in QuickBooks,"* including combined or group rates,
+which *"drop into a corresponding rate in your QuickBooks sales tax liability report."* Rates are
+assigned by shop, customer, unit type or unit. That is the model to copy (section 4).
+
+**Requirements.** QuickBooks Online **Essentials or Plus**. Class tracking needs Plus or higher, so
+OTC is on Plus or Advanced.
+
+**Still unknown, and only OTC's own QBO can answer:** whether card processing fees and the 3%
+surcharge are posted by FullBay or by the bookkeeper, how FullBay handles a voided or edited invoice
+after export, and which tax rates and agencies are set up.
 
 **FullBay Payments** is powered by Stripe, so OTC's card money today probably arrives as Stripe
 payouts. That is also the provider V1 names.
@@ -183,16 +210,23 @@ one customer-facing line per package ("Full Vehicle Wrap") with the materials br
 
 ### Sales tax — the riskiest part
 
-US QBO companies created after November 2017 use **Automated Sales Tax (AST)**. AST picks the tax
-code from addresses and overrides any tax code an app sends. An app can override the **amount** by
-sending `TxnTaxDetail.TotalTax`, and Intuit says that amount is honoured. Developers report cases
-where AST recalculated anyway.
+**Copy FullBay's model: the shop app calculates tax, and QBO records it against a matching rate.**
+FullBay keeps its own tax locations mapped to QBO's rates (section 2). We do the same: tax rates in
+our app, each mapped to the QBO tax code or rate it corresponds to, chosen per customer (and per
+shop address).
 
-Our invoice has already shown the customer a total. **QBO must record the same tax we charged.** So:
+The complication is QBO's **Automated Sales Tax (AST)**, on by default for US companies created
+after November 2017. With AST on, QBO picks the tax code from addresses and overrides any tax code
+an app sends. An app can still override the **amount** with `TxnTaxDetail.TotalTax`, which Intuit
+says is honoured, though developers report cases where AST recalculated anyway. Whether OTC is on
+AST, and how FullBay gets its rates to land, is the first thing to look at in OTC's QBO settings.
+
+Either way, our invoice has already shown the customer a total. **QBO must record the same tax we
+charged.** So:
 
 1. Each pushed line carries `TAX` or `NON` based on our taxability rules (section 5 item 1 of
    [[V1 Alignment]], still unanswered).
-2. The invoice sends `TotalTax` equal to what we charged.
+2. The invoice names the mapped tax rate or code and sends `TotalTax` equal to what we charged.
 3. After create, read back the invoice. If QBO's total doesn't match ours, flag it for review
    instead of leaving a silent mismatch.
 
@@ -337,9 +371,9 @@ mapping screen.
 2. The **payment** applied to it: which account it was deposited to, and how the bank deposit looks.
 3. **Settings › Account and settings › Advanced:** class tracking (per transaction or per row),
    location tracking, custom transaction numbers.
-4. **Settings › Sales tax:** AST on or off, agencies.
+4. **Settings › Sales tax:** AST on or off, agencies, and the rates FullBay's tax locations map to.
 5. **Apps › My apps:** everything connected to the company. Is there a Stripe connector already?
-6. FullBay's **QuickBooks integration settings** screen (the mapping behind the gear icon).
+6. FullBay's **QuickBooks integration settings** screen (the gear icon on the integration card): item and account mapping, class hierarchy, tax locations.
 
 **Questions for the bookkeeper:**
 
@@ -362,8 +396,9 @@ mapping screen.
 
 ## Sources
 
-Search summaries of these pages; the Intuit and FullBay pages themselves could not be opened from
-this session.
+FullBay's two explainer PDFs and its QuickBooks page were read in full. The Intuit pages could not
+be rendered from this session (their content loads from `intuitcdn.net`, which is not allowed), so
+those points come from search summaries.
 
 - FullBay — [QuickBooks integration](https://www.fullbay.com/products/integrations/quickbooks/),
   [integration explainer PDF](https://www2.fullbay.com/rs/823-QJJ-687/images/Fullbay_Quickbooks_Integration_Explainer.pdf),
