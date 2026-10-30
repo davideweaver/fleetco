@@ -173,9 +173,11 @@ source of truth. QBO is the ledger. Same contract the business already runs with
   old rolling 100-day window. The connection still drops if someone disconnects the app in QBO or
   the authorizing user loses admin rights, so the app needs a **Reconnect** button and a visible
   disconnected state.
-- **Cost.** Under Intuit's App Partner Program (2025), writes are uncapped and free; reads are
-  metered, with 500,000 a month free on the free Builder tier. Graphics volume is a few hundred
-  invoices a year. **Effectively free.** Builder blocks rather than bills beyond the cap.
+- **Cost. Free.** Intuit's App Partner Program pricing page (US rates, checked 2026-10-30): the
+  Builder tier has no monthly fee, uncapped **Core** API calls, and **500,000 CorePlus** calls per
+  calendar month, a hard cap rather than a bill. Paid tiers ($300, $1,700, $4,500 a month) only
+  matter for apps with many customers. Third-party guides say writes are Core and reads are
+  CorePlus. Either way, graphics is a few hundred invoices a year, thousands of calls at most.
 - **Sandbox caveat:** QBO sandbox companies do **not** run Automated Sales Tax. Tax behaviour can
   only be verified against the real company. Plan a supervised first-invoice test.
 
