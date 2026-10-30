@@ -72,9 +72,9 @@ textarea:focus, input:focus-visible, button:focus-visible { outline: 2px dashed 
 <script>
 const GROUPS = [
   { title: "Decisions for you before sending", items: [
-    { id: "d-divisions", t: "Division settings are in the guide but not in the V1 Alignment doc", v: ["Card 8.1 and the overview's last part show each division using its own words. You asked for this. Add it to Alignment section 2, or tell me to cut it"] },
-    { id: "d-reports", t: "Nine reports, not ten", v: ["The guide now says nine (the tenth punch-list row was the export requirement). Alignment section 2 still says ten"] },
-    { id: "d-name", t: "Business name on customer documents", v: ["Estimates, invoices and the payment page say \"OTC Fleet Graphix\". Confirm that's the name customers should see"] },
+    { id: "d-divisions", t: "Division settings", v: ["Decided: kept as a V1 feature. Added to Alignment section 2 under \"Built to grow\""] },
+    { id: "d-reports", t: "Nine reports", v: ["Decided: Alignment section 2 now says nine, matching the guide"] },
+    { id: "d-name", t: "Business name on customer documents", v: ["Still open: screens say \"OTC Fleet Graphix\". Card 4.2 now asks Dan to confirm the name customers see"] },
     { id: "d-tech", t: "What technicians can see", v: ["Agreed: no costs, markup or profit. The roles table (6.3) is marked Proposed for the rest, like estimates and invoices"] },
   ] },
   { title: "Before you send it", items: [
@@ -111,7 +111,7 @@ const GROUPS = [
   ] },
   { title: "4 · Invoicing and payments", items: [
     { id: "4.1", t: "Review and close the finished job", kind: "Video", v: ["Job moves to Completed only when the owner closes it", "'Send back' is pointed at but not clicked"] },
-    { id: "4.2", t: "What the invoice looks like", kind: "Picture", v: ["Other unpaid invoices with a total", "Tax reads 'per settings'"], ask: "Need sales tax rates from accounting" },
+    { id: "4.2", t: "What the invoice looks like", kind: "Picture", v: ["Other unpaid invoices with a total", "Tax reads 'per settings'"], ask: "Sales tax rates from accounting, and the business name customers see" },
     { id: "4.3", t: "Get paid by card", kind: "Video", v: ["No email from the system: download the PDF, email it yourself, mark as sent", "Generic card payment page, no processor named"], ask: "Card processor and fees to confirm" },
     { id: "4.4", t: "Recording checks and bank payments", kind: "Picture", v: ["One check from Keystone Dairy pays two invoices"] },
     { id: "4.5", t: "Connecting to QuickBooks", kind: "Picture", v: ["Only sends to QuickBooks. Nothing comes back"], ask: "Two-way sync, or send invoices only?" },
