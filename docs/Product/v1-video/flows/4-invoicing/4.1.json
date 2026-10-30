@@ -1,7 +1,7 @@
 [
-  {"id": "4.1-title", "text": "This clip shows the owner checking a finished job and closing it."},
-  {"id": "4.1-board", "text": "The technician has finished the Ridgeline wrap and sent it to the owner to check. It waits on the job board, marked needs review."},
-  {"id": "4.1-check", "text": "The owner opens the job details and looks at the completion photos. Next to them, the estimated hours and materials sit beside what was actually used."},
+  {"id": "4.1-title", "text": "This clip shows the owner reviewing a finished job and closing it."},
+  {"id": "4.1-board", "text": "The technician has finished the Ridgeline wrap and sent it for review. On the job board it stays in installation in progress, tagged needs review."},
+  {"id": "4.1-check", "text": "The owner opens the job details and looks at the completion photos. Next to them, the estimated hours and materials sit beside the actual hours from the job timers and the materials entered on the job."},
   {"id": "4.1-sendback", "text": "If something needs fixing, the owner can send it back to the technician with a note. This one looks good."},
-  {"id": "4.1-close", "text": "So the owner closes the job. A draft invoice is created automatically, with the deposit already taken off, ready to check before it goes out."}
+  {"id": "4.1-close", "text": "So the owner reviews and closes the job. It moves to completed, and a draft invoice is created with the deposit already taken off, ready to check before it goes out."}
 ]

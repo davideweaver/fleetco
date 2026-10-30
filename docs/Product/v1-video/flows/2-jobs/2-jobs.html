@@ -62,28 +62,29 @@ const DATES = {
 };
 const prodRange = (no) => { const p = DATES[no].p; return p.length > 1 ? `${p[0]} – ${p[p.length - 1].replace(/^\w+ /, "")}` : p[0]; };
 const priPill = (p) => (p === "High" ? `<span class="pill solid">High</span>` : `<span class="pill">${p}</span>`);
+const views = (on) => `<div class="seg">${["Board", "List", "Schedule"].map((v) => `<button class="${v === on ? "on" : ""}">${v}</button>`).join("")}</div>`;
 const hn = (style, html, badge) => `<div class="hn" style="${style}">${badge ? `<span class="badge">${badge}</span>` : ""}<span>${html}</span></div>`;
 
 /* ---------- 2.1 new job right after creation ---------- */
 function newJob() {
   const lines = WRAP.map((w) => `<tr><td>${w[0]}</td><td class="num">${w[1]} ${w[2]}</td><td class="num">${money(w[1] * w[4])}</td></tr>`).join("");
   const body = `<div class="head"><div><div class="crumb">${T.works} › G-1048 · from estimate E-2207</div><h2>Ridgeline Plumbing &amp; Heating · Unit 14 full wrap</h2>
-      <div class="meta">Created Oct 26, 2:40 PM by Owner · Stage: ${T.stages[0]}</div></div>
+      <div class="meta">Created Oct 26, 2:40 PM · Stage: ${T.stages[0]}</div><div class="small muted" style="margin-top:2px">Created by Owner from estimate E-2207</div></div>
     <div class="btns"><button class="btn">Edit</button><button class="btn">Set dates</button><button class="btn primary">Open on ${T.board.toLowerCase()}</button></div></div>
-    <div class="banner"><span class="pill solid">New</span><span>${T.work} created from the approved estimate. Lines, customer, vehicle and deposit came across on their own.</span></div>
+    <div class="banner"><span class="pill solid">New</span><span>The owner clicked Create job on the approved estimate. The approved lines, customer, vehicle and deposit came across.</span></div>
     <div class="cols" style="margin-top:0;grid-template-columns:1fr 340px">
       <div class="stack">
         <div class="tbl" data-k="lines"><table><thead><tr><th>Approved work carried over</th><th class="num">Qty</th><th class="num">Price</th></tr></thead><tbody>
           <tr class="group"><td>Unit 14 · 2024 Ford Transit 250 · full wrap</td><td></td><td class="num">${money(PRICE)}</td></tr>
           ${lines.replace(/<tr>/g, '<tr class="sub">')}
-          <tr class="declined"><td><span class="strike">Unit 17 · 2024 Ford Transit 250 · full wrap</span> <span class="pill dash">Declined</span><div class="small">Declined on the estimate, so it was not carried over</div></td><td></td><td class="num"><span class="strike">${money(PRICE)}</span></td></tr>
+          <tr class="declined"><td><span class="strike">Unit 17 · 2023 Ford Transit 350 HD · full wrap</span> <span class="pill dash">Declined</span><div class="small">Declined on the estimate, so it was not carried over</div></td><td></td><td class="num"><span class="strike">${money(2109)}</span></td></tr>
         </tbody></table></div>
         <div class="box"><h3>Instructions</h3><div class="muted small">Copied from the estimate notes:</div><div style="margin-top:4px">Wrap both sides and the rear. Keep the logo clear of the fuel door.</div></div>
       </div>
       <div class="stack">
         <div class="box" data-k="cust"><h3>Customer</h3><div class="kv"><dt>Company</dt><dd>Ridgeline Plumbing &amp; Heating</dd><dt>Contact</dt><dd>Mike Dorsey</dd><dt>Customer PO</dt><dd>7781</dd></div></div>
         <div class="box"><h3>${T.asset}</h3><div class="kv"><dt>Vehicle</dt><dd>Unit 14</dd><dt>Make, model</dt><dd>2024 Ford Transit 250</dd></div></div>
-        <div class="box" data-k="dep"><h3>Money</h3><div class="kv"><dt>Approved total</dt><dd>${money(PRICE)}</dd><dt>Sales tax</dt><dd>per settings</dd><dt>Deposit</dt><dd><span class="pill solid">Paid by card</span></dd><dt>Paid Oct 26</dt><dd>${money(DEPOSIT)}</dd></div></div>
+        <div class="box" data-k="dep"><h3>Money</h3><div class="kv"><dt>Approved total</dt><dd>${money(PRICE)}</dd><dt>Sales tax</dt><dd>per settings</dd></div><div style="margin-top:10px;display:flex;flex-direction:column;align-items:flex-end;gap:4px"><span class="pill solid">Deposit recorded · ${money(DEPOSIT)}</span><span class="small muted">Check · Oct 26</span></div></div>
         <div class="box"><h3>Still to do</h3><div class="kv"><dt>Technician</dt><dd>Technician 1</dd><dt>Production date</dt><dd class="muted">Not set</dd><dt>Install date</dt><dd class="muted">Not set</dd><dt>Hours, estimated</dt><dd>13.0</dd></div></div>
       </div></div>`;
   return shell(T.works, body, "jobs/G-1048");
@@ -105,7 +106,7 @@ function board() {
         <div class="input small muted">Add a note…</div></div></div>
       <div class="grow"></div><button class="btn primary" data-k="qv-open" style="align-self:stretch;padding:9px">Open job details</button></div>` : "";
   const body = `<div class="head"><div><h2>${T.board}</h2><div class="meta">Every active ${T.work.toLowerCase()} in the division · drag a card to change its stage</div></div>
-    <div class="btns"><button class="btn">All technicians ▾</button><button class="btn primary">+ ${T.work}</button></div></div>
+    <div class="btns">${views("Board")}<button class="btn">All technicians ▾</button><button class="btn primary">+ ${T.work}</button></div></div>
     <div class="board">${cols}</div>${drawer}`;
   return shell(T.board, body, "board");
 }
@@ -143,7 +144,7 @@ function jobList() {
   const active = order.filter((j) => j.stage < 5);
   const rows = active.map((j) => `<tr><td class="num" style="text-align:left">${j.no}</td><td><strong>${j.cust}</strong></td><td>${j.what}</td><td>${T.stages[j.stage]}</td><td><span class="av sm">${j.who}</span> ${TECH[j.who]}</td><td>${priPill(j.pri)}</td><td>${prodRange(j.no)}</td><td>${DATES[j.no].i}</td></tr>`).join("");
   const body = `<div class="head"><div><h2>${T.works}</h2><div class="meta">The same ${T.works.toLowerCase()} as the ${T.board.toLowerCase()}, as a list you can search and sort</div></div>
-    <div class="btns"><button class="btn">Export CSV</button><button class="btn primary">+ ${T.work}</button></div></div>
+    <div class="btns">${views("List")}<button class="btn">Export to spreadsheet</button><button class="btn primary">+ ${T.work}</button></div></div>
     <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
       <div class="seg"><button class="on">Active · 6</button><button>Completed · 38</button><button>All · 44</button></div>
       <div class="input" style="flex:1;max-width:420px;color:var(--ink-3)">Search by ${T.work.toLowerCase()} #, customer, vehicle…</div></div>
@@ -174,7 +175,7 @@ function schedule() {
   });
   const body = `<div class="head"><div><h2>Schedule</h2><div class="meta">Oct 26 – Nov 7 · production and install dates for every ${T.work.toLowerCase()}</div></div>
     <div class="btns"><div class="legend"><span><span class="sw" style="border:1.5px solid var(--ink);background:var(--fill-2)"></span>Production date</span><span><span class="sw" style="border:1.5px dashed var(--ink)"></span>Install date</span></div>
-      <button class="btn">All technicians ▾</button><div class="seg"><button>Week</button><button class="on">2 weeks</button><button>Month</button></div><button class="btn">‹ ›</button></div></div>
+      ${views("Schedule")}<button class="btn">All technicians ▾</button><div class="seg"><button>Week</button><button class="on">2 weeks</button><button>Month</button></div><button class="btn">‹ ›</button></div></div>
     <div class="cal" style="grid-template-rows:auto 1fr 1fr">${grid}</div>`;
   return shell("Schedule", body, "schedule");
 }
@@ -192,6 +193,10 @@ function jobDetails() {
           <div class="file"><div class="ph"></div>Artwork v3.pdf</div><div class="file"><div class="ph"></div>Measurements.jpg</div><div class="file"><div class="ph"></div>Panel layout.pdf</div><div class="file"><div class="ph" style="border-style:dashed;background:none"></div><span class="muted">+ Upload</span></div></div></div>
         <div class="box"><h3>Photos</h3><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">${[0, 1].map(() => `<div class="ph" style="aspect-ratio:4/3"></div>`).join("")}<div class="add" style="aspect-ratio:4/3;border:1.5px dashed var(--ink-2);border-radius:2px;display:grid;place-items:center;color:var(--ink-2)">+</div></div>
           <div class="small muted" style="margin-top:8px">2 “before” photos, Oct 26. Completion photos from the technician land here.</div></div>
+        <div class="box" data-k="checklist"><h3>Checklist</h3><div class="stack" style="gap:6px">
+          <div><span class="chk"></span>Before install: vehicle condition checked</div>
+          <div><span class="chk"></span>Final quality check</div></div>
+          <div class="small muted" style="margin-top:6px">The technician ticks these off on their job details.</div></div>
         <div class="box"><h3>Job notes</h3><div class="stack" style="gap:8px">
           <div class="nt"><b>Oct 30 · Technician 1</b>Printing done, laminating overnight.</div>
           <div class="nt"><b>Oct 28 · Owner</b>Artwork v3 is final. Start printing.</div>
@@ -205,7 +210,7 @@ function jobDetails() {
           <tr><td style="padding:5px 6px">Print and laminate</td><td class="num">—</td><td class="num">1.7</td></tr>
           <tr><td style="padding:5px 6px">Installation</td><td class="num">9.0</td><td class="num">0.0</td></tr>
           <tr><td style="padding:5px 6px"><strong>Total</strong></td><td class="num"><strong>13.0</strong></td><td class="num"><strong>5.2</strong></td></tr></tbody></table></div>
-        <div class="box"><h3>Money · owner only</h3><div class="kv"><dt>Approved total</dt><dd>${money(PRICE)}</dd><dt>Deposit paid</dt><dd>${money(DEPOSIT)}</dd></div></div>
+        <div class="box"><h3>Money · owner only</h3><div class="kv"><dt>Approved total</dt><dd>${money(PRICE)}</dd><dt>Deposit recorded</dt><dd>${money(DEPOSIT)}</dd><div class="rule"></div><dt>Materials, estimated</dt><dd>${money(379.3)}</dd><dt>Materials, actual</dt><dd>${money(389.6)}</dd></div><div class="small muted" style="margin-top:6px">Actual materials as entered on the job. Hours from the job timers.</div></div>
       </div></div>`;
   return shell(T.works, body, "jobs/G-1048");
 }
@@ -264,7 +269,12 @@ const PICTURES = {
   },
   async "2.3"() { S.extra = hn("left:236px;top:545px;max-width:520px", "Same jobs as the job board. Move a card there and its stage changes here too.", 1); go("jobList", "owner"); },
   async "2.4"() { S.extra = ""; go("schedule", "owner"); },
-  async "2.5"() { S.extra = hn("left:850px;top:300px;max-width:150px;font-size:24px", "? proofs"); go("jobDetails", "owner"); },
+  async "2.5"() {
+    S.extra = ""; go("jobDetails", "owner");
+    const r = document.querySelector('[data-k="checklist"]').getBoundingClientRect();
+    S.extra = hn("left:850px;top:300px;max-width:150px;font-size:24px", "? proofs") + hn(`left:${r.right - 250}px;top:${r.top + 8}px;max-width:240px`, "? which checklist items");
+    render();
+  },
 };
 boot();
 </script>

@@ -67,7 +67,7 @@ function timesheets() {
     <div class="btns"><button class="btn">Export for payroll</button><button class="btn primary" data-k="approve" ${S.approved ? "disabled" : ""}>${S.approved ? "Pay period approved" : "Approve pay period"}</button></div></div>
     <div class="tbl"><table><thead><tr><th>Day</th><th class="num">Clock in</th><th class="num">Clock out</th><th class="num">Clocked</th><th class="num">On ${T.works.toLowerCase()}</th><th class="num">Shop time</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>
     ${S.edit ? editModal() : ""}`;
-  return shell("Time & payroll", body, "time/week-of-oct-27");
+  return shell("Time & payroll", body, "time/pay-period-oct-26");
 }
 function editModal() {
   return `<div class="scrim"><div class="modal ${S.typing ? "" : "pop"}">
@@ -94,7 +94,7 @@ function exportScreen() {
   const body = `<div class="head"><div><div class="crumb">Time &amp; payroll › Export for payroll</div><h2>Approved hours for payroll</h2><div class="meta">Hours only. Pay rates and paychecks stay with your payroll service.</div></div>
     <div class="btns"><button class="btn">Print</button><button class="btn primary">Download spreadsheet</button></div></div>
     <div style="display:flex;gap:14px;align-items:center;margin-bottom:16px">
-      <span class="muted small">Dates</span><div class="input" style="width:150px">Oct 26</div><span class="muted">to</span><div class="input" style="width:150px">Oct 30</div>
+      <span class="muted small">Pay period</span><div class="input" style="width:150px">Oct 26</div><span class="muted">to</span><div class="input" style="width:150px">Oct 30</div>
       <span class="pill solid">Approved hours only</span><span class="small muted">All timesheets in this range are approved.</span></div>
     <div class="cols" style="grid-template-columns:1fr 400px;margin-top:0">
       <div class="gap" style="display:flex;flex-direction:column;gap:16px">

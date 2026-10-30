@@ -1,7 +1,7 @@
 [
   {"id": "5.3-title", "text": "This clip shows how the owner orders materials from a vendor."},
   {"id": "5.3-create", "text": "The owner starts a new purchase order and picks the vendor, Keystone Sign Supply. Then they add the materials: wrap film and overlaminate, three hundred feet of each, at the vendor's price."},
-  {"id": "5.3-pdf", "text": "The order downloads as a PDF. The owner attaches it to their own email and sends it to the vendor."},
-  {"id": "5.3-recv", "text": "A few days later the rolls arrive. The owner opens the order and marks the whole order received in one step."},
-  {"id": "5.3-cost", "text": "Back on the materials list, what you pay for the film and laminate now matches the prices on that order. No shelf counts to keep up."}
+  {"id": "5.3-pdf", "text": "The owner downloads the order as a PDF. They send it to the vendor from their own email."},
+  {"id": "5.3-recv", "text": "A few days later the rolls arrive. The owner opens the order and marks the whole order received at once."},
+  {"id": "5.3-cost", "text": "Back on the materials list, what you pay updates to this order's prices. No shelf counts to keep up."}
 ]

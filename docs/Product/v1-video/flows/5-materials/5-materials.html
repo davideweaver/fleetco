@@ -72,7 +72,7 @@ function materials() {
 
 /* ---------- 5.2 saved packages ---------- */
 function packages() {
-  const list = [["Full wrap", "6 lines", true], ["Partial wrap", "6 lines"], ["Door logos (pair)", "4 lines"], ["DOT lettering", "3 lines"]];
+  const list = [["Full wrap", "6 lines", true], ["Partial wrap", "5 lines"], ["Door logos (pair)", "4 lines"], ["DOT lettering", "3 lines"]];
   const rows = WRAP.map((w) => `<tr><td>${w[0]}</td><td class="num">${w[1]}</td><td>${w[2]}</td><td class="num">${money(w[3])}</td><td class="num">${money(w[4])}</td><td class="num">${money(w[1] * w[4])}</td></tr>`).join("");
   const body = `<div class="head"><div><h2>Materials &amp; ordering</h2><div class="meta">Save a common job once. Add it to any estimate in one step, then adjust it for that customer.</div></div>
     <div class="btns"><button class="btn primary">+ New saved package</button></div></div>
@@ -128,7 +128,7 @@ function poForm() {
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
       <div class="box"><h3>Vendor</h3><div class="field"><label>Vendor</label><div class="input" data-k="vendor">${p.vendor ? VENDOR : `<span class="muted">Choose a vendor…</span>`}</div></div>
         <div class="small muted" style="margin-top:8px;min-height:18px">${p.vendor ? "1180 Industrial Rd, York, PA · orders@keystonesign.example" : ""}</div></div>
-      <div class="box"><h3>Ship to</h3><div class="small">OTC Fleet Services · Graphics<br>Shop address from settings<br>Needed by: Nov 4</div></div>
+      <div class="box"><h3>Ship to</h3><div class="small">OTC Fleet Graphix<br>Shop address from settings<br>Needed by: Nov 4</div></div>
     </div>
     <div class="tbl"><table><thead><tr><th>Material</th><th class="num">Qty</th><th>Unit</th><th class="num">Price each</th><th class="num">Line total</th></tr></thead>
       <tbody>${lines}<tr><td colspan="5"><button class="btn dash" data-k="add-mat" ${p.vendor ? "" : "disabled"}>+ Add material</button></td></tr></tbody></table></div>
@@ -148,7 +148,7 @@ function pdfPreview() {
     <div class="pdfbar"><span>PO-0031.pdf · preview</span><span class="btns"><button class="btn">Close</button><button class="btn primary" data-k="save-pdf">Download</button></span></div>
     <div class="doc">
       <div style="display:flex;justify-content:space-between;align-items:flex-start"><div class="logo">LOGO</div><div style="text-align:right"><h5>Purchase order</h5><div class="num" style="text-align:right">PO-0031 · Oct 29</div></div></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div><div class="muted">Vendor</div><strong>${VENDOR}</strong><br>1180 Industrial Rd<br>York, PA</div><div><div class="muted">Ship to</div><strong>OTC Fleet Services · Graphics</strong><br>Needed by Nov 4</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div><div class="muted">Vendor</div><strong>${VENDOR}</strong><br>1180 Industrial Rd<br>York, PA</div><div><div class="muted">Ship to</div><strong>OTC Fleet Graphix</strong><br>Needed by Nov 4</div></div>
       <div class="tbl"><table><thead><tr><th>Item</th><th class="num">Qty</th><th class="num">Price</th><th class="num">Total</th></tr></thead><tbody>${lines}</tbody></table></div>
       <div class="kv" style="width:220px;margin-left:auto"><dt>Order total</dt><dd><strong>${money(1605)}</strong></dd></div>
       <div class="muted" style="border-top:1px solid var(--fill-2);padding-top:10px">Please confirm by email. Questions: call the shop.</div>
@@ -178,7 +178,7 @@ const SCENES = {
   },
   async "5.3-pdf"() {
     await click("pdf", () => { S.po.pdf = true; }, 1800);
-    await click("save-pdf", () => { S.po.pdf = false; toast("PO-0031.pdf downloaded. Attach it to your own email."); }, 600);
+    await click("save-pdf", () => { S.po.pdf = false; toast("PDF downloaded · send it from your own email"); }, 600);
   },
   async "5.3-recv"() {
     go("poListLater", "owner"); toast("A few days later: the rolls arrive", 1800); await wait(1600);

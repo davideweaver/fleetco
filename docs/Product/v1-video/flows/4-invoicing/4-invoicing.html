@@ -11,16 +11,12 @@
 .note .badge { flex: none; width: 26px; height: 26px; border: 1.5px solid var(--pencil); border-radius: 50%; display: grid; place-items: center; font-size: 15px; font-weight: 700; }
 .notes { position: absolute; display: flex; flex-direction: column; gap: 22px; width: 300px; }
 .hint { position: absolute; z-index: 5; background: var(--paper); border: 1.5px solid var(--ink); border-radius: 3px; box-shadow: 4px 4px 0 var(--fill-2); padding: 9px 12px; font-size: 13px; width: 270px; }
-/* plain browser frame for the customer's side (no app menu) */
-.mail { display: grid; grid-template-columns: 260px 1fr; flex: 1; min-height: 0; }
-.mail-list { border-right: 1.5px solid var(--ink); padding: 10px; display: flex; flex-direction: column; gap: 6px; }
-.mail-item { border: 1.5px solid var(--ink-3); border-radius: 3px; padding: 8px 10px; font-size: 13px; display: flex; flex-direction: column; gap: 2px; }
-.mail-item.on { border-color: var(--ink); background: var(--fill); }
 .doc { background: var(--paper); border: 1.5px solid var(--ink); border-radius: 3px; box-shadow: 6px 6px 0 var(--fill-2); }
 .check { display: inline-grid; place-items: center; width: 16px; height: 16px; border: 1.5px solid var(--ink); border-radius: 2px; font-size: 11px; line-height: 1; vertical-align: middle; }
 .check.on { background: var(--ink); color: var(--paper); }
 .flowline { display: flex; align-items: center; gap: 12px; font-size: 14px; padding: 8px 0; border-bottom: 1px solid var(--fill-2); }
 .flowline:last-child { border-bottom: 0; }
+.pdfbar { display: flex; justify-content: space-between; align-items: center; width: 820px; font: 12px var(--mono); }
 .flowline .arrow { font: 600 18px var(--mono); }
 </style>
 </head>
@@ -31,19 +27,18 @@
 const SECTION = "Version 1 · Invoicing and payments";
 const DEP = PRICE / 2;          // 1,009.50
 const BAL = PRICE - DEP;        // 1,009.50
-const BILL_EMAIL = "billing@ridgeline-ph.example";
 
 const S = {
   screen: "title", who: null, title: "",
   hl: false, closed: false, hint: false,
-  inv: "draft", sendModal: false,
+  inv: "draft", pdf: false,
   pay: { stage: "form", filled: 0 },
   notes: "",
 };
 const go = (screen, who) => { S.screen = screen; S.who = who; render(); };
 
 function whoTag(kind) {
-  if (kind === "cust-mail") { const w = $("#who"); w.hidden = false; w.innerHTML = `<span class="av">CU</span><span><b>Customer</b> · in their email</span>`; return; }
+  if (kind === "cust-pdf") { const w = $("#who"); w.hidden = false; w.innerHTML = `<span class="av">CU</span><span><b>Customer</b> · opening the PDF</span>`; return; }
   if (kind === "cust-pay") { const w = $("#who"); w.hidden = false; w.innerHTML = `<span class="av">CU</span><span><b>Customer</b> · paying online</span>`; return; }
   if (kind === "cust-doc") { const w = $("#who"); w.hidden = false; w.innerHTML = `<span class="av">CU</span><span><b>Customer</b> · the invoice they get</span>`; return; }
   setWho(kind);
@@ -56,27 +51,27 @@ function browser(url, body) {
 
 /* ---------- owner: job board ---------- */
 function board() {
-  const jobs = JOBS.map((j) => (j.no === "G-1048" ? { ...j, stage: 5, note: S.closed ? "" : "Needs review" } : j)).filter((j) => !(S.closed && j.no === "G-1048"));
+  const jobs = JOBS.map((j) => (j.no === "G-1048" ? { ...j, stage: S.closed ? 5 : 4, note: S.closed ? "" : "Needs review" } : j));
   const cols = T.stages.map((s, i) => {
     const cs = jobs.filter((j) => j.stage === i);
     return `<div class="col"><div class="col-head"><span>${s}</span><span>${cs.length}</span></div><div class="cards">${cs.map((j) => boardCard(j, j.no === "G-1048" && S.hl ? "hl" : "")).join("")}</div></div>`;
   }).join("");
   return shell(T.board, `<div class="head"><div><h2>${T.board}</h2><div class="meta">Every active ${T.work.toLowerCase()} in the division</div></div>
-    <div class="btns"><div class="seg"><button class="on">Board</button><button>Table</button><button>Calendar</button></div><button class="btn primary">+ ${T.work}</button></div></div><div class="board">${cols}</div>`, "board");
+    <div class="btns"><div class="seg"><button class="on">Board</button><button>List</button><button>Schedule</button></div><button class="btn primary">+ ${T.work}</button></div></div><div class="board">${cols}</div>`, "board");
 }
 
 /* ---------- owner: job details, waiting for review ---------- */
 function job() {
-  const status = S.closed ? `<span class="pill solid">Closed</span>` : `<span class="pill dash">Needs review</span>`;
+  const status = S.closed ? `<span class="pill solid">${T.stages[5]}</span>` : `<span class="pill dash">Needs review</span>`;
   const btns = S.closed
     ? `${status}<button class="btn primary" data-k="open-draft">Open draft invoice</button>`
-    : `${status}<button class="btn" data-k="send-back">Send back</button><button class="btn primary" data-k="close-job">Close ${T.work.toLowerCase()}</button>`;
-  const hint = S.hint ? `<div class="hint pop" style="right:24px;top:70px"><strong>Send back</strong><div class="small muted" style="margin-top:4px">Returns it to Technician 1 with a note saying what to fix. It moves back to "${T.stages[4]}".</div></div>` : "";
-  const body = `<div class="head"><div><div class="crumb">${T.works} › G-1048</div><h2>Ridgeline Plumbing · Unit 14 full wrap</h2><div class="meta">${T.asset}: 2024 Ford Transit 250 · Assigned: Technician 1 · Stage: ${T.stages[5]}</div></div>
+    : `${status}<button class="btn" data-k="send-back">Send back</button><button class="btn primary" data-k="close-job">Review and close</button>`;
+  const hint = S.hint ? `<div class="hint pop" style="right:24px;top:70px"><strong>Send back</strong><div class="small muted" style="margin-top:4px">Returns it to Technician 1 with a note saying what to fix. It stays in "${T.stages[4]}" until they send it for review again.</div></div>` : "";
+  const body = `<div class="head"><div><div class="crumb">${T.works} › G-1048</div><h2>Ridgeline Plumbing · Unit 14 full wrap</h2><div class="meta">${T.asset}: 2024 Ford Transit 250 · Assigned: Technician 1 · Stage: ${T.stages[S.closed ? 5 : 4]}</div></div>
     <div class="btns">${btns}</div></div>${hint}
     <div class="cols" style="margin-top:0;grid-template-columns:1fr 340px">
       <div class="box"><h3>Completion photos · from the technician</h3><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px" data-k="photos">${["Driver side", "Passenger side", "Rear doors"].map((c) => `<div><div class="ph" style="aspect-ratio:4/3"></div><div class="small muted" style="margin-top:4px">${c}</div></div>`).join("")}</div>
-        <div class="small muted" style="margin-top:10px">Uploaded Nov 2, 3:52 PM · Marked finished by Technician 1</div></div>
+        <div class="small muted" style="margin-top:10px">Uploaded Nov 2, 3:52 PM · Sent for review by Technician 1</div></div>
       <div style="display:flex;flex-direction:column;gap:16px">
         <div class="box" data-k="costing"><h3>Estimated vs. actual</h3>
           <div class="tbl"><table><thead><tr><th></th><th class="num">Estimated</th><th class="num">Actual</th></tr></thead><tbody>
@@ -84,7 +79,7 @@ function job() {
             <tr><td>Install hours</td><td class="num">9.0</td><td class="num">9.1</td></tr>
             <tr><td>Materials</td><td class="num">${money(379.3)}</td><td class="num">${money(391.4)}</td></tr>
           </tbody></table></div>
-          <div class="small muted" style="margin-top:8px">Hours from the job timers. Materials from the materials list.</div></div>
+          <div class="small muted" style="margin-top:8px">Hours from the job timers. Materials as entered on the job.</div></div>
         <div class="box"><h3>Notes</h3><div class="small">Oct 30 · Printing done, laminating overnight.</div><div class="small" style="margin-top:6px">Nov 2 · Install done. Fuel door clear.</div></div>
       </div></div>`;
   return shell(T.works, body, "jobs/G-1048");
@@ -94,27 +89,24 @@ function job() {
 function invoice() {
   const st = S.inv;
   const pill = { draft: `<span class="pill dash">Draft</span>`, sent: `<span class="pill">Sent</span>`, paid: `<span class="pill solid">Paid</span>` }[st];
-  const modal = S.sendModal ? `<div class="scrim"><div class="modal pop"><h4>Send invoice OTC-G-0412</h4>
-      <div class="field"><label>To</label><div class="input">${BILL_EMAIL}</div></div>
-      <div class="field"><label>Subject</label><div class="input">Invoice OTC-G-0412 from OTC Fleet Services</div></div>
-      <div class="choice"><span>Include a link to pay by card</span><span class="check on">✓</span></div>
-      <div class="choice"><span>Attach PDF</span><span class="check on">✓</span></div>
-      <div class="btns"><button class="btn">Cancel</button><button class="btn primary" data-k="send-now">Send</button></div></div></div>` : "";
-  const payBox = st === "draft" ? "Not sent yet" : st === "sent" ? `Emailed with a card payment link to ${BILL_EMAIL}` : `<span class="pill solid">Paid by card</span><div style="margin-top:6px">Nov 5 · ${money(BAL)}</div>`;
+  const modal = S.pdf ? `<div class="scrim" style="align-items:start;padding-top:14px"><div style="display:flex;flex-direction:column;gap:8px">
+      <div class="pdfbar"><span>OTC-G-0412.pdf · preview</span><span class="btns"><button class="btn">Close</button><button class="btn primary" data-k="save-pdf">Download</button></span></div>
+      ${invDoc()}</div></div>` : "";
+  const payBox = st === "draft" ? "Not sent yet" : st === "sent" ? `<span class="pill">Marked as sent</span><div style="margin-top:6px">Nov 3 · the PDF has a pay-by-card link</div>` : `<span class="pill solid">Paid by card</span><div style="margin-top:6px">Nov 5 · ${money(BAL)}</div>`;
   const body = `<div class="head"><div><div class="crumb">Invoices › OTC-G-0412</div><h2>Invoice OTC-G-0412 ${pill}</h2><div class="meta">Created when G-1048 was closed · Ridgeline Plumbing &amp; Heating</div></div>
-    <div class="btns"><button class="btn">Edit</button><button class="btn">PDF</button>${st === "draft" ? `<button class="btn primary" data-k="send-inv">Send with payment link</button>` : ""}</div></div>
+    <div class="btns"><button class="btn">Edit</button><button class="btn" data-k="pdf">Download PDF</button>${st === "draft" ? `<button class="btn primary" data-k="mark-sent">Mark as sent</button>` : ""}</div></div>
     <div class="cols" style="margin-top:0">
       <div class="box" style="padding:18px">
         <div style="display:flex;justify-content:space-between"><div class="logo">LOGO</div><div class="small" style="text-align:right">Bill to<br><strong>Ridgeline Plumbing &amp; Heating</strong><br>Customer PO: 7781</div></div>
         <div class="tbl" style="margin-top:16px"><table><thead><tr><th>Description</th><th class="num">Amount</th></tr></thead>
           <tbody><tr><td>Unit 14 · 2024 Ford Transit 250 · full wrap<div class="small muted">Design, print, laminate and install</div></td><td class="num">${money(PRICE)}</td></tr></tbody></table></div>
-        <div class="kv" style="max-width:320px;margin:14px 0 0 auto" data-k="inv-totals"><dt>Subtotal</dt><dd>${money(PRICE)}</dd><dt>Sales tax</dt><dd>per settings</dd><dt>Deposit paid Oct 26</dt><dd>${money(-DEP)}</dd>${st === "paid" ? `<dt>Paid by card Nov 5</dt><dd>${money(-BAL)}</dd>` : ""}<div class="rule"></div>
+        <div class="kv" style="max-width:320px;margin:14px 0 0 auto" data-k="inv-totals"><dt>Subtotal</dt><dd>${money(PRICE)}</dd><dt>Sales tax</dt><dd>per settings</dd><dt>Deposit received Oct 26</dt><dd>${money(-DEP)}</dd>${st === "paid" ? `<dt>Paid by card Nov 5</dt><dd>${money(-BAL)}</dd>` : ""}<div class="rule"></div>
           <dt><strong>Balance due</strong></dt><dd data-k="balance"><strong>${money(st === "paid" ? 0 : BAL)}</strong></dd></div>
-        <div class="box" style="margin-top:16px;border-style:dashed"><h3>Your other open invoices</h3><div class="kv"><dt>OTC-G-0398 · Unit 9 decal refresh · due Nov 26</dt><dd>$420.00</dd></div></div>
+        <div class="box" style="margin-top:16px;border-style:dashed"><h3>Other unpaid invoices</h3><div class="kv"><dt>OTC-G-0398 · Unit 9 decal refresh · due Nov 26</dt><dd>$420.00</dd><div class="rule"></div><dt><strong>Total of other unpaid invoices</strong></dt><dd><strong>$420.00</strong></dd></div></div>
       </div>
       <div style="display:flex;flex-direction:column;gap:16px">
         <div class="box" data-k="paybox"><h3>Payment</h3><div class="small">${payBox}</div></div>
-        <div class="box"><h3>Job</h3><div class="small">G-1048 · Unit 14 full wrap<br><span class="muted">Closed Nov 2</span></div></div>
+        <div class="box"><h3>Job</h3><div class="small">G-1048 · Unit 14 full wrap<br><span class="muted">Completed Nov 2</span></div></div>
       </div></div>${modal}`;
   return shell("Invoices", body, "invoices/OTC-G-0412");
 }
@@ -142,28 +134,11 @@ function invoiceList(modal = "") {
   return shell("Invoices", body, "invoices");
 }
 
-/* ---------- customer: email + card page ---------- */
-function email() {
-  const body = `<div class="mail">
-    <div class="mail-list"><div class="p-h" style="padding:4px 2px">Inbox</div>
-      <div class="mail-item on"><strong>OTC Fleet Services</strong><span>Invoice OTC-G-0412</span><span class="small muted">Today, 9:41 AM</span></div>
-      <div class="mail-item"><strong>Supply house</strong><span>Your order shipped</span><span class="small muted">Yesterday</span></div>
-      <div class="mail-item"><strong>Fuel card</strong><span>October statement</span><span class="small muted">Nov 1</span></div></div>
-    <div style="padding:26px 40px;display:flex;flex-direction:column;gap:14px;min-width:0">
-      <div><h2 style="margin:0;font-size:21px">Invoice OTC-G-0412 from OTC Fleet Services</h2><div class="meta">To: ${BILL_EMAIL} · Attachment: OTC-G-0412.pdf</div></div>
-      <div class="doc" style="padding:24px 28px;max-width:640px;display:flex;flex-direction:column;gap:14px">
-        <div class="logo">LOGO</div>
-        <div>Thank you for your business. Your invoice for <strong>Unit 14 · full wrap</strong> is attached.</div>
-        <div class="kv" style="max-width:360px"><dt>Total</dt><dd>${money(PRICE)}</dd><dt>Deposit paid</dt><dd>${money(-DEP)}</dd><div class="rule"></div><dt><strong>Balance due</strong></dt><dd><strong>${money(BAL)}</strong></dd><dt>Due</dt><dd>Dec 3</dd></div>
-        <div><button class="btn primary" style="padding:10px 22px;font-size:15px" data-k="pay-link">Pay by card</button></div>
-        <div class="small muted">You also have 1 other open invoice: OTC-G-0398 · $420.00</div>
-      </div></div></div>`;
-  return browser("mail.example.com/inbox", body);
-}
+/* ---------- customer: card payment page ---------- */
 function payPage() {
   const p = S.pay, f = (i, v, ph) => `<div class="input" style="${p.filled > i ? "" : "color:var(--ink-3)"}">${p.filled > i ? v : ph}</div>`;
   const inner = p.stage === "done"
-    ? `<div class="done pop" style="margin:0;padding:30px"><strong style="font-size:20px">Payment received</strong><span>${money(BAL)} paid on invoice OTC-G-0412</span><span class="small muted">A receipt was emailed to ${BILL_EMAIL}</span></div>`
+    ? `<div class="done pop" style="margin:0;padding:30px"><strong style="font-size:20px">Payment received</strong><span>${money(BAL)} paid on invoice OTC-G-0412</span><span class="small muted">Thank you. You can close this page.</span></div>`
     : `<div class="field"><label>Name on card</label>${f(0, "Ridgeline Plumbing &amp; Heating", "Name")}</div>
        <div class="field"><label>Card number</label>${f(1, "•••• •••• •••• 4242", "1234 1234 1234 1234")}</div>
        <div class="field"><label>Expires · CVC</label><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">${f(2, "08 / 28", "MM / YY")}${f(2, "•••", "CVC")}</div></div>
@@ -172,17 +147,16 @@ function payPage() {
   const body = `<div style="flex:1;display:grid;place-items:center">
     <div class="doc" style="width:560px;padding:26px 30px;display:flex;flex-direction:column;gap:14px">
       <div style="display:flex;justify-content:space-between;align-items:center"><div class="logo">LOGO</div><span class="small muted">Secure card payment</span></div>
-      <div><div class="crumb">OTC Fleet Services · Invoice OTC-G-0412</div><div style="font:600 30px var(--mono)">${money(BAL)}</div><div class="small muted">Balance due for Unit 14 · full wrap</div></div>
+      <div><div class="crumb">OTC Fleet Graphix · Invoice OTC-G-0412</div><div style="font:600 30px var(--mono)">${money(BAL)}</div><div class="small muted">Balance due for Unit 14 · full wrap</div></div>
       ${inner}</div></div>`;
   return browser("pay.otcfleet.com/OTC-G-0412", body);
 }
 
 /* ---------- 4.2 customer-facing invoice (the PDF / printable) ---------- */
-function custInvoice() {
-  const body = `<div style="flex:1;display:flex;gap:40px;padding:22px 40px;min-height:0;background:var(--fill)">
-    <div class="doc" style="width:820px;align-self:flex-start;padding:26px 34px;display:flex;flex-direction:column;gap:14px">
+function invDoc() {
+  return `<div class="doc" style="width:820px;align-self:flex-start;padding:26px 34px;display:flex;flex-direction:column;gap:14px">
       <div style="display:flex;justify-content:space-between;align-items:flex-start">
-        <div><div class="logo">LOGO</div><div class="small muted" style="margin-top:8px">OTC Fleet Services · Graphics<br>Lancaster, PA</div></div>
+        <div><div class="logo">LOGO</div><div class="small muted" style="margin-top:8px"><strong>OTC Fleet Graphix</strong><br>Lancaster, PA</div></div>
         <div style="text-align:right"><div style="font:700 26px var(--ui)">Invoice</div><div class="kv" style="margin-top:6px"><dt>Invoice no.</dt><dd>OTC-G-0412</dd><dt>Date</dt><dd>Nov 3</dd><dt>Due</dt><dd>Dec 3</dd></div></div></div>
       <div style="display:flex;justify-content:space-between;gap:20px" class="small">
         <div><span class="muted">Bill to</span><br><strong>Ridgeline Plumbing &amp; Heating</strong><br>Accounts payable</div>
@@ -190,17 +164,22 @@ function custInvoice() {
       <div class="tbl" data-k="lines"><table><thead><tr><th>Description</th><th class="num">Qty</th><th class="num">Amount</th></tr></thead>
         <tbody><tr><td><strong>Unit 14 · 2024 Ford Transit 250 · full wrap</strong><div class="small muted">Design, print, laminate and install. Both sides and rear.</div></td><td class="num">1</td><td class="num">${money(PRICE)}</td></tr></tbody></table></div>
       <div style="display:flex;justify-content:space-between;gap:24px;align-items:flex-start">
-        <div class="box" style="border-style:dashed;flex:1"><h3>Your other open invoices</h3><div class="kv"><dt>OTC-G-0398 · Unit 9 decal refresh · due Nov 26</dt><dd>$420.00</dd></div></div>
-        <div class="kv" style="width:300px" data-k="totals"><dt>Subtotal</dt><dd>${money(PRICE)}</dd><dt>Sales tax</dt><dd>per settings</dd><dt>Deposit paid Oct 26</dt><dd>${money(-DEP)}</dd><div class="rule"></div><dt><strong>Balance due</strong></dt><dd><strong>${money(BAL)}</strong></dd></div></div>
+        <div class="box" style="border-style:dashed;flex:1"><h3>Other unpaid invoices</h3><div class="kv"><dt>OTC-G-0398 · Unit 9 decal refresh · due Nov 26</dt><dd>$420.00</dd><div class="rule"></div><dt><strong>Total of other unpaid invoices</strong></dt><dd><strong>$420.00</strong></dd></div></div>
+        <div class="kv" style="width:300px" data-k="totals"><dt>Subtotal</dt><dd>${money(PRICE)}</dd><dt>Sales tax</dt><dd>per settings</dd><dt>Deposit received Oct 26</dt><dd>${money(-DEP)}</dd><div class="rule"></div><dt><strong>Balance due</strong></dt><dd><strong>${money(BAL)}</strong></dd></div></div>
       <div style="display:flex;justify-content:space-between;align-items:center;border-top:1.5px solid var(--ink-3);padding-top:14px">
-        <span class="small muted">Questions about this invoice? Reply to the email it came with.</span>
-        <button class="btn primary" style="padding:10px 22px;font-size:15px">Pay by card</button></div>
-    </div>
+        <span class="small muted">Questions about this invoice? Call or email the shop.</span>
+        <button class="btn primary" style="padding:10px 22px;font-size:15px" data-k="pay-link">Pay by card</button></div>
+    </div>`;
+}
+function custInvoice(notes = true) {
+  const body = `<div style="flex:1;display:flex;gap:40px;padding:22px 40px;min-height:0;background:var(--fill);${notes ? "" : "justify-content:center"}">
+    ${invDoc()}
+    ${notes ? `
     <div class="notes" style="position:static;padding-top:30px">
       <div class="note"><span class="badge">1</span><span>One line per vehicle. The materials and hours behind it stay inside the app.</span></div>
       <div class="note"><span class="badge">2</span><span>Deposit already taken off. Their PO number is printed at the top.</span></div>
       <div class="note"><span class="badge">3</span><span>Sales tax: rates still to come from accounting, so it reads "per settings" for now.</span></div>
-    </div></div>`;
+    </div>` : ""}</div>`;
   return browser("OTC-G-0412.pdf", body);
 }
 
@@ -245,7 +224,7 @@ function qbSettings() {
         <div class="box" style="position:relative"><h3>What gets sent</h3>
           <div class="flowline"><span>Invoices</span><span class="grow"></span><span class="arrow">→</span><span>QuickBooks</span></div>
           <div class="flowline"><span>Payments</span><span class="grow"></span><span class="arrow">→</span><span>QuickBooks</span></div>
-          <div class="small muted" style="margin-top:8px">Sent when an invoice goes out and when a payment is recorded.</div></div>
+          <div class="small muted" style="margin-top:8px">Sent when an invoice is marked as sent and when a payment is recorded.</div></div>
         <div class="note" style="margin-left:6px"><span class="badge">?</span><span>two-way? Still deciding if anything should come back from QuickBooks.</span></div>
       </div>
       <div><div class="p-h" style="margin-bottom:8px">Recently sent</div>
@@ -259,7 +238,7 @@ function qbSettings() {
 function render() {
   const views = {
     title: () => cardScreen(SECTION, S.title),
-    board, job, invoice, invoices: () => invoiceList(), email, pay: payPage,
+    board, job, invoice, invoices: () => invoiceList(), custPdf: () => custInvoice(false), pay: payPage,
     custInvoice, record: () => invoiceList(recordModal()), qb: qbSettings,
   };
   $("#root").innerHTML = views[S.screen]();
@@ -268,8 +247,8 @@ function render() {
 const titleScene = (t) => { parkCursor(); S.title = t; go("title", null); };
 
 const SCENES = {
-  /* 4.1 Approve the finished job */
-  async "4.1-title"() { titleScene("Approve the finished job"); },
+  /* 4.1 Review and close the finished job */
+  async "4.1-title"() { titleScene("Review and close the finished job"); },
   async "4.1-board"() {
     S.closed = false; S.hl = false; S.hint = false;
     go("board", "owner");
@@ -291,7 +270,7 @@ const SCENES = {
   },
   async "4.1-close"() {
     await click("close-job", () => (S.closed = true), 200);
-    toast("Draft invoice created");
+    toast("Job completed · draft invoice created");
     await wait(1800);
     await click("open-draft", () => { S.inv = "draft"; S.screen = "invoice"; }, 600);
     await moveTo("inv-totals", 0, 0, 900);
@@ -301,18 +280,22 @@ const SCENES = {
   /* 4.3 Get paid by card */
   async "4.3-title"() { titleScene("Get paid by card"); },
   async "4.3-send"() {
-    S.inv = "draft"; S.sendModal = false;
+    S.inv = "draft"; S.pdf = false;
     go("invoice", "owner");
     await wait(400);
-    await click("send-inv", () => (S.sendModal = true), 900);
-    await click("send-now", () => { S.sendModal = false; S.inv = "sent"; }, 200);
-    toast("Invoice emailed with a payment link");
+    await click("pdf", () => (S.pdf = true), 1800);
+    await moveTo("pay-link", 0, 0, 700); await wait(600);
+    await click("save-pdf", () => (S.pdf = false), 100);
+    toast("PDF downloaded");
+    await wait(1400);
+    await click("mark-sent", () => (S.inv = "sent"), 100);
+    toast("Marked as sent");
     await wait(900);
   },
-  async "4.3-email"() {
+  async "4.3-open"() {
     parkCursor();
-    go("email", "cust-mail");
-    await wait(2600);
+    go("custPdf", "cust-pdf");
+    await wait(2000);
     await click("pay-link", () => { S.pay = { stage: "form", filled: 0 }; S.screen = "pay"; S.who = "cust-pay"; }, 500);
   },
   async "4.3-pay"() {

@@ -48,16 +48,16 @@ function settings() {
       <div class="tbl"><table><thead><tr><th>Built-in name</th><th>What this division calls it</th></tr></thead><tbody>
         <tr><td>Work order</td><td><span class="term-in ${changed}">${d.work}</span></td></tr>
         <tr><td>Work board</td><td><span class="term-in ${changed}">${d.board}</span></td></tr>
-        <tr><td>Field worker</td><td><span class="term-in ${changed}">${d.worker}</span></td></tr>
+        <tr><td>Field worker</td><td><span class="term-in ${d.worker !== DIVISIONS.graphics.worker ? changed : ""}">${d.worker}</span></td></tr>
         <tr><td>Asset types</td><td><div class="stages">${d.assets.map((s) => `<span>${s}</span>`).join("")}</div></td></tr>
         <tr><td>Board stages</td><td><div class="stages" data-k="stages">${d.stages.map((s) => `<span>${s}</span>`).join("")}</div></td></tr>
       </tbody></table></div>
       <div class="box" style="border-style:dashed" data-k="live">${mech
-        ? `<h3>Preview only · not live</h3><div class="small">Mechanical comes later. In version 1, only the Graphics division is live. Nothing here changes the graphics screens.</div>`
-        : `<h3>Live in version 1</h3><div class="small"><span class="pill solid">Graphics</span> &nbsp;is the only live division. Other divisions come later and reuse these same records.</div>`}</div>
+        ? `<h3>Preview only · not live</h3><div class="small">Mechanical comes later. Only Graphics is set up in version 1. Nothing here changes the graphics screens.</div>`
+        : `<h3>Only Graphics is set up in version 1</h3><div class="small"><span class="pill solid">Graphics</span> &nbsp;is the only division set up. Other divisions come later and reuse these same records.</div>`}</div>
       </div>
       <div class="preview" data-k="preview"><div class="p-h">Preview · menu${mech ? " · later" : ""}</div><div class="mini-nav"><div>${d.board}</div><div>${d.works}</div><div>Estimates</div><div>Invoices</div></div>
-        <div class="p-h" style="margin-top:6px">Preview · card</div><div class="card"><div class="row"><span class="no">${mech ? "M-2210" : "G-1048"}</span><span class="pill">${d.stages[1]}</span></div><div class="cust">${d.work} for Ridgeline Plumbing</div><div class="small muted">${d.worker}: assigned</div></div>
+        <div class="p-h" style="margin-top:6px">Preview · card</div><div class="card"><div class="row"><span class="no">${mech ? "M-2210" : "G-1048"}</span><span class="pill">${d.stages[1]}</span></div><div class="cust">${d.work} for Ridgeline Plumbing &amp; Heating</div><div class="small muted">${d.worker}: assigned</div></div>
         <div class="p-h" style="margin-top:6px">Preview · board columns</div><div class="mini-nav">${d.stages.slice(0, 4).map((s) => `<div>${s}</div>`).join("")}<div class="muted">+ ${d.stages.length - 4} more</div></div></div>
     </div>`;
   return shell("Settings", body, "settings/divisions");
@@ -67,9 +67,9 @@ function settings() {
 function scaled(w, h, s, html) {
   return `<div class="scaled" style="width:${Math.round(w * s)}px;height:${Math.round(h * s)}px"><div class="inner" style="width:${w}px;height:${h}px;transform:scale(${s})">${html}</div></div>`;
 }
-const FILES = ["Proof v3 (approved).pdf", "Measurements.jpg", "Panel layout.pdf"];
+const FILES = ["Artwork v3.pdf", "Measurements.jpg", "Panel layout.pdf"];
 function deskJob() {
-  const body = `<div class="head"><div><div class="crumb">My ${T.works.toLowerCase()} › G-1048</div><h2>Ridgeline Plumbing · Unit 14 full wrap</h2>
+  const body = `<div class="head"><div><div class="crumb">My ${T.works.toLowerCase()} › G-1048</div><h2>Ridgeline Plumbing &amp; Heating · Unit 14 full wrap</h2>
       <div class="meta">${T.asset}: 2024 Ford Transit 250 · Install date: today · Stage: ${T.stages[4]}</div></div>
     <div class="btns"><button class="btn primary">Start timer · Installation</button></div></div>
     <div class="cols" style="margin-top:0">
@@ -87,7 +87,7 @@ function tabletJob() {
   return `<div class="tablet"><div class="notch" style="width:10px;height:10px;border-radius:50%"></div><div class="scr">
     <div class="tbar"><div class="burger"></div><div class="logo" style="width:110px;height:26px">LOGO</div><div class="grow"></div><span class="av">T1</span></div>
     <div class="tbody">
-      <div><div class="crumb">My ${T.works.toLowerCase()} › G-1048</div><h2 style="margin:0;font-size:21px">Ridgeline Plumbing · Unit 14 full wrap</h2>
+      <div><div class="crumb">My ${T.works.toLowerCase()} › G-1048</div><h2 style="margin:0;font-size:21px">Ridgeline Plumbing &amp; Heating · Unit 14 full wrap</h2>
         <div class="meta">${T.asset}: 2024 Ford Transit 250 · Stage: ${T.stages[4]}</div></div>
       <button class="wide solid">Start timer · Installation</button>
       <div class="box"><h3>Instructions</h3><div>Wrap both sides and the rear. Keep the logo clear of the fuel door. Customer drops the van at 7:30 AM.</div></div>
@@ -122,11 +122,11 @@ function devices() {
 function switchover() {
   const row = (done, item, sub, value, from, k = "") => `<tr ${k ? `data-k="${k}"` : ""}><td style="width:34px"><span class="check ${done ? "on" : ""}">${done ? "✓" : ""}</span></td>
     <td><strong>${item}</strong><div class="small muted">${sub}</div></td><td>${value}</td><td>${from}</td></tr>`;
-  const body = `<div class="head"><div><div class="crumb">Settings › Switchover</div><h2>Moving off FullBay</h2><div class="meta">Checklist before the first graphics invoice goes out from the new system</div></div>
-    <div class="btns"><span class="pill dash">1 of 5 done</span></div></div>
+  const body = `<div class="head"><div><div class="crumb">Plan · Moving off FullBay</div><h2>Switchover checklist</h2><div class="meta">A plan for moving off FullBay. Not a screen in the system.</div></div>
+    <div class="btns"><span class="pill dash">0 of 5 done</span></div></div>
     <div class="cols" style="grid-template-columns:1fr 340px;margin-top:0">
       <div class="tbl"><table class="sw"><thead><tr><th></th><th>What to bring over</th><th>Status</th><th>Comes from</th></tr></thead><tbody>
-        ${row(true, "Customers", "Graphics customers and their contacts", `<span class="pill solid">86 in</span>`, "FullBay customer list")}
+        ${row(false, "Customers", "Graphics customers and their contacts", `<span class="pill dash">Not started</span>`, "FullBay export if available, otherwise typed in")}
         ${row(false, "Open jobs to enter", `Started or scheduled, not finished. Typed into the ${T.board.toLowerCase()}.`, `<span class="num">0 of 14 entered</span>`, "FullBay, one by one", "sw-jobs")}
         ${row(false, "Unpaid invoices to enter", "Balances customers still owe", `<span class="num">0 of 9 entered</span>`, "FullBay and QuickBooks", "sw-inv")}
         ${row(false, "Starting invoice number", "So new numbers don't repeat old ones", `<span class="blank">OTC-G-____</span>`, `<span class="pill dash">from accounting</span>`)}
@@ -137,8 +137,8 @@ function switchover() {
         <div class="box"><h3>Switch day</h3><div class="kv"><dt>Open jobs</dt><dd>14</dd><dt>Unpaid invoices</dt><dd>9</dd><div class="rule"></div><dt>Entered so far</dt><dd>0 of 23</dd></div></div>
       </div>
     </div>
-    <div class="note" style="position:absolute;right:30px;top:325px;width:330px;justify-content:center" data-k="ask"><span style="font-size:28px;font-weight:700">↑ ? who and when</span></div>`;
-  return shell("Settings", body, "settings/switchover");
+    <div class="note" style="position:absolute;right:30px;top:345px;width:330px;justify-content:center" data-k="ask"><span style="font-size:24px;font-weight:700;text-align:center">↑ ? who and when · invoice number and tax rates from accounting</span></div>`;
+  return shell("Settings", body, "plan/moving-off-fullbay");
 }
 
 function render() {
