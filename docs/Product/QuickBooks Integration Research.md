@@ -89,8 +89,8 @@ its own class today.
 which *"drop into a corresponding rate in your QuickBooks sales tax liability report."* Rates are
 assigned by shop, customer, unit type or unit. That is the model to copy (section 4).
 
-**Requirements.** QuickBooks Online **Essentials or Plus**. Class tracking needs Plus or higher, so
-OTC is on Plus or Advanced.
+**Requirements.** QuickBooks Online **Essentials or Plus**. Intuit's docs say class tracking is
+available on Plus (and Advanced), so that's what OTC is on.
 
 **Still unknown, and only OTC's own QBO can answer:** whether card processing fees and the 3%
 surcharge are posted by FullBay or by the bookkeeper, how FullBay handles a voided or edited invoice
@@ -168,18 +168,22 @@ source of truth. QBO is the ledger. Same contract the business already runs with
 - An **Intuit developer app**, registered as a private app for one company. Production keys are
   issued after Intuit's app assessment questionnaire, which applies to private apps too. Reported
   turnaround is minutes once submitted.
-- **OAuth 2.0.** Access tokens last an hour. Refresh tokens rotate on use and must be overwritten
-  every time. Intuit's 2026 release notes put a five-year maximum on refresh tokens, replacing the
-  old rolling 100-day window. The connection still drops if someone disconnects the app in QBO or
-  the authorizing user loses admin rights, so the app needs a **Reconnect** button and a visible
-  disconnected state.
+- **OAuth 2.0** (Intuit's authorization FAQ). Access tokens last one hour. Refresh tokens are valid
+  for **100 days, rolling**: every refresh extends them, and every refresh returns a new value that
+  must replace the old one. On top of that there is a **hard five-year limit** (release notes, 2025
+  and May 2026), after which someone has to reconnect. So:
+  - a daily job refreshes the token whether or not anything was pushed, so a quiet season can't
+    let it lapse at 100 days
+  - the newest refresh token is always stored, encrypted
+  - the connection also drops if someone disconnects the app in QBO, so the app needs a
+    **Reconnect** button and a visible disconnected state
 - **Cost. Free.** Intuit's App Partner Program pricing page (US rates, checked 2026-10-30): the
   Builder tier has no monthly fee, uncapped **Core** API calls, and **500,000 CorePlus** calls per
   calendar month, a hard cap rather than a bill. Paid tiers ($300, $1,700, $4,500 a month) only
   matter for apps with many customers. Third-party guides say writes are Core and reads are
   CorePlus. Either way, graphics is a few hundred invoices a year, thousands of calls at most.
-- **Sandbox caveat:** QBO sandbox companies do **not** run Automated Sales Tax. Tax behaviour can
-  only be verified against the real company. Plan a supervised first-invoice test.
+- **Sandbox caveat:** QBO sandbox companies have not supported Automated Sales Tax (Intuit
+  developer blog). Plan a supervised first invoice against the real company either way.
 
 ### What gets pushed
 
@@ -192,9 +196,9 @@ source of truth. QBO is the ledger. Same contract the business already runs with
 | Deposit / prepayment | `Payment` with no invoice (unapplied), later applied | On receipt, and on final invoice | See deposits below. Needs the bookkeeper's preference |
 | Credit / adjustment | `CreditMemo` | On issue | Linked to the customer, applied via a `Payment` line |
 | Refund | `RefundReceipt` or credit + refund | When recorded | Refunds are executed in Stripe and recorded in the app, per V1 scope |
-| Void | Void on `Invoice` | On void in app | QBO clears the linked payments on void |
+| Void | Void on `Invoice` | On void in app | QBO zeroes the invoice and **returns any applied payment to unapplied**. Our void must then refund it or apply it to the reissued invoice, and push that too |
 | Received PO (optional) | `Bill` | On "received" | Only if the bookkeeper wants bills from the shop system. FullBay does this today |
-| Stripe payout (optional) | `Deposit` | Stripe payout webhook | Moves payments from clearing to bank, fee line to expense |
+| Stripe payout (optional) | `Deposit` | Stripe payout webhook | Deposit lines link the `Payment`s it contains (supported by the API), plus a fee line to expense. Moves them from Undeposited Funds to the bank |
 
 **Lookups only, no writes:** items, accounts, classes, tax codes, terms and preferences are read
 from QBO to fill the mapping screens.
@@ -210,18 +214,28 @@ one customer-facing line per package ("Full Vehicle Wrap") with the materials br
 > design, labor) or one *Graphics Sales* item? A split needs a category on every line. One item
 > needs nothing.
 
-### Sales tax — the riskiest part
+### Sales tax — still the part to test hardest
 
 **Copy FullBay's model: the shop app calculates tax, and QBO records it against a matching rate.**
 FullBay keeps its own tax locations mapped to QBO's rates (section 2). We do the same: tax rates in
 our app, each mapped to the QBO tax code or rate it corresponds to, chosen per customer (and per
 shop address).
 
-The complication is QBO's **Automated Sales Tax (AST)**, on by default for US companies created
-after November 2017. With AST on, QBO picks the tax code from addresses and overrides any tax code
-an app sends. An app can still override the **amount** with `TxnTaxDetail.TotalTax`, which Intuit
-says is honoured, though developers report cases where AST recalculated anyway. Whether OTC is on
-AST, and how FullBay gets its rates to land, is the first thing to look at in OTC's QBO settings.
+QBO's **Automated Sales Tax (AST)** applies to US companies created after November 10, 2017
+(check `Preferences.TaxPrefs.PartnerTaxEnabled` on connect). Intuit's AST page is clearer than the
+earlier search results suggested:
+
+- **Left alone, AST calculates tax** from the company's legal address (source) and the invoice's
+  shipping address (destination), or the company address if there is none. The source can't be
+  changed per location.
+- **An app can override it.** Send the tax code in `TxnTaxDetail.TxnTaxCodeRef` and the amount in
+  `TxnTaxDetail.TotalTax`. Intuit: *"For companies using automated sales tax, TxnTaxDetail.TotalTax
+  amount is honored,"* prorated across the code's rates, and *"the TxnTaxCodeRef passed in with the
+  request will also be honored."* That's how our charged tax lands in QBO unchanged.
+- Line amounts are always tax-exclusive in the US. Lines are marked `TAX` or `NON`, the only two
+  line codes. Tax codes (groups of rates) can't be invented by the app under AST; we map to the ones
+  QBO already has, which is what FullBay's tax locations do.
+- Sales tax can only be switched on in the QBO interface, not via the API.
 
 Either way, our invoice has already shown the customer a total. **QBO must record the same tax we
 charged.** So:
@@ -357,7 +371,7 @@ mapping screen.
 | Risk | Mitigation |
 |---|---|
 | Duplicate customers between FullBay and our app | Link before first sync, store QBO ID, no auto-create |
-| AST recalculates tax differently from what the customer was charged | Send `TotalTax`, read back, flag mismatches. Supervised live test. Get taxability from accounting first |
+| QBO records different tax from what the customer was charged | Send tax code and `TotalTax` (documented as honoured), read back, flag mismatches. Supervised first invoice. Get taxability from accounting first |
 | Stripe payments double-counted by a second connector | One writer per Stripe account. Check what's connected to QBO today |
 | Invoice number clash | Prefix + start number agreed before invoice one |
 | Connection silently dropped | Banner, sync screen, nightly check. Nothing in the shop blocks on QBO |
@@ -398,9 +412,9 @@ mapping screen.
 
 ## Sources
 
-FullBay's two explainer PDFs and its QuickBooks page were read in full. The Intuit pages could not
-be rendered from this session (their content loads from `intuitcdn.net`, which is not allowed), so
-those points come from search summaries.
+FullBay's two explainer PDFs and its QuickBooks page were read in full. Intuit's AST, class
+tracking, linked transactions, authorization FAQ, release notes and partner pricing pages were read
+in full on 2026-10-30. Vendor help-centre and community points come from search summaries.
 
 - FullBay — [QuickBooks integration](https://www.fullbay.com/products/integrations/quickbooks/),
   [integration explainer PDF](https://www2.fullbay.com/rs/823-QJJ-687/images/Fullbay_Quickbooks_Integration_Explainer.pdf),
