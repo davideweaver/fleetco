@@ -160,6 +160,8 @@ section 4 (4.4, 4.6–4.9), and a call with the bookkeeper. Carry those into the
 
 ## Related
 
+- [[QuickBooks Integration Research]] — FullBay-equivalent push, what it adds to V1
+
 - [[V1 Alignment]] — the document this replies to
 - [[V1 Scope from Punch List]] — the 62 V1 items
 - [[V1 Vision and Gaps]] — G2, G3, G5, G6, G14
