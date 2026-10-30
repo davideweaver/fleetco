@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Example flow</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Kalam:wght@400;700&display=swap">
+<link rel="stylesheet" href="../lib/wire.css">
+</head>
+<body>
+<script src="../lib/wire.js"></script>
+<script>
+/* Example flow page: copy this to start a new flow. Not part of the guide. */
+const S = { screen: "title", who: null, n: 0 };
+const go = (screen, who) => { S.screen = screen; S.who = who; render(); };
+
+function board() {
+  const cols = T.stages.map((s, i) => {
+    const cs = JOBS.filter((j) => j.stage === i);
+    return `<div class="col"><div class="col-head"><span>${s}</span><span>${cs.length}</span></div><div class="cards">${cs.map((j) => boardCard(j)).join("")}</div></div>`;
+  }).join("");
+  return shell(T.board, `<div class="head"><div><h2>${T.board}</h2><div class="meta">Clicked ${S.n} times</div></div>
+    <div class="btns"><button class="btn primary" data-k="add">+ ${T.work}</button></div></div><div class="board">${cols}</div>`, "board");
+}
+
+function render() {
+  $("#root").innerHTML = { title: () => cardScreen("Version 1 · Example", "An example flow"), board }[S.screen]();
+  setWho(S.who);
+}
+
+const SCENES = {
+  async "ex-title"() { parkCursor(); go("title", null); },
+  async "ex-board"() { go("board", "owner"); await wait(600); await click("add", () => S.n++, 800); },
+};
+const PICTURES = {
+  async "ex-board"() { go("board", "owner"); },
+};
+boot();
+</script>
+</body>
+</html>

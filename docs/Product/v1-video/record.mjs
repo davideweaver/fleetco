@@ -1,6 +1,6 @@
 // Records screens.html scene by scene and lays the narration under it.
 //
-// Usage: node record.mjs <audio_dir> <out.mp4> [narration.json]
+// Usage: node record.mjs <audio_dir> <out.mp4> [narration.json] [page.html]
 //   <audio_dir> holds <scene>.wav and durations.json from make_audio.py.
 //
 // Each scene lasts as long as its narration (plus a short pause) or its on-screen
@@ -16,7 +16,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 const here = dirname(fileURLToPath(import.meta.url));
 // CommonJS require so a globally installed playwright resolves too.
 const { chromium } = createRequire(import.meta.url)("playwright");
-const [audioDir, outFile, narrationFile = join(here, "narration.json")] = process.argv.slice(2).map((p) => resolve(p));
+const [audioDir, outFile, narrationFile = join(here, "narration.json"), pageFile = join(here, "screens.html")] = process.argv.slice(2).map((p) => resolve(p));
 const narration = JSON.parse(readFileSync(narrationFile, "utf8"));
 const durations = JSON.parse(readFileSync(join(audioDir, "durations.json"), "utf8"));
 const PAUSE = 900; // ms of silence after each narration clip
@@ -27,7 +27,7 @@ const browser = await chromium.launch();
 const context = await browser.newContext({ viewport: { width: W, height: H }, recordVideo: { dir: videoDir, size: { width: W, height: H } } });
 const t0 = Date.now();
 const page = await context.newPage();
-await page.goto(pathToFileURL(join(here, "screens.html")).href);
+await page.goto(pathToFileURL(pageFile).href);
 await page.evaluate(() => document.fonts.ready);
 await page.waitForTimeout(500);
 
@@ -54,7 +54,7 @@ args.push(
   "-filter_complex", `${delays};${mix}`,
   "-map", "0:v", "-map", "[aout]",
   "-t", String(endAt / 1000),
-  "-c:v", "libx264", "-preset", "slow", "-crf", "20", "-pix_fmt", "yuv420p",
+  "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-pix_fmt", "yuv420p",
   "-c:a", "aac", "-b:a", "160k", "-ar", "48000", "-ac", "2", "-movflags", "+faststart",
   outFile,
 );
