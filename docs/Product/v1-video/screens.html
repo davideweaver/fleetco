@@ -229,7 +229,7 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /* ===================== screens ===================== */
 function shell(active, body, url) {
-  const nav = [T.board, T.works, "Calendar", "Estimates", "Customers", "Invoices", "Time & payroll", "Materials & POs", "Reports"];
+  const nav = [T.board, T.works, "Schedule", "Estimates", "Customers", "Invoices", "Time & payroll", "Materials & ordering", "Reports"];
   return `<div class="frame">
     <div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">app.otcfleet.com/${url}</span></div>
     <div class="topbar"><div class="logo">LOGO</div><div class="search">Search customers, ${T.works.toLowerCase()}, invoices…</div><div class="grow"></div>
@@ -250,7 +250,7 @@ function estimate() {
     if (cv) {
       rows += `<tr class="${dec}"><td><span class="strike">Unit ${u} · 2024 Ford Transit 250 · full wrap</span><div class="small muted">Design, print, laminate and install</div></td><td class="num"><span class="strike">${money(PRICE)}</span></td><td>${status(u)}</td></tr>`;
     } else {
-      rows += `<tr class="group ${dec} rowin"><td><span class="strike">Unit ${u} · 2024 Ford Transit 250 · Full wrap template</span></td><td></td><td class="num">${money(COST)}</td><td class="num">${money(PRICE)}</td><td class="num">${Math.round(((PRICE - COST) / PRICE) * 100)}%</td><td>${status(u)}</td></tr>`;
+      rows += `<tr class="group ${dec} rowin"><td><span class="strike">Unit ${u} · 2024 Ford Transit 250 · Full wrap package</span></td><td></td><td class="num">${money(COST)}</td><td class="num">${money(PRICE)}</td><td class="num">${Math.round(((PRICE - COST) / PRICE) * 100)}%</td><td>${status(u)}</td></tr>`;
       rows += WRAP.map((w, i) => `<tr class="sub ${dec} rowin" style="animation-delay:${(i + 1) * 60}ms"><td><span class="strike">${w[0]}</span></td><td class="num">${w[1]} ${w[2]}</td><td class="num">${money(w[1] * w[3])}</td><td class="num">${money(w[1] * w[4])}</td><td></td><td></td></tr>`).join("");
     }
   });
@@ -262,10 +262,10 @@ function estimate() {
   const body = `
   <div class="head"><div><div class="crumb">Estimates › E-2207</div><h2>Ridgeline Plumbing &amp; Heating</h2><div class="meta">Contact: Mike Dorsey · Customer PO 7781</div></div>
     <div class="btns"><div class="seg"><button class="${cv ? "" : "on"}" data-k="cv-int">Internal view</button><button class="${cv ? "on" : ""}" data-k="cv-cust">Customer view</button></div>
-    <button class="btn dash" data-k="add-tpl">+ Add from template</button>
+    <button class="btn dash" data-k="add-tpl">+ Add saved package</button>
     <button class="btn" data-k="record-approval" ${e.units.length ? "" : "disabled"}>Record approval</button>
     <button class="btn primary" data-k="create-job" ${e.deposit === "paid" ? "" : "disabled"}>Create ${T.work.toLowerCase()}</button></div></div>
-  ${e.units.length ? `<div class="tbl"><table><thead>${head}</thead><tbody>${rows}</tbody></table></div>` : `<div class="empty">No items yet. Add a vehicle from a template to start.</div>`}
+  ${e.units.length ? `<div class="tbl"><table><thead>${head}</thead><tbody>${rows}</tbody></table></div>` : `<div class="empty">No items yet. Add a vehicle from a saved package to start.</div>`}
   ${e.menu ? `<div class="menu" style="right:258px;top:62px"><div data-k="tpl-wrap"><span>Full wrap</span><span class="muted small">7 lines</span></div><div><span>Partial wrap</span><span class="muted small">6 lines</span></div><div><span>Door logos (pair)</span><span class="muted small">4 lines</span></div><div><span>DOT lettering</span><span class="muted small">3 lines</span></div></div>` : ""}
   <div class="cols">
     <div class="box"><h3>Approval record</h3>${e.approved
@@ -296,7 +296,7 @@ function board() {
     return `<div class="col" data-k="col-${i}"><div class="col-head"><span>${s}</span><span>${cs.length}</span></div><div class="cards">${cs.map((j) => boardCard(j, j.mine ? [S.job.hl ? "hl" : "", S.job.lifted ? "lifted" : "", "pop"].join(" ") : "")).join("")}</div></div>`;
   }).join("");
   const body = `<div class="head"><div><h2>${T.board}</h2><div class="meta">Every active ${T.work.toLowerCase()} in the division</div></div>
-    <div class="btns"><div class="seg"><button class="on">Board</button><button>Table</button><button>Calendar</button></div><button class="btn primary">+ ${T.work}</button></div></div>
+    <div class="btns"><div class="seg"><button class="on">Board</button><button>Table</button><button>Schedule</button></div><button class="btn primary">+ ${T.work}</button></div></div>
     <div class="board">${cols}</div>`;
   return shell(T.board, body, "board");
 }

@@ -104,9 +104,12 @@ h2 { font: 700 30px/1.1 var(--hand); margin: 0; text-wrap: balance; }
 
 /* placeholder viewer */
 .scrim { position: fixed; inset: 0; background: rgba(251,251,249,.86); display: grid; place-items: center; padding: 20px; z-index: 20; }
-.viewer { background: var(--paper); border: 2px solid var(--ink); border-radius: 4px; max-width: 560px; width: 100%; padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; }
+.viewer { background: var(--paper); border: 2px solid var(--ink); border-radius: 4px; max-width: 1180px; max-height: 100%; overflow: auto; width: 100%; padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; }
 .viewer h4 { margin: 0; font-size: 19px; }
 .viewer .thumb { border: 1.5px solid var(--ink); border-radius: 3px; }
+.viewer video, .viewer > img { width: 100%; max-height: 72vh; object-fit: contain; border: 1.5px solid var(--ink); border-radius: 3px; background: var(--paper); display: block; }
+.viewer .small { font-size: 13.5px; color: var(--ink-2); }
+.viewer .flag { display: inline-block; margin-left: 6px; }
 .viewer ul { margin: 0; padding-left: 18px; font-size: 14px; }
 .viewer .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 .btn { border: 1.5px solid var(--ink); background: var(--ink); color: var(--paper); border-radius: 3px; padding: 6px 14px; font-size: 13px; }
@@ -122,7 +125,7 @@ h2 { font: 700 30px/1.1 var(--hand); margin: 0; text-wrap: balance; }
 
   <section class="hero" aria-label="Overview video">
     <button class="player" data-open="overview" aria-label="Play the overview video">
-      <img src="{{IMG:hero}}" alt="Wireframe of the production board">
+      <img src="media/thumbs/overview.jpg" alt="Sketch of the job board">
       <span class="play"><span><svg width="26" height="30" viewBox="0 0 26 30"><path d="M2 2 L24 15 L2 28 Z" fill="#fbfbf9"/></svg></span></span>
       <span class="dur">2:56</span>
     </button>
@@ -163,10 +166,9 @@ h2 { font: 700 30px/1.1 var(--hand); margin: 0; text-wrap: balance; }
 <div id="layer"></div>
 
 <script>
-const IMG = {
-  estimate: "{{IMG:estimate}}", custview: "{{IMG:custview}}", approval: "{{IMG:approval}}", board: "{{IMG:board}}",
-  phone: "{{IMG:phone}}", review: "{{IMG:review}}", invoice: "{{IMG:invoice}}", time: "{{IMG:time}}", terms: "{{IMG:terms}}",
-};
+// Filled in by build.py from each section's manifest: { "1.1": { kind, file, thumb, seconds } }
+const MEDIA = {{MEDIA}};
+const mmss = (sec) => `${Math.floor(sec / 60)}:${String(Math.round(sec) % 60).padStart(2, "0")}`;
 
 // kind: "video" or "picture". len: rough video length. img: a frame from the overview, where one exists.
 // ask: an open question that has to be settled before the flow is final.
@@ -257,15 +259,18 @@ $("#loop").innerHTML = AREAS.filter((a) => a.loop).map((a) => `<a href="#${a.id}
 $("#support").innerHTML = AREAS.filter((a) => !a.loop).map((a) => `<a href="#${a.id}"><span class="n">${a.n}</span><b>${a.title}</b><span class="d">${a.short}</span></a>`).join("");
 
 $("#areas").innerHTML = AREAS.map((a) => {
-  const v = a.flows.filter((f) => f.kind === "video").length, p = a.flows.length - v;
-  const cards = a.flows.map((f, i) => {
-    const key = `${a.n}.${i + 1}`;
-    allFlows[key] = { ...f, key, area: a.title };
-    const thumb = f.img ? `<div class="thumb"><img src="${IMG[f.img]}" alt="" loading="lazy">` : `<div class="thumb x">`;
+  const flows = a.flows.map((f, i) => {
+    const key = `${a.n}.${i + 1}`, m = MEDIA[key];
+    return { ...f, key, area: a.title, m, kind: m ? m.kind : f.kind, len: m && m.seconds ? mmss(m.seconds) : f.len };
+  });
+  const v = flows.filter((f) => f.kind === "video").length, p = flows.length - v;
+  const cards = flows.map((f) => {
+    allFlows[f.key] = f;
+    const thumb = f.m ? `<div class="thumb"><img src="media/thumbs/${f.key}.jpg" alt="" loading="lazy">` : `<div class="thumb x">`;
     const kind = f.kind === "video"
       ? `<span class="kind video"><svg width="8" height="9" viewBox="0 0 8 9"><path d="M0 0 L8 4.5 L0 9 Z" fill="#fbfbf9"/></svg>Video · ${f.len}</span>`
       : `<span class="kind">Picture</span>`;
-    return `<button class="flow" data-flow="${key}">${thumb}${kind}</div><div class="flow-body"><span class="flow-id">${key}</span><b>${f.t}</b><span class="d">${f.d}</span>${f.ask ? `<span class="flag">? ${f.ask}</span>` : ""}</div></button>`;
+    return `<button class="flow" data-flow="${f.key}">${thumb}${kind}</div><div class="flow-body"><span class="flow-id">${f.key}</span><b>${f.t}</b><span class="d">${f.d}</span>${f.ask ? `<span class="flag">? ${f.ask}</span>` : ""}</div></button>`;
   }).join("");
   return `<section class="area" id="${a.id}"><div class="area-head"><div class="area-num">${a.n}</div><div><h2>${a.title}</h2><p>${a.blurb}</p></div>
     <div class="counts">${v} video${v === 1 ? "" : "s"} · ${p} picture${p === 1 ? "" : "s"}</div></div><div class="flows">${cards}</div></section>`;
@@ -275,13 +280,14 @@ $("#nlist").innerHTML = NOT_V1.map(([a, b]) => `<div><span><b>${a}</b><span>${b}
 
 function open(key) {
   const f = key === "overview"
-    ? { t: "One job, from estimate to paid invoice", kind: "video", len: "2:56", img: null, area: "Overview", d: "The full loop in one pass." }
+    ? { t: "One job, from estimate to paid invoice", area: "Overview", d: "The full loop in one pass.", m: { kind: "video", file: "overview.mp4" } }
     : allFlows[key];
-  const img = f.img ? `<div class="thumb"><img src="${IMG[f.img]}" alt=""></div>` : key === "overview" ? `<div class="thumb"><img src="{{IMG:hero}}" alt=""></div>` : `<div class="thumb x"></div>`;
+  const media = !f.m ? `<div class="thumb x"></div><span class="mock">Coming soon.</span>`
+    : f.m.kind === "video" ? `<video src="media/${f.m.file}" poster="media/thumbs/${key}.jpg" controls autoplay playsinline></video>`
+    : `<img src="media/${f.m.file}" alt="${f.t}">`;
   $("#layer").innerHTML = `<div class="scrim" data-close="1"><div class="viewer" role="dialog" aria-modal="true" aria-label="${f.t}">
-    <div class="eyebrow">${f.area}${f.key ? " · " + f.key : ""}</div><h4>${f.t}</h4>${img}
-    <span class="mock">${f.kind === "video" ? `In the real page, the ${f.len} video plays here.` : "In the real page, the full-size picture shows here."}</span>
-    <div class="row"><span class="small">${f.d}</span><button class="btn" data-close="1" id="close">Close</button></div></div></div>`;
+    <div class="row"><div><div class="eyebrow">${f.area}${f.key ? " · " + f.key : ""}</div><h4>${f.t}</h4></div><button class="btn" data-close="1" id="close">Close</button></div>
+    ${media}<div class="small">${f.d}${f.ask ? ` <span class="flag">? ${f.ask}</span>` : ""}</div></div></div>`;
   $("#close").focus();
 }
 document.addEventListener("click", (e) => {
