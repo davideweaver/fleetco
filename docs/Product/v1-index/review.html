@@ -1,0 +1,208 @@
+<title>V1 Guide Review</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Kalam:wght@400;700&display=swap">
+<style>
+/* Layout: one column checklist. Global checks first, then one row per guide card with its
+   thumbnail, the specific things to verify, a done box and a note. Same sketch look as the guide. */
+:root {
+  --paper: #fbfbf9; --grid: #eceae4; --ink: #2b2b2b; --ink-2: #636360; --ink-3: #a3a3a0;
+  --fill: #efefec; --fill-2: #e2e2de; --pencil: #2f5fa8; --ok: #2e6b3a;
+  --hand: "Kalam", "Comic Sans MS", cursive; --ui: "IBM Plex Sans", system-ui, sans-serif; --mono: "IBM Plex Mono", ui-monospace, monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--paper); color: var(--ink); }
+body { font: 15px/1.5 var(--ui); background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 24px 24px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 24px 64px; }
+.wrap { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+h1 { font: 700 clamp(30px, 5vw, 44px)/1.1 var(--hand); margin: 4px 0 6px; }
+h2 { font: 700 24px/1.2 var(--hand); margin: 0; }
+.eyebrow { font: 600 11.5px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); }
+.lede { margin: 0; max-width: 62ch; }
+a { color: var(--pencil); }
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--paper); border: 2px solid var(--ink); border-radius: 4px; padding: 10px 14px; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper); }
+.meter { flex: 1; min-width: 140px; height: 10px; border: 1.5px solid var(--ink); border-radius: 6px; overflow: hidden; }
+.meter span { display: block; height: 100%; background: var(--ink); width: 0; transition: width .3s; }
+.count { font: 600 13px var(--mono); font-variant-numeric: tabular-nums; }
+.save { font: 12px var(--mono); color: var(--ink-2); }
+.filter { display: flex; gap: 0; border: 1.5px solid var(--ink); border-radius: 3px; overflow: hidden; }
+.filter button { font: 13px var(--ui); border: 0; background: var(--paper); padding: 4px 10px; cursor: pointer; }
+.filter button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+section { display: flex; flex-direction: column; gap: 10px; }
+.item { border: 1.5px solid var(--ink); border-radius: 4px; background: var(--paper); display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 12px; padding: 10px; }
+.item.global { grid-template-columns: minmax(0, 1fr); }
+.item.done { border-color: var(--ink-3); }
+.item.done .title { color: var(--ink-2); }
+@media (max-width: 560px) { .item { grid-template-columns: minmax(0, 1fr); } }
+.thumb { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border: 1.5px solid var(--ink-3); border-radius: 2px; filter: grayscale(1); background: var(--fill); }
+.body { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.head { display: flex; gap: 10px; align-items: flex-start; }
+.head input { width: 22px; height: 22px; margin: 2px 0 0; accent-color: var(--ink); flex: none; cursor: pointer; }
+.title { font-weight: 600; }
+.kind { font: 11px var(--mono); color: var(--ink-2); text-transform: uppercase; letter-spacing: .06em; }
+ul { margin: 0; padding-left: 20px; font-size: 14px; color: var(--ink); }
+li { margin: 2px 0; }
+li.ask { color: var(--pencil); font-family: var(--hand); font-size: 15.5px; }
+textarea { width: 100%; min-height: 34px; font: 14px var(--ui); border: 1.5px dashed var(--ink-3); border-radius: 3px; padding: 6px 8px; background: var(--paper); color: var(--ink); resize: vertical; }
+textarea:focus, input:focus-visible, button:focus-visible { outline: 2px dashed var(--pencil); outline-offset: 2px; }
+.hint { font: 15px var(--hand); color: var(--ink-2); }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Before sharing with OTC</div>
+    <h1>V1 guide review</h1>
+    <p class="lede">Open the <a href="https://claude.ai/artifact/8T7wADaJ8r2kvUoi6HJM3r" target="_blank" rel="noopener">guide</a> beside this list. Tick each part once it's right, and leave a note on anything to change. Notes save as you type and come back to me.</p>
+  </header>
+
+  <div class="bar">
+    <span class="count" id="count">0 of 0</span>
+    <div class="meter" aria-hidden="true"><span id="meter"></span></div>
+    <div class="filter" role="group" aria-label="Show">
+      <button id="f-all" aria-pressed="true">All</button><button id="f-open" aria-pressed="false">Not done</button><button id="f-notes" aria-pressed="false">With notes</button>
+    </div>
+    <span class="save" id="save">Loading…</span>
+  </div>
+
+  <div id="list" style="display:flex;flex-direction:column;gap:28px"></div>
+  <p class="hint">Blue lines are open questions for Dan and Kim. They are flagged on the guide on purpose, so check the wording, not the answer.</p>
+</div>
+
+<script>
+const GROUPS = [
+  { title: "Before you send it", items: [
+    { id: "g-share", t: "Sharing works", v: ["Share settings let Dan and Kim open it", "Open the link in a private window or on someone else's phone and play one video"] },
+    { id: "g-sound", t: "Every video plays with sound on a phone", v: ["Silent mode off. Overview, 1.1, 1.3, 2.2, 3.3, 4.1, 4.3, 5.3, 6.1, 8.1"] },
+    { id: "g-names", t: "Made-up names are safe to show", v: ["Customers, vendors and Mike Dorsey are invented. Make sure none is a real OTC customer, vendor or competitor"] },
+    { id: "g-numbers", t: "Sample prices and hours won't distract", v: ["Prices, margins and hours are placeholders. Decide whether to say so when you send it"] },
+    { id: "g-dates", t: "Dates", v: ["The sample week uses Fri Oct 31 and Mon Nov 3, which match 2025's calendar, not 2026's. No years are shown"] },
+    { id: "g-invoice", t: "Invoice numbers", v: ["Most screens use OTC-G-0398 style numbers, but 1.5 shows INV-3311. Real numbering is still from accounting"] },
+    { id: "g-notv1", t: "\"Not in version 1\" list is right", v: ["Every item matches what you've agreed, with nothing missing"] },
+    { id: "g-asks", t: "Blue questions match what you want to ask", v: ["One-click approval, deposits by link, signs and walls, design proofs, sales tax, QuickBooks sync, work in progress, switchover"] },
+  ] },
+  { title: "Overview", items: [
+    { id: "ov", k: "overview", t: "One job, from estimate to paid invoice", kind: "Video 2:56", v: ["Chapter times on the guide line up with the video", "The saved package menu in the video still says Full wrap has 7 lines (it has 6)"] },
+  ] },
+  { title: "1 · Estimates and approval", items: [
+    { id: "1.1", t: "Build an estimate from a saved package", kind: "Video 0:48", v: ["The owner lengthens Unit 17's film to 74 ft, so Unit 17 is $2,109.00, not $2,019.00", "Shorter than the 1:00 planned"] },
+    { id: "1.2", t: "What you see vs. what the customer sees", kind: "Picture", v: ["Customer copy shows subtotal and 'Sales tax per settings', no grand total"] },
+    { id: "1.3", t: "Customer approval", kind: "Video 0:35", v: ["Approval methods offered: Phone call / Email reply / In person"], ask: "Approve with one click from the email?" },
+    { id: "1.4", t: "Deposit by card", kind: "Picture", v: ["Shows the deposit link as built"], ask: "Collect deposits by card link?" },
+    { id: "1.5", t: "Customers and their vehicles", kind: "Picture", v: ["Address, phone, email and other vehicles are invented", "'Sign / wall' row is greyed out"], ask: "Track signs and walls like vehicles?" },
+  ] },
+  { title: "2 · Scheduling and tracking jobs", items: [
+    { id: "2.1", t: "Approved estimate becomes a job", kind: "Picture", v: ["Unit 17 shown as declined and not carried over", "Production and install dates 'Not set'"] },
+    { id: "2.2", t: "Job board", kind: "Video 0:49", v: ["Drags one job forward and one back two stages", "Delay recorded as a job note, no hold flag"] },
+    { id: "2.3", t: "Job list", kind: "Picture", v: ["Tab counts (38 completed, 44 all) are invented"] },
+    { id: "2.4", t: "Schedule", kind: "Picture", v: ["Shows two weeks, Mon to Sat", "Production dates are invented. Whether the board or the calendar owns dates is still your call"] },
+    { id: "2.5", t: "Job details", kind: "Picture", v: ["Design file is called 'Artwork v3.pdf'"], ask: "How should design proofs work?" },
+  ] },
+  { title: "3 · Doing the job", items: [
+    { id: "3.1", t: "My jobs at the shop computer", kind: "Picture", v: ["Technician sees only assigned jobs, no prices"] },
+    { id: "3.2", t: "Clock in and out", kind: "Picture", v: ["Computer at 11:40 AM, phone after clocking out at 3:32 PM"] },
+    { id: "3.3", t: "Track time and finish with photos (3.3 and 3.4)", kind: "Video 1:12", v: ["Same video on both cards", "Timer started on the computer, still running on the phone"] },
+    { id: "3.5", t: "What a technician can't see", kind: "Picture", v: ["Owner view and technician view side by side, with three callouts"] },
+  ] },
+  { title: "4 · Invoicing and payments", items: [
+    { id: "4.1", t: "Approve the finished job", kind: "Video 0:43", v: ["'Send back' is pointed at but not clicked"] },
+    { id: "4.2", t: "What the invoice looks like", kind: "Picture", v: ["Tax reads 'per settings' and the balance has no tax added", "Only one vehicle line, with a note that each vehicle gets one"], ask: "Need sales tax rates from accounting" },
+    { id: "4.3", t: "Get paid by card", kind: "Video 0:30", v: ["Generic card payment page, no processor named", "Customer email shown as billing@ridgeline-ph.example"] },
+    { id: "4.4", t: "Recording checks and bank payments", kind: "Picture", v: ["One check from Keystone Dairy pays two invoices"] },
+    { id: "4.5", t: "Connecting to QuickBooks", kind: "Picture", v: ["Only sends to QuickBooks. Nothing comes back"], ask: "Two-way sync, or send invoices only?" },
+  ] },
+  { title: "5 · Materials and ordering", items: [
+    { id: "5.1", t: "Materials list", kind: "Picture", v: ["No shelf counts", "Vendors are invented"] },
+    { id: "5.2", t: "Saved packages", kind: "Picture", v: ["Full wrap has 6 lines"] },
+    { id: "5.3", t: "Ordering from vendors", kind: "Video 0:43", v: ["Ordered in feet, not rolls", "Receiving raises film from $3.10 to $3.20 per foot", "Whole order received at once"] },
+  ] },
+  { title: "6 · Time and payroll", items: [
+    { id: "6.1", t: "Approve timesheets", kind: "Video 0:34", v: ["Week of Oct 27 to 31", "Missed clock-out fixed to 3:20 PM, with a reason"] },
+    { id: "6.2", t: "Send hours to payroll", kind: "Picture", v: ["No wages and no payroll service connection"] },
+    { id: "6.3", t: "Who can see what", kind: "Picture", v: ["Technicians can't open materials, reports or settings (my inference)", "Says everyone signs in with their own email"] },
+  ] },
+  { title: "7 · Reports", items: [
+    { id: "7.1", t: "Money reports", kind: "Picture", v: ["Aging amounts are invented"] },
+    { id: "7.2", t: "Work in progress", kind: "Picture", v: ["Shows one view, though scope mentions two"], ask: "What should count here?" },
+    { id: "7.3", t: "Time reports", kind: "Picture", v: ["Clocked hours vs. job hours for one week"] },
+  ] },
+  { title: "8 · Setup and moving off FullBay", items: [
+    { id: "8.1", t: "Using your own words", kind: "Video 0:30", v: ["Graphics' field worker word is 'Installer'", "Mechanical shown as preview only"] },
+    { id: "8.2", t: "Computer, phone or tablet", kind: "Picture", v: ["Same job details at three sizes"] },
+    { id: "8.3", t: "Moving off FullBay", kind: "Picture", v: ["86 customers, 14 open jobs and 9 unpaid invoices are invented", "Customers shown as already brought over"], ask: "Who enters them, and when?" },
+  ] },
+];
+
+const ALL = GROUPS.flatMap((g) => g.items);
+const state = {}; // id -> { done, note }
+let db = null, filter = "all";
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+function render() {
+  const show = (it) => filter === "all" || (filter === "open" && !state[it.id]?.done) || (filter === "notes" && state[it.id]?.note);
+  $("#list").innerHTML = GROUPS.map((g) => {
+    const items = g.items.filter(show);
+    if (!items.length) return "";
+    return `<section><h2>${g.title}</h2>${items.map((it) => {
+      const s = state[it.id] || {};
+      const thumb = it.kind ? `<img class="thumb" src="thumbs/${it.k || it.id}.jpg" alt="" loading="lazy">` : "";
+      return `<div class="item ${it.kind ? "" : "global"} ${s.done ? "done" : ""}">${thumb}<div class="body">
+        <label class="head"><input type="checkbox" id="c-${it.id}" data-id="${it.id}" ${s.done ? "checked" : ""}><span><span class="title">${it.kind && !it.id.startsWith("g") && it.id !== "ov" ? it.id + " · " : ""}${esc(it.t)}</span>${it.kind ? `<br><span class="kind">${it.kind}</span>` : ""}</span></label>
+        <ul>${it.v.map((x) => `<li>${esc(x)}</li>`).join("")}${it.ask ? `<li class="ask">? ${esc(it.ask)}</li>` : ""}</ul>
+        <textarea id="n-${it.id}" data-note="${it.id}" placeholder="Note (what to change)">${esc(s.note || "")}</textarea></div></div>`;
+    }).join("")}</section>`;
+  }).join("");
+  const done = ALL.filter((it) => state[it.id]?.done).length;
+  $("#count").textContent = `${done} of ${ALL.length} done`;
+  $("#meter").style.width = (done / ALL.length) * 100 + "%";
+}
+
+function local(write) {
+  try {
+    if (write) localStorage.setItem("v1-review", JSON.stringify(state));
+    else Object.assign(state, JSON.parse(localStorage.getItem("v1-review") || "{}"));
+  } catch (e) {}
+}
+
+async function save(id) {
+  local(true);
+  if (!db) return;
+  $("#save").textContent = "Saving…";
+  try { await db.doc("review/" + id.replace(/\./g, "_")).set({ id, done: !!state[id].done, note: state[id].note || "" }); $("#save").textContent = "Saved"; }
+  catch (e) { $("#save").textContent = "Saved on this device only"; }
+}
+
+document.addEventListener("change", (e) => {
+  const id = e.target.dataset.id;
+  if (!id) return;
+  state[id] = { ...state[id], done: e.target.checked };
+  render(); save(id);
+});
+const timers = {};
+document.addEventListener("input", (e) => {
+  const id = e.target.dataset.note;
+  if (!id) return;
+  state[id] = { ...state[id], note: e.target.value };
+  clearTimeout(timers[id]); timers[id] = setTimeout(() => save(id), 700);
+});
+for (const f of ["all", "open", "notes"]) $("#f-" + f).addEventListener("click", () => {
+  filter = f;
+  for (const g of ["all", "open", "notes"]) $("#f-" + g).setAttribute("aria-pressed", g === f);
+  render();
+});
+
+local(false);
+render();
+(async () => {
+  db = await window.claude?.use?.("db").catch(() => null);
+  if (!db) { $("#save").textContent = "Saves on this device"; return; }
+  $("#save").textContent = "Saved for every device";
+  db.collection("review").onSnapshot((snap) => {
+    const active = document.activeElement?.dataset?.note;
+    for (const d of snap.docs) { const v = d.data(); if (v.id !== active) state[v.id] = { done: v.done, note: v.note }; }
+    local(true);
+    if (!active) render();
+  });
+})();
+</script>
