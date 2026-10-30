@@ -45,9 +45,9 @@ const go = (screen, who) => { S.screen = screen; S.who = who; render(); };
 // The technician's own jobs (same as the video).
 const MY_JOBS = [
   { no: "G-1048", cust: "Ridgeline Plumbing", what: "Unit 14 · full wrap", who: "T1", date: "Today", pri: "High", stage: 4 },
-  { no: "G-1044", cust: "Keystone Dairy Co-op", what: "Tanker DOT lettering", who: "T1", date: "Tomorrow", pri: "High", stage: 3 },
-  { no: "G-1046", cust: "Brightway Movers", what: "Rear door graphics", who: "T1", date: "Nov 4", pri: "Normal", stage: 2 },
-  { no: "G-1052", cust: "Lancaster Kitchen Supply", what: "Box truck logo kit", who: "T1", date: "Nov 5", pri: "Normal", stage: 0 },
+  { no: "G-1044", cust: "Keystone Dairy Co-op", what: "Tanker DOT lettering", who: "T1", date: "Today", pri: "High", stage: 3 },
+  { no: "G-1046", cust: "Brightway Movers", what: "Rear door graphics", who: "T1", date: "Oct 31", pri: "Normal", stage: 2 },
+  { no: "G-1052", cust: "Lancaster Kitchen Supply", what: "Box truck logo kit", who: "T1", date: "Nov 3", pri: "Normal", stage: 0 },
   { no: "G-1043", cust: "Millport School District", what: "Shop wall mural", who: "T1", date: "Oct 29", pri: "Normal", stage: 4 },
   { no: "G-1041", cust: "Ridgeline Plumbing", what: "Unit 9 · decal refresh", who: "T1", date: "Oct 27", pri: "Normal", stage: 5 },
 ];
@@ -67,10 +67,10 @@ function myJobs() {
       <div class="meta">${T.asset}: 2024 Ford Transit 250 · Install date: today · Assigned: Technician 1</div></div>
     <button class="btn primary" style="align-self:flex-start">Start timer · Installation</button>
     <div class="box"><h3>Instructions</h3><div class="small">Wrap both sides and the rear. Keep the logo clear of the fuel door. Customer drops the van at 7:30 AM.</div></div>
-    <div class="box"><h3>Files</h3><div style="display:flex;gap:14px;flex-wrap:wrap">${FILES(true)}</div></div>
+    <div class="box"><h3>Files</h3><div style="display:flex;gap:14px;flex-wrap:wrap">${FILES(false)}</div></div>
     ${checklistBox}
-    <div class="box"><h3>Notes</h3><div class="small">Oct 30 · Printing done, laminating overnight.</div></div>
-    <div class="box"><h3>Completion photos</h3><div class="small muted">None yet. Add them from the phone, or upload them here. When the work is done: Done · send for review. The job stays in ${T.stages[4]}, tagged Needs review, until the owner closes it.</div></div>
+    <div class="box"><h3>Completion photos</h3><div class="small muted">None yet. Add them from the phone, or upload them here.</div>
+      <div class="small" style="margin-top:6px">Then Done · send for review. The job is tagged Needs review until the owner closes it.</div></div>
   </div>`;
   const body = `<div class="head"><div><h2>${T.board}</h2><div class="meta">Showing only ${T.works.toLowerCase()} assigned to you · no costs, markup or profit</div></div>
     <div class="btns"><span class="pill solid">Assigned to me</span><div class="seg"><button class="on">Board</button><button>List</button><button>Schedule</button></div></div></div>
@@ -184,7 +184,7 @@ function checklistJob() {
       </div></div>`;
   const r = `<span class="pill solid">Clocked in 7:02 AM</span>`;
   return techShell("My jobs", body, "my-jobs/G-1048", r)
-    + `<div class="callout" style="left:760px;top:236px"><div class="note"><span class="badge">?</span><span>which checklist items</span></div></div>`;
+    + `<div class="callout" style="left:300px;top:660px"><div class="note"><span class="badge">?</span><span>which checklist items</span></div></div>`;
 }
 
 function render() {
