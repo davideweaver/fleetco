@@ -1,0 +1,6 @@
+[
+  {"id": "1.3-title", "text": "Here is how the owner records the customer's approval."},
+  {"id": "1.3-sent", "text": "The estimate went out by email. The customer calls back. They want Unit 14 wrapped now, but not Unit 17. The owner opens Record approval."},
+  {"id": "1.3-record", "text": "The owner approves Unit 14 and declines Unit 17. They note who said yes, how they said it, and when. Then they save."},
+  {"id": "1.3-record-shown", "text": "The approval record now shows on the estimate. Unit 17 is crossed out, and the total and deposit cover only Unit 14."}
+]

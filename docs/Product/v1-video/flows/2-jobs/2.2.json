@@ -1,0 +1,7 @@
+[
+  {"id": "2.2-title", "text": "The job board shows every open job as a card, moving through six stages."},
+  {"id": "2.2-board", "text": "Here is the job board. There are six stages, from ready for production to completed. Each card shows the customer, the vehicle, the date, the priority, and the initials of the person assigned."},
+  {"id": "2.2-forward", "text": "Printing is done on Unit 14, so the owner drags its card forward one stage, to production complete."},
+  {"id": "2.2-back", "text": "The owner can also move a card backward, or skip a stage. The Keystone Dairy lettering needs a reprint, so it goes back to in production."},
+  {"id": "2.2-quick", "text": "Clicking a card opens a quick view. Delays are written as job notes, so everyone can see why a job is waiting. From here, the owner can open the full job details."}
+]

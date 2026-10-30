@@ -1,0 +1,6 @@
+[
+  {"id": "6.1-title", "text": "This clip shows the owner checking a week of hours and approving it."},
+  {"id": "6.1-week", "text": "The owner opens the timesheets for the week. For each person and each day, they see hours punched in, hours on jobs, and shop time."},
+  {"id": "6.1-fix", "text": "On Thursday, Technician 1 forgot to clock out. The owner opens that day, enters the clock out time, and writes a short reason."},
+  {"id": "6.1-approve", "text": "The change is saved with the reason, so there is a record. Then the owner approves the week, and the hours are ready to send to payroll."}
+]

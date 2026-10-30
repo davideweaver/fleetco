@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Estimates and approval</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Kalam:wght@400;700&display=swap">
+<link rel="stylesheet" href="../../lib/wire.css">
+<style>
+/* page-only helpers (grayscale + the existing pencil blue for callouts) */
+.est td { padding: 5px 10px; }
+.est tr.group td { padding: 7px 10px; }
+.caret { display: inline-block; width: 16px; color: var(--ink-2); font-family: var(--mono); }
+.editing { border: 1.5px solid var(--pencil); box-shadow: 2px 2px 0 var(--pencil); border-radius: 3px; padding: 1px 6px; background: var(--paper); }
+tr.changed td { background: var(--fill); }
+.hint { color: var(--ink-3); font-size: 13px; }
+.fields { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 14px; }
+.fields .f { display: flex; flex-direction: column; gap: 4px; font-size: 13.5px; }
+.fields .f label { font: 600 10.5px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
+.fields .input.pick { display: flex; justify-content: space-between; }
+.fields .input.on { border-color: var(--ink); }
+.panel { position: absolute; top: 0; bottom: 0; }
+.doc { background: var(--paper); border: 2px solid var(--ink); border-radius: 4px; padding: 22px 24px; display: flex; flex-direction: column; gap: 12px; box-shadow: 6px 6px 0 var(--fill-2); }
+.doc .lab { font: 600 11px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); }
+.mail-head { border-bottom: 1.5px solid var(--ink); padding-bottom: 10px; display: grid; grid-template-columns: 70px 1fr; gap: 4px 10px; font-size: 13.5px; }
+.mail-head span:nth-child(odd) { color: var(--ink-2); }
+.paybtn { align-self: center; background: var(--ink); color: var(--paper); border-radius: 5px; padding: 12px 34px; font-weight: 600; font-size: 16px; }
+.note { font-family: var(--hand); color: var(--pencil); font-size: 19px; line-height: 1.25; display: flex; gap: 8px; align-items: flex-start; }
+.note .badge { flex: none; width: 26px; height: 26px; border: 1.5px solid var(--pencil); border-radius: 50%; display: grid; place-items: center; font-size: 15px; font-weight: 700; }
+.pnote { position: absolute; z-index: 20; background: var(--paper); padding: 4px 8px; max-width: 330px; }
+tr.maybe td { color: var(--ink-3); border-top: 1.5px dashed var(--ink-3); border-bottom: 1.5px dashed var(--ink-3); }
+.sec-h { font: 600 10.5px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin: 0 0 8px; display: flex; justify-content: space-between; align-items: center; }
+</style>
+</head>
+<body>
+<script src="../../lib/wire.js"></script>
+<script>
+/* Estimates and approval: videos 1.1, 1.3 and pictures 1.2, 1.4, 1.5 */
+const CONTACT = "Mike Dorsey";
+const VEH = {
+  9: { type: "Vehicle", ymm: "2021 Ford Transit 250", note: "Cargo van" },
+  14: { type: "Vehicle", ymm: "2024 Ford Transit 250", note: "Cargo van, medium roof" },
+  17: { type: "Vehicle", ymm: "2023 Ford Transit 350 HD", note: "Extended length, high roof" },
+  21: { type: "Vehicle", ymm: "2022 Ram ProMaster 2500", note: "Cargo van" },
+};
+const pkgLines = () => WRAP.map((w) => [...w]);
+const lineSum = (ls, k) => ls.reduce((a, r) => a + r[1] * r[k], 0);
+const pct = (c, p) => (p ? Math.round(((p - c) / p) * 100) + "%" : "");
+
+function freshE() {
+  return { cust: null, custMenu: false, vehMenu: false, pkgMenu: null, units: [], edit: null, changed: null,
+    view: "int", modal: false, dec17: false, method: "Phone call", approved: false, deposit: "none", sent: false };
+}
+const S = { screen: "title", who: null, title: ["", ""], E: freshE(), compact: false };
+const go = (screen, who) => { S.screen = screen; S.who = who; render(); };
+const unit = (u) => S.E.units.find((x) => x.u === u);
+const isDec = (u) => S.E.approved && u === 17 && S.E.dec17;
+function storyUnits(withEdit = true) {
+  const a = { u: 14, lines: pkgLines(), open: false }, b = { u: 17, lines: pkgLines(), open: false };
+  if (withEdit) b.lines[0][1] = 74;
+  return [a, b];
+}
+
+/* ---------- estimate screen ---------- */
+function statusPill(u) {
+  const E = S.E;
+  if (!E.approved) return E.sent ? `<span class="pill dash">Waiting</span>` : `<span class="pill dash">Draft</span>`;
+  return isDec(u) ? `<span class="pill dash">Declined</span>` : `<span class="pill solid">Approved</span>`;
+}
+function estTable() {
+  const E = S.E;
+  if (!E.cust) return `<div class="empty">Pick a customer to start.</div>`;
+  let rows = "";
+  for (const x of E.units) {
+    const v = VEH[x.u], c = lineSum(x.lines, 3), p = lineSum(x.lines, 4), dec = isDec(x.u) ? "declined" : "";
+    rows += `<tr class="group ${dec}"><td><span class="caret">${x.lines.length ? (x.open ? "▾" : "▸") : ""}</span><span class="strike">Unit ${x.u} · ${v.ymm}${x.lines.length ? " · Full wrap" : ""}</span></td>
+      <td class="num">${x.lines.length ? x.lines.length + " lines" : ""}</td><td class="num">${x.lines.length ? money(c) : ""}</td><td class="num">${x.lines.length ? money(p) : ""}</td><td class="num">${pct(c, p)}</td>
+      <td>${x.lines.length ? statusPill(x.u) : `<button class="btn dash" data-k="pkg-${x.u}">+ Saved package</button>`}</td></tr>`;
+    if (x.open) rows += x.lines.map((w, i) => {
+      const ed = E.edit && E.edit.u === x.u && E.edit.i === i;
+      const ch = E.changed && E.changed.u === x.u && E.changed.i === i;
+      return `<tr class="sub rowin ${ch ? "changed" : ""}" style="animation-delay:${i * 70}ms"><td>${w[0]}</td>
+        <td class="num"><span data-k="qty-${x.u}-${i}" class="${ed ? "editing" : ""}">${w[1]} ${w[2]}</span></td><td class="num">${money(w[1] * w[3])}</td><td class="num">${money(w[1] * w[4])}</td><td class="num">${pct(w[1] * w[3], w[1] * w[4])}</td><td></td></tr>`;
+    }).join("");
+  }
+  if (E.view === "cust") {
+    rows = E.units.map((x) => `<tr class="${isDec(x.u) ? "declined" : ""}"><td><span class="strike">Unit ${x.u} · ${VEH[x.u].ymm} · Full wrap</span><div class="small muted">Design, print, laminate and install</div></td><td class="num"><span class="strike">${money(lineSum(x.lines, 4))}</span></td><td>${statusPill(x.u)}</td></tr>`).join("");
+    return `<div class="tbl est"><table><thead><tr><th>Description</th><th class="num">Price</th><th style="width:130px">Status</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  }
+  return `<div class="tbl est"><table><thead><tr><th>Item</th><th class="num">Qty</th><th class="num">Cost</th><th class="num">Price</th><th class="num">Margin</th><th style="width:150px">Status</th></tr></thead><tbody>${rows ||
+    `<tr><td colspan="6" class="hint" style="padding:24px;text-align:center">No vehicles yet. Add one of this customer's vehicles.</td></tr>`}</tbody></table></div>
+    <div style="margin-top:10px"><button class="btn dash" data-k="add-veh">+ Add vehicle</button></div>`;
+}
+function sidePanel() {
+  const E = S.E;
+  const live = E.units.filter((x) => !isDec(x.u));
+  const c = live.reduce((a, x) => a + lineSum(x.lines, 3), 0), p = live.reduce((a, x) => a + lineSum(x.lines, 4), 0);
+  const dep = { none: `<button class="btn" data-k="send-deposit" ${E.approved ? "" : "disabled"}>Send deposit link</button>`,
+    sent: `<span class="pill dash">Link emailed Oct 27</span>`,
+    paid: `<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><span class="small muted">Link emailed Oct 27, 10:20 AM</span><span class="pill solid" data-k="dep-paid">Paid by card · Oct 27, 2:41 PM</span><span class="small muted">Comes off the final invoice</span></div>` }[E.deposit];
+  const totals = `<div class="box" data-k="totals"><h3>Totals</h3><div class="kv">
+    ${E.view === "int" ? `<dt>Your cost</dt><dd>${money(c)}</dd>` : ""}<dt>${E.approved ? "Approved price" : "Price"}</dt><dd>${money(p)}</dd>
+    ${E.view === "int" ? `<dt>Margin</dt><dd>${p ? money(p - c) + " · " + pct(c, p) : "—"}</dd>` : ""}<dt>Sales tax</dt><dd>per settings</dd>
+    ${E.approved ? `<div class="rule"></div><dt>Deposit (50%)</dt><dd>${money(p / 2)}</dd>` : ""}</div>
+    ${E.approved ? `<div style="margin-top:12px;display:flex;justify-content:flex-end">${dep}</div>` : ""}</div>`;
+  const appr = `<div class="box" data-k="approval-box"><h3>Approval record</h3>${E.approved
+    ? `<div class="kv"><dt>Unit 14</dt><dd>Approved</dd><dt>Unit 17</dt><dd>${E.dec17 ? "Declined" : "Approved"}</dd><dt>Approved by</dt><dd>${CONTACT}</dd><dt>How</dt><dd>${E.method}</dd><dt>When</dt><dd>Oct 27, 10:14 AM</dd><dt>Recorded by</dt><dd>Owner</dd></div>`
+    : `<div class="muted small">${E.sent ? "Sent to the customer Oct 24. Not approved yet." : "Not sent yet."}</div>`}</div>`;
+  return S.compact ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start">${totals}${appr}</div>` : `<div style="display:flex;flex-direction:column;gap:14px">${totals}${appr}</div>`;
+}
+function estimate() {
+  const E = S.E;
+  const custName = E.cust || "";
+  const body = `
+  <div class="head"><div><div class="crumb">Estimates › E-2207</div><h2 style="white-space:nowrap">${E.cust ? "Ridgeline Plumbing &amp; Heating" : "New estimate"}</h2><div class="meta">${E.cust ? `Contact: ${CONTACT}${S.compact ? " · PO 7781" : ""}` : "Nothing sent to the customer yet"}</div></div>
+    <div class="btns">${E.cust && E.units.some((x) => x.lines.length) ? `<div class="seg"><button class="${E.view === "int" ? "on" : ""}" data-k="v-int">Your view</button><button class="${E.view === "cust" ? "on" : ""}" data-k="v-cust">Customer view</button></div>` : ""}
+    <button class="btn" data-k="record-approval" ${E.sent && !E.approved ? "" : "disabled"}>Record approval</button>
+    <button class="btn primary" data-k="send-est" ${E.units.some((x) => x.lines.length) && !E.sent ? "" : "disabled"}>${E.sent ? "Estimate sent" : "Email estimate"}</button></div></div>
+  <div class="fields" ${S.compact ? "hidden" : ""}>
+    <div class="f"><label>Customer</label><div class="input pick ${E.custMenu ? "on" : ""}" data-k="cust-field"><span class="${custName ? "" : "hint"}">${custName || "Choose a customer…"}</span><span class="muted">▾</span></div></div>
+    <div class="f"><label>Contact</label><div class="input"><span class="${E.cust ? "" : "hint"}">${E.cust ? CONTACT + " · office manager" : "—"}</span></div></div>
+    <div class="f"><label>Customer PO / reference (optional)</label><div class="input"><span class="${E.cust ? "" : "hint"}">${E.cust ? "PO 7781" : "—"}</span></div></div>
+  </div>
+  <div class="cols" style="margin-top:0;grid-template-columns:${S.compact ? "1fr" : "1fr 310px"}"><div>${estTable()}</div>${sidePanel()}</div>
+  ${E.custMenu ? `<div class="menu" style="left:24px;top:132px;width:330px">${CUSTOMERS.map((c, i) => `<div data-k="cust-${i}"><span>${c}</span></div>`).join("")}</div>` : ""}
+  ${E.vehMenu ? `<div class="menu" style="left:24px;top:${vehMenuTop()}px;width:360px"><div class="muted small" style="font-family:var(--mono)">Ridgeline's vehicles</div>${[9, 14, 17, 21].map((u) => `<div data-k="veh-${u}"><span>Unit ${u}</span><span class="muted small">${VEH[u].ymm}</span></div>`).join("")}<div><span>Trailer T-3</span><span class="muted small">2019 Wells Cargo 7×14</span></div></div>` : ""}
+  ${E.pkgMenu ? `<div class="menu" style="right:345px;top:${pkgMenuTop()}px;width:290px"><div class="muted small" style="font-family:var(--mono)">Saved packages</div><div data-k="pk-wrap"><span>Full wrap</span><span class="muted small">6 lines</span></div><div><span>Partial wrap</span><span class="muted small">5 lines</span></div><div><span>Door logos (pair)</span><span class="muted small">4 lines</span></div><div><span>DOT lettering</span><span class="muted small">3 lines</span></div></div>` : ""}
+  ${E.modal ? approvalModal() : ""}`;
+  return shell("Estimates", body, "estimates/E-2207");
+}
+// menus are placed under the element that opened them
+function below(k, dy = 6) {
+  const el = document.querySelector(`[data-k="${k}"]`), sc = document.querySelector(".screen");
+  if (!el || !sc) return 200;
+  return Math.round(el.getBoundingClientRect().bottom - sc.getBoundingClientRect().top + dy);
+}
+let _vehTop = 200, _pkgTop = 200;
+const vehMenuTop = () => _vehTop, pkgMenuTop = () => _pkgTop;
+
+function approvalModal() {
+  const E = S.E;
+  const seg = (u, dec) => `<div class="seg"><button class="${dec ? "" : "on"}">Approve</button><button class="${dec ? "on" : ""}" data-k="decline-${u}">Decline</button></div>`;
+  return `<div class="scrim"><div class="modal" style="width:580px"><h4>Record customer approval</h4>
+    <div class="muted small">Estimate E-2207 · each vehicle can be approved or declined on its own</div>
+    <div class="choice"><span>Unit 14 · Full wrap · ${money(lineSum(unit(14).lines, 4))}</span>${seg(14, false)}</div>
+    <div class="choice"><span>Unit 17 · Full wrap · ${money(lineSum(unit(17).lines, 4))}</span>${seg(17, E.dec17)}</div>
+    <div class="field"><label>Approved by</label><div class="input">${CONTACT} · Ridgeline</div></div>
+    <div class="field"><label>How</label><div class="seg">${["Phone call", "Email reply", "In person"].map((m) => `<button class="${E.method === m ? "on" : ""}" data-k="m-${slug(m)}">${m}</button>`).join("")}</div></div>
+    <div class="field"><label>When</label><div class="input">Oct 27, 10:14 AM</div></div>
+    <div class="field"><label>Note</label><div class="input">Unit 17 maybe in the spring</div></div>
+    <div class="btns"><button class="btn">Cancel</button><button class="btn primary" data-k="save-approval">Save approval</button></div></div></div>`;
+}
+
+/* ---------- picture-only layouts ---------- */
+function custDoc() {
+  const us = storyUnits();
+  return `<div class="doc"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div class="logo">LOGO</div><div style="text-align:right"><div class="lab">Estimate</div><div style="font:600 18px var(--mono)">E-2207</div><div class="small muted">Oct 24</div></div></div>
+    <div class="small"><div class="lab">Prepared for</div>Ridgeline Plumbing &amp; Heating<br>Attn: ${CONTACT} · PO 7781</div>
+    <div class="tbl"><table><thead><tr><th>Description</th><th class="num">Price</th></tr></thead><tbody>
+      ${us.map((x) => `<tr><td style="padding:10px"><b>Unit ${x.u} · ${VEH[x.u].ymm}</b><div>Full wrap</div><div class="small muted">Design, print, laminate and install</div></td><td class="num" style="vertical-align:top;padding:10px">${money(lineSum(x.lines, 4))}</td></tr>`).join("")}
+    </tbody></table></div>
+    <div class="kv" style="width:260px;align-self:flex-end"><dt>Subtotal</dt><dd>${money(us.reduce((a, x) => a + lineSum(x.lines, 4), 0))}</dd><dt>Sales tax</dt><dd>per settings</dd></div>
+    <div class="small muted">Approve each vehicle separately. Reply or call us to approve.</div></div>`;
+}
+function mailDoc() {
+  return `<div class="doc"><div class="lab">Email the customer gets</div>
+    <div class="mail-head"><span>From</span><span>OTC Fleet Services</span><span>To</span><span>${CONTACT} · Ridgeline Plumbing</span><span>Subject</span><span><b>Deposit for estimate E-2207</b></span></div>
+    <div class="logo">LOGO</div>
+    <div style="font-size:14.5px;line-height:1.5">Hi Mike,<br>Thanks for approving Unit 14. To get it on the schedule, please pay the 50% deposit below.</div>
+    <div class="box"><div class="kv"><dt>Unit 14 · Full wrap</dt><dd>${money(PRICE)}</dd><div class="rule"></div><dt><b>Deposit due</b></dt><dd><b>${money(PRICE / 2)}</b></dd></div></div>
+    <div class="paybtn">Pay deposit</div>
+    <div class="small muted" style="text-align:center">Pay by card. The deposit comes off your final invoice.</div>
+    <div class="small muted" style="border-top:1px solid var(--fill-2);padding-top:8px">OTC Fleet Services · Questions? Reply to this email.</div></div>`;
+}
+function customerPage() {
+  const veh = [
+    ["Unit 9", "Vehicle", VEH[9].ymm, "Decal refresh · Oct 28"],
+    ["Unit 14", "Vehicle", VEH[14].ymm, "Full wrap · in production"],
+    ["Unit 17", "Vehicle", VEH[17].ymm, "Declined Oct 27"],
+    ["Unit 21", "Vehicle", VEH[21].ymm, "—"],
+    ["T-3", "Trailer", "2019 Wells Cargo 7×14 enclosed", "—"],
+  ];
+  const body = `<div class="head"><div><div class="crumb">Customers › Ridgeline Plumbing &amp; Heating</div><h2>Ridgeline Plumbing &amp; Heating</h2><div class="meta">Customer since 2019 · 5 vehicles and trailers</div></div>
+    <div class="btns"><button class="btn">Edit customer</button><button class="btn primary">+ New estimate</button></div></div>
+  <div class="cols" style="margin-top:0;grid-template-columns:330px 1fr">
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="box"><h3>Contact</h3><div class="kv" style="grid-template-columns:auto 1fr"><dt>Name</dt><dd style="font-family:var(--ui)">${CONTACT}</dd><dt>Role</dt><dd style="font-family:var(--ui)">Office manager</dd><dt>Phone</dt><dd>(717) 555-0142</dd><dt>Email</dt><dd>office@ridgelineph.com</dd></div></div>
+      <div class="box"><h3>Billing</h3><div class="small" style="line-height:1.5">Ridgeline Plumbing &amp; Heating<br>412 Orchard Rd<br>Mechanicsburg, PA 17055</div></div>
+      <div class="box"><h3>PO / reference numbers</h3><div class="small muted" style="margin-bottom:8px">Optional. Enter one on any estimate, job or invoice and it prints on the invoice.</div><div class="kv"><dt>Usually needs a PO</dt><dd>Yes</dd></div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:56px">
+      <div><div class="sec-h"><span>Vehicles, trailers and other assets</span><button class="btn dash" style="font-family:var(--ui);text-transform:none;letter-spacing:0">+ Add vehicle or trailer</button></div>
+        <div class="tbl"><table><thead><tr><th style="width:110px">Unit</th><th style="width:110px">Type</th><th>Year / make / model</th><th>Last work</th></tr></thead><tbody>
+          ${veh.map((r) => `<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td class="muted">${r[3]}</td></tr>`).join("")}
+          <tr class="maybe" data-k="maybe-row"><td>Shop sign</td><td>Sign / wall ?</td><td>Front sign, 412 Orchard Rd</td><td>—</td></tr>
+        </tbody></table></div></div>
+      <div><div class="sec-h"><span>Open estimates, jobs and invoices</span></div>
+        <div class="tbl"><table><thead><tr><th style="width:120px">Type</th><th style="width:110px">Number</th><th>What</th><th style="width:110px">PO / ref</th><th style="width:170px">Status</th><th class="num" style="width:110px">Amount</th></tr></thead><tbody>
+          <tr><td>Estimate</td><td class="num" style="text-align:left">E-2207</td><td>Units 14 &amp; 17 · full wrap</td><td>PO 7781</td><td><span class="pill solid">Partly approved</span></td><td class="num">${money(PRICE)}</td></tr>
+          <tr><td>${T.work}</td><td class="num" style="text-align:left">G-1048</td><td>Unit 14 · full wrap</td><td>PO 7781</td><td><span class="pill">In production</span></td><td class="num"></td></tr>
+          <tr><td>Invoice</td><td class="num" style="text-align:left">INV-3311</td><td>Unit 9 · decal refresh</td><td class="muted">—</td><td><span class="pill dash">Unpaid</span></td><td class="num">${money(420)}</td></tr>
+        </tbody></table></div></div>
+    </div></div>`;
+  return shell("Customers", body, "customers/ridgeline-plumbing");
+}
+function sideBySide(leftHtml, rightHtml, leftW = 1000) {
+  return `<div class="panel" style="left:0;width:${leftW}px">${leftHtml}</div><div class="panel" style="left:${leftW + 36}px;right:0;display:flex;flex-direction:column;justify-content:center">${rightHtml}</div>`;
+}
+let NOTES = [];
+function render() {
+  const views = {
+    title: () => cardScreen(S.title[0], S.title[1]),
+    estimate,
+    custview: () => sideBySide(estimate(), `<div class="lab" style="font:600 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);margin-bottom:10px">What the customer gets</div>${custDoc()}`, 1010),
+    deposit: () => sideBySide(estimate(), mailDoc(), 1010),
+    customer: customerPage,
+  };
+  $("#root").innerHTML = views[S.screen]() + NOTES.map((n) => `<div class="note pnote" style="${n.pos}">${n.badge ? `<span class="badge">${n.badge}</span>` : ""}<span>${n.text}</span></div>`).join("");
+  setWho(S.who);
+}
+
+/* ---------- scenes ---------- */
+const title = (t) => { parkCursor(); NOTES = []; S.compact = false; S.E = freshE(); S.title = ["Version 1 · Estimates and approval", t]; go("title", null); };
+async function addVehicle(u) {
+  _vehTop = below("add-veh");
+  await click("add-veh", () => (S.E.vehMenu = true), 450);
+  await click("veh-" + u, () => { S.E.vehMenu = false; S.E.units.forEach((x) => (x.open = false)); S.E.units.push({ u, lines: [], open: true }); }, 450);
+}
+async function addPackage(u) {
+  _pkgTop = below("pkg-" + u);
+  await click("pkg-" + u, () => (S.E.pkgMenu = u), 450);
+  await click("pk-wrap", () => { S.E.pkgMenu = null; unit(u).lines = pkgLines(); }, 900);
+}
+const SCENES = {
+  async "1.1-title"() { title("Build an estimate from a saved package"); },
+  async "1.1-customer"() {
+    S.E = freshE(); go("estimate", "owner");
+    await wait(700);
+    await click("cust-field", () => (S.E.custMenu = true), 500);
+    await click("cust-0", () => { S.E.custMenu = false; S.E.cust = CUSTOMERS[0]; }, 700);
+    await addVehicle(14);
+  },
+  async "1.1-package"() {
+    await wait(300);
+    await addPackage(14);
+    await moveTo("qty-14-5", 260, 0, 900);
+    await wait(900);
+    await addVehicle(17);
+    await addPackage(17);
+  },
+  async "1.1-margin"() {
+    await moveTo("totals", 0, -20, 900);
+    await wait(2500);
+  },
+  async "1.1-edit"() {
+    await click("qty-17-0", () => (S.E.edit = { u: 17, i: 0 }), 700);
+    unit(17).lines[0][1] = 74; render();
+    await wait(800);
+    S.E.edit = null; S.E.changed = { u: 17, i: 0 }; render();
+    toast("Unit 17 film changed to 74 ft · price updated");
+    await wait(1200);
+    await moveTo("totals", 0, -20, 900);
+    await wait(1000);
+  },
+
+  async "1.3-title"() { title("Customer approval"); },
+  async "1.3-sent"() {
+    S.E = freshE(); S.E.cust = CUSTOMERS[0]; S.E.units = storyUnits(); S.E.view = "cust"; S.E.sent = true;
+    go("estimate", "owner");
+    await wait(1200);
+    await moveTo("approval-box", 0, -10, 900);
+    await wait(1500);
+    await click("record-approval", () => (S.E.modal = true), 600);
+  },
+  async "1.3-record"() {
+    await wait(400);
+    await click("decline-17", () => (S.E.dec17 = true), 800);
+    await click("m-phone-call", null, 900);
+    await moveTo("save-approval", -200, -60, 800);
+    await wait(600);
+    await click("save-approval", () => { S.E.modal = false; S.E.approved = true; }, 600);
+  },
+  async "1.3-record-shown"() {
+    await moveTo("approval-box", 0, 0, 900);
+    await wait(1800);
+    await moveTo("totals", 0, 0, 900);
+    await wait(1000);
+  },
+};
+
+/* ---------- pictures ---------- */
+const PICTURES = {
+  async "1.2"() {
+    S.E = freshE(); S.E.cust = CUSTOMERS[0]; S.E.units = storyUnits(); S.E.units.forEach((x) => (x.open = true)); S.compact = true;
+    NOTES = [
+      { badge: 1, text: "You see every material and labor line, with your cost, price and margin.", pos: "left:330px;top:770px;max-width:640px" },
+      { badge: 2, text: "The customer sees one line and one price per vehicle.", pos: "left:1110px;top:110px" },
+    ];
+    go("custview", "owner");
+    document.querySelector('[data-k="add-veh"]').parentElement.hidden = true;
+    document.querySelector(".cols > div:last-child").style.display = "none";
+  },
+  async "1.4"() {
+    S.E = freshE(); S.E.cust = CUSTOMERS[0]; S.E.units = storyUnits(); S.E.view = "cust"; S.E.sent = true; S.E.approved = true; S.E.dec17 = true; S.E.deposit = "paid"; S.compact = true;
+    NOTES = [];
+    go("deposit", "owner");
+    const r = document.querySelector('[data-k="dep-paid"]').getBoundingClientRect();
+    NOTES = [{ badge: 1, text: "The customer paid by card from the email link. The deposit comes off the final invoice.", pos: `left:${r.left - 120}px;top:${r.bottom + 60}px;max-width:420px` }];
+    render();
+  },
+  async "1.5"() {
+    NOTES = [];
+    go("customer", "owner");
+    const r = document.querySelector('[data-k="maybe-row"]').getBoundingClientRect();
+    NOTES = [{ badge: "?", text: "Signs and walls as their own type? Not decided yet.", pos: `left:${r.right - 500}px;top:${r.bottom + 4}px;max-width:430px` }];
+    render();
+  },
+  // temporary checks of video screens
+  async "chk-1.1"() { S.E = freshE(); S.E.cust = CUSTOMERS[0]; S.E.units = storyUnits(); S.E.units[1].open = true; S.E.changed = { u: 17, i: 0 }; go("estimate", "owner"); },
+  async "chk-menu"() { S.E = freshE(); S.E.cust = CUSTOMERS[0]; S.E.units = [{ u: 14, lines: [], open: true }]; go("estimate", "owner"); _pkgTop = below("pkg-14"); S.E.pkgMenu = 14; render(); },
+  async "chk-1.3"() { S.E = freshE(); S.E.cust = CUSTOMERS[0]; S.E.units = storyUnits(); S.E.view = "cust"; S.E.sent = true; S.E.modal = true; S.E.dec17 = true; go("estimate", "owner"); },
+  async "chk-1.3b"() { S.E = freshE(); S.E.cust = CUSTOMERS[0]; S.E.units = storyUnits(); S.E.view = "cust"; S.E.sent = true; S.E.approved = true; S.E.dec17 = true; go("estimate", "owner"); },
+};
+boot();
+</script>
+</body>
+</html>
