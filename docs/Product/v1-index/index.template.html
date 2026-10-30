@@ -1,0 +1,293 @@
+<title>Graphics V1 Guide</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Kalam:wght@400;700&display=swap">
+<style>
+/* Layout: a single reading column. Overview video up top, then the work loop as a map,
+   then each area as a section listing its flows (video or picture), then what is not in V1.
+   Same graph-paper wireframe look as the videos, so the whole package reads as "preview". */
+:root {
+  --paper: #fbfbf9; --grid: #eceae4; --ink: #2b2b2b; --ink-2: #636360; --ink-3: #a3a3a0;
+  --fill: #efefec; --fill-2: #e2e2de; --pencil: #2f5fa8;
+  --hand: "Kalam", "Comic Sans MS", cursive; --ui: "IBM Plex Sans", system-ui, sans-serif; --mono: "IBM Plex Mono", ui-monospace, monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--paper); color: var(--ink); }
+body {
+  font: 15px/1.5 var(--ui);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 64px;
+}
+.wrap { max-width: 1080px; margin: 0 auto; display: flex; flex-direction: column; gap: 44px; }
+a { color: inherit; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, a:focus-visible { outline: 2px dashed var(--pencil); outline-offset: 3px; }
+
+.eyebrow { font: 600 11.5px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); }
+h1 { font: 700 clamp(34px, 5vw, 52px)/1.05 var(--hand); margin: 6px 0 10px; text-wrap: balance; }
+h2 { font: 700 30px/1.1 var(--hand); margin: 0; text-wrap: balance; }
+.lede { font-size: 17px; max-width: 62ch; margin: 0; }
+.stamp { display: inline-block; font: 11px/1.5 var(--mono); letter-spacing: .08em; text-transform: uppercase; border: 1.5px dashed var(--ink-2); color: var(--ink-2); padding: 5px 10px; margin-top: 14px; }
+.mock { font: 15px var(--hand); color: var(--pencil); }
+
+/* hero */
+.hero { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 28px; align-items: center; }
+@media (max-width: 820px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+.player { position: relative; border: 2px solid var(--ink); border-radius: 4px; background: var(--paper); overflow: hidden; display: block; padding: 0; width: 100%; }
+.player img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; filter: grayscale(1) contrast(1.02); opacity: .9; }
+.play { position: absolute; inset: 0; display: grid; place-items: center; }
+.play span { width: 74px; height: 74px; border-radius: 50%; background: var(--ink); display: grid; place-items: center; box-shadow: 5px 5px 0 var(--fill-2); }
+.play svg { margin-left: 6px; }
+.dur { position: absolute; right: 10px; bottom: 10px; background: var(--ink); color: var(--paper); font: 12px var(--mono); padding: 2px 7px; border-radius: 3px; }
+.hero-copy { display: flex; flex-direction: column; gap: 10px; }
+.hero-copy h3 { margin: 0; font-size: 20px; }
+.chapters { list-style: none; margin: 4px 0 0; padding: 0; display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; font-size: 14px; }
+.chapters .t { font: 12.5px var(--mono); color: var(--ink-2); padding-top: 2px; font-variant-numeric: tabular-nums; }
+
+/* loop map */
+.map { border: 2px solid var(--ink); border-radius: 4px; background: var(--paper); padding: 20px 22px 18px; display: flex; flex-direction: column; gap: 14px; }
+.map-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.loop { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; align-items: stretch; }
+.loop a { text-decoration: none; border: 2px solid var(--ink); border-radius: 4px; padding: 12px 14px; background: var(--paper); display: flex; flex-direction: column; gap: 2px; position: relative; margin-right: 30px; }
+.loop a:last-child { margin-right: 0; }
+.loop a:not(:last-child)::after { content: "→"; position: absolute; right: -26px; top: 50%; transform: translateY(-50%); font: 700 22px var(--hand); color: var(--ink-2); }
+.loop a:hover, .support a:hover { background: var(--fill); }
+.loop .n, .support .n { font: 600 11px var(--mono); color: var(--ink-2); letter-spacing: .06em; }
+.loop b { font-size: 16px; }
+.loop span.d, .support span.d { font-size: 13px; color: var(--ink-2); line-height: 1.35; }
+.back { font: 16px var(--hand); color: var(--ink-2); text-align: center; border-top: 1.5px dashed var(--ink-3); padding-top: 6px; margin: 0 6%; }
+.support { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.support a { text-decoration: none; border: 1.5px dashed var(--ink-2); border-radius: 4px; padding: 10px 12px; display: flex; flex-direction: column; gap: 1px; }
+.support b { font-size: 15px; }
+.support-label { font: 600 11px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+@media (max-width: 820px) {
+  .loop, .support { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+  .loop a { margin-right: 0; }
+  .loop a::after { display: none; }
+}
+
+/* sections */
+.area { display: flex; flex-direction: column; gap: 14px; scroll-margin-top: 20px; }
+.area-head { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: 14px; align-items: start; border-bottom: 2px solid var(--ink); padding-bottom: 12px; }
+.area-num { width: 46px; height: 46px; border: 2px solid var(--ink); border-radius: 50%; display: grid; place-items: center; font: 700 22px var(--hand); }
+.area-head p { margin: 4px 0 0; color: var(--ink-2); max-width: 64ch; }
+.counts { font: 12px var(--mono); color: var(--ink-2); text-align: right; white-space: nowrap; padding-top: 6px; }
+@media (max-width: 600px) { .area-head { grid-template-columns: 40px minmax(0, 1fr); } .area-num { width: 38px; height: 38px; font-size: 18px; } .counts { grid-column: 2; text-align: left; padding-top: 0; } }
+.flows { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
+.flow { border: 1.5px solid var(--ink); border-radius: 4px; background: var(--paper); text-align: left; padding: 0; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+.flow:hover { box-shadow: 4px 4px 0 var(--fill-2); }
+.thumb { position: relative; aspect-ratio: 16 / 9; border-bottom: 1.5px solid var(--ink); background-color: var(--fill); }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(1); }
+.thumb.x { background-image:
+  linear-gradient(to top right, transparent calc(50% - 1px), var(--ink-3) calc(50% - .5px), var(--ink-3) calc(50% + .5px), transparent calc(50% + 1px)),
+  linear-gradient(to bottom right, transparent calc(50% - 1px), var(--ink-3) calc(50% - .5px), var(--ink-3) calc(50% + .5px), transparent calc(50% + 1px)); }
+.kind { position: absolute; left: 8px; bottom: 8px; display: flex; align-items: center; gap: 5px; background: var(--paper); border: 1.5px solid var(--ink); border-radius: 3px; font: 600 10.5px var(--mono); letter-spacing: .05em; text-transform: uppercase; padding: 2px 6px; }
+.kind.video { background: var(--ink); color: var(--paper); }
+.flow-body { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 4px; }
+.flow-id { font: 11px var(--mono); color: var(--ink-3); }
+.flow-body b { font-size: 15px; line-height: 1.3; }
+.flow-body .d { font-size: 13px; color: var(--ink-2); line-height: 1.4; }
+.flag { align-self: flex-start; margin-top: 4px; font: 14px var(--hand); color: var(--pencil); border: 1.5px solid var(--pencil); border-radius: 3px; padding: 0 7px; }
+
+/* not in v1 */
+.notv1 { border: 2px dashed var(--ink); border-radius: 4px; padding: 20px 22px; display: flex; flex-direction: column; gap: 12px; background: var(--paper); }
+.nlist { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 6px 26px; }
+.nlist div { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 6px; padding: 6px 0; border-bottom: 1px solid var(--fill-2); font-size: 14px; }
+.nlist div::before { content: "✗"; color: var(--ink-2); font-weight: 700; }
+.nlist b { display: block; }
+.nlist span { color: var(--ink-2); font-size: 13px; }
+
+.foot { font: 16px var(--hand); color: var(--ink-2); border-top: 1.5px solid var(--ink-3); padding-top: 12px; }
+
+/* placeholder viewer */
+.scrim { position: fixed; inset: 0; background: rgba(251,251,249,.86); display: grid; place-items: center; padding: 20px; z-index: 20; }
+.viewer { background: var(--paper); border: 2px solid var(--ink); border-radius: 4px; max-width: 560px; width: 100%; padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; }
+.viewer h4 { margin: 0; font-size: 19px; }
+.viewer .thumb { border: 1.5px solid var(--ink); border-radius: 3px; }
+.viewer ul { margin: 0; padding-left: 18px; font-size: 14px; }
+.viewer .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.btn { border: 1.5px solid var(--ink); background: var(--ink); color: var(--paper); border-radius: 3px; padding: 6px 14px; font-size: 13px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">OTC Fleet Services · Version 1 · Graphics division</div>
+    <h1>What V1 does, one flow at a time</h1>
+    <p class="lede">Start with the three-minute overview. Then open any area below to see each piece up close. Short videos show work moving through the system. Pictures show a single screen.</p>
+    <div class="stamp">Wireframes · they show what each screen does, not how it will look</div>
+  </header>
+
+  <section class="hero" aria-label="Overview video">
+    <button class="player" data-open="overview" aria-label="Play the overview video">
+      <img src="{{IMG:hero}}" alt="Wireframe of the production board">
+      <span class="play"><span><svg width="26" height="30" viewBox="0 0 26 30"><path d="M2 2 L24 15 L2 28 Z" fill="#fbfbf9"/></svg></span></span>
+      <span class="dur">3:11</span>
+    </button>
+    <div class="hero-copy">
+      <div class="eyebrow">Start here</div>
+      <h3>One job, from estimate to paid invoice</h3>
+      <ol class="chapters">
+        <li class="t">0:17</li><li>Build an estimate from templates</li>
+        <li class="t">0:47</li><li>Customer approves, pays the deposit</li>
+        <li class="t">1:01</li><li>The job moves across the board</li>
+        <li class="t">1:13</li><li>The technician installs, on a phone</li>
+        <li class="t">1:36</li><li>Owner reviews, closes, invoices</li>
+        <li class="t">2:08</li><li>Timesheets and payroll</li>
+        <li class="t">2:20</li><li>Built for every division</li>
+        <li class="t">2:44</li><li>What isn't in V1</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="map" aria-label="Map of V1">
+    <div class="map-head"><h2>The work loop</h2><span class="mock">Every flow below sits somewhere on this loop</span></div>
+    <div class="loop" id="loop"></div>
+    <div class="back">and back to the next estimate ↺</div>
+    <div class="support-label">Running underneath</div>
+    <div class="support" id="support"></div>
+  </section>
+
+  <div id="areas" style="display:flex;flex-direction:column;gap:44px"></div>
+
+  <section class="notv1" id="not-v1" aria-label="Not in V1">
+    <div><div class="eyebrow">Just as important</div><h2>Not in V1</h2></div>
+    <div class="nlist" id="nlist"></div>
+  </section>
+
+  <div class="foot">Questions marked in blue still need an answer from you before that flow is final.</div>
+</div>
+
+<div id="layer"></div>
+
+<script>
+const IMG = {
+  estimate: "{{IMG:estimate}}", custview: "{{IMG:custview}}", approval: "{{IMG:approval}}", board: "{{IMG:board}}",
+  phone: "{{IMG:phone}}", review: "{{IMG:review}}", invoice: "{{IMG:invoice}}", time: "{{IMG:time}}", terms: "{{IMG:terms}}",
+};
+
+// kind: "video" or "picture". len: rough video length. img: a frame from the overview, where one exists.
+// ask: an open question that has to be settled before the flow is final.
+const AREAS = [
+  { id: "sell", n: 1, loop: true, title: "Win the work", short: "Estimates and approval",
+    blurb: "From the customer's first yes to a paid deposit. Built for the owner at a desk.",
+    flows: [
+      { t: "Build an estimate from templates", d: "Add a vehicle from a saved template and every material and labor line fills in, with cost, price and margin.", kind: "video", len: "1:00", img: "estimate" },
+      { t: "Internal view and customer view", d: "Itemized for the shop. One line per vehicle for the customer.", kind: "picture", img: "custview" },
+      { t: "Customer approval", d: "Approve some vehicles and decline others. Records who, when and how.", kind: "video", len: "0:45", img: "approval", ask: "One-click approve link in the email?" },
+      { t: "Deposit by card", d: "Email a payment link for the deposit. It's applied to the final invoice.", kind: "picture" },
+      { t: "Customers and their assets", d: "Customer record with vehicles, trailers and signs. Optional PO and reference numbers.", kind: "picture", ask: "Track signs and walls as assets?" },
+    ] },
+  { id: "plan", n: 2, loop: true, title: "Plan the work", short: "Jobs, board and calendar",
+    blurb: "Every active job in one place. Who has it, what stage it's in, when it's due.",
+    flows: [
+      { t: "Turn an approved estimate into a job", d: "Approved lines become the job. Nothing is retyped.", kind: "picture" },
+      { t: "The production board", d: "Six stages. Drag a card forward, back, or past a stage. Priority on every card.", kind: "video", len: "0:45", img: "board" },
+      { t: "Jobs table and filters", d: "The same jobs as a list. Filter by stage, customer, technician, priority or date.", kind: "picture" },
+      { t: "Scheduling calendar", d: "Production dates and install dates, kept separate.", kind: "picture" },
+      { t: "The job record", d: "Scope, files, photos, assignments and notes in one place.", kind: "picture", ask: "How do design proofs fit in?" },
+    ] },
+  { id: "do", n: 3, loop: true, title: "Do the work", short: "The technician's phone",
+    blurb: "What the technician sees, on a phone in the bay. Only their own jobs, and no prices.",
+    flows: [
+      { t: "Punch in and out for the day", d: "The attendance clock, separate from job time.", kind: "picture" },
+      { t: "Time a job", d: "One timer at a time, so hours can't be counted twice. Shop time is tracked separately.", kind: "video", len: "0:40", img: "phone" },
+      { t: "Finish with photos", d: "Add completion photos and send the job to the owner for review.", kind: "video", len: "0:30" },
+      { t: "What a technician can't see", d: "No costs, markup, profit, estimates or invoices.", kind: "picture" },
+    ] },
+  { id: "paid", n: 4, loop: true, title: "Close and get paid", short: "Invoices and payments",
+    blurb: "Review the work, close the job, and the invoice is already drafted.",
+    flows: [
+      { t: "Review and close a job", d: "Check the photos and estimated against actual hours. Close it and the draft invoice appears.", kind: "video", len: "0:40", img: "review" },
+      { t: "The invoice", d: "One line per vehicle, deposit taken off, the customer's other unpaid invoices listed.", kind: "picture", img: "invoice", ask: "Sales tax rates from accounting" },
+      { t: "Send and get paid by card", d: "Email with a payment link. Balances update on their own.", kind: "video", len: "0:35" },
+      { t: "Checks and other payments", d: "Record payments that come in by check or bank transfer.", kind: "picture" },
+      { t: "QuickBooks Online", d: "Invoices and payments flow to QuickBooks.", kind: "picture", ask: "Full two-way sync, or one way?" },
+    ] },
+  { id: "materials", n: 5, title: "Materials and purchasing", short: "Catalog, templates, vendor POs",
+    blurb: "What things cost, what you sell them for, and what's on order.",
+    flows: [
+      { t: "Material catalog", d: "Each material with your cost and selling price.", kind: "picture" },
+      { t: "Reusable templates", d: "Save a package like a full wrap once and use it on every estimate.", kind: "picture" },
+      { t: "Vendor purchase orders", d: "Create a PO, download the PDF, mark it received, and costs update.", kind: "video", len: "0:45" },
+    ] },
+  { id: "people", n: 6, title: "People and payroll", short: "Timesheets, payroll, roles",
+    blurb: "Hours reviewed once, exported once, never counted twice.",
+    flows: [
+      { t: "Review and approve timesheets", d: "Fix missed punches, approve the week.", kind: "video", len: "0:35", img: "time" },
+      { t: "Export hours for payroll", d: "Approved hours by employee and day, as a spreadsheet or printout.", kind: "picture" },
+      { t: "Roles: owner and technician", d: "Two roles at launch. Who can see and do what.", kind: "picture" },
+    ] },
+  { id: "reports", n: 7, title: "Reports", short: "Ten reports, export and print",
+    blurb: "The numbers you look at today, every one exportable to a spreadsheet.",
+    flows: [
+      { t: "Money reports", d: "Receivables aging, revenue, ready to invoice, payments.", kind: "picture" },
+      { t: "Work in progress", d: "Two views of work started but not invoiced.", kind: "picture", ask: "What counts as work in progress?" },
+      { t: "Time reports", d: "Clocked hours, job hours, timesheets.", kind: "picture" },
+    ] },
+  { id: "setup", n: 8, title: "Built to grow", short: "Divisions, devices, switchover",
+    blurb: "Set up for graphics now, on the same foundation the shops move onto later.",
+    flows: [
+      { t: "Division terminology and stages", d: "Graphics says job. A mechanical shop can say service order. Same records underneath.", kind: "video", len: "0:30", img: "terms" },
+      { t: "On phones and tablets", d: "Opens in the browser and saves to the home screen. Nothing to download.", kind: "picture" },
+      { t: "Switchover from FullBay", d: "Moving open jobs and unpaid invoices over, and when.", kind: "picture", ask: "Who enters them, and when?" },
+    ] },
+];
+
+const NOT_V1 = [
+  ["Customer portal and customer logins", "Invoices go out by email with a payment link"],
+  ["Live inventory counts", "The catalog keeps cost and price. Stock is still checked by eye"],
+  ["The mechanical shops", "Lancaster, mobile and postal stay on FullBay for now"],
+  ["Leads, sales pipeline, texting", "These stay in GoHighLevel. Approved work is typed in"],
+  ["Preventive maintenance, inspections, DVIR", "Mechanical work, for a later phase"],
+  ["App Store app", "A browser app saved to the home screen instead"],
+  ["Offline mode", "Needs a signal in the bay"],
+  ["ACH payments", "Card by link. Checks and ACH recorded by hand"],
+  ["Full FullBay history", "Open work moves over. FullBay stays readable for history"],
+  ["Labor guides, parts marketplaces", "Mechanical reference data"],
+];
+
+const $ = (s) => document.querySelector(s);
+const allFlows = [];
+
+$("#loop").innerHTML = AREAS.filter((a) => a.loop).map((a) => `<a href="#${a.id}"><span class="n">${a.n}</span><b>${a.title}</b><span class="d">${a.short}</span></a>`).join("");
+$("#support").innerHTML = AREAS.filter((a) => !a.loop).map((a) => `<a href="#${a.id}"><span class="n">${a.n}</span><b>${a.title}</b><span class="d">${a.short}</span></a>`).join("");
+
+$("#areas").innerHTML = AREAS.map((a) => {
+  const v = a.flows.filter((f) => f.kind === "video").length, p = a.flows.length - v;
+  const cards = a.flows.map((f, i) => {
+    const key = `${a.n}.${i + 1}`;
+    allFlows[key] = { ...f, key, area: a.title };
+    const thumb = f.img ? `<div class="thumb"><img src="${IMG[f.img]}" alt="" loading="lazy">` : `<div class="thumb x">`;
+    const kind = f.kind === "video"
+      ? `<span class="kind video"><svg width="8" height="9" viewBox="0 0 8 9"><path d="M0 0 L8 4.5 L0 9 Z" fill="#fbfbf9"/></svg>Video · ${f.len}</span>`
+      : `<span class="kind">Picture</span>`;
+    return `<button class="flow" data-flow="${key}">${thumb}${kind}</div><div class="flow-body"><span class="flow-id">${key}</span><b>${f.t}</b><span class="d">${f.d}</span>${f.ask ? `<span class="flag">? ${f.ask}</span>` : ""}</div></button>`;
+  }).join("");
+  return `<section class="area" id="${a.id}"><div class="area-head"><div class="area-num">${a.n}</div><div><h2>${a.title}</h2><p>${a.blurb}</p></div>
+    <div class="counts">${v} video${v === 1 ? "" : "s"} · ${p} picture${p === 1 ? "" : "s"}</div></div><div class="flows">${cards}</div></section>`;
+}).join("");
+
+$("#nlist").innerHTML = NOT_V1.map(([a, b]) => `<div><span><b>${a}</b><span>${b}</span></span></div>`).join("");
+
+function open(key) {
+  const f = key === "overview"
+    ? { t: "One job, from estimate to paid invoice", kind: "video", len: "3:11", img: null, area: "Overview", d: "The full loop in one pass." }
+    : allFlows[key];
+  const img = f.img ? `<div class="thumb"><img src="${IMG[f.img]}" alt=""></div>` : key === "overview" ? `<div class="thumb"><img src="{{IMG:hero}}" alt=""></div>` : `<div class="thumb x"></div>`;
+  $("#layer").innerHTML = `<div class="scrim" data-close="1"><div class="viewer" role="dialog" aria-modal="true" aria-label="${f.t}">
+    <div class="eyebrow">${f.area}${f.key ? " · " + f.key : ""}</div><h4>${f.t}</h4>${img}
+    <span class="mock">${f.kind === "video" ? `In the real page, the ${f.len} video plays here.` : "In the real page, the annotated picture shows here, full size."}</span>
+    <div class="row"><span class="small">${f.d}</span><button class="btn" data-close="1" id="close">Close</button></div></div></div>`;
+  $("#close").focus();
+}
+document.addEventListener("click", (e) => {
+  const c = e.target.closest("[data-close]");
+  if (c && (c.classList.contains("btn") || e.target === c)) { $("#layer").innerHTML = ""; return; }
+  const b = e.target.closest("[data-flow], [data-open]");
+  if (b) open(b.dataset.flow || b.dataset.open);
+});
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") $("#layer").innerHTML = ""; });
+</script>
