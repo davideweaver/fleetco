@@ -1,0 +1,5 @@
+[
+  { "key": "5.1", "kind": "picture", "file": "5.1.png" },
+  { "key": "5.2", "kind": "picture", "file": "5.2.png" },
+  { "key": "5.3", "kind": "video", "file": "5.3.mp4", "seconds": 43 }
+]

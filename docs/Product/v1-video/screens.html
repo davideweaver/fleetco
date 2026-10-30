@@ -266,7 +266,7 @@ function estimate() {
     <button class="btn" data-k="record-approval" ${e.units.length ? "" : "disabled"}>Record approval</button>
     <button class="btn primary" data-k="create-job" ${e.deposit === "paid" ? "" : "disabled"}>Create ${T.work.toLowerCase()}</button></div></div>
   ${e.units.length ? `<div class="tbl"><table><thead>${head}</thead><tbody>${rows}</tbody></table></div>` : `<div class="empty">No items yet. Add a vehicle from a saved package to start.</div>`}
-  ${e.menu ? `<div class="menu" style="right:258px;top:62px"><div data-k="tpl-wrap"><span>Full wrap</span><span class="muted small">7 lines</span></div><div><span>Partial wrap</span><span class="muted small">6 lines</span></div><div><span>Door logos (pair)</span><span class="muted small">4 lines</span></div><div><span>DOT lettering</span><span class="muted small">3 lines</span></div></div>` : ""}
+  ${e.menu ? `<div class="menu" style="right:258px;top:62px"><div data-k="tpl-wrap"><span>Full wrap</span><span class="muted small">6 lines</span></div><div><span>Partial wrap</span><span class="muted small">6 lines</span></div><div><span>Door logos (pair)</span><span class="muted small">4 lines</span></div><div><span>DOT lettering</span><span class="muted small">3 lines</span></div></div>` : ""}
   <div class="cols">
     <div class="box"><h3>Approval record</h3>${e.approved
       ? `<div class="kv"><dt>Unit 14</dt><dd>Approved</dd><dt>Unit 17</dt><dd>Declined</dd><dt>Approved by</dt><dd>Mike Dorsey</dd><dt>Method</dt><dd>Phone call</dd><dt>When</dt><dd>Oct 27, 10:14 AM</dd><dt>Recorded by</dt><dd>Owner</dd></div>`

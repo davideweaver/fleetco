@@ -194,11 +194,6 @@ const SCENES = {
 const PICTURES = {
   async "5.1"() { go("materials", "owner"); },
   async "5.2"() { go("packages", "owner"); },
-  // temporary checks of video screens
-  async "chk-form"() { S.po = { ...S.po, vendor: true, lines: 2, menu: "mat" }; go("poForm", "owner"); },
-  async "chk-pdf"() { S.po = { ...S.po, vendor: true, lines: 2, pdf: true }; go("poForm", "owner"); },
-  async "chk-recv"() { S.po = { ...S.po, vendor: true, lines: 2, confirm: true }; go("poForm", "owner"); },
-  async "chk-cost"() { S.updated = true; S.po.recv = "yes"; go("materials", "owner"); },
 };
 boot();
 </script>
