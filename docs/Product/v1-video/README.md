@@ -5,7 +5,9 @@ then division terminology and what is not in V1.
 
 | File | What it is |
 |---|---|
-| `v1-walkthrough.mp4` | The rendered video |
+| `v1-walkthrough.mp4` | The overview video |
+| `doing-the-job.mp4` | Flow video: a technician's day at the shop computer and on a phone |
+| `narration-doing-the-job.json` | Voiceover for `doing-the-job.mp4` |
 | `screens.html` | The wireframe screens plus the scripted cursor (`SCENES`) |
 | `narration.json` | Voiceover text, one entry per scene. Scene ids match `SCENES` |
 | `make_audio.py` | Turns `narration.json` into one WAV per scene (Kokoro TTS, offline) |
@@ -19,6 +21,10 @@ pip install kokoro-onnx soundfile
 # from https://github.com/thewh1teagle/kokoro-onnx/releases/tag/model-files-v1.0
 python3 make_audio.py <model_dir> narration.json <audio_dir> [voice]
 node record.mjs <audio_dir> v1-walkthrough.mp4
+
+# a flow video: pass its narration file to both steps
+python3 make_audio.py <model_dir> narration-doing-the-job.json <audio_dir_2>
+node record.mjs <audio_dir_2> doing-the-job.mp4 narration-doing-the-job.json
 ```
 
 Changing narration: edit `narration.json`, rerun both steps. A scene lasts as long as its

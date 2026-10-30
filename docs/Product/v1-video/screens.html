@@ -178,7 +178,7 @@ tr.declined td .strike { text-decoration: line-through; }
 /* ===================== terminology per division ===================== */
 const DIVISIONS = {
   graphics: {
-    name: "Graphics", work: "Job", works: "Jobs", board: "Production board", worker: "Installer", asset: "Vehicle or sign",
+    name: "Graphics", work: "Job", works: "Jobs", board: "Job board", worker: "Installer", asset: "Vehicle or sign",
     stages: ["Ready for production", "In production", "Production complete", "Ready for install", "Install in progress", "Completed"],
     assets: ["Vehicle", "Trailer", "Sign / wall"],
   },
@@ -407,13 +407,109 @@ function endCard() {
   return `<div class="card-screen"><div class="eyebrow">Version 1 · Graphics division</div><h1 class="big">Off FullBay,<br>on a foundation built to grow.</h1><div class="stamp">Wireframe preview · details to confirm together</div></div>`;
 }
 
+/* ===================== technician flow: shop computer + phone ===================== */
+// One technician's day across both screens. Used by narration-doing-the-job.json.
+const TS = { clocked: false, timer: false, secs: 0, photos: 0, sent: false, clockedOut: false, card: null };
+const hms = (s) => `${Math.floor(s / 3600)}:${String(Math.floor(s / 60) % 60).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+setInterval(() => {
+  if (!TS.timer) return;
+  TS.secs++;
+  document.querySelectorAll(".tick").forEach((el) => (el.textContent = hms(TS.secs)));
+}, 1000);
+
+const MY_JOBS = [
+  { no: "G-1048", cust: "Ridgeline Plumbing", what: "Unit 14 · full wrap", who: "T1", date: "Today", pri: "High" },
+  { no: "G-1044", cust: "Keystone Dairy Co-op", what: "Tanker DOT lettering", who: "T1", date: "Tomorrow", pri: "High", stage: 3 },
+  { no: "G-1046", cust: "Brightway Movers", what: "Rear door graphics", who: "T1", date: "Nov 5", pri: "Normal", stage: 2 },
+  { no: "G-1052", cust: "Lancaster Kitchen Supply", what: "Box truck logo kit", who: "T1", date: "Nov 6", pri: "Normal", stage: 0 },
+];
+
+function techShell(active, body, url) {
+  const nav = ["My jobs", "Schedule", "My time"];
+  const clock = TS.clockedOut ? `<span class="pill dash">Clocked out 3:32 PM</span>`
+    : TS.clocked ? `<span class="pill solid">Clocked in 7:02 AM</span>` : `<button class="btn primary" data-k="clock-in">Clock in</button>`;
+  const timer = TS.timer ? `<span class="division" data-k="timer-chip">Timer · G-1048 · <span class="tick">${hms(TS.secs)}</span></span>` : "";
+  return `<div class="frame">
+    <div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">app.otcfleet.com/${url}</span></div>
+    <div class="topbar"><div class="logo">LOGO</div><div class="search">Search my ${T.works.toLowerCase()}…</div><div class="grow"></div>
+      ${timer}${clock}<span class="user"><span class="av">T1</span>Technician</span></div>
+    <div class="app"><div class="nav">${nav.map((n) => `<div class="${n === active ? "on" : ""}" data-k="tnav-${n.split(" ")[1]}">${n}</div>`).join("")}</div>
+    <div class="screen">${body}</div></div></div>`;
+}
+
+function techBoard() {
+  const stage1048 = TS.sent ? 5 : 4;
+  const jobs = MY_JOBS.map((j) => (j.no === "G-1048" ? { ...j, stage: stage1048, note: TS.sent ? "Waiting for owner" : "" } : j));
+  const cols = T.stages.map((s, i) => {
+    const cs = jobs.filter((j) => j.stage === i);
+    return `<div class="col"><div class="col-head"><span>${s}</span><span>${cs.length}</span></div><div class="cards">${cs.map((j) => boardCard(j, j.no === "G-1048" && TS.card ? "hl" : "")).join("")}</div></div>`;
+  }).join("");
+  const body = `<div class="head"><div><h2>${T.board}</h2><div class="meta">Showing only ${T.works.toLowerCase()} assigned to you</div></div>
+    <div class="btns"><span class="pill">Assigned to me</span><div class="seg"><button class="on">Board</button><button>List</button><button>Schedule</button></div></div></div>
+    <div class="board">${cols}</div>`;
+  return techShell("My jobs", body, "my-jobs");
+}
+
+function techJob() {
+  const body = `<div class="head"><div><div class="crumb">My ${T.works.toLowerCase()} › G-1048</div><h2>Ridgeline Plumbing · Unit 14 full wrap</h2>
+      <div class="meta">${T.asset}: 2024 Ford Transit 250 · Install date: today · Stage: ${T.stages[4]}</div></div>
+    <div class="btns">${TS.timer
+      ? `<div class="timer" style="padding:6px 12px;gap:14px"><div><div class="small muted">Installation</div><div class="t tick" style="font-size:20px">${hms(TS.secs)}</div></div><button class="btn">Stop</button></div>`
+      : `<button class="btn primary" data-k="desk-start">Start timer · Installation</button>`}</div></div>
+    <div class="cols" style="margin-top:0">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="box" data-k="instructions"><h3>Instructions</h3><div>Wrap both sides and the rear. Keep the logo clear of the fuel door. Customer drops the van at 7:30 AM.</div></div>
+        <div class="box" data-k="files"><h3>Files</h3><div style="display:flex;gap:20px;flex-wrap:wrap">
+          <div class="file"><div class="ph"></div>Proof v3 (approved).pdf</div><div class="file"><div class="ph"></div>Measurements.jpg</div><div class="file"><div class="ph"></div>Panel layout.pdf</div></div></div>
+        <div class="box"><h3>Completion photos</h3><div class="muted small">None yet. Add them from the phone, or upload them here.</div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="box"><h3>Notes</h3><div class="small">Oct 31 · Printing done, laminating overnight.</div></div>
+        <div class="box" style="border-style:dashed" data-k="noprices"><h3>Not shown to technicians</h3><div class="small muted">Prices, costs, margin and the customer's invoices.</div></div>
+      </div></div>`;
+  return techShell("My jobs", body, "my-jobs/G-1048");
+}
+
+function techPhone() {
+  const top = `<div class="p-top"><strong>G-1048</strong><span class="pill solid">Clocked in 7:02 AM</span></div>`;
+  const body = TS.sent
+    ? `<div class="done pop"><strong>Sent to the owner to check</strong><span class="small muted">The timer stopped at <span>${hms(TS.secs)}</span>.</span></div>`
+    : `<div class="p-sec"><strong>Ridgeline Plumbing · Unit 14</strong><span class="small">2024 Ford Transit 250 · full wrap</span><span class="small muted">Wrap both sides and the rear. Keep the logo clear of the fuel door.</span></div>
+      <div class="p-sec"><div class="p-h">Job timer</div><div class="timer" data-k="phone-timer"><div><div class="small muted">Installation · started at the computer</div><div class="t tick">${hms(TS.secs)}</div></div><button class="btn primary">Stop</button></div></div>
+      <div class="p-sec"><div class="p-h">Files</div><div class="file"><div class="ph"></div>Proof v3 (approved).pdf</div></div>
+      <div class="p-sec"><div class="p-h">Completion photos</div><div class="photos">${Array.from({ length: TS.photos }, () => `<div class="ph pop"></div>`).join("")}<div class="add" data-k="t-add-photo">+</div></div></div>
+      <div class="p-sec" style="border:0"><button class="wide solid" data-k="t-finish">Done · send to owner to check</button></div>`;
+  return `<div class="phone-stage"><div class="phone"><div class="notch"></div>${top}<div class="p-body">${body}</div></div></div>`;
+}
+
+function techTime() {
+  const body = `<div class="head"><div><h2>My time · today</h2><div class="meta">Mon Nov 3 · The owner reviews and approves this</div></div>
+    <div class="btns">${TS.clockedOut ? `<span class="pill dash">Clocked out</span>` : `<button class="btn primary" data-k="clock-out">Clock out</button>`}</div></div>
+    <div class="cols" style="margin-top:0;grid-template-columns:1fr 300px">
+      <div class="tbl"><table><thead><tr><th>What</th><th>From</th><th class="num">Hours</th></tr></thead><tbody>
+        <tr><td>G-1048 · Ridgeline · Installation</td><td>Computer, then phone</td><td class="num">6.4</td></tr>
+        <tr><td>G-1044 · Keystone Dairy · Prep</td><td>Computer</td><td class="num">0.5</td></tr>
+        <tr><td>Shop time · cleanup and restock</td><td>Phone</td><td class="num">1.6</td></tr>
+      </tbody></table></div>
+      <div class="box" data-k="day-total"><h3>Today</h3><div class="kv"><dt>Clocked in</dt><dd>7:02 AM</dd><dt>Clocked out</dt><dd>${TS.clockedOut ? "3:32 PM" : "—"}</dd><div class="rule"></div><dt>On jobs</dt><dd>6.9 h</dd><dt>Shop time</dt><dd>1.6 h</dd><dt><strong>Total</strong></dt><dd><strong>8.5 h</strong></dd></div></div>
+    </div>`;
+  return techShell("My time", body, "my-time");
+}
+
+function genericCard() {
+  const c = S.card;
+  return `<div class="card-screen"><div class="eyebrow">${c.eyebrow}</div><h1 class="big">${c.big}</h1>${c.lede ? `<p class="lede">${c.lede}</p>` : ""}<div class="stamp">Sketch · shows what each screen does, not the final design</div></div>`;
+}
+
 function render() {
-  const view = { title: titleCard, estimate, board, phone, job: jobRecord, invoice, time: timeScreen, settings, notv1: notV1, end: endCard }[S.screen];
+  const view = { title: titleCard, estimate, board, phone, job: jobRecord, invoice, time: timeScreen, settings, notv1: notV1, end: endCard,
+    card: genericCard, tboard: techBoard, tjob: techJob, tphone: techPhone, ttime: techTime }[S.screen];
   $("#root").innerHTML = view();
   const w = $("#who");
   w.hidden = !S.who;
   if (S.who === "owner") w.innerHTML = `<span class="av">OW</span><span><b>Owner</b> · at the desk</span>`;
-  if (S.who === "tech") w.innerHTML = `<span class="av">T1</span><span><b>Technician</b> · on a phone</span>`;
+  if (S.who === "tech" || S.who === "tech-phone") w.innerHTML = `<span class="av">T1</span><span><b>Technician</b> · on a phone at the van</span>`;
+  if (S.who === "tech-desk") w.innerHTML = `<span class="av">T1</span><span><b>Technician</b> · at the shop computer</span>`;
 }
 
 /* ===================== cursor + director ===================== */
@@ -584,6 +680,60 @@ const SCENES = {
   },
 
   async end() { go("end", null); },
+
+  /* ---------- flow video: Doing the job (computer + phone) ---------- */
+  async "tech-title"() {
+    parkCursor();
+    S.card = { eyebrow: "Version 1 · Doing the job", big: "A technician's day,<br>at the computer and the van.", lede: "Same system, same job, whichever screen is closest." };
+    go("card", null);
+  },
+
+  async "tech-desk"() {
+    parkCursor();
+    go("tboard", "tech-desk");
+    await wait(1600);
+    await click("clock-in", () => (TS.clocked = true), 2200);
+    await moveTo("card-G-1048", 0, 0, 900);
+    await wait(2400);
+  },
+
+  async "tech-job"() {
+    await click("card-G-1048", () => go("tjob", "tech-desk"), 1400);
+    await moveTo("instructions", 0, 0, 800); await wait(1300);
+    await moveTo("files", -200, 0, 800); await wait(1300);
+    await moveTo("noprices", 0, 0, 800); await wait(1600);
+    await click("desk-start", () => { TS.timer = true; TS.secs = 0; }, 2400);
+  },
+
+  async "tech-phone"() {
+    parkCursor();
+    TS.secs = 6 * 3600 + 21 * 60; // about 6.4 h, matching My time
+    go("tphone", "tech-phone");
+    await wait(2600);
+    await moveTo("phone-timer", 40, 10, 900);
+    await wait(3600);
+    for (let i = 0; i < 3; i++) await click("t-add-photo", () => TS.photos++, 650);
+    await wait(900);
+    await click("t-finish", () => { TS.sent = true; TS.timer = false; }, 1500);
+  },
+
+  async "tech-back"() {
+    parkCursor();
+    TS.card = true;
+    go("tboard", "tech-desk");
+    await wait(1200);
+    await moveTo("card-G-1048", 0, 0, 900);
+    await wait(2600);
+    await click("tnav-time", () => go("ttime", "tech-desk"), 1400);
+    await moveTo("day-total", 0, 0, 800); await wait(2400);
+    await click("clock-out", () => (TS.clockedOut = true), 1200);
+  },
+
+  async "tech-end"() {
+    parkCursor();
+    S.card = { eyebrow: "Version 1 · Doing the job", big: "Only their jobs.<br>No prices. Any screen.", lede: "" };
+    go("card", null);
+  },
 };
 
 window.director = { run: (id) => SCENES[id](), ids: Object.keys(SCENES) };

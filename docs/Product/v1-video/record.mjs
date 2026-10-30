@@ -1,6 +1,6 @@
 // Records screens.html scene by scene and lays the narration under it.
 //
-// Usage: node record.mjs <audio_dir> <out.mp4>
+// Usage: node record.mjs <audio_dir> <out.mp4> [narration.json]
 //   <audio_dir> holds <scene>.wav and durations.json from make_audio.py.
 //
 // Each scene lasts as long as its narration (plus a short pause) or its on-screen
@@ -16,8 +16,8 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 const here = dirname(fileURLToPath(import.meta.url));
 // CommonJS require so a globally installed playwright resolves too.
 const { chromium } = createRequire(import.meta.url)("playwright");
-const [audioDir, outFile] = process.argv.slice(2).map((p) => resolve(p));
-const narration = JSON.parse(readFileSync(join(here, "narration.json"), "utf8"));
+const [audioDir, outFile, narrationFile = join(here, "narration.json")] = process.argv.slice(2).map((p) => resolve(p));
+const narration = JSON.parse(readFileSync(narrationFile, "utf8"));
 const durations = JSON.parse(readFileSync(join(audioDir, "durations.json"), "utf8"));
 const PAUSE = 900; // ms of silence after each narration clip
 const W = 1600, H = 900;

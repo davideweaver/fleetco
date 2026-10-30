@@ -1,0 +1,8 @@
+[
+  {"id": "tech-title", "text": "This is how a technician works through a job. They use the same system at the shop computer and on their phone at the vehicle. Either way, they only see their own jobs, and never see prices or costs."},
+  {"id": "tech-desk", "text": "The day starts at the shop computer. The technician clocks in, and the job board shows only the jobs assigned to them. Today's install is right there."},
+  {"id": "tech-job", "text": "Opening the job shows the instructions and the approved design files. There are no prices or costs anywhere on this page. They start the installation timer right here at the computer."},
+  {"id": "tech-phone", "text": "Then they head out to the van with their phone. It's the same job, and the timer they started at the computer is still running. When the install is done, they take completion photos right on the phone, and send the job to the owner to check. That stops the timer."},
+  {"id": "tech-back", "text": "Back at the computer, the job shows it's waiting for the owner. Their hours for the day are all in one place, whichever screen they used, ready for the owner to approve. Then they clock out."},
+  {"id": "tech-end", "text": "Only their jobs, no prices, on whatever screen is closest."}
+]
