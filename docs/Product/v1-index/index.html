@@ -133,7 +133,7 @@ h2 { font: 700 30px/1.1 var(--hand); margin: 0; text-wrap: balance; }
         <li class="t">0:17</li><li>Build an estimate from templates</li>
         <li class="t">0:47</li><li>Customer approves, pays the deposit</li>
         <li class="t">1:01</li><li>The job moves across the board</li>
-        <li class="t">1:13</li><li>The technician does the job, on a phone</li>
+        <li class="t">1:13</li><li>The technician does the job</li>
         <li class="t">1:36</li><li>Owner approves the work and sends the invoice</li>
         <li class="t">2:08</li><li>Timesheets and payroll</li>
         <li class="t">2:20</li><li>Settings for other divisions</li>
@@ -189,12 +189,13 @@ const AREAS = [
       { t: "Schedule", d: "A calendar with production dates and install dates kept separate.", kind: "picture" },
       { t: "Job details", d: "Instructions, files, photos, who's assigned, and notes, all on one page.", kind: "picture", ask: "How should design proofs work?" },
     ] },
-  { id: "phone", n: 3, loop: true, title: "Doing the job", short: "What the technician uses on a phone",
-    blurb: "What the technician sees on a phone. Only their own jobs, and no prices.",
+  { id: "phone", n: 3, loop: true, title: "Doing the job", short: "What the technician uses, at a computer or on a phone",
+    blurb: "The technician uses the same system at a shop computer or on a phone at the vehicle. Either way, they see only their own jobs and no prices.",
     flows: [
-      { t: "Clock in and out", d: "Clocking in for the day is separate from time spent on jobs.", kind: "picture" },
-      { t: "Track time on a job", d: "Start and stop a timer. Only one runs at a time, so hours aren't counted twice.", kind: "video", len: "0:40", img: "phone" },
-      { t: "Finish with photos", d: "Add photos of the finished work and send the job to the owner to check.", kind: "video", len: "0:30" },
+      { t: "My jobs at the shop computer", d: "The technician's own jobs on the board and schedule, with instructions and files.", kind: "picture" },
+      { t: "Clock in and out", d: "Clocking in for the day is separate from time spent on jobs. Works from the computer or the phone.", kind: "picture" },
+      { t: "Track time on a job", d: "Start and stop a timer from the computer or the phone. Only one runs at a time, so hours aren't counted twice.", kind: "video", len: "0:40", img: "phone" },
+      { t: "Finish with photos", d: "Take photos on the phone, or upload them at the computer, and send the job to the owner to check.", kind: "video", len: "0:30" },
       { t: "What a technician can't see", d: "No costs, prices, profit, estimates or invoices.", kind: "picture" },
     ] },
   { id: "invoicing", n: 4, loop: true, title: "Invoicing and payments", short: "Bill the customer and get paid",
@@ -231,7 +232,7 @@ const AREAS = [
     blurb: "Settings that let other divisions use this later, the devices it runs on, and the move off FullBay.",
     flows: [
       { t: "Using your own words", d: "Each division can name things its own way. Graphics says job. A repair shop can say service order.", kind: "video", len: "0:30", img: "terms" },
-      { t: "Phones and tablets", d: "Open it in the browser and save it to the home screen. Nothing to download.", kind: "picture" },
+      { t: "Computer, phone or tablet", d: "Everyone uses the same system in a web browser. On a phone it fits the small screen and saves to the home screen.", kind: "picture" },
       { t: "Moving off FullBay", d: "Bringing over open jobs and unpaid invoices.", kind: "picture", ask: "Who enters them, and when?" },
     ] },
 ];
