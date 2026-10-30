@@ -303,11 +303,11 @@ const SCENES = {
   async "4.3-send"() {
     S.inv = "draft"; S.sendModal = false;
     go("invoice", "owner");
-    await wait(900);
-    await click("send-inv", () => (S.sendModal = true), 1500);
+    await wait(400);
+    await click("send-inv", () => (S.sendModal = true), 900);
     await click("send-now", () => { S.sendModal = false; S.inv = "sent"; }, 200);
     toast("Invoice emailed with a payment link");
-    await wait(1500);
+    await wait(900);
   },
   async "4.3-email"() {
     parkCursor();
@@ -317,18 +317,18 @@ const SCENES = {
   },
   async "4.3-pay"() {
     for (let i = 1; i <= 4; i++) { S.pay.filled = i; render(); await wait(450); }
-    await click("pay-now", () => (S.pay.stage = "done"), 2200);
+    await click("pay-now", () => (S.pay.stage = "done"), 1300);
   },
   async "4.3-paid"() {
     parkCursor();
     S.inv = "paid"; go("invoice", "owner");
     await wait(500);
     toast("Payment received · balance $0.00");
-    await moveTo("balance", 0, 0, 900);
-    await wait(1600);
+    await moveTo("balance", 0, 0, 800);
+    await wait(1000);
     await click("nav-invoices", () => (S.screen = "invoices"), 600);
-    await moveTo("row-0412", 200, 0, 900);
-    await wait(2200);
+    await moveTo("row-0412", 200, 0, 800);
+    await wait(1400);
   },
 };
 
@@ -336,13 +336,6 @@ const PICTURES = {
   async "4.2"() { go("custInvoice", "cust-doc"); },
   async "4.4"() { S.inv = "paid"; go("record", "owner"); },
   async "4.5"() { go("qb", "owner"); },
-  // temporary checks of video screens
-  async "chk-board"() { S.hl = true; go("board", "owner"); },
-  async "chk-job"() { S.hint = true; go("job", "owner"); },
-  async "chk-inv"() { S.sendModal = true; go("invoice", "owner"); },
-  async "chk-email"() { go("email", "cust-mail"); },
-  async "chk-pay"() { S.pay.filled = 4; go("pay", "cust-pay"); },
-  async "chk-list"() { S.inv = "paid"; go("invoices", "owner"); },
 };
 boot();
 </script>

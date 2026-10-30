@@ -1,0 +1,7 @@
+[
+  { "key": "4.1", "kind": "video", "file": "4.1.mp4", "seconds": 43 },
+  { "key": "4.2", "kind": "picture", "file": "4.2.png" },
+  { "key": "4.3", "kind": "video", "file": "4.3.mp4", "seconds": 30 },
+  { "key": "4.4", "kind": "picture", "file": "4.4.png" },
+  { "key": "4.5", "kind": "picture", "file": "4.5.png" }
+]
