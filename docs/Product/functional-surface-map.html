@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Functional Surface — FullBay × myotcfleet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0d0e0d;        /* asphalt */
+  --ink-2:#141614;
+  --ink-3:#1c1f1c;
+  --ink-4:#262a26;
+  --rule:#30352f;
+  --rule-2:#3d433c;
+  --fg:#f2f1ea;
+  --fg-2:#b4b5a9;
+  --fg-3:#7e8077;
+  --hi:#ff6a1f;         /* safety orange */
+  --hi-dim:#8f3a12;
+  --none:#e05252;
+  --thin:#d98324;
+  --partial:#d4c023;
+  --full:#3fae72;
+  --beyond:#4b9fe0;
+  --shell:92px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--ink);color:var(--fg);
+  font:400 15px/1.6 Barlow,system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+/* grain + vignette atmosphere */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:9;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/></filter><rect width='120' height='120' filter='url(%23n)' opacity='.035'/></svg>");
+  mix-blend-mode:overlay;
+}
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:8;
+  background:radial-gradient(130% 90% at 18% 0%,transparent 40%,rgba(0,0,0,.55) 100%);
+}
+
+/* ---------- masthead ---------- */
+header{
+  position:relative;z-index:10;
+  border-bottom:1px solid var(--rule);
+  background:linear-gradient(180deg,var(--ink-2),var(--ink));
+  padding:26px var(--gut,34px) 0;
+  --gut:34px;
+}
+.hazard{height:6px;width:100%;
+  background:repeating-linear-gradient(135deg,var(--hi) 0 14px,#1a1a17 14px 28px);
+  opacity:.85;margin-bottom:22px}
+.mast{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;flex-wrap:wrap}
+h1{
+  font:800 clamp(30px,4.6vw,52px)/0.92 "Barlow Condensed",sans-serif;
+  text-transform:uppercase;letter-spacing:-.015em;
+}
+h1 em{font-style:normal;color:var(--hi)}
+.kicker{
+  font:500 11px/1 "IBM Plex Mono",monospace;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--fg-3);margin-bottom:10px;
+}
+.lede{color:var(--fg-2);max-width:62ch;font-size:14.5px;margin-top:12px}
+.counts{display:flex;gap:0;border:1px solid var(--rule);border-radius:3px;overflow:hidden;flex-shrink:0}
+.counts div{padding:12px 18px;border-right:1px solid var(--rule);background:var(--ink-3)}
+.counts div:last-child{border-right:0}
+.counts b{display:block;font:700 26px/1 "Barlow Condensed",sans-serif;letter-spacing:-.02em}
+.counts span{font:500 9.5px/1 "IBM Plex Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--fg-3);margin-top:6px;display:block}
+
+/* legend */
+.legend{display:flex;gap:20px;flex-wrap:wrap;padding:20px 0 22px;margin-top:22px;border-top:1px solid var(--rule)}
+.lg{display:flex;gap:8px;align-items:center;font:500 11px/1.3 "IBM Plex Mono",monospace;letter-spacing:.06em;color:var(--fg-2);text-transform:uppercase}
+.sw{width:11px;height:11px;border-radius:2px;flex-shrink:0}
+
+/* ---------- layout ---------- */
+.stage{display:grid;grid-template-columns:minmax(300px,380px) 1fr;align-items:start;position:relative;z-index:10}
+@media (max-width:1020px){.stage{grid-template-columns:1fr}}
+
+nav{border-right:1px solid var(--rule);padding:30px 0 80px;position:sticky;top:0;max-height:100vh;overflow-y:auto}
+nav::-webkit-scrollbar{width:9px}
+nav::-webkit-scrollbar-thumb{background:var(--ink-4);border-radius:9px}
+@media (max-width:1020px){nav{position:static;max-height:none;border-right:0;border-bottom:1px solid var(--rule)}}
+
+.band{margin-bottom:26px}
+.band-hd{padding:0 34px 10px;display:flex;align-items:baseline;gap:9px}
+.band-hd h2{font:700 12px/1 "IBM Plex Mono",monospace;letter-spacing:.17em;text-transform:uppercase;color:var(--fg)}
+.band-hd .ct{font:500 11px/1 "IBM Plex Mono",monospace;color:var(--fg-3)}
+.band-hd p{font-size:12.5px;color:var(--fg-3);padding:0 34px;line-height:1.45}
+.band-sub{font-size:12.5px;color:var(--fg-3);padding:0 34px 12px;line-height:1.45;max-width:46ch}
+
+button.area{
+  display:grid;grid-template-columns:30px 1fr 12px;gap:12px;align-items:center;
+  width:100%;text-align:left;background:none;border:0;border-left:3px solid transparent;
+  padding:11px 34px 11px 31px;cursor:pointer;color:inherit;font:inherit;
+  transition:background .14s,border-color .14s;
+}
+button.area:hover{background:var(--ink-2)}
+button.area .num{font:500 10.5px/1 "IBM Plex Mono",monospace;color:var(--fg-3);letter-spacing:.04em}
+button.area .nm{font:600 15.5px/1.25 "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.015em;font-size:16px}
+button.area .dot{width:9px;height:9px;border-radius:2px;justify-self:end}
+button.area[aria-selected="true"]{background:var(--ink-3);border-left-color:var(--hi)}
+button.area[aria-selected="true"] .nm{color:var(--hi)}
+button.area:focus-visible{outline:2px solid var(--hi);outline-offset:-2px}
+
+/* ---------- detail ---------- */
+main{padding:34px 44px 110px;max-width:860px}
+@media (max-width:640px){main{padding:26px 22px 80px}header{--gut:22px}.band-hd,.band-sub,button.area{padding-left:22px;padding-right:22px}button.area{padding-left:19px}}
+
+.d-top{display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+.d-num{font:500 11px/1 "IBM Plex Mono",monospace;color:var(--fg-3);letter-spacing:.14em;padding-top:11px}
+h3.d-name{font:800 clamp(26px,3.4vw,40px)/1.02 "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:-.01em;flex:1 1 260px}
+.chip{
+  font:600 10px/1 "IBM Plex Mono",monospace;letter-spacing:.13em;text-transform:uppercase;
+  padding:7px 10px;border-radius:3px;white-space:nowrap;margin-top:5px;
+}
+.d-who{font:500 11.5px/1 "IBM Plex Mono",monospace;letter-spacing:.09em;text-transform:uppercase;color:var(--fg-3);margin:2px 0 22px}
+.d-pitch{font-size:17.5px;line-height:1.5;color:var(--fg);border-left:2px solid var(--hi);padding-left:18px;margin-bottom:26px}
+
+h4{font:700 11px/1 "IBM Plex Mono",monospace;letter-spacing:.17em;text-transform:uppercase;color:var(--fg-3);margin:30px 0 11px;padding-bottom:7px;border-bottom:1px solid var(--rule)}
+main p{color:var(--fg-2);margin-bottom:13px;max-width:70ch}
+main p strong{color:var(--fg);font-weight:600}
+main ul{list-style:none;margin:0 0 13px}
+main ul li{color:var(--fg-2);padding-left:19px;position:relative;margin-bottom:8px;max-width:70ch}
+main ul li::before{content:"";position:absolute;left:3px;top:.62em;width:6px;height:1px;background:var(--hi)}
+main ul li strong{color:var(--fg);font-weight:600}
+
+.vocab{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:6px}
+.vocab span{
+  font:500 11.5px/1 "IBM Plex Mono",monospace;background:var(--ink-3);
+  border:1px solid var(--rule-2);border-radius:3px;padding:7px 9px;color:var(--fg-2);
+}
+
+.verdict{background:var(--ink-2);border:1px solid var(--rule);border-left:3px solid var(--vc,var(--hi));border-radius:3px;padding:18px 20px;margin-top:14px}
+.verdict .vt{font:600 10px/1 "IBM Plex Mono",monospace;letter-spacing:.15em;text-transform:uppercase;color:var(--vc,var(--hi));margin-bottom:9px}
+.verdict p{margin:0;color:var(--fg-2)}
+.verdict p + p{margin-top:10px}
+
+.scale{display:flex;gap:3px;margin:16px 0 4px}
+.scale i{height:5px;flex:1;background:var(--ink-4);border-radius:1px}
+.scale i.on{background:var(--vc,var(--hi))}
+.scale-l{font:500 10px/1 "IBM Plex Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-3)}
+
+.fade{animation:rise .3s cubic-bezier(.2,.7,.3,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+.hint{color:var(--fg-3);font-size:14px;max-width:48ch;margin-top:40px}
+footer{border-top:1px solid var(--rule);padding:22px 34px 40px;position:relative;z-index:10;
+  font:500 11px/1.7 "IBM Plex Mono",monospace;color:var(--fg-3);letter-spacing:.05em}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hazard"></div>
+  <div class="mast">
+    <div>
+      <p class="kicker">Fleetco · product surface reference</p>
+      <h1>Functional Surface<br><em>FullBay</em> × <em>myotcfleet</em></h1>
+      <p class="lede">Every functional area of both systems, written for reading rather than for engineering. Pick an area on the left to see what it is, who lives in it, and how far the replacement actually reaches.</p>
+    </div>
+    <div class="counts">
+      <div><b>12</b><span>FullBay areas</span></div>
+      <div><b>9</b><span>Beyond FullBay</span></div>
+      <div><b>21</b><span>Total</span></div>
+    </div>
+  </div>
+  <div class="legend">
+    <span class="lg"><i class="sw" style="background:var(--none)"></i> Nothing built</span>
+    <span class="lg"><i class="sw" style="background:var(--thin)"></i> Pointer only</span>
+    <span class="lg"><i class="sw" style="background:var(--partial)"></i> Partial</span>
+    <span class="lg"><i class="sw" style="background:var(--full)"></i> Matched or better</span>
+    <span class="lg"><i class="sw" style="background:var(--beyond)"></i> Beyond FullBay</span>
+  </div>
+</header>
+
+<div class="stage">
+  <nav id="nav" aria-label="Functional areas"></nav>
+  <main id="detail" aria-live="polite"></main>
+</div>
+
+<footer>
+  Sources — FullBay: logged-in walkthrough 2026-10-09 + gated help centre (447 articles across 13 collections) + marketing.<br>
+  myotcfleet: repo read of cthomasotc-ui/myotcfleet 2026-10-11 (50 tables, 201 RLS policies, 47 routes) + authenticated crawl 2026-10-10.<br>
+  Companion to fullbay-surface-map.html · see “myotcfleet Codebase” and “Feature Inventory Draft”.
+</footer>
+
+<script>
+const C={none:'var(--none)',thin:'var(--thin)',partial:'var(--partial)',full:'var(--full)',beyond:'var(--beyond)'};
+const LBL={none:'Nothing built',thin:'Pointer only',partial:'Partial',full:'Matched or better',beyond:'Beyond FullBay'};
+const FILL={none:0,thin:1,partial:2,full:4,beyond:4};
+
+const AREAS=[
+/* ============ BAND 1: FULLBAY SHOP FLOOR ============ */
+{
+ id:'service-orders',band:0,n:'01',name:'Service Orders',cov:'thin',
+ who:'Service writer · Technician · Manager',
+ pitch:'The spine of the whole product. Every dollar FullBay touches starts as a service order, and everything else in the system is either feeding it or billing it.',
+ what:[
+  'A <strong>Service Order</strong> is one visit by one unit. Inside it, each individual repair is an <strong>Action Item</strong> — FullBay calls it a SOAI, and the abbreviation shows up in the UI itself. Every action item carries the three-part repair record: <strong>Concern</strong> (what the customer reported), <strong>Cause</strong> (what the tech found), <strong>Correction</strong> (what was done), each with its own parts and labor tabs.',
+  'The live board is a kanban: <strong>Unassigned → Assign → Diagnose → Price Parts → Authorize → Wait For Authorization → Repair → Recent Completed</strong>. That pipeline is the shop\'s day. A service writer stands in it from open to close.',
+  'There are two separate priority fields, which tells you something about how the business really runs. <strong>Service Request Urgency</strong> is set at intake ("Emergency — get this fixed right away", "Remember for the next visit"). <strong>Service Order Urgency</strong> is set during the work ("WIP", "Parts", "Pending"). Both are shop-configurable.',
+  'Thirteen list tabs and seven view modes exist because different roles need different cuts of the same queue — By Tech for a foreman, By Customer for a writer, Prioritize for a manager.'
+ ],
+ vocab:['Service Order','Action Item (SOAI)','Concern / Cause / Correction','Quick SO','Global Services','Part Kits','Sublet','Yard Check','Daily Rates','Access SOAI'],
+ verdict:[
+  'myotcfleet has a table called <strong>active_services</strong> that looks like a work order and is not one. Its columns are <code>stage, severity, first_concern, po_number, estimate_number, service_order_number, estimate_total</code> — reference numbers pointing at FullBay documents, plus a cached total.',
+  'There are no line items, no action items, no cause/correction record, no parts, no labor, no technician assignment. The portal shows the customer a status and a number. <strong>The repair itself has no representation in the new system at all.</strong> This is the single largest gap, and it is the area FullBay charges for.'
+ ]
+},
+{
+ id:'estimates',band:0,n:'02',name:'Estimates & Authorization',cov:'partial',
+ who:'Service writer · Customer · Authorizer',
+ pitch:'The workflow that separates heavy-duty repair from ordinary auto work. A fleet does not just get a bill — it approves the work first, line by line, and that approval is a legal and financial record.',
+ what:[
+  'The shop diagnoses, prices the parts and labor, and sends an estimate. The customer approves, declines, or <strong>partially approves</strong> — then approved-and-assigned work converts automatically into a live service order.',
+  'Authorization is <strong>per repair line</strong>, not per estimate. A real customer-facing estimate shows each line with its own "Authorize Correction(s)? Yes/No" toggle plus a "Toggle All" shortcut. A fleet can approve the brakes and decline the cosmetic work on the same visit.',
+  'Labor time comes from <strong>MOTOR</strong> or <strong>Mitchell 1</strong> labor guides, or from the shop\'s own history. <strong>Expected Hours</strong> is a tracked concept distinct from actual clocked hours — the gap between the two is how a shop learns to quote.',
+  'Edge cases carry real money: <strong>Require Re-Authorization</strong> when scope changes mid-repair, <strong>Pre-Authorize All Parts</strong> below a threshold, and mid-job authorization for newly found work without re-approving everything.',
+  'The estimate header literally reads <strong>Service Order / Purchase Order / Service Writer / Authorizer</strong> — FullBay records who approved, by name.'
+ ],
+ vocab:['Authorizer','Per-line authorization','Expected Hours','Require Re-Authorization','Pre-Authorize All Parts','Quick Estimate','Shop Supplies','Spending thresholds'],
+ verdict:[
+  'This is the one shop-side area where myotcfleet genuinely participates. It owns the <strong>customer half</strong> of the workflow: a <code>ready_to_authorize</code> stage, a dedicated <code>/active-services/$serviceId/authorize</code> route, an <code>authorized_at</code> timestamp, and the <code>fleet_authorizer</code> role built around exactly this act. The whole app is organised around the Fleet Authorizer as its central persona.',
+  'What it does not have is the <strong>shop half</strong> — building the estimate. No pricing, no labor-guide integration, no parts lookup, no per-line construction, no Expected Hours. It can collect an approval; it cannot produce the thing being approved.'
+ ]
+},
+{
+ id:'parts',band:0,n:'03',name:'Parts & Inventory',cov:'none',
+ who:'Parts manager · Front counter · Owner',
+ pitch:'The deepest area in the entire product — 68 help-centre articles, more than any other collection. It is also where shop profit is actually won or lost, which is why it is so elaborate.',
+ what:[
+  'Live stock across shelves, bins, service trucks and multiple shop locations, with <strong>intra-company transfers</strong> as a named workflow. Barcode scanning, min/max reorder thresholds, auto-ordering, bin assignment, and <strong>cycle counts</strong> distinct from ad-hoc adjustments.',
+  'Purchasing is a full subsystem: create a PO, email the vendor, receive, return, plus <strong>combined POs</strong> spanning several service orders and vendors, and a <strong>Needs Ordered</strong> working list.',
+  '<strong>Core charges</strong> are the thing outsiders always miss. Rebuildable parts carry a refundable deposit, tracked as separate charge/credit lines with their own core inventory and valuation report. This has real accounting consequences and three dedicated help articles.',
+  'Margin control is its own discipline: <strong>pricing scales</strong> and <strong>pricing matrices</strong> (tiered markup by cost band and customer type), a <strong>cost floor</strong> enforced regardless of markup, "Use Last Cost", and a "Privacy On" mode that hides cost from customer-facing views.',
+  'Oddities that reveal how shops really operate: <strong>fake inventory parts</strong> for billing something you do not stock, <strong>counter sales</strong> with no service order attached, drop-shipping straight to a job site, and separately tracked shipping, freight and restocking fees.'
+ ],
+ vocab:['Core charge / core credit','Pricing matrix','Cost floor','Counter Sale','Fake inventory part','Combined PO','Cycle count','Drop shipping','Inventory velocity'],
+ verdict:[
+  '<strong>Nothing.</strong> No parts table, no inventory, no vendors-for-parts, no purchase orders, no core tracking.',
+  'Note the trap: myotcfleet does have a <code>vendors</code> module, but it is a different thing entirely — outside service providers with an application workflow, not parts suppliers with stock and POs. Do not let the matching word create a false sense of coverage.'
+ ]
+},
+{
+ id:'labor',band:0,n:'04',name:'Labor & Technician Time',cov:'none',
+ who:'Technician · Shop foreman · Payroll',
+ pitch:'How work becomes both a payroll number and a billable number. Fleetco pays technicians on actual clocked hours, so this module is directly load-bearing for making payroll.',
+ what:[
+  'A technician taps a job to clock in, and every minute logs against that job and unit. The live account captures <strong>GPS coordinates on time stamps</strong> — relevant for road techs.',
+  'Billable labor is split from non-billable admin time per tech. <strong>Expected Hours vs actual</strong> drives the shop\'s productivity view: the tech home screen shows completed hours, SO hours, <strong>efficiency</strong> and <strong>utilization</strong> per person.',
+  'Timesheets are a separate subsystem from job clocking — configurable timesheet activities, payroll corrections, and reconciliation against service-order time stamps.',
+  'Seven canned employee reports exist, including a <strong>Payroll Advance</strong> report, which implies pay runs are genuinely driven from this data rather than re-keyed elsewhere.'
+ ],
+ vocab:['Clock in/out per job','Efficiency','Utilization','Expected vs actual hours','Timesheet activities','Payroll Advance','Labor vs admin split'],
+ verdict:[
+  '<strong>Nothing.</strong> No technicians, no time entries, no timesheets, no labor rates, no productivity metrics.',
+  'This is a sleeper risk in any replacement conversation. Technician time feeds payroll, and payroll cannot run on a best-effort basis. Any cutover plan has to treat this as a hard dependency, not a phase-two feature.'
+ ]
+},
+{
+ id:'pm',band:0,n:'05',name:'PM Scheduling',cov:'partial',
+ who:'Fleet manager · Service writer · Technician',
+ pitch:'Preventive maintenance is the recurring revenue of a heavy-duty shop and the reason a fleet keeps a relationship rather than shopping each repair. It is scheduled work, which means it is predictable work.',
+ what:[
+  'PM intervals are defined by <strong>mileage, engine hours, or calendar time</strong> — and set at the unit, unit-type, or component level, so a template applies across a class of trucks rather than one at a time.',
+  'A configurable <strong>coming-due window</strong> (observed at 30 days) flags work before it is late. Due and overdue PMs <strong>auto-generate service orders</strong> into their own Auto-Gen SOs tab — the system creates the shop\'s baseline workload without anyone typing it.',
+  'Supporting machinery that matters in practice: <strong>batch-add</strong> a PM across many units, <strong>enter last performed</strong> to backfill a baseline for a unit serviced elsewhere, and step-by-step <strong>procedures</strong> attached to a PM definition.',
+  'Meter readings captured on a service order drive the next due date, and PM history lives permanently on the unit record. Fleet customers can request upcoming PM through the portal.'
+ ],
+ vocab:['PM interval (miles / hours / calendar)','Coming-due window','Auto-Gen SO','Unit type template','Last performed','Meter reading','Procedures'],
+ verdict:[
+  'myotcfleet has the <strong>visible surface</strong> and none of the engine. Units carry a <code>next_pm_date</code>, there is a real calendar (<code>fleet_schedule_events</code> with validation triggers) and a twelve-month service-history view.',
+  'Missing: interval definitions of any kind, meter-driven calculation, unit-type templates, and auto-generation. The date is a stored value someone must set, not a computed one. A customer can see a PM is coming; nothing decides when it is coming.'
+ ]
+},
+{
+ id:'inspections',band:0,n:'06',name:'Inspections & DVIR',cov:'full',
+ who:'Driver · Technician · Fleet manager',
+ pitch:'How a problem gets reported by the person who noticed it. For a fleet this is a compliance obligation; for the shop it is the top of the funnel.',
+ what:[
+  'Driver Vehicle Inspection Reports arrive through an <strong>integration</strong>, not natively — <strong>Whip Around</strong> is the named partner. A driver flags a defect on their phone and it flows into a new FullBay service order.',
+  '<strong>Pitstop</strong> supplies telematics-driven predicted-failure flagging, turning fault codes into work orders.',
+  'FullBay\'s own contribution is the <strong>guided inspection</strong>: a technician-run in-app checklist used during a job.'
+ ],
+ vocab:['DVIR','Defect-to-SO','Guided inspection','Predicted failure','Whip Around','Pitstop'],
+ verdict:[
+  '<strong>This is myotcfleet\'s strongest area, and it beats FullBay outright.</strong> It has a native driver-reporting system where FullBay has a third-party dependency.',
+  'The mechanism is a <strong>QR sticker on the vehicle</strong>. A driver scans it and reports a problem without an account — <code>vehicle_qr_tokens</code>, <code>qr_sign_in_requests</code>, <code>qr_audit_events</code>, token-limit triggers and anonymous reporting routes are all built. There is a 12-item issue taxonomy (taillight out, check engine light, brake noise, no start…) and a full workflow: <code>submitted → waiting_authorizer_review → approved_for_otc | declined | handle_internally → sent_to_otc → scheduled → in_service → completed</code>.',
+  'The <strong>declined / handle_internally</strong> branch is a real business rule FullBay does not model: the fleet can take a repair in-house instead of sending it out. Keep this module. It is the clearest product insight in the codebase.'
+ ]
+},
+{
+ id:'invoicing',band:0,n:'07',name:'Invoicing & Payments',cov:'partial',
+ who:'Office · Owner · Customer',
+ pitch:'Where the work becomes money, and considerably deeper than a billing screen. FullBay maintains real accounting structure rather than passing everything to QuickBooks.',
+ what:[
+  'An approved order becomes an invoice with actual labor hours, delivered by text, email, or portal link with an attached PDF. Payment accepts card, ACH, eCheck, Apple Pay, Google Pay, buy-now-pay-later, and <strong>Interstate Billing Service</strong> fleet A/R financing.',
+  'The accounts-receivable layer is substantial: <strong>customer statements</strong> with their own preferences, <strong>credit memos</strong> documented separately from refunds, partial and full refunds, pre-payments, auto-reconciliation and a dispute workflow.',
+  'FullBay keeps its own <strong>chart of accounts</strong> and item mapping, plus <strong>cash-basis sales-tax reporting</strong> and 1099-style vendor tax documents. This is deeper than a QuickBooks pass-through — and <strong>QuickBooks sync is confirmed as Fleetco\'s live accounting workflow today.</strong>',
+  '<strong>Warranty work</strong> gets its own billing treatment, and <strong>Quick Charge</strong> handles payment with no service order attached.'
+ ],
+ vocab:['A/R Aging','Customer Statements','Credit Memo','Chart of Accounts','Cash-basis sales tax','Quick Charge','IBS financing','Warranty billing'],
+ verdict:[
+  'myotcfleet handles the <strong>customer-facing</strong> slice: an <code>invoices</code> table with <code>current / coming_due / past_due / paid</code> status, an invoice detail route, <code>fullbay_invoices</code> synced from the one working FullBay endpoint, plus <code>fullbay_customer_payments</code> and <code>fullbay_billing_sync</code>. Stripe is wired in.',
+  'Missing is the entire accounting back half — statements, credit memos, refunds, chart of accounts, tax reporting, QuickBooks sync, warranty treatment. Note that the Stripe integration is pointed at <strong>portal subscriptions</strong>, not at charging fleet customers for repairs. Those are different businesses.'
+ ]
+},
+{
+ id:'portal',band:0,n:'08',name:'Customer Portal',cov:'full',
+ who:'Fleet customer · Fleet authorizer · Driver',
+ pitch:'FullBay\'s weakest module and the entire reason myotcfleet exists. This is the one area where the replacement is not catching up but already ahead.',
+ what:[
+  'Access is a <strong>per-customer magic link</strong> — the portal has no login screen of its own. Every customer record in the shop app has a "Portal" button that opens their unguessable URL. One link per company, shared among everyone there.',
+  'Sections are <strong>Units, Messages, Active Services, Contacts, Invoices, Payments, Configuration</strong>, plus a Request Service button. Units list unit number, nickname, status, severity, VIN, year/make/model, ship-to address and open orders.',
+  'Delegation is handled with <strong>four named contact fields</strong> rather than dollar thresholds — the customer record records who decides what. A <strong>Primary Access Method</strong> field notes how units usually reach the shop.',
+  'Customers see a <strong>Ready To Invoice</strong> status, a per-order notes channel separate from account messages, and a send log showing which shop employee sent an estimate and when.'
+ ],
+ vocab:['Magic-link access','Units / Active Services / Invoices','Four delegate contacts','Ready To Invoice','Primary Access Method','Per-SO notes'],
+ verdict:[
+  '<strong>Full replacement, and a clear upgrade.</strong> Where FullBay gives one shared unguessable URL per company, myotcfleet has real authentication: per-person accounts, email/password with admin-only invitation, ten roles, a thirteen-permission enum with per-user overrides, and 201 RLS policies enforcing tenant isolation.',
+  'It also adds what the magic link cannot: individual identity and accountability, <strong>fleet groups</strong> for departments inside one customer, per-tenant white-label branding, feature toggles, and remembered devices.',
+  'If the engagement were scoped to nothing but this module, it would still be defensible on its own merits. This is the strongest argument for keeping the existing codebase.'
+ ]
+},
+{
+ id:'reporting',band:0,n:'09',name:'Reporting',cov:'partial',
+ who:'Owner · Manager · Office',
+ pitch:'Thirty-eight named canned reports across five categories. Reporting depth is usually what quietly locks a shop into its software — someone runs one of these every month and the business depends on the number.',
+ what:[
+  '<strong>Revenue (7)</strong> — A/R Aging, All Revenue, Closed Without Invoicing, Credits & Refunds, Payments, Sold Sublet, Work in Progress Revenue.',
+  '<strong>Inventory Management (10)</strong> — Balance, Reconciliation, Velocity, Special Order Velocity, No Location, Parts To Be Returned, Returned Parts and more.',
+  '<strong>Customer Management (11)</strong> — Bill To, Text Message Communications, Equipment Utilization, <strong>Fleet Cost per Unit</strong>, Global Services and others.',
+  '<strong>Employee Management (7)</strong> — Clocked Hours, Completed Hours, Employee Statistics, Invoiced Hours, Payroll Advance, SO Hours, Timesheet.',
+  '<strong>Work In Progress (3)</strong> — WIP Details, WIP Parts, WIP summary.'
+ ],
+ vocab:['A/R Aging','Fleet Cost per Unit','Inventory Velocity','Employee Statistics','WIP','Equipment Utilization'],
+ verdict:[
+  'myotcfleet has a <code>/reports</code> route producing three totals — units, services, invoices — plus a fleet unit export and a twelve-month service history view.',
+  'Against 38 named reports that is early-stage, but most of those 38 report on data myotcfleet does not hold. The honest statement is that reporting is <strong>blocked by the missing shop-side model</strong>, not under-built. Ask Fleetco which handful they actually run monthly — that list will be far shorter than 38, and it is the real requirement.'
+ ]
+},
+{
+ id:'mobile',band:0,n:'10',name:'Mobile Experience',cov:'full',
+ who:'Technician · Driver · Owner',
+ pitch:'Where the work physically happens. The important finding here came straight from Fleetco and it simplifies the roadmap considerably.',
+ what:[
+  'FullBay ships native iOS and Android apps. <strong>Fleetco does not use them</strong> — and has never considered them. Their real pattern is the web app bookmarked to the home screen, on both iPad and phone.',
+  'The technician workflow that runs through that bookmark: clock in and out, capture mileage, work paperless service orders and estimates, and take payment in the field.'
+ ],
+ vocab:['Home-screen bookmark','Paperless SO','Field payment','Mileage capture'],
+ verdict:[
+  '<strong>Equivalent by default.</strong> myotcfleet is a responsive web app, which is exactly the delivery model Fleetco already uses in practice.',
+  'The scoping consequence is worth stating plainly: <strong>no native app is required.</strong> That removes app-store builds, release cycles, device testing and two platform codebases from the estimate. A responsive PWA is not a compromise here — it matches observed behaviour.'
+ ]
+},
+{
+ id:'integrations',band:0,n:'11',name:'Integrations',cov:'partial',
+ who:'Owner · Office · Parts manager',
+ pitch:'The real switching cost. Features can be rebuilt; a working QuickBooks sync and a licensed labor guide are contracts, data feeds and money.',
+ what:[
+  '<strong>QuickBooks</strong> — confirmed in active use by Fleetco. This is their live accounting workflow and the hardest single dependency to replace.',
+  '<strong>MOTOR</strong> and <strong>Mitchell 1</strong> (ProDemand, TruckSeries) — licensed labor-time guides used for estimating. A paid data feed, a cost line, and a genuine moat.',
+  '<strong>Telematics</strong> — nine named GPS providers including Samsara, Motive, Geotab and Verizon Connect.',
+  'Operational partners: <strong>Whip Around</strong> (DVIR), <strong>Pitstop</strong> (predictive), <strong>FleetNet</strong> (roadside intake), <strong>Interstate Billing</strong> (A/R financing), <strong>FullBay Marketplace / FinditParts</strong> (19M+ parts across 40+ vendors), and <strong>FullBay Payments</strong> on Stripe.',
+  'AI: <strong>Spike</strong>, the in-app help assistant, is <strong>actively used</strong> by Fleetco. <strong>Claudia</strong>, the AI phone receptionist, is not used and not a fit.',
+  'And the <strong>FullBay API</strong> — documented, and the subject of its own finding below.'
+ ],
+ vocab:['QuickBooks sync','MOTOR','Mitchell 1','Whip Around','Pitstop','FleetNet','Marketplace','Spike'],
+ verdict:[
+  'myotcfleet has three: <strong>Verizon Connect</strong> (the largest piece of code in the repo at 1,779 lines plus a 2,105-line map), <strong>Stripe</strong> for portal subscriptions, and <strong>FullBay</strong> itself.',
+  'The FullBay integration deserves its own note. The API is <code>POST app.fullbay.com/services/*.php</code> — legacy PHP returning XML, authenticated with <code>SHA1(apiKey + date + outbound IP)</code>. Seven endpoints were probed: <code>getCustomers</code>, <code>getCustomerUnits</code>, <code>getUnits</code>, <code>getServiceOrders</code>, <code>getInvoices</code>, <code>getPreventiveMaintenance</code>, <code>getPMSchedules</code>. <strong>Only getInvoices is used anywhere</strong>, confirming Fleetco\'s report that the API exposes invoices and nothing else.',
+  'Two consequences follow. The unit importer <strong>back-derives the vehicle roster from up to 104 weeks of invoice history</strong>, which is lossy by construction. And writes have no API at all — the one attempt replays FullBay\'s public web form, abandoned because "the public form creates a brand-new Fullbay customer and never matches an existing one." <strong>Dual-write during a cutover is therefore impossible.</strong>'
+ ]
+},
+{
+ id:'roles',band:0,n:'00',name:'Roles & Permissions',cov:'partial',
+ who:'Owner · System admin',
+ pitch:'Who can see and do what. In a shop this is not bureaucracy — cost and margin visibility is genuinely sensitive, and the roles encode real trust boundaries.',
+ what:[
+  'Three billing tiers: <strong>Full User</strong> (everything, per seat), <strong>Office User</strong> (orders, invoices, payroll visibility — no inventory, no tech assignment, no clock), and <strong>Timesheet User</strong> (clock in/out only, cheaper seat).',
+  'Roles are <strong>not a fixed list</strong>. A shop creates and names its own on top of a base type. One real account had: System Admin, Owner, Admin, Executive, Operations Manager, Supervisor, Office, Lead Tech, Shop Foreman, Shop Technician, Road Technician, Lead Trailer Technician, Graphics, and a Test Role for validating behaviour before rollout.',
+  'Every role and permission change is <strong>audit-logged per employee</strong> to a dedicated history page.',
+  '<strong>Service Writer</strong> is FullBay\'s own term for the person running the order day to day — use that word with Fleetco, not "service advisor".'
+ ],
+ vocab:['Full / Office / Timesheet user','Custom roles','Role change history','Service Writer','Lone Wolf Tech'],
+ verdict:[
+  'myotcfleet has a real and well-built permission system — ten roles, a thirteen-value <code>app_permission</code> enum, per-user overrides via <code>user_permissions</code>, and 201 RLS policies. For the customer side it is arguably more rigorous than FullBay\'s.',
+  'But it covers a <strong>different population</strong>. The roles are fleet-customer roles plus two OTC staff roles; there is nothing for technicians, parts managers, foremen, or per-seat billing tiers. There is also a legacy smell worth cleaning up: five distinct role keys all render as the same label, "Fleet Authorizer".',
+  'One real risk: <strong>201 untested RLS policies.</strong> The repo has no test suite at all, and RLS is precisely the kind of logic that fails silently and leaks across tenants.'
+ ]
+},
+
+/* ============ BAND 2: BEYOND FULLBAY ============ */
+{
+ id:'compliance',band:1,n:'12',name:'Insurance & Registration Compliance',cov:'beyond',
+ who:'Fleet admin · Fleet authorizer',
+ pitch:'The clearest example of myotcfleet solving a problem FullBay simply does not address. This is a fleet-operator problem, not a repair-shop problem — which is exactly why the shop software ignores it.',
+ what:[
+  'Every unit carries <strong>compliance requirements</strong> (<code>asset_compliance_requirements</code>, auto-created per unit by a trigger — 101 rows for 101 units on the sandbox tenant).',
+  'Insurance is modelled properly: <strong>policies</strong>, <strong>policy-to-unit</strong> assignment, uploaded <strong>documents</strong>, and <strong>proofs</strong> of coverage. Registrations are tracked separately with date validation triggers and a <code>promote_effective_registrations</code> function that rolls a pending registration forward when it takes effect.',
+  'Expirations are chased automatically. <strong>pg_cron</strong> hits <code>/api/public/cron/compliance-reminders</code> daily, with the secret in <code>private.cron_secrets</code> and per-recipient-per-day deduplication via <code>compliance_reminder_log</code>. Reminders fire whether or not anyone opens the app.',
+  'There is also a <strong>review flag</strong> mechanism for documents needing human attention.'
+ ],
+ vocab:['Compliance requirement','Insurance proof','Policy-to-unit','Effective registration','Reminder dedupe key','Review flag'],
+ verdict:[
+  '<strong>Entirely outside FullBay.</strong> Nothing in the shop system tracks whether a truck\'s insurance or registration is current.',
+  'Two implications. For Fleetco this is real value the portal adds on top of the repair relationship. For the resale ambition it is a <strong>differentiator</strong> — it addresses the fleet operator\'s compliance anxiety rather than the shop\'s workflow, and it is the kind of thing that keeps a customer logging in between repairs.'
+ ]
+},
+{
+ id:'qr',band:1,n:'13',name:'QR Vehicle Reporting',cov:'beyond',
+ who:'Driver · Fleet admin',
+ pitch:'A physical sticker on the truck that turns any driver into a reporter without an account, a login, or training. The best single idea in the codebase.',
+ what:[
+  'Each unit gets QR tokens (<code>vehicle_qr_tokens</code>, with a trigger limiting how many per unit and a guard on reassignment). The sticker leads to <code>/q/$token</code> or <code>/report-vehicle/$qrTokenId</code>.',
+  'A driver scans, picks from a <strong>12-item issue taxonomy</strong>, and submits — no account needed. There is a <code>qr_can_report</code> database function governing who may report against what.',
+  'Everything is audited (<code>qr_audit_events</code>), and an optional <strong>QR sign-in</strong> path (<code>qr_sign_in_requests</code>, <code>/qr-continue</code>) lets a driver escalate into a real session. Sticker management lives at <code>/admin/qr-codes</code>.'
+ ],
+ vocab:['QR token','Anonymous report','qr_can_report','QR sign-in','Sticker batch','Issue taxonomy'],
+ verdict:[
+  '<strong>FullBay has no equivalent</strong> — it depends on the Whip Around integration for driver input, which requires drivers to be onboarded into another product.',
+  'The insight is that the lowest-friction reporter is the person standing next to the broken truck, and the way to reach them is a sticker rather than an app. Preserve this exactly as designed.'
+ ]
+},
+{
+ id:'lifecycle',band:1,n:'14',name:'Vehicle Lifecycle',cov:'beyond',
+ who:'Fleet owner · Finance',
+ pitch:'The asset from planned purchase through disposal. A shop cares about the current repair; a fleet owner cares about whether to keep the truck at all.',
+ what:[
+  'A <strong>lifecycle record per asset</strong> (<code>vehicle_lifecycle</code>) with an explicit stage machine — <code>change_lifecycle_stage</code> moves an asset between stages and <code>bump_lifecycle_version</code> maintains optimistic-concurrency versioning.',
+  'A full <strong>event history</strong> (<code>vehicle_lifecycle_events</code>) records what happened to the asset over its life.',
+  'His own description of the module: <em>"Planned purchases through disposal."</em>',
+  'Status on the sandbox tenant: <code>setup: false</code>, zero assets. Built, not yet adopted.'
+ ],
+ vocab:['Lifecycle stage','Planned purchase','Disposal','Lifecycle event','Version bump'],
+ verdict:[
+  '<strong>Outside FullBay\'s scope entirely.</strong> The closest FullBay comes is the Equipment Utilization and Fleet Cost per Unit reports — useful inputs to a keep-or-replace decision, but not a lifecycle model.',
+  'Worth confirming demand before investing further. The module is scaffolded but unused, which may mean it was built ahead of a real request. Good idea, unproven need.'
+ ]
+},
+{
+ id:'fleet-groups',band:1,n:'15',name:'Fleet Groups',cov:'beyond',
+ who:'Fleet admin · Department manager',
+ pitch:'Structure inside a single customer. A large fleet is not one undifferentiated pile of trucks — it has depots, divisions and departments, each with its own people and its own authority to approve work.',
+ what:[
+  'Groups (<code>fleet_groups</code>) carry a <strong>group type</strong>, status, description, and counts of vehicles, authorizers and viewers. Units belong to a group via <code>fleet_group_id</code>.',
+  'People are assigned to groups (<code>user_fleet_group_assignments</code>) with validation triggers, and group membership drives what they can see.',
+  'Each group can map to a <strong>FullBay customer name</strong> — the bridge between how the fleet is organised and how the shop bills it.',
+  'A per-tenant toggle decides whether the account is group-scoped or company-wide at all.'
+ ],
+ vocab:['Fleet group','Group type','Authorizer count','Group-scoped visibility','FullBay customer mapping'],
+ verdict:[
+  'FullBay handles related needs differently — <strong>third-party billing</strong> and <strong>Bill To</strong> let a repair be charged to someone other than the unit owner — but it has no concept of departments inside a customer with scoped visibility.',
+  '<strong>Caution, from his own roadmap:</strong> group scoping is enforced on vehicles, driver reports, calendar and lifecycle — and <em>not</em> on active services, invoices, service history, fleet tracking, insurance, vendors, reports or notification recipients. That is an authorization gap rather than a missing feature, and it should be closed before the module carries a real multi-department customer.'
+ ]
+},
+{
+ id:'tracking',band:1,n:'16',name:'Fleet Tracking',cov:'beyond',
+ who:'Fleet admin · Dispatcher',
+ pitch:'A live map of where the trucks are, shown to the fleet customer rather than to the shop.',
+ what:[
+  'Powered by <strong>Verizon Connect</strong> — the largest integration in the codebase at 1,779 lines, plus a 2,105-line map component.',
+  'His description: <em>"Live vehicle locations."</em> Returned all 101 units on the sandbox tenant, so it is wired to real data.',
+  'Runs through a server function rather than direct database access, keeping the telematics credentials server-side.'
+ ],
+ vocab:['Verizon Connect','Live location','Fleet map'],
+ verdict:[
+  'FullBay integrates nine telematics providers, but it consumes GPS for <em>its own</em> purposes — a GPS tab on the service order list, predicted failures, time-stamp coordinates. It does not present a live fleet map to the customer.',
+  'This is a <strong>presentation-layer differentiator</strong> rather than new data. It is also the module most exposed to a single vendor: everything here assumes Verizon Connect, and a customer on Samsara or Motive would need new work.'
+ ]
+},
+{
+ id:'vendors',band:1,n:'17',name:'Service Vendors',cov:'beyond',
+ who:'Fleet admin · Outside vendor',
+ pitch:'Outside service providers the fleet uses directly, with a self-service way for them to come aboard. Not to be confused with FullBay\'s parts vendors.',
+ what:[
+  '<code>vendors</code>, <code>vendor_contacts</code>, <code>vendor_shops</code> and <code>vendor_documents</code> model the provider, its people, its locations and its paperwork.',
+  'Onboarding is self-service: a tokenized <strong>application link</strong> (<code>vendor_invitations</code>, <code>/vendor-apply/$token</code>) with expiry, revocation and used-at tracking, plus an application wizard.',
+  'His description: <em>"Vendor list and vendor application links."</em>',
+  'Status on the sandbox: zero vendors, one pending invitation. Barely exercised.'
+ ],
+ vocab:['Vendor invitation token','Application wizard','Vendor shop','Vendor document','Expiry / revocation'],
+ verdict:[
+  'Genuinely different from FullBay\'s vendor module, which is about <strong>parts suppliers</strong> — bills, payments, credit memos, portals, tax documents. This one is about <strong>service providers to the fleet</strong>.',
+  'The self-service application flow with expiring tokens is a nice piece of design. But with zero vendors on the sandbox it is unproven, and it is worth asking whether the fleet actually manages outside vendors this way or whether this was built speculatively.'
+ ]
+},
+{
+ id:'tenancy',band:1,n:'18',name:'Multi-Tenancy & White Label',cov:'beyond',
+ who:'OTC admin · Reseller',
+ pitch:'The machinery for running this as a product rather than as one company\'s internal tool. This is the resale ambition, already partly built.',
+ what:[
+  'Per-tenant <strong>branding</strong> (<code>company_branding</code>): display name, logo, accent colour, light/dark theme and toolbar mode — plus an <code>isDemo</code> flag.',
+  'Per-tenant <strong>feature toggles</strong> (<code>company_feature_toggles</code>) across 14 modules: service, driver_reports, driver_report_routing, calendar, fleet, fleet_groups, billing, fullbay_billing, reports, fleet_tracking, insurance_registration, vendors, vehicle_lifecycle, service_history.',
+  'Tenant administration: create a customer company, create a <strong>demo</strong> tenant and later convert it to real, manage that customer\'s users and permissions, and set subscription exemptions.',
+  '<strong>Amtrak</strong> is in the system as a branded demo account — worth understanding what that relationship actually is.'
+ ],
+ vocab:['Feature toggle','Tenant branding','Demo → real conversion','isDemo','Accent colour','Company settings'],
+ verdict:[
+  '<strong>Not applicable to FullBay</strong> — this is the layer you build when you intend to sell the portal to other fleet-management companies, which is exactly the resale play on the table.',
+  'The sandbox tenant had <strong>only one of fourteen features enabled</strong>, which is a useful reminder that what you see when you log in is a configured subset, not the product.'
+ ]
+},
+{
+ id:'saas-billing',band:1,n:'19',name:'Portal Subscriptions',cov:'beyond',
+ who:'OTC admin · Finance',
+ pitch:'Charging for the portal itself. A small module with a large strategic signal attached to it.',
+ what:[
+  '<code>company_subscriptions</code> tracks a tenant\'s plan, with Stripe wired in (<code>stripe</code> 22, <code>@stripe/react-stripe-js</code>).',
+  'Admin functions include <code>createCompanyCheckoutLink</code> and <code>setSubscriptionExempt</code>, plus a <code>company_has_active_subscription</code> database function used for gating.',
+  'There is a customer-facing <code>/admin/subscription</code> route.'
+ ],
+ vocab:['company_subscriptions','Checkout link','Subscription exempt','Active-subscription gate'],
+ verdict:[
+  'FullBay has nothing comparable because FullBay <em>is</em> the vendor — this is the equivalent of FullBay\'s own billing system, rebuilt from the other side of the table.',
+  '<strong>The signal matters more than the code.</strong> Someone has already built the plumbing to charge other companies for this portal. That is a decision about what the business is, not a feature — and it is worth a direct conversation before scoping anything, because it changes who the customer is.'
+ ]
+},
+{
+ id:'otc-admin',band:1,n:'20',name:'OTC Internal Admin',cov:'beyond',
+ who:'OTC administrator · OTC service coordinator',
+ pitch:'The staff-side control panel — and the thing most likely to be mistaken for "the internal side is underway". It administers who uses the portal, not the repair business.',
+ what:[
+  'Tenant operations: browse all customer companies, open a company detail view, create new customer companies, spin up demo tenants and convert them.',
+  'User operations: set a customer user\'s role and individual permissions from inside that customer\'s Users tab.',
+  'An <strong>"open customer account"</strong> impersonation mechanism, so OTC staff can see exactly what a customer sees.',
+  'Integration operations: the FullBay connection test and endpoint probe, the unit importer, the form-test harness, and the Verizon configuration screen.',
+  'Nineteen source files gate on <code>otc_admin</code> / <code>otc_coordinator</code>, and there is real audit infrastructure behind it (<code>audit_events</code>, <code>record_changes</code> with a trim trigger).'
+ ],
+ vocab:['listOtcCompanies','Open customer account','otc_account_sessions','Audit events','Demo conversion'],
+ verdict:[
+  'This is a <strong>SaaS control panel, not a shop system.</strong> It manages tenants, users and integrations. There is no service order, no technician, no part, no invoice-building anywhere in it.',
+  '<strong>The impersonation design is the thing to fix first.</strong> Opening a customer account <em>moves the OTC user\'s <code>profiles.company_id</code></em> into that customer and records a row in <code>otc_account_sessions</code>; database role helpers then treat them as that company\'s admin. It is clever reuse of the existing company-scoped RLS, and there are guard triggers showing he saw the risk — but identity should not be mutable state. A crash, timeout or abandoned session can leave a user pointed at the wrong company.'
+ ]
+}
+];
+
+const BANDS=[
+ {t:'FullBay Functional Areas',sub:'The system being replaced. Twelve areas, ordered roughly as the shop experiences them. Colour shows how far myotcfleet reaches into each one.'},
+ {t:'Beyond FullBay',sub:'Nine areas myotcfleet has that FullBay does not. This is where the replacement is additive rather than catching up — and where the resale story lives.'}
+];
+
+/* ---------- render nav ---------- */
+const nav=document.getElementById('nav');
+BANDS.forEach((b,bi)=>{
+  const items=AREAS.filter(a=>a.band===bi);
+  const sec=document.createElement('section');
+  sec.className='band';
+  sec.innerHTML=`<div class="band-hd"><h2>${b.t}</h2><span class="ct">${items.length}</span></div><p class="band-sub">${b.sub}</p>`;
+  items.forEach(a=>{
+    const btn=document.createElement('button');
+    btn.className='area';btn.id='btn-'+a.id;btn.setAttribute('role','tab');
+    btn.setAttribute('aria-selected','false');
+    btn.innerHTML=`<span class="num">${a.n}</span><span class="nm">${a.name}</span><span class="dot" style="background:${C[a.cov]}" title="${LBL[a.cov]}"></span>`;
+    btn.onclick=()=>select(a.id,true);
+    sec.appendChild(btn);
+  });
+  nav.appendChild(sec);
+});
+
+/* ---------- render detail ---------- */
+function select(id,push){
+  const a=AREAS.find(x=>x.id===id);if(!a)return;
+  document.querySelectorAll('button.area').forEach(b=>b.setAttribute('aria-selected','false'));
+  const btn=document.getElementById('btn-'+id);
+  if(btn)btn.setAttribute('aria-selected','true');
+  const c=C[a.cov],fill=FILL[a.cov];
+  document.getElementById('detail').innerHTML=`
+    <div class="fade" style="--vc:${c}">
+      <div class="d-top">
+        <span class="d-num">${a.n}</span>
+        <h3 class="d-name">${a.name}</h3>
+        <span class="chip" style="background:${c}22;color:${c};border:1px solid ${c}55">${LBL[a.cov]}</span>
+      </div>
+      <p class="d-who">${a.who}</p>
+      <p class="d-pitch">${a.pitch}</p>
+
+      <h4>What it is</h4>
+      ${a.what.map(p=>`<p>${p}</p>`).join('')}
+
+      <h4>Vocabulary</h4>
+      <div class="vocab">${a.vocab.map(v=>`<span>${v}</span>`).join('')}</div>
+
+      <h4>myotcfleet coverage</h4>
+      <div class="scale">${[0,1,2,3].map(i=>`<i class="${i<fill?'on':''}"></i>`).join('')}</div>
+      <p class="scale-l">${LBL[a.cov]}</p>
+      <div class="verdict">
+        <p class="vt">Assessment</p>
+        ${a.verdict.map(p=>`<p>${p}</p>`).join('')}
+      </div>
+    </div>`;
+  if(push)history.replaceState(null,'','#'+id);
+  if(window.innerWidth<=1020&&push)document.getElementById('detail').scrollIntoView({block:'start'});
+}
+
+/* keyboard nav */
+document.addEventListener('keydown',e=>{
+  if(e.key!=='ArrowDown'&&e.key!=='ArrowUp')return;
+  const cur=AREAS.findIndex(a=>document.getElementById('btn-'+a.id).getAttribute('aria-selected')==='true');
+  if(cur<0)return;
+  const next=e.key==='ArrowDown'?Math.min(cur+1,AREAS.length-1):Math.max(cur-1,0);
+  e.preventDefault();select(AREAS[next].id,true);
+  document.getElementById('btn-'+AREAS[next].id).scrollIntoView({block:'nearest'});
+});
+
+select((location.hash||'').replace('#','')||'service-orders',false);
+</script>
+</body>
+</html>

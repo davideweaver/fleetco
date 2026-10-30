@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>FullBay Punch List — OTC Fleet Services</title>
+<style>
+/* ============================================================
+   FullBay Punch List
+   Aesthetic: shop service manual / work-order clipboard.
+   All fonts are locally available on iOS/macOS — no network
+   required. Works from file:// with no server.
+   ============================================================ */
+
+:root{
+  --paper:#f2efe7;
+  --paper-2:#e9e5da;
+  --ink:#16140f;
+  --ink-2:#4a443b;
+  --ink-3:#847c6e;
+  --rule:#16140f;
+  --hair:#cbc4b4;
+
+  --go:#0d5f5c;
+  --go-soft:#d6e6e3;
+  --later:#b06c06;
+  --later-soft:#f6e6c9;
+  --cut:#8d3521;
+  --cut-soft:#ecd9d2;
+
+  --key:#b8381f;
+
+  --display:"Futura","Avenir Next Condensed","Avenir Next",
+            "Trebuchet MS",sans-serif;
+  --body:"Avenir Next","Avenir","Optima","Trebuchet MS",sans-serif;
+  --mono:"Menlo","SFMono-Regular","Courier New",monospace;
+
+  --pad:clamp(14px,3vw,30px);
+}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+html{-webkit-text-size-adjust:100%}
+
+body{
+  margin:0;
+  font-family:var(--body);
+  color:var(--ink);
+  background:var(--paper);
+  /* paper grain */
+  background-image:
+    repeating-linear-gradient(0deg,rgba(22,20,15,.016) 0 1px,transparent 1px 3px),
+    repeating-linear-gradient(90deg,rgba(22,20,15,.012) 0 1px,transparent 1px 4px);
+  line-height:1.45;
+  -webkit-overflow-scrolling:touch;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+
+/* ---------------- masthead ---------------- */
+
+header.sheet{
+  background:var(--ink);
+  color:var(--paper);
+  padding:calc(8px + env(safe-area-inset-top)) var(--pad) 8px;
+  border-bottom:4px solid var(--ink);
+}
+.mast{
+  display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+}
+h1{
+  font-family:var(--display);
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.02em;
+  font-size:clamp(19px,2.9vw,26px);
+  line-height:1;
+  margin:0;flex:0 0 auto;
+}
+.mast-meta{
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;
+  text-transform:uppercase;color:#a79a84;
+  display:flex;gap:14px;flex-wrap:wrap;margin-left:auto;
+}
+.mast-meta b{color:#e8b765;font-weight:400}
+.mast-meta i{font-style:normal}
+.hint{
+  margin:5px 0 0;
+  font-family:var(--mono);
+  font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;
+  color:#8d8373;line-height:1.5;
+}
+.hint b{color:#ded6c6;font-weight:700}
+
+/* ---------------- sticky control bar ---------------- */
+
+.bar{
+  position:sticky;top:0;z-index:40;
+  background:var(--paper-2);
+  border-bottom:2px solid var(--rule);
+  box-shadow:0 6px 14px -10px rgba(22,20,15,.6);
+}
+.bar-in{
+  padding:9px var(--pad);
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+}
+.meter{
+  flex:1 1 190px;min-width:150px;
+}
+.meter-top{
+  display:flex;justify-content:space-between;align-items:baseline;
+  font-family:var(--mono);font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-2);
+}
+.track{
+  height:9px;background:var(--paper);
+  border:1px solid var(--rule);margin-top:5px;
+  display:flex;overflow:hidden;
+}
+.track i{display:block;height:100%;transition:width .3s ease}
+.track .s-go{background:var(--go)}
+.track .s-later{background:var(--later)}
+.track .s-cut{background:var(--cut);opacity:.75}
+
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+button.f{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;
+  text-transform:uppercase;
+  padding:8px 11px;min-height:38px;
+  background:transparent;border:1.5px solid var(--hair);
+  color:var(--ink-2);cursor:pointer;
+}
+button.f[aria-pressed="true"]{
+  background:var(--ink);color:var(--paper);border-color:var(--ink);
+}
+button.f.f-key[aria-pressed="true"]{background:var(--key);border-color:var(--key)}
+
+button.act{
+  font-family:var(--display);text-transform:uppercase;letter-spacing:.1em;
+  font-weight:700;font-size:13px;
+  padding:10px 16px;min-height:42px;
+  background:var(--ink);color:var(--paper);
+  border:none;cursor:pointer;
+}
+button.act.ghost{background:transparent;color:var(--ink);border:2px solid var(--ink)}
+
+.savenote{
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-3);
+  width:100%;
+}
+.savenote.warn{color:var(--cut);font-weight:700}
+
+/* ---------------- section nav ---------------- */
+
+nav.jump{
+  display:flex;gap:0;overflow-x:auto;
+  border-top:1px solid var(--hair);
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+nav.jump::-webkit-scrollbar{display:none}
+nav.jump a{
+  flex:0 0 auto;
+  font-family:var(--mono);font-size:10px;letter-spacing:.1em;
+  text-transform:uppercase;text-decoration:none;
+  color:var(--ink-2);padding:10px 13px;
+  border-right:1px solid var(--hair);
+  white-space:nowrap;
+}
+nav.jump a b{color:var(--ink);font-weight:700}
+
+/* ---------------- sections ---------------- */
+
+main{padding:0 var(--pad) 90px}
+
+section{margin:34px 0 0;scroll-margin-top:132px}
+
+.sec-head{
+  display:flex;align-items:center;gap:12px;
+  border-bottom:3px solid var(--rule);
+  padding:8px 4px 7px;
+  margin:0;width:100%;
+  background:transparent;border-top:none;border-left:none;border-right:none;
+  text-align:left;color:inherit;font:inherit;
+  cursor:pointer;-webkit-user-select:none;user-select:none;
+  min-height:52px;
+}
+.sec-head:active{background:rgba(22,20,15,.05)}
+.sec-num{
+  font-family:var(--mono);font-size:11px;letter-spacing:.1em;
+  color:var(--paper);background:var(--ink);
+  padding:4px 8px;align-self:center;flex:0 0 auto;
+}
+.sec-head h2{
+  font-family:var(--display);text-transform:uppercase;
+  letter-spacing:.04em;font-weight:700;
+  font-size:clamp(18px,3.4vw,26px);
+  margin:0;flex:1;line-height:1.05;min-width:0;
+}
+.sec-count{
+  font-family:var(--mono);font-size:10px;letter-spacing:.1em;
+  color:var(--ink-3);text-transform:uppercase;white-space:nowrap;
+  flex:0 0 auto;
+}
+.sec-count.done{color:var(--go);font-weight:700}
+
+/* chevron */
+.chev{
+  flex:0 0 auto;width:26px;height:26px;position:relative;
+  border:1.5px solid var(--ink);
+}
+.chev::after{
+  content:"";position:absolute;left:50%;top:50%;
+  width:7px;height:7px;
+  border-right:2px solid var(--ink);border-bottom:2px solid var(--ink);
+  transform:translate(-50%,-62%) rotate(45deg);
+  transition:transform .18s ease;
+}
+section.collapsed .chev::after{transform:translate(-50%,-38%) rotate(-135deg)}
+
+/* collapsed + done states */
+section.collapsed ul.rows,
+section.collapsed .sec-note{display:none}
+/* while a filter is active, folded sections open up so matches aren't hidden;
+   they fold back to their saved state when the filter clears */
+body.filtering section.collapsed ul.rows{display:block}
+section.done .sec-num{background:var(--go)}
+section.done .sec-head{border-bottom-color:var(--go)}
+section.done .chev{border-color:var(--go)}
+section.done .chev::after{border-color:var(--go)}
+.sec-note{
+  font-size:13.5px;color:var(--ink-2);margin:9px 0 0;max-width:72ch;
+  font-style:italic;
+}
+
+/* ---------------- rows ---------------- */
+
+ul.rows{list-style:none;margin:0;padding:0}
+
+li.row{
+  border-bottom:1px solid var(--hair);
+  padding:13px 0;
+  display:grid;
+  grid-template-columns:34px 1fr;
+  gap:0 11px;
+  align-items:start;
+}
+li.row[hidden]{display:none}
+
+.rid{
+  font-family:var(--mono);font-size:10px;color:var(--ink-3);
+  padding-top:3px;letter-spacing:.04em;
+}
+
+.rmain{min-width:0}
+
+.rtitle{
+  font-weight:600;font-size:15.5px;line-height:1.3;
+  display:flex;flex-wrap:wrap;gap:7px;align-items:baseline;
+}
+.rdesc{
+  font-size:13.5px;color:var(--ink-2);margin-top:3px;max-width:76ch;
+}
+.tag{
+  font-family:var(--mono);font-size:9px;letter-spacing:.12em;
+  text-transform:uppercase;padding:2px 6px;
+  border:1px solid var(--hair);color:var(--ink-3);
+  font-weight:400;position:relative;top:-1px;
+}
+.tag.t-key{border-color:var(--key);color:var(--key);font-weight:700}
+.tag.t-known{border-color:var(--go);color:var(--go)}
+
+/* choice buttons — big enough for a thumb on an iPad */
+.choices{
+  display:flex;gap:7px;margin-top:10px;flex-wrap:wrap;
+  align-items:stretch;
+}
+button.ch{
+  font-family:var(--mono);font-size:11px;letter-spacing:.11em;
+  text-transform:uppercase;font-weight:700;
+  padding:0 14px;min-height:44px;min-width:92px;
+  background:var(--paper);border:1.5px solid var(--hair);
+  color:var(--ink-3);cursor:pointer;
+  transition:background .12s,color .12s,border-color .12s;
+}
+button.ch:active{transform:translateY(1px)}
+button.ch[aria-pressed="true"].c-v1{background:var(--go);border-color:var(--go);color:#fff}
+button.ch[aria-pressed="true"].c-later{background:var(--later);border-color:var(--later);color:#fff}
+button.ch[aria-pressed="true"].c-cut{background:var(--cut);border-color:var(--cut);color:#fff}
+
+button.note-btn{
+  font-family:var(--mono);font-size:11px;letter-spacing:.11em;
+  text-transform:uppercase;
+  padding:0 13px;min-height:44px;
+  background:transparent;border:1.5px dashed var(--hair);
+  color:var(--ink-2);cursor:pointer;margin-left:auto;
+}
+button.note-btn.has{border-style:solid;border-color:var(--ink);color:var(--ink);font-weight:700}
+
+textarea.note{
+  display:block;width:100%;margin-top:9px;
+  font-family:var(--body);font-size:15px;line-height:1.4;
+  padding:10px 12px;
+  background:#fffdf7;border:1.5px solid var(--ink);
+  color:var(--ink);resize:vertical;min-height:76px;
+}
+textarea.note::placeholder{color:var(--ink-3);font-style:italic}
+textarea.note[hidden]{display:none}
+
+/* row state wash */
+li.row.is-go{background:linear-gradient(90deg,var(--go-soft),transparent 62%)}
+li.row.is-later{background:linear-gradient(90deg,var(--later-soft),transparent 62%)}
+li.row.is-cut{background:linear-gradient(90deg,var(--cut-soft),transparent 62%)}
+li.row.is-cut .rtitle{text-decoration:line-through;text-decoration-thickness:1px;color:var(--ink-2)}
+
+/* ---------------- export drawer ---------------- */
+
+.export{
+  margin:46px 0 0;border:3px solid var(--rule);
+  background:var(--paper-2);
+}
+.export h2{
+  font-family:var(--display);text-transform:uppercase;letter-spacing:.06em;
+  font-size:clamp(16px,3vw,22px);margin:0;
+  background:var(--ink);color:var(--paper);padding:11px var(--pad);
+}
+.export-in{padding:var(--pad)}
+.export p{font-size:13.5px;color:var(--ink-2);margin:0 0 13px;max-width:70ch}
+.export-btns{display:flex;gap:9px;flex-wrap:wrap}
+textarea.out{
+  width:100%;margin-top:14px;min-height:240px;
+  font-family:var(--mono);font-size:12px;line-height:1.5;
+  padding:12px;background:#fffdf7;border:1.5px solid var(--ink);
+}
+textarea.out[hidden]{display:none}
+
+footer.colophon{
+  padding:26px var(--pad) 40px;
+  font-family:var(--mono);font-size:10px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-3);
+  border-top:1px solid var(--hair);margin-top:40px;
+}
+
+/* ---------------- print ---------------- */
+
+@media print{
+  .bar,nav.jump,.export,button.note-btn,.chev{display:none!important}
+  /* never print a folded section as empty */
+  section.collapsed ul.rows,section.collapsed .sec-note{display:block!important}
+  body{background:#fff;font-size:11pt}
+  header.sheet{background:#fff;color:#000;border-bottom:3px solid #000}
+  .hint,.mast-meta,.mast-meta b{color:#333}
+  li.row{break-inside:avoid;page-break-inside:avoid}
+  button.ch{border-color:#000;color:#000}
+  button.ch[aria-pressed="true"]{background:#000!important;color:#fff!important}
+  textarea.note{border-color:#000}
+  section{break-before:auto}
+}
+</style>
+</head>
+<body>
+
+<header class="sheet">
+  <div class="mast">
+    <h1>FullBay Punch&nbsp;List</h1>
+    <span class="mast-meta">
+      <b>OTC Fleet Services</b>
+      <i id="stampDate">&mdash;</i>
+    </span>
+  </div>
+  <p class="hint">
+    Tap a section to open it &middot; <b>V1</b> = day one, <b>Later</b> = eventually,
+    <b>Not&nbsp;needed</b> = don&rsquo;t build &middot; tap a choice again to clear it
+  </p>
+</header>
+
+<div class="bar">
+  <div class="bar-in">
+    <div class="meter">
+      <div class="meter-top">
+        <span id="progLabel">0 of 0 marked</span>
+        <span id="progTally"></span>
+      </div>
+      <div class="track" aria-hidden="true">
+        <i class="s-go"  id="barGo"    style="width:0%"></i>
+        <i class="s-later" id="barLater" style="width:0%"></i>
+        <i class="s-cut" id="barCut"  style="width:0%"></i>
+      </div>
+    </div>
+    <div class="filters" role="group" aria-label="Filter rows">
+      <button class="f" data-filter="all"   aria-pressed="true">All</button>
+      <button class="f" data-filter="todo"  aria-pressed="false">Unmarked</button>
+      <button class="f f-key" data-filter="key" aria-pressed="false">Key only</button>
+      <button class="f" data-filter="v1"    aria-pressed="false">V1</button>
+      <button class="f" data-filter="later" aria-pressed="false">Later</button>
+      <button class="f" data-filter="cut"   aria-pressed="false">Cut</button>
+    </div>
+    <button class="act ghost" id="btnFold">Collapse all</button>
+    <button class="act" id="btnJumpExport">Results</button>
+    <div class="savenote" id="saveNote">Saving to this browser automatically.</div>
+  </div>
+  <nav class="jump" id="jumpNav" aria-label="Jump to section"></nav>
+</div>
+
+<main>
+  <div id="sections"></div>
+
+  <div class="export" id="exportBlock">
+    <h2>Results</h2>
+    <div class="export-in">
+      <p>
+        Builds a plain-text summary grouped by V1 / Later / Not needed, with every comment attached.
+        Copy it and paste it anywhere &mdash; email, Notes, a message to Dave. Do this before you
+        close the tab if you want a copy off this device.
+      </p>
+      <div class="export-btns">
+        <button class="act" id="btnBuild">Build summary</button>
+        <button class="act ghost" id="btnCopy">Copy to clipboard</button>
+        <button class="act ghost" id="btnPrint">Print / Save PDF</button>
+        <button class="act ghost" id="btnReset">Start over</button>
+      </div>
+      <textarea class="out" id="out" hidden readonly spellcheck="false"></textarea>
+    </div>
+  </div>
+</main>
+
+<footer class="colophon">
+  Sources: logged-in FullBay walkthrough + help center (12 collections, ~440 articles),
+  FullBay marketing, and answers OTC already gave. Rows marked <b>confirmed</b> are things
+  you&rsquo;ve already told us &mdash; just check we got them right.
+</footer>
+
+<script>
+/* ============================================================
+   DATA
+   k:1  => key decision, moves the plan
+   pre  => already answered by OTC; shown pre-marked for confirmation
+   ============================================================ */
+const DATA = [
+{
+  id:"roles", n:"0", t:"Roles & Who Does What",
+  note:"FullBay bills per seat and per role, so this section is also part of the $5k question.",
+  rows:[
+    {t:"Full User seats", d:"Complete access — service orders, inventory, assigning techs to an action item. The expensive seat."},
+    {t:"Office User seats", d:"Service orders, invoices, payroll visibility. No inventory, no tech assignment, no clock in/out."},
+    {t:"Timesheet User seats", d:"Clock in and out only. Cheaper seat."},
+    {t:"Custom roles you built yourself", d:"You have a lot of them — System Admin, Owner, Admin, Executive, Operations Manager, Supervisor, Office, Lead Tech, Shop Foreman, Shop Technician, Road Technician, Lead Trailer Technician, Graphics, Test Role. Which are real and which are leftovers?", k:1},
+    {t:"Role change history log", d:"Every permission change recorded per employee on its own page."},
+    {t:"Service Writer role", d:"The person building estimates and running the order day to day."},
+    {t:"Lone Wolf Tech workflow", d:"A named pattern for a tech working solo or remote with no office backup."}
+  ]
+},
+{
+  id:"so", n:"1", t:"Service Orders",
+  note:"FullBay calls the repair line an Action Item (SOAI). This is the spine of the whole system — and the deepest screen in it.",
+  rows:[
+    {t:"Quick SO", d:"Fast path for a simple job."},
+    {t:"Quick Estimate", d:"Lighter estimate with its own create / authorize / print / convert steps."},
+    {t:"Full New Service Order flow", d:"The formal path for complex work."},
+    {t:"Action Item (SOAI)", d:"The repair line itself: concern, cause, correction, each with its own parts and labor tabs."},
+    {t:"The kanban pipeline", d:"Unassigned → Assign → Diagnose → Price Parts → Authorize → Wait For Authorization → Repair → Recently Completed. Do you work the board, or ignore it?", k:1},
+    {t:"Service Order Urgency field", d:"None / WIP / Parts / Pending, and you can add your own."},
+    {t:"Service Request Urgency field", d:"A separate earlier-stage priority on incoming requests: ASAP / today / emergency / remember for next visit."},
+    {t:"The 13 service order tabs", d:"In Process, GPS, On Hold, PMs, Estimates, Quick Charge, Service Requests, Pending Repairs, Customers, History, All SOs, Auto-Gen SOs, Deleted SOs. Which do you open in a normal week?", k:1},
+    {t:"The 7 list view modes", d:"By Status, Full View, By Action Item, By Customer, By Tech, Prioritize, Custom View. Same question — which ones get used?", k:1},
+    {t:"Delete and restore a service order", d:"Soft delete, recoverable later."},
+    {t:"Optional Review step", d:"An extra review stage before an order can be completed."},
+    {t:"Require re-authorization", d:"Make the customer approve again if something changes after the first yes."},
+    {t:"Bill to a third party", d:"Charge someone other than the unit's owner. You have an 'ARI / Third Party Billing' labor rate, so this looks live.", k:1},
+    {t:"Sublet work", d:"Recording work an outside vendor performed."},
+    {t:"Yard Check", d:"Walking the yard to verify which units are physically on site."},
+    {t:"Unit locations and usage tracking", d:"Where a unit is, and meter readings over time."},
+    {t:"Daily Rates", d:"Day-rate billing like storage or demurrage, separate from a normal invoice."},
+    {t:"Driver and Carrier capture", d:"Recording who dropped the unit off. There's a setting to make it mandatory."},
+    {t:"Access SOAI", d:"A special action-item type for your own shop-owned units and yard equipment."},
+    {t:"Global Services / Canned Jobs", d:"Reusable labor-plus-parts templates for repairs you do over and over.", k:1},
+    {t:"Part Kits", d:"A pre-bundled parts list for one repair."},
+    {t:"AI note cleanup and voice-to-text", d:"Dictate rough notes, it rewrites them professionally. Also does translation."},
+    {t:"Multi-location / shop switcher", d:"You have two shop entities under one login — Lancaster and Mobile Department.", k:1},
+    {t:"Schedule page / calendar", d:"Real calendar with events, employee work schedules, and a shareable view-only link."},
+    {t:"View-only public schedule link", d:"A live app.fullbay.com link exists in your settings. Is anyone using it?"},
+    {t:"FleetNet emergency / roadside intake", d:"Emergency requests routing in from FleetNet."},
+    {t:"Vendor warranty clearing", d:"Setting up and submitting warranty claims to a vendor or OEM."}
+  ]
+},
+{
+  id:"est", n:"2", t:"Estimates & Customer Authorization",
+  note:"The authorization gate is the one thing no shop can operate without, so most of this is likely V1. The question is which parts.",
+  rows:[
+    {t:"Standard estimate flow", d:"Record concern/cause/correction per line, add parts and labor, attach photos, review, send, track."},
+    {t:"Labor time from a guide", d:"MOTOR or Mitchell 1 fills in how long a job should take. Or your own history.", k:1},
+    {t:"Expected Hours", d:"The guide or estimate time a job should take, tracked separately from actual clocked time."},
+    {t:"Parts pricing on the estimate", d:"Pulled from stock, special order, or the marketplace, with markup applied automatically."},
+    {t:"Send for authorization by portal", d:"Customer approves in their portal."},
+    {t:"Send for authorization by text", d:"Two-way texting."},
+    {t:"Send for authorization by email", d:"Emailed estimate."},
+    {t:"Approve / decline / partially approve", d:"Line-by-line yes or no, with a toggle-all control."},
+    {t:"Auto-convert on approval", d:"Approved plus a tech assigned turns it into a live order by itself."},
+    {t:"Pre-authorize parts under a threshold", d:"Skip per-part approval for cheap parts."},
+    {t:"Spending thresholds per customer", d:"A customer sets a dollar limit under which work is auto-approved.", k:1},
+    {t:"Mid-repair additional work approval", d:"Approve newly found work without re-approving the whole order."},
+    {t:"Shop Supplies fee line", d:"A named fee category of its own on the total, separate from labor, parts and tax."},
+    {t:"Per-order customer note box", d:"Customer messages you about one specific job."},
+    {t:"Who-sent-it log on the estimate", d:"The customer can see which of your people sent it and when."}
+  ]
+},
+{
+  id:"parts", n:"3", t:"Parts & Inventory",
+  note:"The deepest area in FullBay's help center — 68 articles. Also where the biggest possible scope cut lives: whether V1 needs real stock counts at all.",
+  rows:[
+    {t:"Real-time stock levels", d:"Live counts by shelf, bin, truck and location.", k:1},
+    {t:"Could you go live WITHOUT real stock counts?", d:"Parts typed onto a job with a cost and markup, so billing is right, but no live count. Honestly the single biggest thing that could come out of V1.", k:1},
+    {t:"Inventory across multiple shops", d:"Separate counts per location."},
+    {t:"Intra-company parts transfers", d:"Moving stock between your own locations."},
+    {t:"Barcode scanning", d:"Scanning parts into stock or onto a truck."},
+    {t:"Min/max levels and reorder alerts", d:"Threshold warnings, plus an auto-order setting."},
+    {t:"Bin and location assignment", d:"Default locations, moving quantities, deleting locations."},
+    {t:"Cycle counts", d:"Scheduled periodic audits."},
+    {t:"Ad hoc inventory adjustments", d:"One-off corrections outside a count."},
+    {t:"Do you trust your current stock count?", d:"Straight question, and a useful one. If it's eyeballed and counted twice a year, a lot of this section gets easier.", k:1},
+    {t:"Inventory search tags", d:"Tagging to find parts beyond part number and description."},
+    {t:"Purchase orders", d:"Create, email to vendor, receive, return, delete.", k:1},
+    {t:"Combined purchase orders", d:"Several orders or vendors on one PO."},
+    {t:"Add parts to an existing PO", d:"Appending to a PO already out."},
+    {t:"Needs-Ordered parts list", d:"A working list of parts flagged as needed but not ordered yet."},
+    {t:"Use Last Cost", d:"Auto-fill a part's cost from the last price you paid."},
+    {t:"Vendor records", d:"Add and edit vendors."},
+    {t:"Vendor bills", d:"Recording what a vendor billed you."},
+    {t:"Vendor payments", d:"Paying vendors from inside FullBay."},
+    {t:"Vendor credit memos", d:"Credits back from a vendor."},
+    {t:"Vendor portals", d:"Vendor-facing access."},
+    {t:"Vendor tax documents", d:"1099-style handling."},
+    {t:"FullBay Marketplace / FinditParts", d:"In-app ordering across 40-plus vendors including NAPA and O'Reilly.", k:1},
+    {t:"Counter sale", d:"A walk-in parts sale with no service order attached."},
+    {t:"Fake inventory parts", d:"A placeholder part you can bill without carrying real stock."},
+    {t:"Core charge tracking", d:"Core charge and core credit as separate lines, with their own core inventory and value report.", k:1},
+    {t:"Pricing scales", d:"Tiered markup by cost band."},
+    {t:"Pricing matrices", d:"Markup rules by customer type."},
+    {t:"Cost floor", d:"A minimum sell price that overrides markup rules."},
+    {t:"Privacy On mode", d:"Hides your cost and markup from the customer view."},
+    {t:"Restrict use of inventory", d:"Locking down who can draw against stock."},
+    {t:"Drop shipping", d:"Vendor ships straight to the customer or job site."},
+    {t:"Shipping, freight and restocking fees", d:"Tracked as their own fee types."}
+  ]
+},
+{
+  id:"labor", n:"4", t:"Labor & Technician Time",
+  note:"You already told us techs are paid on actual clocked hours with a manager reviewing before payroll — no flat rate, no flagged hours. That simplifies this a lot. The open question is the clock itself.",
+  rows:[
+    {t:"Is there a plain punch in/out for the day, separate from clocking to a repair order?", d:"This is the single most important row in this section. If all time is recorded against an order, the new system needs its own time capture on day one. If there's a standalone punch clock, FullBay can keep running payroll through the whole migration.", k:1},
+    {t:"Clock in and out per job", d:"Tap a job, every minute logs to that job and unit."},
+    {t:"GPS on time stamps", d:"There's a setting to capture coordinates on each stamp. It was off on the account we saw."},
+    {t:"Billable vs admin time split", d:"Separating billable labor from shop time, per tech."},
+    {t:"Timesheet activities", d:"Named non-job activities beyond repair time."},
+    {t:"Manual timesheet corrections", d:"Fixing a bad punch."},
+    {t:"Manager review before payroll", d:"You confirmed this step exists. Just checking we have it right.", pre:"v1"},
+    {t:"Live technician workload view", d:"Who is working on what and who has capacity."},
+    {t:"Efficiency and utilization stats per tech", d:"The tech home screen shows completed hours, SO hours, efficiency, utilization, clocked hours. Does anyone look at these?", k:1},
+    {t:"Labor guide integration", d:"MOTOR, Mitchell 1 ProDemand and TruckSeries."},
+    {t:"Payroll export", d:"How hours get from here to whoever runs payroll.", k:1}
+  ]
+},
+{
+  id:"pm", n:"5", t:"Preventive Maintenance",
+  note:"PM work is the most predictable thing a shop does, which makes it a candidate for moving first. Worth paying attention to this section.",
+  rows:[
+    {t:"PM intervals by mileage", d:"Due based on odometer."},
+    {t:"PM intervals by engine hours", d:"Due based on hours."},
+    {t:"PM intervals by calendar", d:"Due based on date."},
+    {t:"Coming-due window setting", d:"How far ahead a PM is flagged. Set to 30 days on the account we saw."},
+    {t:"Automatic service order generation", d:"Due PMs create their own order in the Auto-Gen SOs tab.", k:1},
+    {t:"PM schedules on unit types", d:"Attach a schedule to a type of truck, not one truck at a time."},
+    {t:"Batch add PMs across many units", d:"Bulk assignment."},
+    {t:"Enter last-performed info", d:"Backfilling a baseline for a unit serviced somewhere else."},
+    {t:"Procedures attached to a PM", d:"Step-by-step instructions on the PM definition."},
+    {t:"Meter reading capture", d:"Entered on the order, drives the next due date."},
+    {t:"PM history on the unit record", d:"Permanent log per unit."},
+    {t:"Customer-scheduled PM requests", d:"The fleet customer books their own upcoming PM in the portal."}
+  ]
+},
+{
+  id:"insp", n:"6", t:"Inspections & DVIR",
+  note:"This looks like it is mostly NOT FullBay — it leans on Whip Around and Pitstop. Worth confirming who handles DVIR intake today.",
+  rows:[
+    {t:"Driver-submitted DVIR via Whip Around", d:"Driver flags a defect on their phone, it becomes a service order. Is Whip Around actually in use?", k:1},
+    {t:"Predicted failures via Pitstop", d:"Telematics fault prediction feeding a work order."},
+    {t:"Guided inspection during a job", d:"An in-app checklist the tech runs while working."},
+    {t:"Anything on paper?", d:"If inspections happen on paper today, say so here — that's a real opportunity, not a gap."}
+  ]
+},
+{
+  id:"inv", n:"7", t:"Invoicing & Payments",
+  note:"You confirmed QuickBooks sync is your live accounting workflow. FullBay Payments runs on Stripe underneath. If payment processing is part of the $5k bill, that matters a lot to the plan.",
+  rows:[
+    {t:"One-click invoice from a completed order", d:"Approved order becomes a final invoice with actual hours."},
+    {t:"Invoice by email with PDF", d:"Emailed PDF."},
+    {t:"Invoice by text", d:"Texted link."},
+    {t:"Invoice via portal link", d:"Customer opens it in their portal."},
+    {t:"Prepayments", d:"Collecting money before the work is finished."},
+    {t:"Card payments", d:"Credit and debit."},
+    {t:"ACH / eCheck", d:"Bank transfer."},
+    {t:"Apple Pay / Google Pay", d:"Wallet payments."},
+    {t:"Buy-now-pay-later", d:"Financed payment option."},
+    {t:"Interstate Billing Service (IBS)", d:"Fleet accounts-receivable financing."},
+    {t:"Are you paying FullBay to process payments?", d:"If card processing fees are inside the $5k, that's revenue FullBay captures that the plan has to account for separately.", k:1},
+    {t:"Quick Charge", d:"Taking a payment with no service order attached."},
+    {t:"Customer statements", d:"A/R statements, separate from individual invoices, with their own preferences."},
+    {t:"Customer credit memos", d:"Credits, handled separately from refunds."},
+    {t:"Refunds, partial and full", d:"Money back."},
+    {t:"Require signature on payment", d:"A setting to force a signature."},
+    {t:"Duplicate invoice number handling", d:"How the system prevents or handles a repeat number."},
+    {t:"What invoice number are you on right now?", d:"Needed so a new system can use a number range that can never collide with FullBay's. Cheap to decide now, painful later.", k:1},
+    {t:"Auto-matching payments to invoices", d:"Payments reconcile themselves."},
+    {t:"Dispute / chargeback workflow", d:"Built-in dispute handling."},
+    {t:"FullBay's own chart of accounts", d:"It maintains its own accounts and item mapping — deeper than just passing data to QuickBooks.", k:1},
+    {t:"Cash-basis sales tax reporting", d:"A specific named tax reporting mode."},
+    {t:"How is sales tax calculated on an invoice today?", d:"Has to be right on the very first invoice out of a new system, or the ledger and the return are wrong.", k:1},
+    {t:"QuickBooks sync", d:"You confirmed this is your real workflow today.", pre:"v1"},
+    {t:"Could the bookkeeper key or import invoices by hand at first?", d:"If yes for a small number of customers, a real QuickBooks integration moves out of V1 and the build gets meaningfully shorter.", k:1},
+    {t:"Warranty work billing", d:"A separate accounting treatment for warranty-covered repairs."}
+  ]
+},
+{
+  id:"portal", n:"8", t:"Customer Portal",
+  note:"This is the part Cam's app already does well, and the part FullBay does worst. Mark what your customers actually touch — and what they complain about.",
+  rows:[
+    {t:"Magic-link access, no password", d:"Each customer gets one unguessable URL they bookmark. No login screen at all. If it leaks, you reset it.", k:1},
+    {t:"Has a portal link ever had to be reset?", d:"Worth knowing whether the no-password model has caused a real problem."},
+    {t:"Units tab", d:"Unit number, nickname, status, severity, VIN, year/make/model, ship-to, open orders."},
+    {t:"Customer adds their own units", d:"They can create a unit themselves."},
+    {t:"Customer pulls their own fleet report", d:"Self-service report."},
+    {t:"Unit status values", d:"New, Confirmed, Out of Service, Owner-Operator, Shop-Company Owned, Sold, Transferred."},
+    {t:"Messages tab", d:"Account-level messaging between you and the customer."},
+    {t:"Active Services tab", d:"Open work, filterable by unit."},
+    {t:"Customer-facing pipeline stages", d:"Saved but not submitted → Submitted → Evaluating & Diagnosis → Ready to authorize → Service in progress → Recently completed."},
+    {t:"Invoices tab with A/R columns", d:"Current, Coming Due, Past Due, Balance."},
+    {t:"Customer creates their own statement", d:"Self-service statement."},
+    {t:"Customer pays invoices in batch", d:"Paying several at once."},
+    {t:"Customer saves their own payment method", d:"They add a card or bank account themselves."},
+    {t:"Contacts tab", d:"Their people."},
+    {t:"Configuration / Your Info tab", d:"Customer edits their own name, contacts, addresses, payment methods, attachments and notes."},
+    {t:"The four decision-maker fields", d:"Who makes overall decisions, who runs day-to-day fleet, who authorizes repairs, who handles billing. A real delegation model, separate from dollar thresholds.", k:1},
+    {t:"Primary access method field", d:"How units normally get to you, e.g. customer brings it in."},
+    {t:"Request Service button", d:"Customer-initiated service request.", k:1},
+    {t:"Help & Training link for customers", d:"Customer-facing documentation."},
+    {t:"What do your customers complain about most?", d:"Free text. The complaints are where the new portal wins, and they cost nothing to collect.", k:1}
+  ]
+},
+{
+  id:"rep", n:"9", t:"The 38 Reports",
+  note:"All 38 canned reports, by name. There is no custom report builder in FullBay. This is the fastest place in the whole list to return weeks of schedule — if you run four of these, mark the other 34 and we are done.",
+  rows:[
+    {t:"A/R Aging", d:"Revenue"},
+    {t:"All Revenue", d:"Revenue"},
+    {t:"Closed Without Invoicing / Ready To Invoice", d:"Revenue"},
+    {t:"Credits & Refunds", d:"Revenue"},
+    {t:"Payments", d:"Revenue"},
+    {t:"Sold Sublet", d:"Revenue"},
+    {t:"Work in Progress Revenue", d:"Revenue"},
+    {t:"Inventory Balance", d:"Inventory"},
+    {t:"Inventory Reconciliation", d:"Inventory"},
+    {t:"Inventory Velocity", d:"Inventory"},
+    {t:"Inventory with No Location", d:"Inventory"},
+    {t:"Parts To Be Returned", d:"Inventory"},
+    {t:"Returned Parts", d:"Inventory"},
+    {t:"Shortage", d:"Inventory"},
+    {t:"Sold Parts", d:"Inventory"},
+    {t:"Special Order Velocity", d:"Inventory"},
+    {t:"Vendor", d:"Inventory"},
+    {t:"WIP Details", d:"Work in progress"},
+    {t:"WIP Parts", d:"Work in progress"},
+    {t:"WIP Summary", d:"Work in progress"},
+    {t:"Bill To", d:"Customer"},
+    {t:"Customer Communications: Text Messages", d:"Customer"},
+    {t:"Equipment Utilization", d:"Customer"},
+    {t:"Fleet Cost per Unit", d:"Customer"},
+    {t:"Fleet", d:"Customer"},
+    {t:"Global Services / PMs", d:"Customer"},
+    {t:"Invoices Created When Customer Was Over Limit Or Past Due", d:"Customer"},
+    {t:"Pending Repairs", d:"Customer"},
+    {t:"Shop Utilization", d:"Customer"},
+    {t:"Unit Possession (Receive / Release)", d:"Customer"},
+    {t:"Warranty", d:"Customer"},
+    {t:"Clocked Hours", d:"Employee"},
+    {t:"Completed Hours", d:"Employee"},
+    {t:"Employee Statistics", d:"Employee"},
+    {t:"Invoiced Hours", d:"Employee"},
+    {t:"Payroll Advance", d:"Employee"},
+    {t:"SO Hours", d:"Employee"},
+    {t:"Timesheet", d:"Employee"},
+    {t:"Do you export reports, or just read them on screen?", d:"Changes whether export formats matter at all.", k:1}
+  ]
+},
+{
+  id:"mob", n:"10", t:"Mobile & Tablets",
+  note:"You already told us techs use the web app bookmarked to an iPad or phone home screen, and nobody uses the native apps. The one thing still open is what happens when the wifi drops.",
+  rows:[
+    {t:"Web app bookmarked to the home screen", d:"Your actual pattern today, on iPad and phone.", pre:"v1"},
+    {t:"Native iOS / Android app", d:"Exists, but you told us nobody uses it.", pre:"cut"},
+    {t:"How bad is the wifi in the bays, honestly?", d:"If a tech loses connection mid-job and it costs them work, the new system needs offline support — and that roughly doubles the build. This is the biggest single swing in the whole project.", k:1},
+    {t:"Mileage capture on mobile", d:"Recording miles from a phone."},
+    {t:"Paperless order / estimate / invoice on mobile", d:"Full job on a device."},
+    {t:"Taking payment in the field", d:"Mobile payment collection."}
+  ]
+},
+{
+  id:"int", n:"11", t:"Integrations",
+  note:"Each live integration is real work to replace. Each dead one is free. Several are already answered.",
+  rows:[
+    {t:"FullBay API", d:"We've confirmed it only returns invoice detail. Nothing else answers usefully, and there's no way to write anything back in.", k:1},
+    {t:"Can FullBay export your data at all?", d:"Any report, CSV or data dump. The API can't supply history, so this is the only path. The single highest-risk unknown in the project.", k:1},
+    {t:"QuickBooks", d:"Confirmed in active use.", pre:"v1"},
+    {t:"Spike (in-app AI help assistant)", d:"You told us your guys use this a lot for figuring out FullBay. Worth noting as a real need — in-app help — not necessarily an AI feature to rebuild.", pre:"later"},
+    {t:"AI Receptionist (Claudia)", d:"You told us: not used, not trialed, not a fit.", pre:"cut"},
+    {t:"VMRS coding", d:"Nothing in your live configuration, and your own contact wasn't familiar with it.", pre:"cut"},
+    {t:"MOTOR", d:"Labor time guide, HD service guide, parts cross-reference.", k:1},
+    {t:"Mitchell 1 (ProDemand / TruckSeries)", d:"Labor guide and repair information."},
+    {t:"Whip Around", d:"Driver DVIR intake."},
+    {t:"Pitstop", d:"Predictive maintenance and fault codes."},
+    {t:"FleetNet", d:"Emergency and roadside intake."},
+    {t:"Two-way texting", d:"Texting customers and techs from inside FullBay.", k:1},
+    {t:"FullBay Payments (Stripe)", d:"Card, ACH, wallet and BNPL processing."},
+    {t:"FullBay Marketplace / FinditParts", d:"In-app parts ordering."},
+    {t:"GPS / telematics", d:"Nine providers supported: Azuga, Geotab, GeoForce, GPS Trackit, Linxup, Motive, Samsara, US Fleet Tracking, Verizon Connect. Any of them live?", k:1},
+    {t:"Dieselmatic", d:"Shop website and marketing add-on."},
+    {t:"Anything else you pay for that touches FullBay?", d:"Free text — anything we missed."}
+  ]
+}
+];
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const KEY="otc-fullbay-punchlist-v1";
+const CKEY=KEY+"-collapsed";
+const LABEL={v1:"V1",later:"Later",cut:"Not needed"};
+let state={};
+let collapsed={};          /* sectionId -> true when folded shut */
+let storageOK=true;
+
+function load(){
+  try{
+    const raw=localStorage.getItem(KEY);
+    if(raw) state=JSON.parse(raw)||{};
+    const c=localStorage.getItem(CKEY);
+    if(c) collapsed=JSON.parse(c)||{};
+    else foldAllShut();            /* first open: everything starts closed */
+    localStorage.setItem(KEY+"-probe","1");
+    localStorage.removeItem(KEY+"-probe");
+  }catch(e){
+    storageOK=false;
+    foldAllShut();                 /* no storage: start closed every time */
+  }
+}
+function foldAllShut(){
+  collapsed={};
+  DATA.forEach(s=>{collapsed[s.id]=true;});
+}
+function save(){
+  if(!storageOK) return;
+  try{
+    localStorage.setItem(KEY,JSON.stringify(state));
+    localStorage.setItem(CKEY,JSON.stringify(collapsed));
+  }
+  catch(e){ storageOK=false; paintSaveNote(); }
+}
+function paintSaveNote(){
+  const el=document.getElementById("saveNote");
+  if(storageOK){
+    el.className="savenote";
+    el.textContent="Saving to this browser automatically · "+
+      new Date().toLocaleTimeString([], {hour:"numeric",minute:"2-digit"});
+  }else{
+    el.className="savenote warn";
+    el.textContent="⚠ This browser won’t save progress — build and copy the summary before closing the tab.";
+  }
+}
+
+/* seed pre-answers once */
+function seed(){
+  let touched=false;
+  DATA.forEach(sec=>sec.rows.forEach((r,i)=>{
+    const id=sec.id+"-"+i;
+    if(r.pre && !state[id]){ state[id]={s:r.pre,n:""}; touched=true; }
+  }));
+  if(touched) save();
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function render(){
+  const host=document.getElementById("sections");
+  const nav=document.getElementById("jumpNav");
+  host.innerHTML="";nav.innerHTML="";
+
+  DATA.forEach(sec=>{
+    const a=document.createElement("a");
+    a.href="#sec-"+sec.id;
+    a.innerHTML="<b>"+sec.n+"</b> &nbsp;"+sec.t;
+    nav.appendChild(a);
+
+    const s=document.createElement("section");
+    s.id="sec-"+sec.id;
+    s.innerHTML=
+      '<button class="sec-head" data-sec="'+sec.id+'" aria-expanded="true"'+
+        ' aria-controls="rows-'+sec.id+'">'+
+        '<span class="sec-num">'+sec.n+'</span>'+
+        '<h2>'+sec.t+'</h2>'+
+        '<span class="sec-count" id="cnt-'+sec.id+'"></span>'+
+        '<span class="chev" aria-hidden="true"></span>'+
+      '</button>'+
+      (sec.note?'<p class="sec-note">'+sec.note+'</p>':'');
+
+    const ul=document.createElement("ul");
+    ul.className="rows";
+    ul.id="rows-"+sec.id;
+
+    sec.rows.forEach((r,i)=>{
+      const id=sec.id+"-"+i;
+      const cur=state[id]||{s:"",n:""};
+      const li=document.createElement("li");
+      li.className="row";
+      li.dataset.id=id;
+      li.dataset.key=r.k?"1":"0";
+
+      li.innerHTML=
+        '<div class="rid">'+sec.n+"."+(i+1)+'</div>'+
+        '<div class="rmain">'+
+          '<div class="rtitle">'+esc(r.t)+
+            (r.k?' <span class="tag t-key">Key</span>':'')+
+            (r.pre?' <span class="tag t-known">Confirmed</span>':'')+
+          '</div>'+
+          (r.d?'<div class="rdesc">'+esc(r.d)+'</div>':'')+
+          '<div class="choices">'+
+            btn("v1",id,cur.s)+btn("later",id,cur.s)+btn("cut",id,cur.s)+
+            '<button class="note-btn'+(cur.n?' has':'')+'" data-note="'+id+'">'+
+              (cur.n?"Note ✓":"+ Note")+'</button>'+
+          '</div>'+
+          '<textarea class="note" data-ta="'+id+'" '+(cur.n?'':'hidden')+
+            ' placeholder="What’s different about how you need this?">'+esc(cur.n)+'</textarea>'+
+        '</div>';
+      ul.appendChild(li);
+      applyRowClass(li,cur.s);
+    });
+
+    s.appendChild(ul);
+    host.appendChild(s);
+  });
+
+  /* Apply stored done + collapsed state BEFORE the first tally, so that
+     auto-collapse only fires on a real transition to complete — a section
+     you deliberately re-opened stays open across reloads. */
+  DATA.forEach(sec=>{
+    const node=document.getElementById("sec-"+sec.id);
+    const full=sec.rows.every((r,i)=>(state[sec.id+"-"+i]||{}).s);
+    node.classList.toggle("done",full);
+    const shut=!!collapsed[sec.id];
+    node.classList.toggle("collapsed",shut);
+    node.querySelector("button.sec-head").setAttribute("aria-expanded",String(!shut));
+  });
+
+  wire();
+  tally();
+  paintCollapseAll();
+}
+
+function btn(kind,id,cur){
+  return '<button class="ch c-'+kind+'" data-set="'+kind+'" data-row="'+id+'" '+
+    'aria-pressed="'+(cur===kind)+'">'+LABEL[kind]+'</button>';
+}
+function esc(s){
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+function applyRowClass(li,s){
+  li.classList.remove("is-go","is-later","is-cut");
+  if(s==="v1")li.classList.add("is-go");
+  else if(s==="later")li.classList.add("is-later");
+  else if(s==="cut")li.classList.add("is-cut");
+}
+
+function wire(){
+  document.querySelectorAll("button.sec-head").forEach(h=>{
+    h.addEventListener("click",()=>{
+      const id=h.dataset.sec;
+      setCollapsed(id,!collapsed[id]);
+      save();
+    });
+  });
+
+  document.querySelectorAll("button.ch").forEach(b=>{
+    b.addEventListener("click",()=>{
+      const id=b.dataset.row, val=b.dataset.set;
+      const cur=state[id]||{s:"",n:""};
+      cur.s = (cur.s===val) ? "" : val;   /* tap again to clear */
+      state[id]=cur;
+      const li=b.closest("li.row");
+      li.querySelectorAll("button.ch").forEach(o=>
+        o.setAttribute("aria-pressed", String(o.dataset.set===cur.s)));
+      applyRowClass(li,cur.s);
+      save();tally();applyFilter();
+    });
+  });
+
+  document.querySelectorAll("button.note-btn").forEach(b=>{
+    b.addEventListener("click",()=>{
+      const ta=document.querySelector('textarea[data-ta="'+b.dataset.note+'"]');
+      ta.hidden=!ta.hidden;
+      if(!ta.hidden){ ta.focus(); }
+    });
+  });
+
+  document.querySelectorAll("textarea.note").forEach(ta=>{
+    ta.addEventListener("input",()=>{
+      const id=ta.dataset.ta;
+      const cur=state[id]||{s:"",n:""};
+      cur.n=ta.value;state[id]=cur;
+      const b=document.querySelector('button[data-note="'+id+'"]');
+      if(cur.n.trim()){ b.classList.add("has"); b.textContent="Note ✓"; }
+      else { b.classList.remove("has"); b.textContent="+ Note"; }
+      save();
+    });
+  });
+}
+
+/* ============================================================
+   TALLY + FILTER
+   ============================================================ */
+function setCollapsed(id,val){
+  collapsed[id]=!!val;
+  if(!val) delete collapsed[id];
+  const sec=document.getElementById("sec-"+id);
+  if(!sec) return;
+  sec.classList.toggle("collapsed",!!val);
+  const h=sec.querySelector("button.sec-head");
+  if(h) h.setAttribute("aria-expanded",String(!val));
+  paintCollapseAll();
+}
+
+function paintCollapseAll(){
+  const btn=document.getElementById("btnFold");
+  if(!btn) return;
+  const allShut=DATA.every(s=>collapsed[s.id]);
+  btn.textContent=allShut?"Expand all":"Collapse all";
+}
+
+function tally(){
+  let total=0,go=0,later=0,cut=0;
+  DATA.forEach(sec=>{
+    let st=0;
+    sec.rows.forEach((r,i)=>{
+      total++;
+      const s=(state[sec.id+"-"+i]||{}).s;
+      if(s){st++; if(s==="v1")go++; else if(s==="later")later++; else cut++;}
+    });
+    const el=document.getElementById("cnt-"+sec.id);
+    const full=st===sec.rows.length;
+    if(el){
+      el.textContent=full?("Done ✓ · "+st):(st+"/"+sec.rows.length+" marked");
+      el.classList.toggle("done",full);
+    }
+    const node=document.getElementById("sec-"+sec.id);
+    if(node){
+      const was=node.classList.contains("done");
+      node.classList.toggle("done",full);
+      /* fold it away the moment the last row in the section gets marked */
+      if(full && !was && !collapsed[sec.id]) setCollapsed(sec.id,true);
+    }
+  });
+  const done=go+later+cut;
+  document.getElementById("progLabel").textContent=done+" of "+total+" marked";
+  document.getElementById("progTally").textContent=
+    "V1 "+go+" · Later "+later+" · Cut "+cut;
+  document.getElementById("barGo").style.width=(go/total*100)+"%";
+  document.getElementById("barLater").style.width=(later/total*100)+"%";
+  document.getElementById("barCut").style.width=(cut/total*100)+"%";
+  paintSaveNote();
+}
+
+let filter="all";
+function applyFilter(){
+  document.body.classList.toggle("filtering",filter!=="all");
+  document.querySelectorAll("li.row").forEach(li=>{
+    const s=(state[li.dataset.id]||{}).s||"";
+    let show=true;
+    if(filter==="todo") show=!s;
+    else if(filter==="key") show=li.dataset.key==="1";
+    else if(filter==="v1") show=s==="v1";
+    else if(filter==="later") show=s==="later";
+    else if(filter==="cut") show=s==="cut";
+    li.hidden=!show;
+  });
+  document.querySelectorAll("section").forEach(sec=>{
+    const any=[...sec.querySelectorAll("li.row")].some(li=>!li.hidden);
+    sec.hidden=!any;
+  });
+}
+document.querySelectorAll("button.f").forEach(b=>{
+  b.addEventListener("click",()=>{
+    filter=b.dataset.filter;
+    document.querySelectorAll("button.f").forEach(o=>
+      o.setAttribute("aria-pressed",String(o===b)));
+    applyFilter();
+    window.scrollTo({top:0,behavior:"smooth"});
+  });
+});
+
+/* ============================================================
+   EXPORT
+   ============================================================ */
+function buildSummary(){
+  const buckets={v1:[],later:[],cut:[]},unmarked=[],notes=[];
+  DATA.forEach(sec=>sec.rows.forEach((r,i)=>{
+    const id=sec.id+"-"+i;
+    const cur=state[id]||{s:"",n:""};
+    const line=sec.n+"."+(i+1)+"  "+r.t+"   ["+sec.t+"]";
+    if(cur.s) buckets[cur.s].push(line); else unmarked.push(line);
+    if(cur.n && cur.n.trim())
+      notes.push(sec.n+"."+(i+1)+"  "+r.t+"\n    → "+cur.n.trim());
+  }));
+
+  const L=[];
+  L.push("FULLBAY PUNCH LIST — OTC FLEET SERVICES");
+  L.push("Marked "+new Date().toLocaleString());
+  L.push("");
+  L.push("TOTALS: V1 "+buckets.v1.length+
+         " | Later "+buckets.later.length+
+         " | Not needed "+buckets.cut.length+
+         " | Unmarked "+unmarked.length);
+  L.push("");
+  L.push("=== V1 — NEEDED DAY ONE ("+buckets.v1.length+") ===");
+  L.push(buckets.v1.length?buckets.v1.join("\n"):"(none)");
+  L.push("");
+  L.push("=== LATER ("+buckets.later.length+") ===");
+  L.push(buckets.later.length?buckets.later.join("\n"):"(none)");
+  L.push("");
+  L.push("=== NOT NEEDED — DO NOT BUILD ("+buckets.cut.length+") ===");
+  L.push(buckets.cut.length?buckets.cut.join("\n"):"(none)");
+  L.push("");
+  L.push("=== COMMENTS ("+notes.length+") ===");
+  L.push(notes.length?notes.join("\n\n"):"(none)");
+  L.push("");
+  L.push("=== STILL UNMARKED ("+unmarked.length+") ===");
+  L.push(unmarked.length?unmarked.join("\n"):"(none — complete)");
+  L.push("");
+  L.push("--- raw ---");
+  L.push(JSON.stringify(state));
+  return L.join("\n");
+}
+
+document.getElementById("btnBuild").addEventListener("click",()=>{
+  const out=document.getElementById("out");
+  out.value=buildSummary();
+  out.hidden=false;
+  out.scrollIntoView({behavior:"smooth",block:"center"});
+});
+document.getElementById("btnCopy").addEventListener("click",async()=>{
+  const out=document.getElementById("out");
+  if(!out.value){ out.value=buildSummary(); out.hidden=false; }
+  const b=document.getElementById("btnCopy");
+  try{
+    await navigator.clipboard.writeText(out.value);
+    b.textContent="Copied ✓";
+  }catch(e){
+    out.removeAttribute("readonly");
+    out.focus();out.setSelectionRange(0,out.value.length);
+    b.textContent="Select all → Copy";
+  }
+  setTimeout(()=>{b.textContent="Copy to clipboard";},2600);
+});
+document.getElementById("btnPrint").addEventListener("click",()=>window.print());
+document.getElementById("btnReset").addEventListener("click",()=>{
+  if(!confirm("Clear every mark and comment and start over?")) return;
+  state={};save();seed();render();applyFilter();
+});
+document.getElementById("btnFold").addEventListener("click",()=>{
+  const allShut=DATA.every(s=>collapsed[s.id]);
+  DATA.forEach(s=>setCollapsed(s.id,!allShut));
+  save();
+  window.scrollTo({top:0,behavior:"smooth"});
+});
+document.getElementById("btnJumpExport").addEventListener("click",()=>{
+  document.getElementById("exportBlock")
+    .scrollIntoView({behavior:"smooth",block:"start"});
+});
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+document.getElementById("stampDate").textContent=
+  new Date().toLocaleDateString([], {year:"numeric",month:"long",day:"numeric"});
+load();seed();render();applyFilter();
+</script>
+</body>
+</html>

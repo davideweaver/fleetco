@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "sourceMap": false
+  },
+  "exclude": [
+    "**/__tests__/**",
+    "platform/test/**",
+    "vitest.config.ts",
+    "eslint.config.mjs"
+  ]
+}

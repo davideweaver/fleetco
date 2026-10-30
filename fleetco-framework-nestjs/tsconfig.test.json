@@ -1,0 +1,14 @@
+{
+  // Vitest is ESM-only, so the test files and the harness cannot be typechecked
+  // under the `node16`/CommonJS settings NestJS's decorator emit needs. Two
+  // configs, one source tree. See NOTES.md § Where the framework fought.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "types": ["node"]
+  },
+  "include": ["src/**/*.ts", "scripts/**/*.ts", "vitest.config.ts"],
+  "exclude": ["node_modules", "dist"]
+}

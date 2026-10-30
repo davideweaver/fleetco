@@ -1,0 +1,41 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "lib": ["ES2023"],
+    "rootDir": ".",
+    "outDir": "build",
+    "sourceMap": true,
+    "declaration": false,
+    "removeComments": false,
+
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "forceConsistentCasingInFileNames": true,
+    "verbatimModuleSyntax": true,
+
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "types": ["node"]
+  },
+  "include": [
+    "app/**/*.ts",
+    "providers/**/*.ts",
+    "start/**/*.ts",
+    "config/**/*.ts",
+    "bin/**/*.ts",
+    "platform/**/*.ts",
+    "modules/**/*.ts",
+    "scripts/**/*.ts",
+    "vitest.config.ts",
+    "eslint.config.mjs",
+    "adonisrc.ts"
+  ]
+}

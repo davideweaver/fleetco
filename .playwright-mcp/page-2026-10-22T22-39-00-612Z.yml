@@ -1,0 +1,108 @@
+- generic [active] [ref=f2e1]:
+  - banner [ref=f2e2]:
+    - generic [ref=f2e3]:
+      - heading "FullBay Punch List" [level=1] [ref=f2e4]
+      - generic [ref=f2e5]:
+        - generic [ref=f2e6]: OTC Fleet Services
+        - generic [ref=f2e7]: October 22, 2026
+    - paragraph [ref=f2e8]: Tap a section to open it · V1 = day one, Later = eventually, Not needed = don’t build · tap a choice again to clear it
+  - generic [ref=f2e9]:
+    - generic [ref=f2e10]:
+      - generic [ref=f2e12]:
+        - generic [ref=f2e13]: 8 of 217 marked
+        - generic [ref=f2e14]: V1 4 · Later 1 · Cut 3
+      - group "Filter rows" [ref=f2e19]:
+        - button "All" [pressed] [ref=f2e20] [cursor=pointer]
+        - button "Unmarked" [ref=f2e21] [cursor=pointer]
+        - button "Key only" [ref=f2e22] [cursor=pointer]
+        - button "V1" [ref=f2e23] [cursor=pointer]
+        - button "Later" [ref=f2e24] [cursor=pointer]
+        - button "Cut" [ref=f2e25] [cursor=pointer]
+      - button "Expand all" [ref=f2e26] [cursor=pointer]
+      - button "Results" [ref=f2e27] [cursor=pointer]
+      - generic [ref=f2e28]: Saving to this browser automatically · 6:39 PM
+    - navigation "Jump to section" [ref=f2e29]:
+      - link "0 Roles & Who Does What" [ref=f2e30] [cursor=pointer]:
+        - /url: "#sec-roles"
+      - link "1 Service Orders" [ref=f2e31] [cursor=pointer]:
+        - /url: "#sec-so"
+      - link "2 Estimates & Customer Authorization" [ref=f2e32] [cursor=pointer]:
+        - /url: "#sec-est"
+      - link "3 Parts & Inventory" [ref=f2e33] [cursor=pointer]:
+        - /url: "#sec-parts"
+      - link "4 Labor & Technician Time" [ref=f2e34] [cursor=pointer]:
+        - /url: "#sec-labor"
+      - link "5 Preventive Maintenance" [ref=f2e35] [cursor=pointer]:
+        - /url: "#sec-pm"
+      - link "6 Inspections & DVIR" [ref=f2e36] [cursor=pointer]:
+        - /url: "#sec-insp"
+      - link "7 Invoicing & Payments" [ref=f2e37] [cursor=pointer]:
+        - /url: "#sec-inv"
+      - link "8 Customer Portal" [ref=f2e38] [cursor=pointer]:
+        - /url: "#sec-portal"
+      - link "9 The 38 Reports" [ref=f2e39] [cursor=pointer]:
+        - /url: "#sec-rep"
+      - link "10 Mobile & Tablets" [ref=f2e40] [cursor=pointer]:
+        - /url: "#sec-mob"
+      - link "11 Integrations" [ref=f2e41] [cursor=pointer]:
+        - /url: "#sec-int"
+  - main [ref=f2e42]:
+    - generic [ref=f2e43]:
+      - button "0 Roles & Who Does What 0/7 marked" [ref=f2e45] [cursor=pointer]:
+        - generic [ref=f2e46]: "0"
+        - heading "Roles & Who Does What" [level=2] [ref=f2e47]
+        - generic [ref=f2e48]: 0/7 marked
+      - button "1 Service Orders 0/27 marked" [ref=f2e51] [cursor=pointer]:
+        - generic [ref=f2e52]: "1"
+        - heading "Service Orders" [level=2] [ref=f2e53]
+        - generic [ref=f2e54]: 0/27 marked
+      - button "2 Estimates & Customer Authorization 0/15 marked" [ref=f2e57] [cursor=pointer]:
+        - generic [ref=f2e58]: "2"
+        - heading "Estimates & Customer Authorization" [level=2] [ref=f2e59]
+        - generic [ref=f2e60]: 0/15 marked
+      - button "3 Parts & Inventory 0/33 marked" [ref=f2e63] [cursor=pointer]:
+        - generic [ref=f2e64]: "3"
+        - heading "Parts & Inventory" [level=2] [ref=f2e65]
+        - generic [ref=f2e66]: 0/33 marked
+      - button "4 Labor & Technician Time 1/11 marked" [ref=f2e69] [cursor=pointer]:
+        - generic [ref=f2e70]: "4"
+        - heading "Labor & Technician Time" [level=2] [ref=f2e71]
+        - generic [ref=f2e72]: 1/11 marked
+      - button "5 Preventive Maintenance 0/12 marked" [ref=f2e75] [cursor=pointer]:
+        - generic [ref=f2e76]: "5"
+        - heading "Preventive Maintenance" [level=2] [ref=f2e77]
+        - generic [ref=f2e78]: 0/12 marked
+      - button "6 Inspections & DVIR 0/4 marked" [ref=f2e81] [cursor=pointer]:
+        - generic [ref=f2e82]: "6"
+        - heading "Inspections & DVIR" [level=2] [ref=f2e83]
+        - generic [ref=f2e84]: 0/4 marked
+      - button "7 Invoicing & Payments 1/26 marked" [ref=f2e87] [cursor=pointer]:
+        - generic [ref=f2e88]: "7"
+        - heading "Invoicing & Payments" [level=2] [ref=f2e89]
+        - generic [ref=f2e90]: 1/26 marked
+      - button "8 Customer Portal 0/20 marked" [ref=f2e93] [cursor=pointer]:
+        - generic [ref=f2e94]: "8"
+        - heading "Customer Portal" [level=2] [ref=f2e95]
+        - generic [ref=f2e96]: 0/20 marked
+      - button "9 The 38 Reports 0/39 marked" [ref=f2e99] [cursor=pointer]:
+        - generic [ref=f2e100]: "9"
+        - heading "The 38 Reports" [level=2] [ref=f2e101]
+        - generic [ref=f2e102]: 0/39 marked
+      - button "10 Mobile & Tablets 2/6 marked" [ref=f2e105] [cursor=pointer]:
+        - generic [ref=f2e106]: "10"
+        - heading "Mobile & Tablets" [level=2] [ref=f2e107]
+        - generic [ref=f2e108]: 2/6 marked
+      - button "11 Integrations 4/17 marked" [ref=f2e111] [cursor=pointer]:
+        - generic [ref=f2e112]: "11"
+        - heading "Integrations" [level=2] [ref=f2e113]
+        - generic [ref=f2e114]: 4/17 marked
+    - generic [ref=f2e116]:
+      - heading "Results" [level=2] [ref=f2e117]
+      - generic [ref=f2e118]:
+        - paragraph [ref=f2e119]: Builds a plain-text summary grouped by V1 / Later / Not needed, with every comment attached. Copy it and paste it anywhere — email, Notes, a message to Dave. Do this before you close the tab if you want a copy off this device.
+        - generic [ref=f2e120]:
+          - button "Build summary" [ref=f2e121] [cursor=pointer]
+          - button "Copy to clipboard" [ref=f2e122] [cursor=pointer]
+          - button "Print / Save PDF" [ref=f2e123] [cursor=pointer]
+          - button "Start over" [ref=f2e124] [cursor=pointer]
+  - contentinfo [ref=f2e125]: "Sources: logged-in FullBay walkthrough + help center (12 collections, ~440 articles), FullBay marketing, and answers OTC already gave. Rows marked confirmed are things you’ve already told us — just check we got them right."

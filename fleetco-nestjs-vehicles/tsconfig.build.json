@@ -1,0 +1,12 @@
+{
+  // Emits to `dist/` with `src/` as the root, so the entrypoint is
+  // `dist/main.js` — what the Dockerfile and `npm start` expect. Tests, the
+  // test harness and the `scripts/` CLIs are excluded from the shipped image.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist"
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist", "src/**/__tests__/**", "src/platform/test/**"]
+}

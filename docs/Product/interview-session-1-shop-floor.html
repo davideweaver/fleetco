@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Interview 1 — Shop Floor · Fleetco</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0d0e0d;--ink-2:#141614;--ink-3:#1c1f1c;--ink-4:#262a26;
+  --rule:#30352f;--rule-2:#3d433c;
+  --fg:#f2f1ea;--fg-2:#b4b5a9;--fg-3:#7e8077;
+  --hi:#ff6a1f;
+  --ask:#4b9fe0;--probe:#d4c023;--belief:#9085e9;
+  --use:#3fae72;--dont:#e05252;--unknown:#d98324;--diff:#4b9fe0;
+  --bar:66px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--ink);color:var(--fg);font:400 15px/1.6 Barlow,system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:90px}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:1;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/></filter><rect width='120' height='120' filter='url(%23n)' opacity='.03'/></svg>");mix-blend-mode:overlay}
+
+/* ---------- session bar ---------- */
+.bar{position:sticky;top:0;z-index:50;height:var(--bar);display:flex;align-items:center;gap:14px;
+  padding:0 20px;background:rgba(13,14,13,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--rule-2)}
+.bar .id{font:700 13px/1 "IBM Plex Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--hi);white-space:nowrap}
+.clock{font:600 26px/1 "IBM Plex Mono",monospace;letter-spacing:-.01em;min-width:104px;font-variant-numeric:tabular-nums}
+.clock.live{color:var(--hi)}
+.bar button{font:600 11px/1 "IBM Plex Mono",monospace;letter-spacing:.1em;text-transform:uppercase;
+  background:var(--ink-3);color:var(--fg);border:1px solid var(--rule-2);border-radius:3px;padding:10px 13px;cursor:pointer;white-space:nowrap}
+.bar button:hover{background:var(--ink-4);border-color:var(--fg-3)}
+.bar button.go{background:var(--hi);color:#140b05;border-color:var(--hi)}
+.bar button.go:hover{filter:brightness(1.1)}
+.prog{flex:1;min-width:90px;height:6px;background:var(--ink-4);border-radius:3px;overflow:hidden}
+.prog i{display:block;height:100%;width:0;background:var(--hi);transition:width .3s}
+.pct{font:600 11px/1 "IBM Plex Mono",monospace;color:var(--fg-3);min-width:62px}
+.offs{width:58px;background:var(--ink-3);border:1px solid var(--rule-2);color:var(--fg);border-radius:3px;
+  padding:8px 6px;font:500 12px/1 "IBM Plex Mono",monospace;text-align:center}
+.bar label{font:500 9.5px/1.2 "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-3)}
+@media (max-width:900px){.bar{height:auto;flex-wrap:wrap;padding:12px 16px;gap:10px}.prog{order:9;flex-basis:100%}}
+
+/* ---------- head ---------- */
+header{padding:34px 28px 0;max-width:900px;margin:0 auto;position:relative;z-index:2}
+.kick{font:500 11px/1 "IBM Plex Mono",monospace;letter-spacing:.2em;text-transform:uppercase;color:var(--fg-3);margin-bottom:10px}
+h1{font:800 clamp(28px,4.4vw,46px)/.95 "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:-.015em}
+h1 em{font-style:normal;color:var(--hi)}
+.lede{color:var(--fg-2);max-width:66ch;margin-top:14px;font-size:14.5px}
+.rules{border:1px solid var(--rule);border-left:3px solid var(--hi);border-radius:3px;background:var(--ink-2);padding:18px 20px;margin:24px 0 10px;max-width:72ch}
+.rules h2{font:700 11px/1 "IBM Plex Mono",monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--hi);margin-bottom:11px}
+.rules li{list-style:none;color:var(--fg-2);padding-left:18px;position:relative;margin-bottom:8px;font-size:14px}
+.rules li:last-child{margin:0}
+.rules li::before{content:"";position:absolute;left:2px;top:.62em;width:6px;height:1px;background:var(--hi)}
+.rules li b{color:var(--fg)}
+
+main{max-width:900px;margin:0 auto;padding:16px 28px 60px;position:relative;z-index:2}
+@media (max-width:640px){header,main{padding-left:18px;padding-right:18px}}
+
+/* ---------- area card ---------- */
+.area{border:1px solid var(--rule);border-radius:4px;background:var(--ink-2);margin:20px 0;overflow:hidden;transition:border-color .2s,opacity .2s}
+.area[data-state="done"]{border-color:var(--use)}
+.area[data-state="done"] .ahd{background:linear-gradient(90deg,rgba(63,174,114,.12),transparent)}
+.area[data-state="skip"]{opacity:.5}
+.ahd{display:flex;align-items:center;gap:13px;padding:17px 20px;cursor:pointer;background:var(--ink-3);border-bottom:1px solid var(--rule)}
+.ahd .n{font:500 11px/1 "IBM Plex Mono",monospace;color:var(--fg-3);letter-spacing:.1em}
+.ahd h3{font:700 21px/1.1 "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.01em;flex:1}
+.ahd .st{font:600 9.5px/1 "IBM Plex Mono",monospace;letter-spacing:.12em;text-transform:uppercase;padding:6px 9px;border-radius:3px;background:var(--ink-4);color:var(--fg-3);white-space:nowrap}
+.ahd .st.done{background:rgba(63,174,114,.17);color:var(--use)}
+.ahd .st.open{background:rgba(255,106,31,.16);color:var(--hi)}
+.ahd .tw{font:500 11px/1 "IBM Plex Mono",monospace;color:var(--fg-3);white-space:nowrap}
+.ahd .caret{color:var(--fg-3);font-size:12px;transition:transform .2s}
+.area.collapsed .caret{transform:rotate(-90deg)}
+.area.collapsed .abody{display:none}
+.abody{padding:20px}
+
+.blk{margin-bottom:22px}
+.blk > h4{font:700 10.5px/1 "IBM Plex Mono",monospace;letter-spacing:.15em;text-transform:uppercase;
+  margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid var(--rule)}
+.blk.ask h4{color:var(--ask)}.blk.probe h4{color:var(--probe)}.blk.belief h4{color:var(--belief)}
+.q{font-size:17px;line-height:1.45;color:var(--fg);border-left:2px solid var(--ask);padding-left:16px;margin-bottom:10px}
+.q.alt{font-size:15px;color:var(--fg-2);border-left-color:var(--rule-2)}
+ul.plain{list-style:none}
+ul.plain li{color:var(--fg-2);padding-left:19px;position:relative;margin-bottom:9px;max-width:72ch}
+ul.plain li::before{content:"";position:absolute;left:3px;top:.62em;width:6px;height:1px;background:var(--probe)}
+ul.plain li b{color:var(--fg)}
+details.bel{border:1px solid var(--rule-2);border-radius:3px;background:var(--ink-3)}
+details.bel summary{cursor:pointer;padding:12px 15px;font:600 11px/1 "IBM Plex Mono",monospace;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--belief);list-style:none}
+details.bel summary::-webkit-details-marker{display:none}
+details.bel summary::before{content:"▸ ";}
+details.bel[open] summary::before{content:"▾ ";}
+details.bel .in{padding:4px 16px 16px;border-top:1px solid var(--rule)}
+details.bel p{color:var(--fg-2);margin:11px 0 0;font-size:14px;max-width:72ch}
+details.bel p b{color:var(--fg)}
+code{font:500 12.5px/1 "IBM Plex Mono",monospace;background:var(--ink-4);padding:2px 5px;border-radius:2px;color:var(--fg-2)}
+
+/* capture */
+.cap{border-top:1px solid var(--rule-2);margin-top:4px;padding-top:18px}
+.cap h4{font:700 10.5px/1 "IBM Plex Mono",monospace;letter-spacing:.15em;text-transform:uppercase;color:var(--hi);margin-bottom:12px}
+.verd{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:13px}
+.verd button{font:600 10.5px/1 "IBM Plex Mono",monospace;letter-spacing:.07em;text-transform:uppercase;
+  background:var(--ink-3);border:1px solid var(--rule-2);color:var(--fg-2);border-radius:3px;padding:10px 12px;cursor:pointer}
+.verd button:hover{border-color:var(--fg-3);color:var(--fg)}
+.verd button[aria-pressed="true"]{color:#140b05;font-weight:600}
+.verd button[data-v="use"][aria-pressed="true"]{background:var(--use);border-color:var(--use)}
+.verd button[data-v="dont"][aria-pressed="true"]{background:var(--dont);border-color:var(--dont)}
+.verd button[data-v="unknown"][aria-pressed="true"]{background:var(--unknown);border-color:var(--unknown)}
+.verd button[data-v="diff"][aria-pressed="true"]{background:var(--diff);border-color:var(--diff)}
+textarea{width:100%;min-height:92px;background:var(--ink);border:1px solid var(--rule-2);border-radius:3px;
+  color:var(--fg);padding:12px 13px;font:400 14.5px/1.55 Barlow,sans-serif;resize:vertical}
+textarea:focus{outline:1px solid var(--hi);border-color:var(--hi)}
+.caprow{display:flex;gap:9px;align-items:center;margin-top:11px;flex-wrap:wrap}
+.caprow button{font:600 10.5px/1 "IBM Plex Mono",monospace;letter-spacing:.09em;text-transform:uppercase;
+  border-radius:3px;padding:10px 13px;cursor:pointer;border:1px solid var(--rule-2);background:var(--ink-3);color:var(--fg)}
+.caprow button.mk{background:var(--hi);border-color:var(--hi);color:#140b05}
+.caprow button:hover{filter:brightness(1.12)}
+.stamps{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.stamps span{font:500 11px/1 "IBM Plex Mono",monospace;background:var(--ink-4);border:1px solid var(--rule-2);
+  border-radius:3px;padding:6px 8px;color:var(--fg-2);cursor:pointer}
+.stamps span:hover{border-color:var(--dont);color:var(--dont)}
+
+/* must-ask + close */
+.must{border:1px solid var(--dont);border-radius:4px;background:rgba(224,82,82,.07);padding:20px;margin:30px 0}
+.must h2{font:700 11px/1 "IBM Plex Mono",monospace;letter-spacing:.15em;text-transform:uppercase;color:var(--dont);margin-bottom:12px}
+.must .q{border-left-color:var(--dont)}
+.must p{color:var(--fg-2);font-size:14px;margin-top:8px;max-width:72ch}
+footer{max-width:900px;margin:0 auto;padding:0 28px 50px;position:relative;z-index:2;
+  font:500 11px/1.75 "IBM Plex Mono",monospace;color:var(--fg-3);letter-spacing:.04em;border-top:1px solid var(--rule);padding-top:20px}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);z-index:99;
+  background:var(--hi);color:#140b05;font:600 12px/1 "IBM Plex Mono",monospace;letter-spacing:.08em;
+  text-transform:uppercase;padding:14px 20px;border-radius:3px;transition:transform .25s;pointer-events:none}
+.toast.on{transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <span class="id">S1 · Shop Floor</span>
+  <span class="clock" id="clock">00:00</span>
+  <button class="go" id="startBtn">Start</button>
+  <label>Offset<br><input class="offs" id="offset" value="0" title="Seconds the recording started BEFORE you pressed Start. Positive = recording started first."></label>
+  <div class="prog"><i id="progBar"></i></div>
+  <span class="pct" id="progTxt">0 / 5</span>
+  <button id="expMd">Export MD</button>
+  <button id="expJson">JSON</button>
+  <button id="resetBtn">Reset</button>
+</div>
+
+<header>
+  <p class="kick">Fleetco · discovery interview · session 1 of 3</p>
+  <h1>The <em>Shop Floor</em></h1>
+  <p class="lede">The five areas where we have essentially nothing built, and where FullBay's $5k/month actually goes. This is the session that decides whether the project is "own the portal" or "build a shop system." Everything else can wait.</p>
+
+  <div class="rules">
+    <h2>How to run this</h2>
+    <ul>
+      <li><b>Press Start when the recording starts.</b> Every timestamp you capture is an offset from that moment, so marks line up with the transcript. If the recording was already running, put the head-start in seconds into Offset.</li>
+      <li><b>Ask before you reveal.</b> Each area opens with a question to ask cold. The "what we believe" panel stays closed until after they have answered in their own words — opening it early turns the interview into a confirmation exercise.</li>
+      <li><b>Hit Mark liberally.</b> One click stamps the current time against that area. Use it whenever something lands; it is how I find the moment in the transcript later.</li>
+      <li><b>Get the service writer in the room.</b> A manager describes the workflow as designed; the service writer describes what actually happens.</li>
+      <li>Everything saves to this browser as you go. Export at the end and send me the file.</li>
+    </ul>
+  </div>
+</header>
+
+<main id="main"></main>
+
+<div class="must" style="max-width:900px;margin:0 auto 34px;">
+  <h2>Must ask before the call ends</h2>
+  <p class="q">"If we moved one customer off FullBay, what can you get <em>out</em> of FullBay — any export, report, CSV, anything?"</p>
+  <p>The API only returns invoices, so a vendor-side export is the only path for history. If the answer is "nothing," history either gets re-keyed by hand or abandoned, and that is a scoping decision they need to make consciously.</p>
+  <p class="q" style="margin-top:18px">"Could a customer move over in one go, with no going back — or do you need both systems running in parallel for a while?"</p>
+  <p>Parallel running is not available. FullBay has no write API, and the one write path creates a brand-new customer rather than matching the existing one. A hard per-customer cutover is the only shape on offer, and they should hear that now rather than mid-migration.</p>
+</div>
+
+<footer id="foot"></footer>
+<div class="toast" id="toast">Saved</div>
+
+<script>
+const AREAS=[
+{
+ id:'service-orders',n:'01',name:'Service Orders',
+ ask:'Walk me through a truck that came in this morning. From the phone call to the moment it drives out — who touches it, and what do they type?',
+ alts:[
+  'Where do you stand in the system all day? Which screen is open right now?',
+  'What happens when a tech finds a second problem halfway through a job?'
+ ],
+ probes:[
+  '<b>The kanban.</b> Does the board actually run as Unassigned → Assign → Diagnose → Price Parts → Authorize → Wait For Authorization → Repair? Which stages do things get stuck in, and which do you skip?',
+  '<b>Two urgency fields.</b> Do you use both Service Request Urgency (at intake) and Service Order Urgency (during work), or has one of them gone dead?',
+  '<b>Thirteen tabs, seven view modes.</b> Which ones does each person actually open? Expect this list to collapse hard.',
+  '<b>Concern / Cause / Correction.</b> Does the tech really fill in all three, or does one become a dumping ground?',
+  '<b>Quick SO vs full Service Order vs Quick Estimate.</b> Three creation paths — what fraction of work goes down each?',
+  '<b>The odd ones.</b> Yard Check, Daily Rates, Sublet, Access SOAI, third-party billing — used, or inherited?'
+ ],
+ belief:[
+  'This is FullBay\'s spine: one <b>Service Order</b> per unit visit, with each repair as an <b>Action Item (SOAI)</b> carrying Concern / Cause / Correction, each with its own parts and labor tabs.',
+  'We have <b>nothing</b>. The table named <code>active_services</code> looks like a work order and is not one — its columns are <code>stage, severity, first_concern, estimate_number, service_order_number, estimate_total</code>. Reference numbers pointing at FullBay documents plus a cached total.',
+  'No line items, no cause/correction, no parts, no labor, no technician assignment. <b>The repair has no representation in the new system at all.</b> This is the largest single gap.'
+ ]
+},
+{
+ id:'estimates',n:'02',name:'Estimates & Authorization',
+ ask:'How does a customer find out what a repair will cost, and how do you know they said yes?',
+ alts:[
+  'Has a customer ever approved part of an estimate and declined the rest? What happened next?',
+  'Where does the labor time on an estimate come from?'
+ ],
+ probes:[
+  '<b>Per-line authorization.</b> Do customers really approve line by line, or do most just hit Toggle All?',
+  '<b>Labor guides.</b> MOTOR or Mitchell 1 — which, and is anyone paying for it? Or is it mostly shop history and gut feel?',
+  '<b>Expected vs actual hours.</b> Does anyone look at the gap? Is it used to coach or to price?',
+  '<b>Re-authorization.</b> Is "Require Re-Authorization" switched on? What is the real rule when scope grows mid-repair?',
+  '<b>Thresholds.</b> Is Pre-Authorize All Parts set, and at what dollar figure?',
+  '<b>Who authorizes.</b> The estimate header records an "Authorizer" by name — is that meaningful to you, or just a field?',
+  '<b>Delivery.</b> Portal, text, or email — what do customers actually respond to fastest?'
+ ],
+ belief:[
+  'This is the workflow that makes heavy-duty repair different from ordinary auto work, and <b>the one shop-side area where our app genuinely participates.</b>',
+  'We own the <b>customer half</b>: a <code>ready_to_authorize</code> stage, a dedicated authorize route, an <code>authorized_at</code> timestamp, and a <code>fleet_authorizer</code> role built around exactly this act. The whole portal is organised around the Fleet Authorizer as its central persona.',
+  'We do not own the <b>shop half</b> — building the estimate. No pricing, no labor guide, no parts lookup, no per-line construction, no Expected Hours. We can collect an approval; we cannot produce the thing being approved.'
+ ]
+},
+{
+ id:'parts',n:'03',name:'Parts & Inventory',
+ ask:'Talk me through getting a part onto a repair — from the tech asking for it to it showing up on the invoice.',
+ alts:[
+  'What happens when the part is not on the shelf?',
+  'Who decides what a part sells for?'
+ ],
+ probes:[
+  '<b>Core charges.</b> How much of your volume carries cores? How is the credit actually chased down? This has three dedicated help articles, so it is not an edge case.',
+  '<b>Pricing.</b> Pricing scales, pricing matrices, cost floor — which of these three are configured, and who set them?',
+  '<b>Counting.</b> Do you run cycle counts, or is it a once-a-year scramble?',
+  '<b>Purchasing.</b> Are POs created in FullBay or by phone/email first and entered after? Combined POs — real or theoretical?',
+  '<b>Marketplace.</b> Do you order through FullBay Marketplace / FinditParts, or direct with NAPA and O\'Reilly?',
+  '<b>Locations.</b> Two shop entities exist on your account — do parts move between Lancaster and Mobile, and is that tracked or informal?',
+  '<b>The weird ones.</b> Fake inventory parts, counter sales, drop shipping, restocking fees — which are load-bearing?'
+ ],
+ belief:[
+  'The deepest area in the whole product — <b>68 help-centre articles</b>, more than any other collection, and where shop profit is won or lost.',
+  'We have <b>nothing</b>. No parts, no stock, no purchase orders, no core tracking, no pricing rules.',
+  '<b>Watch for a false positive here.</b> Our app has a "vendors" module, but it means outside <i>service providers</i> with an application workflow — not parts suppliers with stock and POs. The shared word does not mean shared coverage.'
+ ]
+},
+{
+ id:'labor',n:'04',name:'Labor & Technician Time',
+ ask:'How does a technician\'s day get recorded, and how does that turn into a paycheck?',
+ alts:[
+  'What happens if a tech forgets to clock out?',
+  'Do you look at efficiency or utilization numbers for anyone?'
+ ],
+ probes:[
+  '<b>Payroll dependency.</b> Techs are paid on actual clocked hours in FullBay today — is payroll run from these numbers directly, or re-keyed somewhere else?',
+  '<b>Corrections.</b> How often do timesheets need fixing, and who has authority to fix them?',
+  '<b>Billable vs admin.</b> Is the split maintained honestly, or does everything land in one bucket?',
+  '<b>Efficiency / utilization.</b> The tech home screen shows these per person. Does anyone act on them?',
+  '<b>GPS on timestamps.</b> That setting is on in your account — deliberate, for road techs, or inherited?',
+  '<b>Road vs shop.</b> Does the Mobile Department clock differently from Lancaster?',
+  '<b>The Payroll Advance report.</b> Who runs it, and when?'
+ ],
+ belief:[
+  'How work becomes both a payroll number and a billable number. A tech taps a job to clock in and every minute logs against that job and unit.',
+  'We have <b>nothing</b>. No technicians, no time entries, no timesheets, no labor rates, no productivity metrics.',
+  '<b>This is the sleeper risk of the whole project.</b> Technician time feeds payroll, and payroll cannot run on a best-effort basis. Any cutover has to treat this as a hard dependency rather than a phase-two feature — which is a point worth making out loud in this call.'
+ ]
+},
+{
+ id:'pm',n:'05',name:'PM Scheduling',
+ ask:'How do you know a truck is due for preventive maintenance before the customer calls you?',
+ alts:[
+  'How much of your work is scheduled versus a truck showing up broken?',
+  'Where does a mileage reading come from, and who types it in?'
+ ],
+ probes:[
+  '<b>Intervals.</b> Mileage, engine hours, or calendar — which do you actually use, and does it vary by unit type?',
+  '<b>Auto-generated SOs.</b> Does the Auto-Gen SOs tab produce real work you act on, or noise you ignore?',
+  '<b>Coming-due window.</b> Yours is set to 30 days — chosen, or default?',
+  '<b>Meter readings.</b> How reliably do they get captured? This is the input the whole thing depends on.',
+  '<b>Unit-type templates.</b> Are PMs attached to unit types, or set up one truck at a time?',
+  '<b>Procedures.</b> Do techs follow attached step-by-step procedures, or is it known by heart?',
+  '<b>Customer-initiated.</b> Do fleets ever schedule their own PM through the portal, or does it always come from you?'
+ ],
+ belief:[
+  'PM is the recurring, <b>predictable</b> revenue of a heavy-duty shop, and the reason a fleet keeps a relationship instead of shopping each repair.',
+  'We have the <b>visible surface and none of the engine</b>: units carry a <code>next_pm_date</code>, there is a real calendar with validation triggers, and a twelve-month service-history view.',
+  'Missing: interval definitions of any kind, meter-driven calculation, unit-type templates, and auto-generation. <b>Our date is a value someone must type, not a value anything computes.</b> A customer can see a PM is coming; nothing decides when it is coming.'
+ ]
+}
+];
+
+const CROSS=[
+ {q:'What do you keep in spreadsheets outside FullBay?',why:'The workarounds are the single highest-value product signal available. Anything maintained by hand is a feature the system failed to provide.'},
+ {q:'What did you turn on and then stop using?',why:'Finds the cruft. Every item here is scope we must not rebuild.'},
+ {q:'What do you re-type from one screen into another?',why:'Each instance is either a missing integration or a missing field.'},
+ {q:'Of the 38 canned reports, which do you actually run each month?',why:'The honest answer is probably four. That short list is the real reporting requirement.'}
+];
+
+/* ---------- state ---------- */
+const KEY='fleetco-s1-shopfloor-v1';
+let S=JSON.parse(localStorage.getItem(KEY)||'null')||{t0:null,offset:0,areas:{},cross:{}};
+AREAS.forEach(a=>S.areas[a.id]=S.areas[a.id]||{state:'',verdict:'',notes:'',stamps:[]});
+CROSS.forEach((c,i)=>S.cross[i]=S.cross[i]||{notes:'',stamps:[]});
+const save=()=>{localStorage.setItem(KEY,JSON.stringify(S));toast('Saved')};
+let tT;const toast=m=>{const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('on'),1100)};
+
+const fmt=s=>{s=Math.max(0,Math.round(s));const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;
+  return (h?String(h).padStart(2,'0')+':':'')+String(m).padStart(2,'0')+':'+String(x).padStart(2,'0')};
+const nowOff=()=>S.t0?(Date.now()-S.t0)/1000+(+S.offset||0):0;
+
+/* ---------- render ---------- */
+const VERD=[['use','Use it'],['dont','Don\'t use it'],['unknown','Didn\'t know it existed'],['diff','Need it different']];
+const main=document.getElementById('main');
+
+AREAS.forEach(a=>{
+  const st=S.areas[a.id];
+  const el=document.createElement('section');
+  el.className='area'+(st.state==='done'?'':'');
+  el.dataset.state=st.state;el.id='a-'+a.id;
+  el.innerHTML=`
+    <div class="ahd">
+      <span class="n">${a.n}</span>
+      <h3>${a.name}</h3>
+      <span class="tw" data-tw></span>
+      <span class="st ${st.state==='done'?'done':''}">${st.state==='done'?'Covered':st.state==='skip'?'Skipped':'Not covered'}</span>
+      <span class="caret">▾</span>
+    </div>
+    <div class="abody">
+      <div class="blk ask"><h4>Ask this first — cold, before revealing anything</h4>
+        <p class="q">${a.ask}</p>
+        ${a.alts.map(x=>`<p class="q alt">${x}</p>`).join('')}
+      </div>
+      <div class="blk probe"><h4>Then probe</h4>
+        <ul class="plain">${a.probes.map(p=>`<li>${p}</li>`).join('')}</ul>
+      </div>
+      <div class="blk belief">
+        <details class="bel"><summary>What we believe — open only after they have answered</summary>
+          <div class="in">${a.belief.map(p=>`<p>${p}</p>`).join('')}</div>
+        </details>
+      </div>
+      <div class="cap">
+        <h4>Capture</h4>
+        <div class="verd">${VERD.map(([v,l])=>`<button data-v="${v}" aria-pressed="${st.verdict===v}">${l}</button>`).join('')}</div>
+        <textarea placeholder="What they said — their words, not mine. Surprises first.">${st.notes||''}</textarea>
+        <div class="caprow">
+          <button class="mk" data-mark>⦿ Mark time</button>
+          <button data-done>${st.state==='done'?'Covered ✓':'Mark covered'}</button>
+          <button data-skip>Skip</button>
+        </div>
+        <div class="stamps" data-stamps></div>
+      </div>
+    </div>`;
+  main.appendChild(el);
+
+  const hd=el.querySelector('.ahd');
+  hd.onclick=e=>{if(e.target.closest('button'))return;el.classList.toggle('collapsed')};
+  el.querySelectorAll('.verd button').forEach(b=>b.onclick=()=>{
+    st.verdict=st.verdict===b.dataset.v?'':b.dataset.v;
+    el.querySelectorAll('.verd button').forEach(x=>x.setAttribute('aria-pressed',st.verdict===x.dataset.v));
+    save();
+  });
+  const ta=el.querySelector('textarea');
+  ta.oninput=()=>{st.notes=ta.value};
+  ta.onblur=save;
+  el.querySelector('[data-mark]').onclick=()=>{
+    if(!S.t0){toast('Press Start first');return}
+    st.stamps.push(Math.round(nowOff()));renderStamps();save();
+  };
+  el.querySelector('[data-done]').onclick=()=>{
+    st.state=st.state==='done'?'':'done';paint();save();
+  };
+  el.querySelector('[data-skip]').onclick=()=>{
+    st.state=st.state==='skip'?'':'skip';paint();save();
+  };
+  function renderStamps(){
+    el.querySelector('[data-stamps]').innerHTML=st.stamps.map((s,i)=>
+      `<span data-i="${i}" title="Click to remove">${fmt(s)} ✕</span>`).join('');
+    el.querySelectorAll('[data-stamps] span').forEach(sp=>sp.onclick=()=>{
+      st.stamps.splice(+sp.dataset.i,1);renderStamps();save()});
+    el.querySelector('[data-tw]').textContent=st.stamps.length?fmt(st.stamps[0]):'';
+  }
+  function paint(){
+    el.dataset.state=st.state;
+    const s=el.querySelector('.st');
+    s.className='st '+(st.state==='done'?'done':'');
+    s.textContent=st.state==='done'?'Covered':st.state==='skip'?'Skipped':'Not covered';
+    el.querySelector('[data-done]').textContent=st.state==='done'?'Covered ✓':'Mark covered';
+    if(st.state==='done')el.classList.add('collapsed');
+    prog();
+  }
+  renderStamps();prog();
+});
+
+/* cross-cutting */
+const cs=document.createElement('section');
+cs.className='area';cs.id='a-cross';
+cs.innerHTML=`<div class="ahd"><span class="n">∗</span><h3>Cross-cutting — ask these somewhere in every session</h3><span class="caret">▾</span></div>
+<div class="abody">${CROSS.map((c,i)=>`
+  <div class="blk"><p class="q">${c.q}</p><p style="color:var(--fg-3);font-size:13.5px;max-width:70ch">${c.why}</p>
+  <textarea data-ci="${i}" placeholder="Their answer">${S.cross[i].notes||''}</textarea>
+  <div class="caprow"><button class="mk" data-cmark="${i}">⦿ Mark time</button></div>
+  <div class="stamps" data-cstamps="${i}"></div></div>`).join('')}</div>`;
+main.appendChild(cs);
+cs.querySelector('.ahd').onclick=e=>{if(!e.target.closest('button'))cs.classList.toggle('collapsed')};
+cs.querySelectorAll('textarea').forEach(t=>{t.oninput=()=>{S.cross[t.dataset.ci].notes=t.value};t.onblur=save});
+function renderC(i){
+  const w=cs.querySelector(`[data-cstamps="${i}"]`);
+  w.innerHTML=S.cross[i].stamps.map((s,j)=>`<span data-j="${j}">${fmt(s)} ✕</span>`).join('');
+  w.querySelectorAll('span').forEach(sp=>sp.onclick=()=>{S.cross[i].stamps.splice(+sp.dataset.j,1);renderC(i);save()});
+}
+cs.querySelectorAll('[data-cmark]').forEach(b=>b.onclick=()=>{
+  if(!S.t0){toast('Press Start first');return}
+  const i=b.dataset.cmark;S.cross[i].stamps.push(Math.round(nowOff()));renderC(i);save()});
+CROSS.forEach((_,i)=>renderC(i));
+
+/* ---------- bar ---------- */
+const clock=document.getElementById('clock'),startBtn=document.getElementById('startBtn'),off=document.getElementById('offset');
+off.value=S.offset||0;
+off.onchange=()=>{S.offset=+off.value||0;save()};
+function tick(){ if(S.t0){clock.textContent=fmt(nowOff());clock.classList.add('live')} }
+setInterval(tick,500);
+startBtn.onclick=()=>{
+  if(S.t0){if(!confirm('Session already running. Restart the clock from zero?'))return}
+  S.t0=Date.now();save();startBtn.textContent='Running';startBtn.classList.remove('go');tick();
+};
+if(S.t0){startBtn.textContent='Running';startBtn.classList.remove('go');tick()}
+
+function prog(){
+  const d=AREAS.filter(a=>S.areas[a.id].state==='done').length;
+  document.getElementById('progBar').style.width=(d/AREAS.length*100)+'%';
+  document.getElementById('progTxt').textContent=d+' / '+AREAS.length;
+}
+prog();
+
+/* ---------- export ---------- */
+const VL=Object.fromEntries(VERD);
+function toMd(){
+  const d=new Date();
+  let o=`# Fleetco Interview — Session 1: Shop Floor\n\n`;
+  o+=`- Date: ${d.toISOString().slice(0,10)}\n`;
+  o+=`- Clock started: ${S.t0?new Date(S.t0).toLocaleTimeString():'never started'}\n`;
+  o+=`- Recording offset applied: ${S.offset||0}s\n`;
+  o+=`- Areas covered: ${AREAS.filter(a=>S.areas[a.id].state==='done').length} of ${AREAS.length}\n`;
+  o+=`\n> Timestamps are offsets into the recording. Use them to find the moment in the transcript.\n\n---\n`;
+  AREAS.forEach(a=>{
+    const s=S.areas[a.id];
+    o+=`\n## ${a.n} — ${a.name}\n\n`;
+    o+=`- Status: **${s.state==='done'?'Covered':s.state==='skip'?'Skipped':'Not covered'}**\n`;
+    o+=`- Verdict: **${s.verdict?VL[s.verdict]:'—'}**\n`;
+    o+=`- Timestamps: ${s.stamps.length?s.stamps.map(fmt).join(', '):'—'}\n`;
+    o+=`\n**Notes**\n\n${s.notes?s.notes.trim():'_none_'}\n`;
+  });
+  o+=`\n---\n\n## Cross-cutting\n`;
+  CROSS.forEach((c,i)=>{
+    o+=`\n### ${c.q}\n\n- Timestamps: ${S.cross[i].stamps.length?S.cross[i].stamps.map(fmt).join(', '):'—'}\n\n${S.cross[i].notes?S.cross[i].notes.trim():'_none_'}\n`;
+  });
+  return o;
+}
+function dl(name,text,type){
+  const b=new Blob([text],{type});const u=URL.createObjectURL(b);
+  const a=document.createElement('a');a.href=u;a.download=name;a.click();URL.revokeObjectURL(u);
+}
+const stamp=()=>new Date().toISOString().slice(0,10);
+document.getElementById('expMd').onclick=()=>{
+  const t=toMd();dl(`fleetco-interview-s1-shopfloor-${stamp()}.md`,t,'text/markdown');
+  navigator.clipboard?.writeText(t).then(()=>toast('Exported + copied'),()=>toast('Exported'));
+};
+document.getElementById('expJson').onclick=()=>{
+  dl(`fleetco-interview-s1-shopfloor-${stamp()}.json`,
+    JSON.stringify({session:'s1-shop-floor',exportedAt:new Date().toISOString(),...S,
+      areaMeta:AREAS.map(a=>({id:a.id,n:a.n,name:a.name}))},null,2),'application/json');
+  toast('JSON exported');
+};
+document.getElementById('resetBtn').onclick=()=>{
+  if(!confirm('Clear all notes, verdicts and timestamps for this session?'))return;
+  localStorage.removeItem(KEY);location.reload();
+};
+document.getElementById('foot').innerHTML=
+ `Session 1 of 3 · next: Portal &amp; Extras, then Money &amp; Integrations.<br>`+
+ `Reference: functional-surface-map.html · Sources: FullBay logged-in pass 2026-10-09, repo read 2026-10-11.<br>`+
+ `Notes autosave to this browser. Export before clearing site data.`;
+</script>
+</body>
+</html>

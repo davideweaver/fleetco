@@ -1,0 +1,6 @@
+[     424ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ https://www.googletagmanager.com/gtag/js?id=G-WZ46833KH9:0
+[     552ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092:0
+[     693ms] [INFO] Clear-Site-Data header on 'https://www.producthunt.com/v4/reset': Cleared data types: "cache". @ https://www.producthunt.com/products/archivist:0
+[     895ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ https://static.ads-twitter.com/uwt.js:0
+[     976ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ https://snap.licdn.com/li.lms-analytics/insight.min.js:0
+[   10231ms] [LOG] Download the Apollo DevTools for a better development experience: %s https://chrome.google.com/webstore/detail/apollo-client-developer-t/jdkknkkbebbapilgoeccciglkfbmbnfm @ https://www.producthunt.com/_next/static/chunks/3vo29ga8t657y.js:4

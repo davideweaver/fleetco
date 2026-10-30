@@ -1,0 +1,2408 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]: OTC Fleet Services
+      - generic [ref=e5]: FullBay replacement — scoping
+      - generic [ref=e6]: October 22, 2026
+    - heading [level=1] [ref=e7]:
+      - text: FullBay Punch List
+      - emphasis [ref=e8]: What do you actually use?
+    - paragraph [ref=e9]: Every section and feature we could find in FullBay, from a logged-in walkthrough plus their help center. Mark each row V1, Later, or Not needed. Add a comment wherever the answer is “yes but not like that.” The rows you cut are worth more than the rows you keep — every one is time off the build.
+    - generic [ref=e10]:
+      - generic [ref=e11]: V1 · we need this to run day one
+      - generic [ref=e12]: Later · needed eventually, can live without it for a while
+      - generic [ref=e13]: Not needed · nobody here uses it — don’t build it
+      - generic [ref=e14]: Key · this answer moves the plan
+  - generic [ref=e15]:
+    - generic [ref=e16]:
+      - generic [ref=e18]:
+        - generic [ref=e19]: 8 of 217 marked
+        - generic [ref=e20]: V1 4 · Later 1 · Cut 3
+      - group "Filter rows" [ref=e25]:
+        - button "All" [pressed] [ref=e26] [cursor=pointer]
+        - button "Unmarked" [ref=e27] [cursor=pointer]
+        - button "Key only" [ref=e28] [cursor=pointer]
+        - button "V1" [ref=e29] [cursor=pointer]
+        - button "Later" [ref=e30] [cursor=pointer]
+        - button "Cut" [ref=e31] [cursor=pointer]
+      - button "Results" [ref=e32] [cursor=pointer]
+      - generic [ref=e33]: Saving to this browser automatically · 5:35 PM
+    - navigation "Jump to section" [ref=e34]:
+      - link "0 Roles & Who Does What" [ref=e35] [cursor=pointer]:
+        - /url: "#sec-roles"
+      - link "1 Service Orders" [ref=e36] [cursor=pointer]:
+        - /url: "#sec-so"
+      - link "2 Estimates & Customer Authorization" [ref=e37] [cursor=pointer]:
+        - /url: "#sec-est"
+      - link "3 Parts & Inventory" [ref=e38] [cursor=pointer]:
+        - /url: "#sec-parts"
+      - link "4 Labor & Technician Time" [ref=e39] [cursor=pointer]:
+        - /url: "#sec-labor"
+      - link "5 Preventive Maintenance" [ref=e40] [cursor=pointer]:
+        - /url: "#sec-pm"
+      - link "6 Inspections & DVIR" [ref=e41] [cursor=pointer]:
+        - /url: "#sec-insp"
+      - link "7 Invoicing & Payments" [ref=e42] [cursor=pointer]:
+        - /url: "#sec-inv"
+      - link "8 Customer Portal" [ref=e43] [cursor=pointer]:
+        - /url: "#sec-portal"
+      - link "9 The 38 Reports" [ref=e44] [cursor=pointer]:
+        - /url: "#sec-rep"
+      - link "10 Mobile & Tablets" [ref=e45] [cursor=pointer]:
+        - /url: "#sec-mob"
+      - link "11 Integrations" [ref=e46] [cursor=pointer]:
+        - /url: "#sec-int"
+  - main [ref=e47]:
+    - generic [ref=e48]:
+      - generic [ref=e49]:
+        - generic [ref=e50]:
+          - generic [ref=e51]: "0"
+          - heading "Roles & Who Does What" [level=2] [ref=e52]
+          - generic [ref=e53]: 0/7 marked
+        - paragraph [ref=e54]: FullBay bills per seat and per role, so this section is also part of the $5k question.
+        - list [ref=e55]:
+          - listitem [ref=e56]:
+            - generic [ref=e57]: "0.1"
+            - generic [ref=e58]:
+              - generic [ref=e59]: Full User seats
+              - generic [ref=e60]: Complete access — service orders, inventory, assigning techs to an action item. The expensive seat.
+              - generic [ref=e61]:
+                - button "V1" [ref=e62] [cursor=pointer]
+                - button "Later" [ref=e63] [cursor=pointer]
+                - button "Not needed" [ref=e64] [cursor=pointer]
+                - button "+ Note" [ref=e65] [cursor=pointer]
+          - listitem [ref=e66]:
+            - generic [ref=e67]: "0.2"
+            - generic [ref=e68]:
+              - generic [ref=e69]: Office User seats
+              - generic [ref=e70]: Service orders, invoices, payroll visibility. No inventory, no tech assignment, no clock in/out.
+              - generic [ref=e71]:
+                - button "V1" [ref=e72] [cursor=pointer]
+                - button "Later" [ref=e73] [cursor=pointer]
+                - button "Not needed" [ref=e74] [cursor=pointer]
+                - button "+ Note" [ref=e75] [cursor=pointer]
+          - listitem [ref=e76]:
+            - generic [ref=e77]: "0.3"
+            - generic [ref=e78]:
+              - generic [ref=e79]: Timesheet User seats
+              - generic [ref=e80]: Clock in and out only. Cheaper seat.
+              - generic [ref=e81]:
+                - button "V1" [ref=e82] [cursor=pointer]
+                - button "Later" [ref=e83] [cursor=pointer]
+                - button "Not needed" [ref=e84] [cursor=pointer]
+                - button "+ Note" [ref=e85] [cursor=pointer]
+          - listitem [ref=e86]:
+            - generic [ref=e87]: "0.4"
+            - generic [ref=e88]:
+              - generic [ref=e89]:
+                - text: Custom roles you built yourself
+                - generic [ref=e90]: Key
+              - generic [ref=e91]: You have a lot of them — System Admin, Owner, Admin, Executive, Operations Manager, Supervisor, Office, Lead Tech, Shop Foreman, Shop Technician, Road Technician, Lead Trailer Technician, Graphics, Test Role. Which are real and which are leftovers?
+              - generic [ref=e92]:
+                - button "V1" [ref=e93] [cursor=pointer]
+                - button "Later" [ref=e94] [cursor=pointer]
+                - button "Not needed" [ref=e95] [cursor=pointer]
+                - button "+ Note" [ref=e96] [cursor=pointer]
+          - listitem [ref=e97]:
+            - generic [ref=e98]: "0.5"
+            - generic [ref=e99]:
+              - generic [ref=e100]: Role change history log
+              - generic [ref=e101]: Every permission change recorded per employee on its own page.
+              - generic [ref=e102]:
+                - button "V1" [ref=e103] [cursor=pointer]
+                - button "Later" [ref=e104] [cursor=pointer]
+                - button "Not needed" [ref=e105] [cursor=pointer]
+                - button "+ Note" [ref=e106] [cursor=pointer]
+          - listitem [ref=e107]:
+            - generic [ref=e108]: "0.6"
+            - generic [ref=e109]:
+              - generic [ref=e110]: Service Writer role
+              - generic [ref=e111]: The person building estimates and running the order day to day.
+              - generic [ref=e112]:
+                - button "V1" [ref=e113] [cursor=pointer]
+                - button "Later" [ref=e114] [cursor=pointer]
+                - button "Not needed" [ref=e115] [cursor=pointer]
+                - button "+ Note" [ref=e116] [cursor=pointer]
+          - listitem [ref=e117]:
+            - generic [ref=e118]: "0.7"
+            - generic [ref=e119]:
+              - generic [ref=e120]: Lone Wolf Tech workflow
+              - generic [ref=e121]: A named pattern for a tech working solo or remote with no office backup.
+              - generic [ref=e122]:
+                - button "V1" [ref=e123] [cursor=pointer]
+                - button "Later" [ref=e124] [cursor=pointer]
+                - button "Not needed" [ref=e125] [cursor=pointer]
+                - button "+ Note" [ref=e126] [cursor=pointer]
+      - generic [ref=e127]:
+        - generic [ref=e128]:
+          - generic [ref=e129]: "1"
+          - heading "Service Orders" [level=2] [ref=e130]
+          - generic [ref=e131]: 0/27 marked
+        - paragraph [ref=e132]: FullBay calls the repair line an Action Item (SOAI). This is the spine of the whole system — and the deepest screen in it.
+        - list [ref=e133]:
+          - listitem [ref=e134]:
+            - generic [ref=e135]: "1.1"
+            - generic [ref=e136]:
+              - generic [ref=e137]: Quick SO
+              - generic [ref=e138]: Fast path for a simple job.
+              - generic [ref=e139]:
+                - button "V1" [ref=e140] [cursor=pointer]
+                - button "Later" [ref=e141] [cursor=pointer]
+                - button "Not needed" [ref=e142] [cursor=pointer]
+                - button "+ Note" [ref=e143] [cursor=pointer]
+          - listitem [ref=e144]:
+            - generic [ref=e145]: "1.2"
+            - generic [ref=e146]:
+              - generic [ref=e147]: Quick Estimate
+              - generic [ref=e148]: Lighter estimate with its own create / authorize / print / convert steps.
+              - generic [ref=e149]:
+                - button "V1" [ref=e150] [cursor=pointer]
+                - button "Later" [ref=e151] [cursor=pointer]
+                - button "Not needed" [ref=e152] [cursor=pointer]
+                - button "+ Note" [ref=e153] [cursor=pointer]
+          - listitem [ref=e154]:
+            - generic [ref=e155]: "1.3"
+            - generic [ref=e156]:
+              - generic [ref=e157]: Full New Service Order flow
+              - generic [ref=e158]: The formal path for complex work.
+              - generic [ref=e159]:
+                - button "V1" [ref=e160] [cursor=pointer]
+                - button "Later" [ref=e161] [cursor=pointer]
+                - button "Not needed" [ref=e162] [cursor=pointer]
+                - button "+ Note" [ref=e163] [cursor=pointer]
+          - listitem [ref=e164]:
+            - generic [ref=e165]: "1.4"
+            - generic [ref=e166]:
+              - generic [ref=e167]: Action Item (SOAI)
+              - generic [ref=e168]: "The repair line itself: concern, cause, correction, each with its own parts and labor tabs."
+              - generic [ref=e169]:
+                - button "V1" [ref=e170] [cursor=pointer]
+                - button "Later" [ref=e171] [cursor=pointer]
+                - button "Not needed" [ref=e172] [cursor=pointer]
+                - button "+ Note" [ref=e173] [cursor=pointer]
+          - listitem [ref=e174]:
+            - generic [ref=e175]: "1.5"
+            - generic [ref=e176]:
+              - generic [ref=e177]:
+                - text: The kanban pipeline
+                - generic [ref=e178]: Key
+              - generic [ref=e179]: Unassigned → Assign → Diagnose → Price Parts → Authorize → Wait For Authorization → Repair → Recently Completed. Do you work the board, or ignore it?
+              - generic [ref=e180]:
+                - button "V1" [ref=e181] [cursor=pointer]
+                - button "Later" [ref=e182] [cursor=pointer]
+                - button "Not needed" [ref=e183] [cursor=pointer]
+                - button "+ Note" [ref=e184] [cursor=pointer]
+          - listitem [ref=e185]:
+            - generic [ref=e186]: "1.6"
+            - generic [ref=e187]:
+              - generic [ref=e188]: Service Order Urgency field
+              - generic [ref=e189]: None / WIP / Parts / Pending, and you can add your own.
+              - generic [ref=e190]:
+                - button "V1" [ref=e191] [cursor=pointer]
+                - button "Later" [ref=e192] [cursor=pointer]
+                - button "Not needed" [ref=e193] [cursor=pointer]
+                - button "+ Note" [ref=e194] [cursor=pointer]
+          - listitem [ref=e195]:
+            - generic [ref=e196]: "1.7"
+            - generic [ref=e197]:
+              - generic [ref=e198]: Service Request Urgency field
+              - generic [ref=e199]: "A separate earlier-stage priority on incoming requests: ASAP / today / emergency / remember for next visit."
+              - generic [ref=e200]:
+                - button "V1" [ref=e201] [cursor=pointer]
+                - button "Later" [ref=e202] [cursor=pointer]
+                - button "Not needed" [ref=e203] [cursor=pointer]
+                - button "+ Note" [ref=e204] [cursor=pointer]
+          - listitem [ref=e205]:
+            - generic [ref=e206]: "1.8"
+            - generic [ref=e207]:
+              - generic [ref=e208]:
+                - text: The 13 service order tabs
+                - generic [ref=e209]: Key
+              - generic [ref=e210]: In Process, GPS, On Hold, PMs, Estimates, Quick Charge, Service Requests, Pending Repairs, Customers, History, All SOs, Auto-Gen SOs, Deleted SOs. Which do you open in a normal week?
+              - generic [ref=e211]:
+                - button "V1" [ref=e212] [cursor=pointer]
+                - button "Later" [ref=e213] [cursor=pointer]
+                - button "Not needed" [ref=e214] [cursor=pointer]
+                - button "+ Note" [ref=e215] [cursor=pointer]
+          - listitem [ref=e216]:
+            - generic [ref=e217]: "1.9"
+            - generic [ref=e218]:
+              - generic [ref=e219]:
+                - text: The 7 list view modes
+                - generic [ref=e220]: Key
+              - generic [ref=e221]: By Status, Full View, By Action Item, By Customer, By Tech, Prioritize, Custom View. Same question — which ones get used?
+              - generic [ref=e222]:
+                - button "V1" [ref=e223] [cursor=pointer]
+                - button "Later" [ref=e224] [cursor=pointer]
+                - button "Not needed" [ref=e225] [cursor=pointer]
+                - button "+ Note" [ref=e226] [cursor=pointer]
+          - listitem [ref=e227]:
+            - generic [ref=e228]: "1.10"
+            - generic [ref=e229]:
+              - generic [ref=e230]: Delete and restore a service order
+              - generic [ref=e231]: Soft delete, recoverable later.
+              - generic [ref=e232]:
+                - button "V1" [ref=e233] [cursor=pointer]
+                - button "Later" [ref=e234] [cursor=pointer]
+                - button "Not needed" [ref=e235] [cursor=pointer]
+                - button "+ Note" [ref=e236] [cursor=pointer]
+          - listitem [ref=e237]:
+            - generic [ref=e238]: "1.11"
+            - generic [ref=e239]:
+              - generic [ref=e240]: Optional Review step
+              - generic [ref=e241]: An extra review stage before an order can be completed.
+              - generic [ref=e242]:
+                - button "V1" [ref=e243] [cursor=pointer]
+                - button "Later" [ref=e244] [cursor=pointer]
+                - button "Not needed" [ref=e245] [cursor=pointer]
+                - button "+ Note" [ref=e246] [cursor=pointer]
+          - listitem [ref=e247]:
+            - generic [ref=e248]: "1.12"
+            - generic [ref=e249]:
+              - generic [ref=e250]: Require re-authorization
+              - generic [ref=e251]: Make the customer approve again if something changes after the first yes.
+              - generic [ref=e252]:
+                - button "V1" [ref=e253] [cursor=pointer]
+                - button "Later" [ref=e254] [cursor=pointer]
+                - button "Not needed" [ref=e255] [cursor=pointer]
+                - button "+ Note" [ref=e256] [cursor=pointer]
+          - listitem [ref=e257]:
+            - generic [ref=e258]: "1.13"
+            - generic [ref=e259]:
+              - generic [ref=e260]:
+                - text: Bill to a third party
+                - generic [ref=e261]: Key
+              - generic [ref=e262]: Charge someone other than the unit's owner. You have an 'ARI / Third Party Billing' labor rate, so this looks live.
+              - generic [ref=e263]:
+                - button "V1" [ref=e264] [cursor=pointer]
+                - button "Later" [ref=e265] [cursor=pointer]
+                - button "Not needed" [ref=e266] [cursor=pointer]
+                - button "+ Note" [ref=e267] [cursor=pointer]
+          - listitem [ref=e268]:
+            - generic [ref=e269]: "1.14"
+            - generic [ref=e270]:
+              - generic [ref=e271]: Sublet work
+              - generic [ref=e272]: Recording work an outside vendor performed.
+              - generic [ref=e273]:
+                - button "V1" [ref=e274] [cursor=pointer]
+                - button "Later" [ref=e275] [cursor=pointer]
+                - button "Not needed" [ref=e276] [cursor=pointer]
+                - button "+ Note" [ref=e277] [cursor=pointer]
+          - listitem [ref=e278]:
+            - generic [ref=e279]: "1.15"
+            - generic [ref=e280]:
+              - generic [ref=e281]: Yard Check
+              - generic [ref=e282]: Walking the yard to verify which units are physically on site.
+              - generic [ref=e283]:
+                - button "V1" [ref=e284] [cursor=pointer]
+                - button "Later" [ref=e285] [cursor=pointer]
+                - button "Not needed" [ref=e286] [cursor=pointer]
+                - button "+ Note" [ref=e287] [cursor=pointer]
+          - listitem [ref=e288]:
+            - generic [ref=e289]: "1.16"
+            - generic [ref=e290]:
+              - generic [ref=e291]: Unit locations and usage tracking
+              - generic [ref=e292]: Where a unit is, and meter readings over time.
+              - generic [ref=e293]:
+                - button "V1" [ref=e294] [cursor=pointer]
+                - button "Later" [ref=e295] [cursor=pointer]
+                - button "Not needed" [ref=e296] [cursor=pointer]
+                - button "+ Note" [ref=e297] [cursor=pointer]
+          - listitem [ref=e298]:
+            - generic [ref=e299]: "1.17"
+            - generic [ref=e300]:
+              - generic [ref=e301]: Daily Rates
+              - generic [ref=e302]: Day-rate billing like storage or demurrage, separate from a normal invoice.
+              - generic [ref=e303]:
+                - button "V1" [ref=e304] [cursor=pointer]
+                - button "Later" [ref=e305] [cursor=pointer]
+                - button "Not needed" [ref=e306] [cursor=pointer]
+                - button "+ Note" [ref=e307] [cursor=pointer]
+          - listitem [ref=e308]:
+            - generic [ref=e309]: "1.18"
+            - generic [ref=e310]:
+              - generic [ref=e311]: Driver and Carrier capture
+              - generic [ref=e312]: Recording who dropped the unit off. There's a setting to make it mandatory.
+              - generic [ref=e313]:
+                - button "V1" [ref=e314] [cursor=pointer]
+                - button "Later" [ref=e315] [cursor=pointer]
+                - button "Not needed" [ref=e316] [cursor=pointer]
+                - button "+ Note" [ref=e317] [cursor=pointer]
+          - listitem [ref=e318]:
+            - generic [ref=e319]: "1.19"
+            - generic [ref=e320]:
+              - generic [ref=e321]: Access SOAI
+              - generic [ref=e322]: A special action-item type for your own shop-owned units and yard equipment.
+              - generic [ref=e323]:
+                - button "V1" [ref=e324] [cursor=pointer]
+                - button "Later" [ref=e325] [cursor=pointer]
+                - button "Not needed" [ref=e326] [cursor=pointer]
+                - button "+ Note" [ref=e327] [cursor=pointer]
+          - listitem [ref=e328]:
+            - generic [ref=e329]: "1.20"
+            - generic [ref=e330]:
+              - generic [ref=e331]:
+                - text: Global Services / Canned Jobs
+                - generic [ref=e332]: Key
+              - generic [ref=e333]: Reusable labor-plus-parts templates for repairs you do over and over.
+              - generic [ref=e334]:
+                - button "V1" [ref=e335] [cursor=pointer]
+                - button "Later" [ref=e336] [cursor=pointer]
+                - button "Not needed" [ref=e337] [cursor=pointer]
+                - button "+ Note" [ref=e338] [cursor=pointer]
+          - listitem [ref=e339]:
+            - generic [ref=e340]: "1.21"
+            - generic [ref=e341]:
+              - generic [ref=e342]: Part Kits
+              - generic [ref=e343]: A pre-bundled parts list for one repair.
+              - generic [ref=e344]:
+                - button "V1" [ref=e345] [cursor=pointer]
+                - button "Later" [ref=e346] [cursor=pointer]
+                - button "Not needed" [ref=e347] [cursor=pointer]
+                - button "+ Note" [ref=e348] [cursor=pointer]
+          - listitem [ref=e349]:
+            - generic [ref=e350]: "1.22"
+            - generic [ref=e351]:
+              - generic [ref=e352]: AI note cleanup and voice-to-text
+              - generic [ref=e353]: Dictate rough notes, it rewrites them professionally. Also does translation.
+              - generic [ref=e354]:
+                - button "V1" [ref=e355] [cursor=pointer]
+                - button "Later" [ref=e356] [cursor=pointer]
+                - button "Not needed" [ref=e357] [cursor=pointer]
+                - button "+ Note" [ref=e358] [cursor=pointer]
+          - listitem [ref=e359]:
+            - generic [ref=e360]: "1.23"
+            - generic [ref=e361]:
+              - generic [ref=e362]:
+                - text: Multi-location / shop switcher
+                - generic [ref=e363]: Key
+              - generic [ref=e364]: You have two shop entities under one login — Lancaster and Mobile Department.
+              - generic [ref=e365]:
+                - button "V1" [ref=e366] [cursor=pointer]
+                - button "Later" [ref=e367] [cursor=pointer]
+                - button "Not needed" [ref=e368] [cursor=pointer]
+                - button "+ Note" [ref=e369] [cursor=pointer]
+          - listitem [ref=e370]:
+            - generic [ref=e371]: "1.24"
+            - generic [ref=e372]:
+              - generic [ref=e373]: Schedule page / calendar
+              - generic [ref=e374]: Real calendar with events, employee work schedules, and a shareable view-only link.
+              - generic [ref=e375]:
+                - button "V1" [ref=e376] [cursor=pointer]
+                - button "Later" [ref=e377] [cursor=pointer]
+                - button "Not needed" [ref=e378] [cursor=pointer]
+                - button "+ Note" [ref=e379] [cursor=pointer]
+          - listitem [ref=e380]:
+            - generic [ref=e381]: "1.25"
+            - generic [ref=e382]:
+              - generic [ref=e383]: View-only public schedule link
+              - generic [ref=e384]: A live app.fullbay.com link exists in your settings. Is anyone using it?
+              - generic [ref=e385]:
+                - button "V1" [ref=e386] [cursor=pointer]
+                - button "Later" [ref=e387] [cursor=pointer]
+                - button "Not needed" [ref=e388] [cursor=pointer]
+                - button "+ Note" [ref=e389] [cursor=pointer]
+          - listitem [ref=e390]:
+            - generic [ref=e391]: "1.26"
+            - generic [ref=e392]:
+              - generic [ref=e393]: FleetNet emergency / roadside intake
+              - generic [ref=e394]: Emergency requests routing in from FleetNet.
+              - generic [ref=e395]:
+                - button "V1" [ref=e396] [cursor=pointer]
+                - button "Later" [ref=e397] [cursor=pointer]
+                - button "Not needed" [ref=e398] [cursor=pointer]
+                - button "+ Note" [ref=e399] [cursor=pointer]
+          - listitem [ref=e400]:
+            - generic [ref=e401]: "1.27"
+            - generic [ref=e402]:
+              - generic [ref=e403]: Vendor warranty clearing
+              - generic [ref=e404]: Setting up and submitting warranty claims to a vendor or OEM.
+              - generic [ref=e405]:
+                - button "V1" [ref=e406] [cursor=pointer]
+                - button "Later" [ref=e407] [cursor=pointer]
+                - button "Not needed" [ref=e408] [cursor=pointer]
+                - button "+ Note" [ref=e409] [cursor=pointer]
+      - generic [ref=e410]:
+        - generic [ref=e411]:
+          - generic [ref=e412]: "2"
+          - heading "Estimates & Customer Authorization" [level=2] [ref=e413]
+          - generic [ref=e414]: 0/15 marked
+        - paragraph [ref=e415]: The authorization gate is the one thing no shop can operate without, so most of this is likely V1. The question is which parts.
+        - list [ref=e416]:
+          - listitem [ref=e417]:
+            - generic [ref=e418]: "2.1"
+            - generic [ref=e419]:
+              - generic [ref=e420]: Standard estimate flow
+              - generic [ref=e421]: Record concern/cause/correction per line, add parts and labor, attach photos, review, send, track.
+              - generic [ref=e422]:
+                - button "V1" [ref=e423] [cursor=pointer]
+                - button "Later" [ref=e424] [cursor=pointer]
+                - button "Not needed" [ref=e425] [cursor=pointer]
+                - button "+ Note" [ref=e426] [cursor=pointer]
+          - listitem [ref=e427]:
+            - generic [ref=e428]: "2.2"
+            - generic [ref=e429]:
+              - generic [ref=e430]:
+                - text: Labor time from a guide
+                - generic [ref=e431]: Key
+              - generic [ref=e432]: MOTOR or Mitchell 1 fills in how long a job should take. Or your own history.
+              - generic [ref=e433]:
+                - button "V1" [ref=e434] [cursor=pointer]
+                - button "Later" [ref=e435] [cursor=pointer]
+                - button "Not needed" [ref=e436] [cursor=pointer]
+                - button "+ Note" [ref=e437] [cursor=pointer]
+          - listitem [ref=e438]:
+            - generic [ref=e439]: "2.3"
+            - generic [ref=e440]:
+              - generic [ref=e441]: Expected Hours
+              - generic [ref=e442]: The guide or estimate time a job should take, tracked separately from actual clocked time.
+              - generic [ref=e443]:
+                - button "V1" [ref=e444] [cursor=pointer]
+                - button "Later" [ref=e445] [cursor=pointer]
+                - button "Not needed" [ref=e446] [cursor=pointer]
+                - button "+ Note" [ref=e447] [cursor=pointer]
+          - listitem [ref=e448]:
+            - generic [ref=e449]: "2.4"
+            - generic [ref=e450]:
+              - generic [ref=e451]: Parts pricing on the estimate
+              - generic [ref=e452]: Pulled from stock, special order, or the marketplace, with markup applied automatically.
+              - generic [ref=e453]:
+                - button "V1" [ref=e454] [cursor=pointer]
+                - button "Later" [ref=e455] [cursor=pointer]
+                - button "Not needed" [ref=e456] [cursor=pointer]
+                - button "+ Note" [ref=e457] [cursor=pointer]
+          - listitem [ref=e458]:
+            - generic [ref=e459]: "2.5"
+            - generic [ref=e460]:
+              - generic [ref=e461]: Send for authorization by portal
+              - generic [ref=e462]: Customer approves in their portal.
+              - generic [ref=e463]:
+                - button "V1" [ref=e464] [cursor=pointer]
+                - button "Later" [ref=e465] [cursor=pointer]
+                - button "Not needed" [ref=e466] [cursor=pointer]
+                - button "+ Note" [ref=e467] [cursor=pointer]
+          - listitem [ref=e468]:
+            - generic [ref=e469]: "2.6"
+            - generic [ref=e470]:
+              - generic [ref=e471]: Send for authorization by text
+              - generic [ref=e472]: Two-way texting.
+              - generic [ref=e473]:
+                - button "V1" [ref=e474] [cursor=pointer]
+                - button "Later" [ref=e475] [cursor=pointer]
+                - button "Not needed" [ref=e476] [cursor=pointer]
+                - button "+ Note" [ref=e477] [cursor=pointer]
+          - listitem [ref=e478]:
+            - generic [ref=e479]: "2.7"
+            - generic [ref=e480]:
+              - generic [ref=e481]: Send for authorization by email
+              - generic [ref=e482]: Emailed estimate.
+              - generic [ref=e483]:
+                - button "V1" [ref=e484] [cursor=pointer]
+                - button "Later" [ref=e485] [cursor=pointer]
+                - button "Not needed" [ref=e486] [cursor=pointer]
+                - button "+ Note" [ref=e487] [cursor=pointer]
+          - listitem [ref=e488]:
+            - generic [ref=e489]: "2.8"
+            - generic [ref=e490]:
+              - generic [ref=e491]: Approve / decline / partially approve
+              - generic [ref=e492]: Line-by-line yes or no, with a toggle-all control.
+              - generic [ref=e493]:
+                - button "V1" [ref=e494] [cursor=pointer]
+                - button "Later" [ref=e495] [cursor=pointer]
+                - button "Not needed" [ref=e496] [cursor=pointer]
+                - button "+ Note" [ref=e497] [cursor=pointer]
+          - listitem [ref=e498]:
+            - generic [ref=e499]: "2.9"
+            - generic [ref=e500]:
+              - generic [ref=e501]: Auto-convert on approval
+              - generic [ref=e502]: Approved plus a tech assigned turns it into a live order by itself.
+              - generic [ref=e503]:
+                - button "V1" [ref=e504] [cursor=pointer]
+                - button "Later" [ref=e505] [cursor=pointer]
+                - button "Not needed" [ref=e506] [cursor=pointer]
+                - button "+ Note" [ref=e507] [cursor=pointer]
+          - listitem [ref=e508]:
+            - generic [ref=e509]: "2.10"
+            - generic [ref=e510]:
+              - generic [ref=e511]: Pre-authorize parts under a threshold
+              - generic [ref=e512]: Skip per-part approval for cheap parts.
+              - generic [ref=e513]:
+                - button "V1" [ref=e514] [cursor=pointer]
+                - button "Later" [ref=e515] [cursor=pointer]
+                - button "Not needed" [ref=e516] [cursor=pointer]
+                - button "+ Note" [ref=e517] [cursor=pointer]
+          - listitem [ref=e518]:
+            - generic [ref=e519]: "2.11"
+            - generic [ref=e520]:
+              - generic [ref=e521]:
+                - text: Spending thresholds per customer
+                - generic [ref=e522]: Key
+              - generic [ref=e523]: A customer sets a dollar limit under which work is auto-approved.
+              - generic [ref=e524]:
+                - button "V1" [ref=e525] [cursor=pointer]
+                - button "Later" [ref=e526] [cursor=pointer]
+                - button "Not needed" [ref=e527] [cursor=pointer]
+                - button "+ Note" [ref=e528] [cursor=pointer]
+          - listitem [ref=e529]:
+            - generic [ref=e530]: "2.12"
+            - generic [ref=e531]:
+              - generic [ref=e532]: Mid-repair additional work approval
+              - generic [ref=e533]: Approve newly found work without re-approving the whole order.
+              - generic [ref=e534]:
+                - button "V1" [ref=e535] [cursor=pointer]
+                - button "Later" [ref=e536] [cursor=pointer]
+                - button "Not needed" [ref=e537] [cursor=pointer]
+                - button "+ Note" [ref=e538] [cursor=pointer]
+          - listitem [ref=e539]:
+            - generic [ref=e540]: "2.13"
+            - generic [ref=e541]:
+              - generic [ref=e542]: Shop Supplies fee line
+              - generic [ref=e543]: A named fee category of its own on the total, separate from labor, parts and tax.
+              - generic [ref=e544]:
+                - button "V1" [ref=e545] [cursor=pointer]
+                - button "Later" [ref=e546] [cursor=pointer]
+                - button "Not needed" [ref=e547] [cursor=pointer]
+                - button "+ Note" [ref=e548] [cursor=pointer]
+          - listitem [ref=e549]:
+            - generic [ref=e550]: "2.14"
+            - generic [ref=e551]:
+              - generic [ref=e552]: Per-order customer note box
+              - generic [ref=e553]: Customer messages you about one specific job.
+              - generic [ref=e554]:
+                - button "V1" [ref=e555] [cursor=pointer]
+                - button "Later" [ref=e556] [cursor=pointer]
+                - button "Not needed" [ref=e557] [cursor=pointer]
+                - button "+ Note" [ref=e558] [cursor=pointer]
+          - listitem [ref=e559]:
+            - generic [ref=e560]: "2.15"
+            - generic [ref=e561]:
+              - generic [ref=e562]: Who-sent-it log on the estimate
+              - generic [ref=e563]: The customer can see which of your people sent it and when.
+              - generic [ref=e564]:
+                - button "V1" [ref=e565] [cursor=pointer]
+                - button "Later" [ref=e566] [cursor=pointer]
+                - button "Not needed" [ref=e567] [cursor=pointer]
+                - button "+ Note" [ref=e568] [cursor=pointer]
+      - generic [ref=e569]:
+        - generic [ref=e570]:
+          - generic [ref=e571]: "3"
+          - heading "Parts & Inventory" [level=2] [ref=e572]
+          - generic [ref=e573]: 0/33 marked
+        - paragraph [ref=e574]: "The deepest area in FullBay's help center — 68 articles. Also where the biggest possible scope cut lives: whether V1 needs real stock counts at all."
+        - list [ref=e575]:
+          - listitem [ref=e576]:
+            - generic [ref=e577]: "3.1"
+            - generic [ref=e578]:
+              - generic [ref=e579]:
+                - text: Real-time stock levels
+                - generic [ref=e580]: Key
+              - generic [ref=e581]: Live counts by shelf, bin, truck and location.
+              - generic [ref=e582]:
+                - button "V1" [ref=e583] [cursor=pointer]
+                - button "Later" [ref=e584] [cursor=pointer]
+                - button "Not needed" [ref=e585] [cursor=pointer]
+                - button "+ Note" [ref=e586] [cursor=pointer]
+          - listitem [ref=e587]:
+            - generic [ref=e588]: "3.2"
+            - generic [ref=e589]:
+              - generic [ref=e590]:
+                - text: Could you go live WITHOUT real stock counts?
+                - generic [ref=e591]: Key
+              - generic [ref=e592]: Parts typed onto a job with a cost and markup, so billing is right, but no live count. Honestly the single biggest thing that could come out of V1.
+              - generic [ref=e593]:
+                - button "V1" [ref=e594] [cursor=pointer]
+                - button "Later" [ref=e595] [cursor=pointer]
+                - button "Not needed" [ref=e596] [cursor=pointer]
+                - button "+ Note" [ref=e597] [cursor=pointer]
+          - listitem [ref=e598]:
+            - generic [ref=e599]: "3.3"
+            - generic [ref=e600]:
+              - generic [ref=e601]: Inventory across multiple shops
+              - generic [ref=e602]: Separate counts per location.
+              - generic [ref=e603]:
+                - button "V1" [ref=e604] [cursor=pointer]
+                - button "Later" [ref=e605] [cursor=pointer]
+                - button "Not needed" [ref=e606] [cursor=pointer]
+                - button "+ Note" [ref=e607] [cursor=pointer]
+          - listitem [ref=e608]:
+            - generic [ref=e609]: "3.4"
+            - generic [ref=e610]:
+              - generic [ref=e611]: Intra-company parts transfers
+              - generic [ref=e612]: Moving stock between your own locations.
+              - generic [ref=e613]:
+                - button "V1" [ref=e614] [cursor=pointer]
+                - button "Later" [ref=e615] [cursor=pointer]
+                - button "Not needed" [ref=e616] [cursor=pointer]
+                - button "+ Note" [ref=e617] [cursor=pointer]
+          - listitem [ref=e618]:
+            - generic [ref=e619]: "3.5"
+            - generic [ref=e620]:
+              - generic [ref=e621]: Barcode scanning
+              - generic [ref=e622]: Scanning parts into stock or onto a truck.
+              - generic [ref=e623]:
+                - button "V1" [ref=e624] [cursor=pointer]
+                - button "Later" [ref=e625] [cursor=pointer]
+                - button "Not needed" [ref=e626] [cursor=pointer]
+                - button "+ Note" [ref=e627] [cursor=pointer]
+          - listitem [ref=e628]:
+            - generic [ref=e629]: "3.6"
+            - generic [ref=e630]:
+              - generic [ref=e631]: Min/max levels and reorder alerts
+              - generic [ref=e632]: Threshold warnings, plus an auto-order setting.
+              - generic [ref=e633]:
+                - button "V1" [ref=e634] [cursor=pointer]
+                - button "Later" [ref=e635] [cursor=pointer]
+                - button "Not needed" [ref=e636] [cursor=pointer]
+                - button "+ Note" [ref=e637] [cursor=pointer]
+          - listitem [ref=e638]:
+            - generic [ref=e639]: "3.7"
+            - generic [ref=e640]:
+              - generic [ref=e641]: Bin and location assignment
+              - generic [ref=e642]: Default locations, moving quantities, deleting locations.
+              - generic [ref=e643]:
+                - button "V1" [ref=e644] [cursor=pointer]
+                - button "Later" [ref=e645] [cursor=pointer]
+                - button "Not needed" [ref=e646] [cursor=pointer]
+                - button "+ Note" [ref=e647] [cursor=pointer]
+          - listitem [ref=e648]:
+            - generic [ref=e649]: "3.8"
+            - generic [ref=e650]:
+              - generic [ref=e651]: Cycle counts
+              - generic [ref=e652]: Scheduled periodic audits.
+              - generic [ref=e653]:
+                - button "V1" [ref=e654] [cursor=pointer]
+                - button "Later" [ref=e655] [cursor=pointer]
+                - button "Not needed" [ref=e656] [cursor=pointer]
+                - button "+ Note" [ref=e657] [cursor=pointer]
+          - listitem [ref=e658]:
+            - generic [ref=e659]: "3.9"
+            - generic [ref=e660]:
+              - generic [ref=e661]: Ad hoc inventory adjustments
+              - generic [ref=e662]: One-off corrections outside a count.
+              - generic [ref=e663]:
+                - button "V1" [ref=e664] [cursor=pointer]
+                - button "Later" [ref=e665] [cursor=pointer]
+                - button "Not needed" [ref=e666] [cursor=pointer]
+                - button "+ Note" [ref=e667] [cursor=pointer]
+          - listitem [ref=e668]:
+            - generic [ref=e669]: "3.10"
+            - generic [ref=e670]:
+              - generic [ref=e671]:
+                - text: Do you trust your current stock count?
+                - generic [ref=e672]: Key
+              - generic [ref=e673]: Straight question, and a useful one. If it's eyeballed and counted twice a year, a lot of this section gets easier.
+              - generic [ref=e674]:
+                - button "V1" [ref=e675] [cursor=pointer]
+                - button "Later" [ref=e676] [cursor=pointer]
+                - button "Not needed" [ref=e677] [cursor=pointer]
+                - button "+ Note" [ref=e678] [cursor=pointer]
+          - listitem [ref=e679]:
+            - generic [ref=e680]: "3.11"
+            - generic [ref=e681]:
+              - generic [ref=e682]: Inventory search tags
+              - generic [ref=e683]: Tagging to find parts beyond part number and description.
+              - generic [ref=e684]:
+                - button "V1" [ref=e685] [cursor=pointer]
+                - button "Later" [ref=e686] [cursor=pointer]
+                - button "Not needed" [ref=e687] [cursor=pointer]
+                - button "+ Note" [ref=e688] [cursor=pointer]
+          - listitem [ref=e689]:
+            - generic [ref=e690]: "3.12"
+            - generic [ref=e691]:
+              - generic [ref=e692]:
+                - text: Purchase orders
+                - generic [ref=e693]: Key
+              - generic [ref=e694]: Create, email to vendor, receive, return, delete.
+              - generic [ref=e695]:
+                - button "V1" [ref=e696] [cursor=pointer]
+                - button "Later" [ref=e697] [cursor=pointer]
+                - button "Not needed" [ref=e698] [cursor=pointer]
+                - button "+ Note" [ref=e699] [cursor=pointer]
+          - listitem [ref=e700]:
+            - generic [ref=e701]: "3.13"
+            - generic [ref=e702]:
+              - generic [ref=e703]: Combined purchase orders
+              - generic [ref=e704]: Several orders or vendors on one PO.
+              - generic [ref=e705]:
+                - button "V1" [ref=e706] [cursor=pointer]
+                - button "Later" [ref=e707] [cursor=pointer]
+                - button "Not needed" [ref=e708] [cursor=pointer]
+                - button "+ Note" [ref=e709] [cursor=pointer]
+          - listitem [ref=e710]:
+            - generic [ref=e711]: "3.14"
+            - generic [ref=e712]:
+              - generic [ref=e713]: Add parts to an existing PO
+              - generic [ref=e714]: Appending to a PO already out.
+              - generic [ref=e715]:
+                - button "V1" [ref=e716] [cursor=pointer]
+                - button "Later" [ref=e717] [cursor=pointer]
+                - button "Not needed" [ref=e718] [cursor=pointer]
+                - button "+ Note" [ref=e719] [cursor=pointer]
+          - listitem [ref=e720]:
+            - generic [ref=e721]: "3.15"
+            - generic [ref=e722]:
+              - generic [ref=e723]: Needs-Ordered parts list
+              - generic [ref=e724]: A working list of parts flagged as needed but not ordered yet.
+              - generic [ref=e725]:
+                - button "V1" [ref=e726] [cursor=pointer]
+                - button "Later" [ref=e727] [cursor=pointer]
+                - button "Not needed" [ref=e728] [cursor=pointer]
+                - button "+ Note" [ref=e729] [cursor=pointer]
+          - listitem [ref=e730]:
+            - generic [ref=e731]: "3.16"
+            - generic [ref=e732]:
+              - generic [ref=e733]: Use Last Cost
+              - generic [ref=e734]: Auto-fill a part's cost from the last price you paid.
+              - generic [ref=e735]:
+                - button "V1" [ref=e736] [cursor=pointer]
+                - button "Later" [ref=e737] [cursor=pointer]
+                - button "Not needed" [ref=e738] [cursor=pointer]
+                - button "+ Note" [ref=e739] [cursor=pointer]
+          - listitem [ref=e740]:
+            - generic [ref=e741]: "3.17"
+            - generic [ref=e742]:
+              - generic [ref=e743]: Vendor records
+              - generic [ref=e744]: Add and edit vendors.
+              - generic [ref=e745]:
+                - button "V1" [ref=e746] [cursor=pointer]
+                - button "Later" [ref=e747] [cursor=pointer]
+                - button "Not needed" [ref=e748] [cursor=pointer]
+                - button "+ Note" [ref=e749] [cursor=pointer]
+          - listitem [ref=e750]:
+            - generic [ref=e751]: "3.18"
+            - generic [ref=e752]:
+              - generic [ref=e753]: Vendor bills
+              - generic [ref=e754]: Recording what a vendor billed you.
+              - generic [ref=e755]:
+                - button "V1" [ref=e756] [cursor=pointer]
+                - button "Later" [ref=e757] [cursor=pointer]
+                - button "Not needed" [ref=e758] [cursor=pointer]
+                - button "+ Note" [ref=e759] [cursor=pointer]
+          - listitem [ref=e760]:
+            - generic [ref=e761]: "3.19"
+            - generic [ref=e762]:
+              - generic [ref=e763]: Vendor payments
+              - generic [ref=e764]: Paying vendors from inside FullBay.
+              - generic [ref=e765]:
+                - button "V1" [ref=e766] [cursor=pointer]
+                - button "Later" [ref=e767] [cursor=pointer]
+                - button "Not needed" [ref=e768] [cursor=pointer]
+                - button "+ Note" [ref=e769] [cursor=pointer]
+          - listitem [ref=e770]:
+            - generic [ref=e771]: "3.20"
+            - generic [ref=e772]:
+              - generic [ref=e773]: Vendor credit memos
+              - generic [ref=e774]: Credits back from a vendor.
+              - generic [ref=e775]:
+                - button "V1" [ref=e776] [cursor=pointer]
+                - button "Later" [ref=e777] [cursor=pointer]
+                - button "Not needed" [ref=e778] [cursor=pointer]
+                - button "+ Note" [ref=e779] [cursor=pointer]
+          - listitem [ref=e780]:
+            - generic [ref=e781]: "3.21"
+            - generic [ref=e782]:
+              - generic [ref=e783]: Vendor portals
+              - generic [ref=e784]: Vendor-facing access.
+              - generic [ref=e785]:
+                - button "V1" [ref=e786] [cursor=pointer]
+                - button "Later" [ref=e787] [cursor=pointer]
+                - button "Not needed" [ref=e788] [cursor=pointer]
+                - button "+ Note" [ref=e789] [cursor=pointer]
+          - listitem [ref=e790]:
+            - generic [ref=e791]: "3.22"
+            - generic [ref=e792]:
+              - generic [ref=e793]: Vendor tax documents
+              - generic [ref=e794]: 1099-style handling.
+              - generic [ref=e795]:
+                - button "V1" [ref=e796] [cursor=pointer]
+                - button "Later" [ref=e797] [cursor=pointer]
+                - button "Not needed" [ref=e798] [cursor=pointer]
+                - button "+ Note" [ref=e799] [cursor=pointer]
+          - listitem [ref=e800]:
+            - generic [ref=e801]: "3.23"
+            - generic [ref=e802]:
+              - generic [ref=e803]:
+                - text: FullBay Marketplace / FinditParts
+                - generic [ref=e804]: Key
+              - generic [ref=e805]: In-app ordering across 40-plus vendors including NAPA and O'Reilly.
+              - generic [ref=e806]:
+                - button "V1" [ref=e807] [cursor=pointer]
+                - button "Later" [ref=e808] [cursor=pointer]
+                - button "Not needed" [ref=e809] [cursor=pointer]
+                - button "+ Note" [ref=e810] [cursor=pointer]
+          - listitem [ref=e811]:
+            - generic [ref=e812]: "3.24"
+            - generic [ref=e813]:
+              - generic [ref=e814]: Counter sale
+              - generic [ref=e815]: A walk-in parts sale with no service order attached.
+              - generic [ref=e816]:
+                - button "V1" [ref=e817] [cursor=pointer]
+                - button "Later" [ref=e818] [cursor=pointer]
+                - button "Not needed" [ref=e819] [cursor=pointer]
+                - button "+ Note" [ref=e820] [cursor=pointer]
+          - listitem [ref=e821]:
+            - generic [ref=e822]: "3.25"
+            - generic [ref=e823]:
+              - generic [ref=e824]: Fake inventory parts
+              - generic [ref=e825]: A placeholder part you can bill without carrying real stock.
+              - generic [ref=e826]:
+                - button "V1" [ref=e827] [cursor=pointer]
+                - button "Later" [ref=e828] [cursor=pointer]
+                - button "Not needed" [ref=e829] [cursor=pointer]
+                - button "+ Note" [ref=e830] [cursor=pointer]
+          - listitem [ref=e831]:
+            - generic [ref=e832]: "3.26"
+            - generic [ref=e833]:
+              - generic [ref=e834]:
+                - text: Core charge tracking
+                - generic [ref=e835]: Key
+              - generic [ref=e836]: Core charge and core credit as separate lines, with their own core inventory and value report.
+              - generic [ref=e837]:
+                - button "V1" [ref=e838] [cursor=pointer]
+                - button "Later" [ref=e839] [cursor=pointer]
+                - button "Not needed" [ref=e840] [cursor=pointer]
+                - button "+ Note" [ref=e841] [cursor=pointer]
+          - listitem [ref=e842]:
+            - generic [ref=e843]: "3.27"
+            - generic [ref=e844]:
+              - generic [ref=e845]: Pricing scales
+              - generic [ref=e846]: Tiered markup by cost band.
+              - generic [ref=e847]:
+                - button "V1" [ref=e848] [cursor=pointer]
+                - button "Later" [ref=e849] [cursor=pointer]
+                - button "Not needed" [ref=e850] [cursor=pointer]
+                - button "+ Note" [ref=e851] [cursor=pointer]
+          - listitem [ref=e852]:
+            - generic [ref=e853]: "3.28"
+            - generic [ref=e854]:
+              - generic [ref=e855]: Pricing matrices
+              - generic [ref=e856]: Markup rules by customer type.
+              - generic [ref=e857]:
+                - button "V1" [ref=e858] [cursor=pointer]
+                - button "Later" [ref=e859] [cursor=pointer]
+                - button "Not needed" [ref=e860] [cursor=pointer]
+                - button "+ Note" [ref=e861] [cursor=pointer]
+          - listitem [ref=e862]:
+            - generic [ref=e863]: "3.29"
+            - generic [ref=e864]:
+              - generic [ref=e865]: Cost floor
+              - generic [ref=e866]: A minimum sell price that overrides markup rules.
+              - generic [ref=e867]:
+                - button "V1" [ref=e868] [cursor=pointer]
+                - button "Later" [ref=e869] [cursor=pointer]
+                - button "Not needed" [ref=e870] [cursor=pointer]
+                - button "+ Note" [ref=e871] [cursor=pointer]
+          - listitem [ref=e872]:
+            - generic [ref=e873]: "3.30"
+            - generic [ref=e874]:
+              - generic [ref=e875]: Privacy On mode
+              - generic [ref=e876]: Hides your cost and markup from the customer view.
+              - generic [ref=e877]:
+                - button "V1" [ref=e878] [cursor=pointer]
+                - button "Later" [ref=e879] [cursor=pointer]
+                - button "Not needed" [ref=e880] [cursor=pointer]
+                - button "+ Note" [ref=e881] [cursor=pointer]
+          - listitem [ref=e882]:
+            - generic [ref=e883]: "3.31"
+            - generic [ref=e884]:
+              - generic [ref=e885]: Restrict use of inventory
+              - generic [ref=e886]: Locking down who can draw against stock.
+              - generic [ref=e887]:
+                - button "V1" [ref=e888] [cursor=pointer]
+                - button "Later" [ref=e889] [cursor=pointer]
+                - button "Not needed" [ref=e890] [cursor=pointer]
+                - button "+ Note" [ref=e891] [cursor=pointer]
+          - listitem [ref=e892]:
+            - generic [ref=e893]: "3.32"
+            - generic [ref=e894]:
+              - generic [ref=e895]: Drop shipping
+              - generic [ref=e896]: Vendor ships straight to the customer or job site.
+              - generic [ref=e897]:
+                - button "V1" [ref=e898] [cursor=pointer]
+                - button "Later" [ref=e899] [cursor=pointer]
+                - button "Not needed" [ref=e900] [cursor=pointer]
+                - button "+ Note" [ref=e901] [cursor=pointer]
+          - listitem [ref=e902]:
+            - generic [ref=e903]: "3.33"
+            - generic [ref=e904]:
+              - generic [ref=e905]: Shipping, freight and restocking fees
+              - generic [ref=e906]: Tracked as their own fee types.
+              - generic [ref=e907]:
+                - button "V1" [ref=e908] [cursor=pointer]
+                - button "Later" [ref=e909] [cursor=pointer]
+                - button "Not needed" [ref=e910] [cursor=pointer]
+                - button "+ Note" [ref=e911] [cursor=pointer]
+      - generic [ref=e912]:
+        - generic [ref=e913]:
+          - generic [ref=e914]: "4"
+          - heading "Labor & Technician Time" [level=2] [ref=e915]
+          - generic [ref=e916]: 1/11 marked
+        - paragraph [ref=e917]: You already told us techs are paid on actual clocked hours with a manager reviewing before payroll — no flat rate, no flagged hours. That simplifies this a lot. The open question is the clock itself.
+        - list [ref=e918]:
+          - listitem [ref=e919]:
+            - generic [ref=e920]: "4.1"
+            - generic [ref=e921]:
+              - generic [ref=e922]:
+                - text: Is there a plain punch in/out for the day, separate from clocking to a repair order?
+                - generic [ref=e923]: Key
+              - generic [ref=e924]: This is the single most important row in this section. If all time is recorded against an order, the new system needs its own time capture on day one. If there's a standalone punch clock, FullBay can keep running payroll through the whole migration.
+              - generic [ref=e925]:
+                - button "V1" [ref=e926] [cursor=pointer]
+                - button "Later" [ref=e927] [cursor=pointer]
+                - button "Not needed" [ref=e928] [cursor=pointer]
+                - button "+ Note" [ref=e929] [cursor=pointer]
+          - listitem [ref=e930]:
+            - generic [ref=e931]: "4.2"
+            - generic [ref=e932]:
+              - generic [ref=e933]: Clock in and out per job
+              - generic [ref=e934]: Tap a job, every minute logs to that job and unit.
+              - generic [ref=e935]:
+                - button "V1" [ref=e936] [cursor=pointer]
+                - button "Later" [ref=e937] [cursor=pointer]
+                - button "Not needed" [ref=e938] [cursor=pointer]
+                - button "+ Note" [ref=e939] [cursor=pointer]
+          - listitem [ref=e940]:
+            - generic [ref=e941]: "4.3"
+            - generic [ref=e942]:
+              - generic [ref=e943]: GPS on time stamps
+              - generic [ref=e944]: There's a setting to capture coordinates on each stamp. It was off on the account we saw.
+              - generic [ref=e945]:
+                - button "V1" [ref=e946] [cursor=pointer]
+                - button "Later" [ref=e947] [cursor=pointer]
+                - button "Not needed" [ref=e948] [cursor=pointer]
+                - button "+ Note" [ref=e949] [cursor=pointer]
+          - listitem [ref=e950]:
+            - generic [ref=e951]: "4.4"
+            - generic [ref=e952]:
+              - generic [ref=e953]: Billable vs admin time split
+              - generic [ref=e954]: Separating billable labor from shop time, per tech.
+              - generic [ref=e955]:
+                - button "V1" [ref=e956] [cursor=pointer]
+                - button "Later" [ref=e957] [cursor=pointer]
+                - button "Not needed" [ref=e958] [cursor=pointer]
+                - button "+ Note" [ref=e959] [cursor=pointer]
+          - listitem [ref=e960]:
+            - generic [ref=e961]: "4.5"
+            - generic [ref=e962]:
+              - generic [ref=e963]: Timesheet activities
+              - generic [ref=e964]: Named non-job activities beyond repair time.
+              - generic [ref=e965]:
+                - button "V1" [ref=e966] [cursor=pointer]
+                - button "Later" [ref=e967] [cursor=pointer]
+                - button "Not needed" [ref=e968] [cursor=pointer]
+                - button "+ Note" [ref=e969] [cursor=pointer]
+          - listitem [ref=e970]:
+            - generic [ref=e971]: "4.6"
+            - generic [ref=e972]:
+              - generic [ref=e973]: Manual timesheet corrections
+              - generic [ref=e974]: Fixing a bad punch.
+              - generic [ref=e975]:
+                - button "V1" [ref=e976] [cursor=pointer]
+                - button "Later" [ref=e977] [cursor=pointer]
+                - button "Not needed" [ref=e978] [cursor=pointer]
+                - button "+ Note" [ref=e979] [cursor=pointer]
+          - listitem [ref=e980]:
+            - generic [ref=e981]: "4.7"
+            - generic [ref=e982]:
+              - generic [ref=e983]:
+                - text: Manager review before payroll
+                - generic [ref=e984]: Confirmed
+              - generic [ref=e985]: You confirmed this step exists. Just checking we have it right.
+              - generic [ref=e986]:
+                - button "V1" [pressed] [ref=e987] [cursor=pointer]
+                - button "Later" [ref=e988] [cursor=pointer]
+                - button "Not needed" [ref=e989] [cursor=pointer]
+                - button "+ Note" [ref=e990] [cursor=pointer]
+          - listitem [ref=e991]:
+            - generic [ref=e992]: "4.8"
+            - generic [ref=e993]:
+              - generic [ref=e994]: Live technician workload view
+              - generic [ref=e995]: Who is working on what and who has capacity.
+              - generic [ref=e996]:
+                - button "V1" [ref=e997] [cursor=pointer]
+                - button "Later" [ref=e998] [cursor=pointer]
+                - button "Not needed" [ref=e999] [cursor=pointer]
+                - button "+ Note" [ref=e1000] [cursor=pointer]
+          - listitem [ref=e1001]:
+            - generic [ref=e1002]: "4.9"
+            - generic [ref=e1003]:
+              - generic [ref=e1004]:
+                - text: Efficiency and utilization stats per tech
+                - generic [ref=e1005]: Key
+              - generic [ref=e1006]: The tech home screen shows completed hours, SO hours, efficiency, utilization, clocked hours. Does anyone look at these?
+              - generic [ref=e1007]:
+                - button "V1" [ref=e1008] [cursor=pointer]
+                - button "Later" [ref=e1009] [cursor=pointer]
+                - button "Not needed" [ref=e1010] [cursor=pointer]
+                - button "+ Note" [ref=e1011] [cursor=pointer]
+          - listitem [ref=e1012]:
+            - generic [ref=e1013]: "4.10"
+            - generic [ref=e1014]:
+              - generic [ref=e1015]: Labor guide integration
+              - generic [ref=e1016]: MOTOR, Mitchell 1 ProDemand and TruckSeries.
+              - generic [ref=e1017]:
+                - button "V1" [ref=e1018] [cursor=pointer]
+                - button "Later" [ref=e1019] [cursor=pointer]
+                - button "Not needed" [ref=e1020] [cursor=pointer]
+                - button "+ Note" [ref=e1021] [cursor=pointer]
+          - listitem [ref=e1022]:
+            - generic [ref=e1023]: "4.11"
+            - generic [ref=e1024]:
+              - generic [ref=e1025]:
+                - text: Payroll export
+                - generic [ref=e1026]: Key
+              - generic [ref=e1027]: How hours get from here to whoever runs payroll.
+              - generic [ref=e1028]:
+                - button "V1" [ref=e1029] [cursor=pointer]
+                - button "Later" [ref=e1030] [cursor=pointer]
+                - button "Not needed" [ref=e1031] [cursor=pointer]
+                - button "+ Note" [ref=e1032] [cursor=pointer]
+      - generic [ref=e1033]:
+        - generic [ref=e1034]:
+          - generic [ref=e1035]: "5"
+          - heading "Preventive Maintenance" [level=2] [ref=e1036]
+          - generic [ref=e1037]: 0/12 marked
+        - paragraph [ref=e1038]: PM work is the most predictable thing a shop does, which makes it a candidate for moving first. Worth paying attention to this section.
+        - list [ref=e1039]:
+          - listitem [ref=e1040]:
+            - generic [ref=e1041]: "5.1"
+            - generic [ref=e1042]:
+              - generic [ref=e1043]: PM intervals by mileage
+              - generic [ref=e1044]: Due based on odometer.
+              - generic [ref=e1045]:
+                - button "V1" [ref=e1046] [cursor=pointer]
+                - button "Later" [ref=e1047] [cursor=pointer]
+                - button "Not needed" [ref=e1048] [cursor=pointer]
+                - button "+ Note" [ref=e1049] [cursor=pointer]
+          - listitem [ref=e1050]:
+            - generic [ref=e1051]: "5.2"
+            - generic [ref=e1052]:
+              - generic [ref=e1053]: PM intervals by engine hours
+              - generic [ref=e1054]: Due based on hours.
+              - generic [ref=e1055]:
+                - button "V1" [ref=e1056] [cursor=pointer]
+                - button "Later" [ref=e1057] [cursor=pointer]
+                - button "Not needed" [ref=e1058] [cursor=pointer]
+                - button "+ Note" [ref=e1059] [cursor=pointer]
+          - listitem [ref=e1060]:
+            - generic [ref=e1061]: "5.3"
+            - generic [ref=e1062]:
+              - generic [ref=e1063]: PM intervals by calendar
+              - generic [ref=e1064]: Due based on date.
+              - generic [ref=e1065]:
+                - button "V1" [ref=e1066] [cursor=pointer]
+                - button "Later" [ref=e1067] [cursor=pointer]
+                - button "Not needed" [ref=e1068] [cursor=pointer]
+                - button "+ Note" [ref=e1069] [cursor=pointer]
+          - listitem [ref=e1070]:
+            - generic [ref=e1071]: "5.4"
+            - generic [ref=e1072]:
+              - generic [ref=e1073]: Coming-due window setting
+              - generic [ref=e1074]: How far ahead a PM is flagged. Set to 30 days on the account we saw.
+              - generic [ref=e1075]:
+                - button "V1" [ref=e1076] [cursor=pointer]
+                - button "Later" [ref=e1077] [cursor=pointer]
+                - button "Not needed" [ref=e1078] [cursor=pointer]
+                - button "+ Note" [ref=e1079] [cursor=pointer]
+          - listitem [ref=e1080]:
+            - generic [ref=e1081]: "5.5"
+            - generic [ref=e1082]:
+              - generic [ref=e1083]:
+                - text: Automatic service order generation
+                - generic [ref=e1084]: Key
+              - generic [ref=e1085]: Due PMs create their own order in the Auto-Gen SOs tab.
+              - generic [ref=e1086]:
+                - button "V1" [ref=e1087] [cursor=pointer]
+                - button "Later" [ref=e1088] [cursor=pointer]
+                - button "Not needed" [ref=e1089] [cursor=pointer]
+                - button "+ Note" [ref=e1090] [cursor=pointer]
+          - listitem [ref=e1091]:
+            - generic [ref=e1092]: "5.6"
+            - generic [ref=e1093]:
+              - generic [ref=e1094]: PM schedules on unit types
+              - generic [ref=e1095]: Attach a schedule to a type of truck, not one truck at a time.
+              - generic [ref=e1096]:
+                - button "V1" [ref=e1097] [cursor=pointer]
+                - button "Later" [ref=e1098] [cursor=pointer]
+                - button "Not needed" [ref=e1099] [cursor=pointer]
+                - button "+ Note" [ref=e1100] [cursor=pointer]
+          - listitem [ref=e1101]:
+            - generic [ref=e1102]: "5.7"
+            - generic [ref=e1103]:
+              - generic [ref=e1104]: Batch add PMs across many units
+              - generic [ref=e1105]: Bulk assignment.
+              - generic [ref=e1106]:
+                - button "V1" [ref=e1107] [cursor=pointer]
+                - button "Later" [ref=e1108] [cursor=pointer]
+                - button "Not needed" [ref=e1109] [cursor=pointer]
+                - button "+ Note" [ref=e1110] [cursor=pointer]
+          - listitem [ref=e1111]:
+            - generic [ref=e1112]: "5.8"
+            - generic [ref=e1113]:
+              - generic [ref=e1114]: Enter last-performed info
+              - generic [ref=e1115]: Backfilling a baseline for a unit serviced somewhere else.
+              - generic [ref=e1116]:
+                - button "V1" [ref=e1117] [cursor=pointer]
+                - button "Later" [ref=e1118] [cursor=pointer]
+                - button "Not needed" [ref=e1119] [cursor=pointer]
+                - button "+ Note" [ref=e1120] [cursor=pointer]
+          - listitem [ref=e1121]:
+            - generic [ref=e1122]: "5.9"
+            - generic [ref=e1123]:
+              - generic [ref=e1124]: Procedures attached to a PM
+              - generic [ref=e1125]: Step-by-step instructions on the PM definition.
+              - generic [ref=e1126]:
+                - button "V1" [ref=e1127] [cursor=pointer]
+                - button "Later" [ref=e1128] [cursor=pointer]
+                - button "Not needed" [ref=e1129] [cursor=pointer]
+                - button "+ Note" [ref=e1130] [cursor=pointer]
+          - listitem [ref=e1131]:
+            - generic [ref=e1132]: "5.10"
+            - generic [ref=e1133]:
+              - generic [ref=e1134]: Meter reading capture
+              - generic [ref=e1135]: Entered on the order, drives the next due date.
+              - generic [ref=e1136]:
+                - button "V1" [ref=e1137] [cursor=pointer]
+                - button "Later" [ref=e1138] [cursor=pointer]
+                - button "Not needed" [ref=e1139] [cursor=pointer]
+                - button "+ Note" [ref=e1140] [cursor=pointer]
+          - listitem [ref=e1141]:
+            - generic [ref=e1142]: "5.11"
+            - generic [ref=e1143]:
+              - generic [ref=e1144]: PM history on the unit record
+              - generic [ref=e1145]: Permanent log per unit.
+              - generic [ref=e1146]:
+                - button "V1" [ref=e1147] [cursor=pointer]
+                - button "Later" [ref=e1148] [cursor=pointer]
+                - button "Not needed" [ref=e1149] [cursor=pointer]
+                - button "+ Note" [ref=e1150] [cursor=pointer]
+          - listitem [ref=e1151]:
+            - generic [ref=e1152]: "5.12"
+            - generic [ref=e1153]:
+              - generic [ref=e1154]: Customer-scheduled PM requests
+              - generic [ref=e1155]: The fleet customer books their own upcoming PM in the portal.
+              - generic [ref=e1156]:
+                - button "V1" [ref=e1157] [cursor=pointer]
+                - button "Later" [ref=e1158] [cursor=pointer]
+                - button "Not needed" [ref=e1159] [cursor=pointer]
+                - button "+ Note" [ref=e1160] [cursor=pointer]
+      - generic [ref=e1161]:
+        - generic [ref=e1162]:
+          - generic [ref=e1163]: "6"
+          - heading "Inspections & DVIR" [level=2] [ref=e1164]
+          - generic [ref=e1165]: 0/4 marked
+        - paragraph [ref=e1166]: This looks like it is mostly NOT FullBay — it leans on Whip Around and Pitstop. Worth confirming who handles DVIR intake today.
+        - list [ref=e1167]:
+          - listitem [ref=e1168]:
+            - generic [ref=e1169]: "6.1"
+            - generic [ref=e1170]:
+              - generic [ref=e1171]:
+                - text: Driver-submitted DVIR via Whip Around
+                - generic [ref=e1172]: Key
+              - generic [ref=e1173]: Driver flags a defect on their phone, it becomes a service order. Is Whip Around actually in use?
+              - generic [ref=e1174]:
+                - button "V1" [ref=e1175] [cursor=pointer]
+                - button "Later" [ref=e1176] [cursor=pointer]
+                - button "Not needed" [ref=e1177] [cursor=pointer]
+                - button "+ Note" [ref=e1178] [cursor=pointer]
+          - listitem [ref=e1179]:
+            - generic [ref=e1180]: "6.2"
+            - generic [ref=e1181]:
+              - generic [ref=e1182]: Predicted failures via Pitstop
+              - generic [ref=e1183]: Telematics fault prediction feeding a work order.
+              - generic [ref=e1184]:
+                - button "V1" [ref=e1185] [cursor=pointer]
+                - button "Later" [ref=e1186] [cursor=pointer]
+                - button "Not needed" [ref=e1187] [cursor=pointer]
+                - button "+ Note" [ref=e1188] [cursor=pointer]
+          - listitem [ref=e1189]:
+            - generic [ref=e1190]: "6.3"
+            - generic [ref=e1191]:
+              - generic [ref=e1192]: Guided inspection during a job
+              - generic [ref=e1193]: An in-app checklist the tech runs while working.
+              - generic [ref=e1194]:
+                - button "V1" [ref=e1195] [cursor=pointer]
+                - button "Later" [ref=e1196] [cursor=pointer]
+                - button "Not needed" [ref=e1197] [cursor=pointer]
+                - button "+ Note" [ref=e1198] [cursor=pointer]
+          - listitem [ref=e1199]:
+            - generic [ref=e1200]: "6.4"
+            - generic [ref=e1201]:
+              - generic [ref=e1202]: Anything on paper?
+              - generic [ref=e1203]: If inspections happen on paper today, say so here — that's a real opportunity, not a gap.
+              - generic [ref=e1204]:
+                - button "V1" [ref=e1205] [cursor=pointer]
+                - button "Later" [ref=e1206] [cursor=pointer]
+                - button "Not needed" [ref=e1207] [cursor=pointer]
+                - button "+ Note" [ref=e1208] [cursor=pointer]
+      - generic [ref=e1209]:
+        - generic [ref=e1210]:
+          - generic [ref=e1211]: "7"
+          - heading "Invoicing & Payments" [level=2] [ref=e1212]
+          - generic [ref=e1213]: 1/26 marked
+        - paragraph [ref=e1214]: You confirmed QuickBooks sync is your live accounting workflow. FullBay Payments runs on Stripe underneath. If payment processing is part of the $5k bill, that matters a lot to the plan.
+        - list [ref=e1215]:
+          - listitem [ref=e1216]:
+            - generic [ref=e1217]: "7.1"
+            - generic [ref=e1218]:
+              - generic [ref=e1219]: One-click invoice from a completed order
+              - generic [ref=e1220]: Approved order becomes a final invoice with actual hours.
+              - generic [ref=e1221]:
+                - button "V1" [ref=e1222] [cursor=pointer]
+                - button "Later" [ref=e1223] [cursor=pointer]
+                - button "Not needed" [ref=e1224] [cursor=pointer]
+                - button "+ Note" [ref=e1225] [cursor=pointer]
+          - listitem [ref=e1226]:
+            - generic [ref=e1227]: "7.2"
+            - generic [ref=e1228]:
+              - generic [ref=e1229]: Invoice by email with PDF
+              - generic [ref=e1230]: Emailed PDF.
+              - generic [ref=e1231]:
+                - button "V1" [ref=e1232] [cursor=pointer]
+                - button "Later" [ref=e1233] [cursor=pointer]
+                - button "Not needed" [ref=e1234] [cursor=pointer]
+                - button "+ Note" [ref=e1235] [cursor=pointer]
+          - listitem [ref=e1236]:
+            - generic [ref=e1237]: "7.3"
+            - generic [ref=e1238]:
+              - generic [ref=e1239]: Invoice by text
+              - generic [ref=e1240]: Texted link.
+              - generic [ref=e1241]:
+                - button "V1" [ref=e1242] [cursor=pointer]
+                - button "Later" [ref=e1243] [cursor=pointer]
+                - button "Not needed" [ref=e1244] [cursor=pointer]
+                - button "+ Note" [ref=e1245] [cursor=pointer]
+          - listitem [ref=e1246]:
+            - generic [ref=e1247]: "7.4"
+            - generic [ref=e1248]:
+              - generic [ref=e1249]: Invoice via portal link
+              - generic [ref=e1250]: Customer opens it in their portal.
+              - generic [ref=e1251]:
+                - button "V1" [ref=e1252] [cursor=pointer]
+                - button "Later" [ref=e1253] [cursor=pointer]
+                - button "Not needed" [ref=e1254] [cursor=pointer]
+                - button "+ Note" [ref=e1255] [cursor=pointer]
+          - listitem [ref=e1256]:
+            - generic [ref=e1257]: "7.5"
+            - generic [ref=e1258]:
+              - generic [ref=e1259]: Prepayments
+              - generic [ref=e1260]: Collecting money before the work is finished.
+              - generic [ref=e1261]:
+                - button "V1" [ref=e1262] [cursor=pointer]
+                - button "Later" [ref=e1263] [cursor=pointer]
+                - button "Not needed" [ref=e1264] [cursor=pointer]
+                - button "+ Note" [ref=e1265] [cursor=pointer]
+          - listitem [ref=e1266]:
+            - generic [ref=e1267]: "7.6"
+            - generic [ref=e1268]:
+              - generic [ref=e1269]: Card payments
+              - generic [ref=e1270]: Credit and debit.
+              - generic [ref=e1271]:
+                - button "V1" [ref=e1272] [cursor=pointer]
+                - button "Later" [ref=e1273] [cursor=pointer]
+                - button "Not needed" [ref=e1274] [cursor=pointer]
+                - button "+ Note" [ref=e1275] [cursor=pointer]
+          - listitem [ref=e1276]:
+            - generic [ref=e1277]: "7.7"
+            - generic [ref=e1278]:
+              - generic [ref=e1279]: ACH / eCheck
+              - generic [ref=e1280]: Bank transfer.
+              - generic [ref=e1281]:
+                - button "V1" [ref=e1282] [cursor=pointer]
+                - button "Later" [ref=e1283] [cursor=pointer]
+                - button "Not needed" [ref=e1284] [cursor=pointer]
+                - button "+ Note" [ref=e1285] [cursor=pointer]
+          - listitem [ref=e1286]:
+            - generic [ref=e1287]: "7.8"
+            - generic [ref=e1288]:
+              - generic [ref=e1289]: Apple Pay / Google Pay
+              - generic [ref=e1290]: Wallet payments.
+              - generic [ref=e1291]:
+                - button "V1" [ref=e1292] [cursor=pointer]
+                - button "Later" [ref=e1293] [cursor=pointer]
+                - button "Not needed" [ref=e1294] [cursor=pointer]
+                - button "+ Note" [ref=e1295] [cursor=pointer]
+          - listitem [ref=e1296]:
+            - generic [ref=e1297]: "7.9"
+            - generic [ref=e1298]:
+              - generic [ref=e1299]: Buy-now-pay-later
+              - generic [ref=e1300]: Financed payment option.
+              - generic [ref=e1301]:
+                - button "V1" [ref=e1302] [cursor=pointer]
+                - button "Later" [ref=e1303] [cursor=pointer]
+                - button "Not needed" [ref=e1304] [cursor=pointer]
+                - button "+ Note" [ref=e1305] [cursor=pointer]
+          - listitem [ref=e1306]:
+            - generic [ref=e1307]: "7.10"
+            - generic [ref=e1308]:
+              - generic [ref=e1309]: Interstate Billing Service (IBS)
+              - generic [ref=e1310]: Fleet accounts-receivable financing.
+              - generic [ref=e1311]:
+                - button "V1" [ref=e1312] [cursor=pointer]
+                - button "Later" [ref=e1313] [cursor=pointer]
+                - button "Not needed" [ref=e1314] [cursor=pointer]
+                - button "+ Note" [ref=e1315] [cursor=pointer]
+          - listitem [ref=e1316]:
+            - generic [ref=e1317]: "7.11"
+            - generic [ref=e1318]:
+              - generic [ref=e1319]:
+                - text: Are you paying FullBay to process payments?
+                - generic [ref=e1320]: Key
+              - generic [ref=e1321]: If card processing fees are inside the $5k, that's revenue FullBay captures that the plan has to account for separately.
+              - generic [ref=e1322]:
+                - button "V1" [ref=e1323] [cursor=pointer]
+                - button "Later" [ref=e1324] [cursor=pointer]
+                - button "Not needed" [ref=e1325] [cursor=pointer]
+                - button "+ Note" [ref=e1326] [cursor=pointer]
+          - listitem [ref=e1327]:
+            - generic [ref=e1328]: "7.12"
+            - generic [ref=e1329]:
+              - generic [ref=e1330]: Quick Charge
+              - generic [ref=e1331]: Taking a payment with no service order attached.
+              - generic [ref=e1332]:
+                - button "V1" [ref=e1333] [cursor=pointer]
+                - button "Later" [ref=e1334] [cursor=pointer]
+                - button "Not needed" [ref=e1335] [cursor=pointer]
+                - button "+ Note" [ref=e1336] [cursor=pointer]
+          - listitem [ref=e1337]:
+            - generic [ref=e1338]: "7.13"
+            - generic [ref=e1339]:
+              - generic [ref=e1340]: Customer statements
+              - generic [ref=e1341]: A/R statements, separate from individual invoices, with their own preferences.
+              - generic [ref=e1342]:
+                - button "V1" [ref=e1343] [cursor=pointer]
+                - button "Later" [ref=e1344] [cursor=pointer]
+                - button "Not needed" [ref=e1345] [cursor=pointer]
+                - button "+ Note" [ref=e1346] [cursor=pointer]
+          - listitem [ref=e1347]:
+            - generic [ref=e1348]: "7.14"
+            - generic [ref=e1349]:
+              - generic [ref=e1350]: Customer credit memos
+              - generic [ref=e1351]: Credits, handled separately from refunds.
+              - generic [ref=e1352]:
+                - button "V1" [ref=e1353] [cursor=pointer]
+                - button "Later" [ref=e1354] [cursor=pointer]
+                - button "Not needed" [ref=e1355] [cursor=pointer]
+                - button "+ Note" [ref=e1356] [cursor=pointer]
+          - listitem [ref=e1357]:
+            - generic [ref=e1358]: "7.15"
+            - generic [ref=e1359]:
+              - generic [ref=e1360]: Refunds, partial and full
+              - generic [ref=e1361]: Money back.
+              - generic [ref=e1362]:
+                - button "V1" [ref=e1363] [cursor=pointer]
+                - button "Later" [ref=e1364] [cursor=pointer]
+                - button "Not needed" [ref=e1365] [cursor=pointer]
+                - button "+ Note" [ref=e1366] [cursor=pointer]
+          - listitem [ref=e1367]:
+            - generic [ref=e1368]: "7.16"
+            - generic [ref=e1369]:
+              - generic [ref=e1370]: Require signature on payment
+              - generic [ref=e1371]: A setting to force a signature.
+              - generic [ref=e1372]:
+                - button "V1" [ref=e1373] [cursor=pointer]
+                - button "Later" [ref=e1374] [cursor=pointer]
+                - button "Not needed" [ref=e1375] [cursor=pointer]
+                - button "+ Note" [ref=e1376] [cursor=pointer]
+          - listitem [ref=e1377]:
+            - generic [ref=e1378]: "7.17"
+            - generic [ref=e1379]:
+              - generic [ref=e1380]: Duplicate invoice number handling
+              - generic [ref=e1381]: How the system prevents or handles a repeat number.
+              - generic [ref=e1382]:
+                - button "V1" [ref=e1383] [cursor=pointer]
+                - button "Later" [ref=e1384] [cursor=pointer]
+                - button "Not needed" [ref=e1385] [cursor=pointer]
+                - button "+ Note" [ref=e1386] [cursor=pointer]
+          - listitem [ref=e1387]:
+            - generic [ref=e1388]: "7.18"
+            - generic [ref=e1389]:
+              - generic [ref=e1390]:
+                - text: What invoice number are you on right now?
+                - generic [ref=e1391]: Key
+              - generic [ref=e1392]: Needed so a new system can use a number range that can never collide with FullBay's. Cheap to decide now, painful later.
+              - generic [ref=e1393]:
+                - button "V1" [ref=e1394] [cursor=pointer]
+                - button "Later" [ref=e1395] [cursor=pointer]
+                - button "Not needed" [ref=e1396] [cursor=pointer]
+                - button "+ Note" [ref=e1397] [cursor=pointer]
+          - listitem [ref=e1398]:
+            - generic [ref=e1399]: "7.19"
+            - generic [ref=e1400]:
+              - generic [ref=e1401]: Auto-matching payments to invoices
+              - generic [ref=e1402]: Payments reconcile themselves.
+              - generic [ref=e1403]:
+                - button "V1" [ref=e1404] [cursor=pointer]
+                - button "Later" [ref=e1405] [cursor=pointer]
+                - button "Not needed" [ref=e1406] [cursor=pointer]
+                - button "+ Note" [ref=e1407] [cursor=pointer]
+          - listitem [ref=e1408]:
+            - generic [ref=e1409]: "7.20"
+            - generic [ref=e1410]:
+              - generic [ref=e1411]: Dispute / chargeback workflow
+              - generic [ref=e1412]: Built-in dispute handling.
+              - generic [ref=e1413]:
+                - button "V1" [ref=e1414] [cursor=pointer]
+                - button "Later" [ref=e1415] [cursor=pointer]
+                - button "Not needed" [ref=e1416] [cursor=pointer]
+                - button "+ Note" [ref=e1417] [cursor=pointer]
+          - listitem [ref=e1418]:
+            - generic [ref=e1419]: "7.21"
+            - generic [ref=e1420]:
+              - generic [ref=e1421]:
+                - text: FullBay's own chart of accounts
+                - generic [ref=e1422]: Key
+              - generic [ref=e1423]: It maintains its own accounts and item mapping — deeper than just passing data to QuickBooks.
+              - generic [ref=e1424]:
+                - button "V1" [ref=e1425] [cursor=pointer]
+                - button "Later" [ref=e1426] [cursor=pointer]
+                - button "Not needed" [ref=e1427] [cursor=pointer]
+                - button "+ Note" [ref=e1428] [cursor=pointer]
+          - listitem [ref=e1429]:
+            - generic [ref=e1430]: "7.22"
+            - generic [ref=e1431]:
+              - generic [ref=e1432]: Cash-basis sales tax reporting
+              - generic [ref=e1433]: A specific named tax reporting mode.
+              - generic [ref=e1434]:
+                - button "V1" [ref=e1435] [cursor=pointer]
+                - button "Later" [ref=e1436] [cursor=pointer]
+                - button "Not needed" [ref=e1437] [cursor=pointer]
+                - button "+ Note" [ref=e1438] [cursor=pointer]
+          - listitem [ref=e1439]:
+            - generic [ref=e1440]: "7.23"
+            - generic [ref=e1441]:
+              - generic [ref=e1442]:
+                - text: How is sales tax calculated on an invoice today?
+                - generic [ref=e1443]: Key
+              - generic [ref=e1444]: Has to be right on the very first invoice out of a new system, or the ledger and the return are wrong.
+              - generic [ref=e1445]:
+                - button "V1" [ref=e1446] [cursor=pointer]
+                - button "Later" [ref=e1447] [cursor=pointer]
+                - button "Not needed" [ref=e1448] [cursor=pointer]
+                - button "+ Note" [ref=e1449] [cursor=pointer]
+          - listitem [ref=e1450]:
+            - generic [ref=e1451]: "7.24"
+            - generic [ref=e1452]:
+              - generic [ref=e1453]:
+                - text: QuickBooks sync
+                - generic [ref=e1454]: Confirmed
+              - generic [ref=e1455]: You confirmed this is your real workflow today.
+              - generic [ref=e1456]:
+                - button "V1" [pressed] [ref=e1457] [cursor=pointer]
+                - button "Later" [ref=e1458] [cursor=pointer]
+                - button "Not needed" [ref=e1459] [cursor=pointer]
+                - button "+ Note" [ref=e1460] [cursor=pointer]
+          - listitem [ref=e1461]:
+            - generic [ref=e1462]: "7.25"
+            - generic [ref=e1463]:
+              - generic [ref=e1464]:
+                - text: Could the bookkeeper key or import invoices by hand at first?
+                - generic [ref=e1465]: Key
+              - generic [ref=e1466]: If yes for a small number of customers, a real QuickBooks integration moves out of V1 and the build gets meaningfully shorter.
+              - generic [ref=e1467]:
+                - button "V1" [ref=e1468] [cursor=pointer]
+                - button "Later" [ref=e1469] [cursor=pointer]
+                - button "Not needed" [ref=e1470] [cursor=pointer]
+                - button "+ Note" [ref=e1471] [cursor=pointer]
+          - listitem [ref=e1472]:
+            - generic [ref=e1473]: "7.26"
+            - generic [ref=e1474]:
+              - generic [ref=e1475]: Warranty work billing
+              - generic [ref=e1476]: A separate accounting treatment for warranty-covered repairs.
+              - generic [ref=e1477]:
+                - button "V1" [ref=e1478] [cursor=pointer]
+                - button "Later" [ref=e1479] [cursor=pointer]
+                - button "Not needed" [ref=e1480] [cursor=pointer]
+                - button "+ Note" [ref=e1481] [cursor=pointer]
+      - generic [ref=e1482]:
+        - generic [ref=e1483]:
+          - generic [ref=e1484]: "8"
+          - heading "Customer Portal" [level=2] [ref=e1485]
+          - generic [ref=e1486]: 0/20 marked
+        - paragraph [ref=e1487]: This is the part Cam's app already does well, and the part FullBay does worst. Mark what your customers actually touch — and what they complain about.
+        - list [ref=e1488]:
+          - listitem [ref=e1489]:
+            - generic [ref=e1490]: "8.1"
+            - generic [ref=e1491]:
+              - generic [ref=e1492]:
+                - text: Magic-link access, no password
+                - generic [ref=e1493]: Key
+              - generic [ref=e1494]: Each customer gets one unguessable URL they bookmark. No login screen at all. If it leaks, you reset it.
+              - generic [ref=e1495]:
+                - button "V1" [ref=e1496] [cursor=pointer]
+                - button "Later" [ref=e1497] [cursor=pointer]
+                - button "Not needed" [ref=e1498] [cursor=pointer]
+                - button "+ Note" [ref=e1499] [cursor=pointer]
+          - listitem [ref=e1500]:
+            - generic [ref=e1501]: "8.2"
+            - generic [ref=e1502]:
+              - generic [ref=e1503]: Has a portal link ever had to be reset?
+              - generic [ref=e1504]: Worth knowing whether the no-password model has caused a real problem.
+              - generic [ref=e1505]:
+                - button "V1" [ref=e1506] [cursor=pointer]
+                - button "Later" [ref=e1507] [cursor=pointer]
+                - button "Not needed" [ref=e1508] [cursor=pointer]
+                - button "+ Note" [ref=e1509] [cursor=pointer]
+          - listitem [ref=e1510]:
+            - generic [ref=e1511]: "8.3"
+            - generic [ref=e1512]:
+              - generic [ref=e1513]: Units tab
+              - generic [ref=e1514]: Unit number, nickname, status, severity, VIN, year/make/model, ship-to, open orders.
+              - generic [ref=e1515]:
+                - button "V1" [ref=e1516] [cursor=pointer]
+                - button "Later" [ref=e1517] [cursor=pointer]
+                - button "Not needed" [ref=e1518] [cursor=pointer]
+                - button "+ Note" [ref=e1519] [cursor=pointer]
+          - listitem [ref=e1520]:
+            - generic [ref=e1521]: "8.4"
+            - generic [ref=e1522]:
+              - generic [ref=e1523]: Customer adds their own units
+              - generic [ref=e1524]: They can create a unit themselves.
+              - generic [ref=e1525]:
+                - button "V1" [ref=e1526] [cursor=pointer]
+                - button "Later" [ref=e1527] [cursor=pointer]
+                - button "Not needed" [ref=e1528] [cursor=pointer]
+                - button "+ Note" [ref=e1529] [cursor=pointer]
+          - listitem [ref=e1530]:
+            - generic [ref=e1531]: "8.5"
+            - generic [ref=e1532]:
+              - generic [ref=e1533]: Customer pulls their own fleet report
+              - generic [ref=e1534]: Self-service report.
+              - generic [ref=e1535]:
+                - button "V1" [ref=e1536] [cursor=pointer]
+                - button "Later" [ref=e1537] [cursor=pointer]
+                - button "Not needed" [ref=e1538] [cursor=pointer]
+                - button "+ Note" [ref=e1539] [cursor=pointer]
+          - listitem [ref=e1540]:
+            - generic [ref=e1541]: "8.6"
+            - generic [ref=e1542]:
+              - generic [ref=e1543]: Unit status values
+              - generic [ref=e1544]: New, Confirmed, Out of Service, Owner-Operator, Shop-Company Owned, Sold, Transferred.
+              - generic [ref=e1545]:
+                - button "V1" [ref=e1546] [cursor=pointer]
+                - button "Later" [ref=e1547] [cursor=pointer]
+                - button "Not needed" [ref=e1548] [cursor=pointer]
+                - button "+ Note" [ref=e1549] [cursor=pointer]
+          - listitem [ref=e1550]:
+            - generic [ref=e1551]: "8.7"
+            - generic [ref=e1552]:
+              - generic [ref=e1553]: Messages tab
+              - generic [ref=e1554]: Account-level messaging between you and the customer.
+              - generic [ref=e1555]:
+                - button "V1" [ref=e1556] [cursor=pointer]
+                - button "Later" [ref=e1557] [cursor=pointer]
+                - button "Not needed" [ref=e1558] [cursor=pointer]
+                - button "+ Note" [ref=e1559] [cursor=pointer]
+          - listitem [ref=e1560]:
+            - generic [ref=e1561]: "8.8"
+            - generic [ref=e1562]:
+              - generic [ref=e1563]: Active Services tab
+              - generic [ref=e1564]: Open work, filterable by unit.
+              - generic [ref=e1565]:
+                - button "V1" [ref=e1566] [cursor=pointer]
+                - button "Later" [ref=e1567] [cursor=pointer]
+                - button "Not needed" [ref=e1568] [cursor=pointer]
+                - button "+ Note" [ref=e1569] [cursor=pointer]
+          - listitem [ref=e1570]:
+            - generic [ref=e1571]: "8.9"
+            - generic [ref=e1572]:
+              - generic [ref=e1573]: Customer-facing pipeline stages
+              - generic [ref=e1574]: Saved but not submitted → Submitted → Evaluating & Diagnosis → Ready to authorize → Service in progress → Recently completed.
+              - generic [ref=e1575]:
+                - button "V1" [ref=e1576] [cursor=pointer]
+                - button "Later" [ref=e1577] [cursor=pointer]
+                - button "Not needed" [ref=e1578] [cursor=pointer]
+                - button "+ Note" [ref=e1579] [cursor=pointer]
+          - listitem [ref=e1580]:
+            - generic [ref=e1581]: "8.10"
+            - generic [ref=e1582]:
+              - generic [ref=e1583]: Invoices tab with A/R columns
+              - generic [ref=e1584]: Current, Coming Due, Past Due, Balance.
+              - generic [ref=e1585]:
+                - button "V1" [ref=e1586] [cursor=pointer]
+                - button "Later" [ref=e1587] [cursor=pointer]
+                - button "Not needed" [ref=e1588] [cursor=pointer]
+                - button "+ Note" [ref=e1589] [cursor=pointer]
+          - listitem [ref=e1590]:
+            - generic [ref=e1591]: "8.11"
+            - generic [ref=e1592]:
+              - generic [ref=e1593]: Customer creates their own statement
+              - generic [ref=e1594]: Self-service statement.
+              - generic [ref=e1595]:
+                - button "V1" [ref=e1596] [cursor=pointer]
+                - button "Later" [ref=e1597] [cursor=pointer]
+                - button "Not needed" [ref=e1598] [cursor=pointer]
+                - button "+ Note" [ref=e1599] [cursor=pointer]
+          - listitem [ref=e1600]:
+            - generic [ref=e1601]: "8.12"
+            - generic [ref=e1602]:
+              - generic [ref=e1603]: Customer pays invoices in batch
+              - generic [ref=e1604]: Paying several at once.
+              - generic [ref=e1605]:
+                - button "V1" [ref=e1606] [cursor=pointer]
+                - button "Later" [ref=e1607] [cursor=pointer]
+                - button "Not needed" [ref=e1608] [cursor=pointer]
+                - button "+ Note" [ref=e1609] [cursor=pointer]
+          - listitem [ref=e1610]:
+            - generic [ref=e1611]: "8.13"
+            - generic [ref=e1612]:
+              - generic [ref=e1613]: Customer saves their own payment method
+              - generic [ref=e1614]: They add a card or bank account themselves.
+              - generic [ref=e1615]:
+                - button "V1" [ref=e1616] [cursor=pointer]
+                - button "Later" [ref=e1617] [cursor=pointer]
+                - button "Not needed" [ref=e1618] [cursor=pointer]
+                - button "+ Note" [ref=e1619] [cursor=pointer]
+          - listitem [ref=e1620]:
+            - generic [ref=e1621]: "8.14"
+            - generic [ref=e1622]:
+              - generic [ref=e1623]: Contacts tab
+              - generic [ref=e1624]: Their people.
+              - generic [ref=e1625]:
+                - button "V1" [ref=e1626] [cursor=pointer]
+                - button "Later" [ref=e1627] [cursor=pointer]
+                - button "Not needed" [ref=e1628] [cursor=pointer]
+                - button "+ Note" [ref=e1629] [cursor=pointer]
+          - listitem [ref=e1630]:
+            - generic [ref=e1631]: "8.15"
+            - generic [ref=e1632]:
+              - generic [ref=e1633]: Configuration / Your Info tab
+              - generic [ref=e1634]: Customer edits their own name, contacts, addresses, payment methods, attachments and notes.
+              - generic [ref=e1635]:
+                - button "V1" [ref=e1636] [cursor=pointer]
+                - button "Later" [ref=e1637] [cursor=pointer]
+                - button "Not needed" [ref=e1638] [cursor=pointer]
+                - button "+ Note" [ref=e1639] [cursor=pointer]
+          - listitem [ref=e1640]:
+            - generic [ref=e1641]: "8.16"
+            - generic [ref=e1642]:
+              - generic [ref=e1643]:
+                - text: The four decision-maker fields
+                - generic [ref=e1644]: Key
+              - generic [ref=e1645]: Who makes overall decisions, who runs day-to-day fleet, who authorizes repairs, who handles billing. A real delegation model, separate from dollar thresholds.
+              - generic [ref=e1646]:
+                - button "V1" [ref=e1647] [cursor=pointer]
+                - button "Later" [ref=e1648] [cursor=pointer]
+                - button "Not needed" [ref=e1649] [cursor=pointer]
+                - button "+ Note" [ref=e1650] [cursor=pointer]
+          - listitem [ref=e1651]:
+            - generic [ref=e1652]: "8.17"
+            - generic [ref=e1653]:
+              - generic [ref=e1654]: Primary access method field
+              - generic [ref=e1655]: How units normally get to you, e.g. customer brings it in.
+              - generic [ref=e1656]:
+                - button "V1" [ref=e1657] [cursor=pointer]
+                - button "Later" [ref=e1658] [cursor=pointer]
+                - button "Not needed" [ref=e1659] [cursor=pointer]
+                - button "+ Note" [ref=e1660] [cursor=pointer]
+          - listitem [ref=e1661]:
+            - generic [ref=e1662]: "8.18"
+            - generic [ref=e1663]:
+              - generic [ref=e1664]:
+                - text: Request Service button
+                - generic [ref=e1665]: Key
+              - generic [ref=e1666]: Customer-initiated service request.
+              - generic [ref=e1667]:
+                - button "V1" [ref=e1668] [cursor=pointer]
+                - button "Later" [ref=e1669] [cursor=pointer]
+                - button "Not needed" [ref=e1670] [cursor=pointer]
+                - button "+ Note" [ref=e1671] [cursor=pointer]
+          - listitem [ref=e1672]:
+            - generic [ref=e1673]: "8.19"
+            - generic [ref=e1674]:
+              - generic [ref=e1675]: Help & Training link for customers
+              - generic [ref=e1676]: Customer-facing documentation.
+              - generic [ref=e1677]:
+                - button "V1" [ref=e1678] [cursor=pointer]
+                - button "Later" [ref=e1679] [cursor=pointer]
+                - button "Not needed" [ref=e1680] [cursor=pointer]
+                - button "+ Note" [ref=e1681] [cursor=pointer]
+          - listitem [ref=e1682]:
+            - generic [ref=e1683]: "8.20"
+            - generic [ref=e1684]:
+              - generic [ref=e1685]:
+                - text: What do your customers complain about most?
+                - generic [ref=e1686]: Key
+              - generic [ref=e1687]: Free text. The complaints are where the new portal wins, and they cost nothing to collect.
+              - generic [ref=e1688]:
+                - button "V1" [ref=e1689] [cursor=pointer]
+                - button "Later" [ref=e1690] [cursor=pointer]
+                - button "Not needed" [ref=e1691] [cursor=pointer]
+                - button "+ Note" [ref=e1692] [cursor=pointer]
+      - generic [ref=e1693]:
+        - generic [ref=e1694]:
+          - generic [ref=e1695]: "9"
+          - heading "The 38 Reports" [level=2] [ref=e1696]
+          - generic [ref=e1697]: 0/39 marked
+        - paragraph [ref=e1698]: All 38 canned reports, by name. There is no custom report builder in FullBay. This is the fastest place in the whole list to return weeks of schedule — if you run four of these, mark the other 34 and we are done.
+        - list [ref=e1699]:
+          - listitem [ref=e1700]:
+            - generic [ref=e1701]: "9.1"
+            - generic [ref=e1702]:
+              - generic [ref=e1703]: A/R Aging
+              - generic [ref=e1704]: Revenue
+              - generic [ref=e1705]:
+                - button "V1" [ref=e1706] [cursor=pointer]
+                - button "Later" [ref=e1707] [cursor=pointer]
+                - button "Not needed" [ref=e1708] [cursor=pointer]
+                - button "+ Note" [ref=e1709] [cursor=pointer]
+          - listitem [ref=e1710]:
+            - generic [ref=e1711]: "9.2"
+            - generic [ref=e1712]:
+              - generic [ref=e1713]: All Revenue
+              - generic [ref=e1714]: Revenue
+              - generic [ref=e1715]:
+                - button "V1" [ref=e1716] [cursor=pointer]
+                - button "Later" [ref=e1717] [cursor=pointer]
+                - button "Not needed" [ref=e1718] [cursor=pointer]
+                - button "+ Note" [ref=e1719] [cursor=pointer]
+          - listitem [ref=e1720]:
+            - generic [ref=e1721]: "9.3"
+            - generic [ref=e1722]:
+              - generic [ref=e1723]: Closed Without Invoicing / Ready To Invoice
+              - generic [ref=e1724]: Revenue
+              - generic [ref=e1725]:
+                - button "V1" [ref=e1726] [cursor=pointer]
+                - button "Later" [ref=e1727] [cursor=pointer]
+                - button "Not needed" [ref=e1728] [cursor=pointer]
+                - button "+ Note" [ref=e1729] [cursor=pointer]
+          - listitem [ref=e1730]:
+            - generic [ref=e1731]: "9.4"
+            - generic [ref=e1732]:
+              - generic [ref=e1733]: Credits & Refunds
+              - generic [ref=e1734]: Revenue
+              - generic [ref=e1735]:
+                - button "V1" [ref=e1736] [cursor=pointer]
+                - button "Later" [ref=e1737] [cursor=pointer]
+                - button "Not needed" [ref=e1738] [cursor=pointer]
+                - button "+ Note" [ref=e1739] [cursor=pointer]
+          - listitem [ref=e1740]:
+            - generic [ref=e1741]: "9.5"
+            - generic [ref=e1742]:
+              - generic [ref=e1743]: Payments
+              - generic [ref=e1744]: Revenue
+              - generic [ref=e1745]:
+                - button "V1" [ref=e1746] [cursor=pointer]
+                - button "Later" [ref=e1747] [cursor=pointer]
+                - button "Not needed" [ref=e1748] [cursor=pointer]
+                - button "+ Note" [ref=e1749] [cursor=pointer]
+          - listitem [ref=e1750]:
+            - generic [ref=e1751]: "9.6"
+            - generic [ref=e1752]:
+              - generic [ref=e1753]: Sold Sublet
+              - generic [ref=e1754]: Revenue
+              - generic [ref=e1755]:
+                - button "V1" [ref=e1756] [cursor=pointer]
+                - button "Later" [ref=e1757] [cursor=pointer]
+                - button "Not needed" [ref=e1758] [cursor=pointer]
+                - button "+ Note" [ref=e1759] [cursor=pointer]
+          - listitem [ref=e1760]:
+            - generic [ref=e1761]: "9.7"
+            - generic [ref=e1762]:
+              - generic [ref=e1763]: Work in Progress Revenue
+              - generic [ref=e1764]: Revenue
+              - generic [ref=e1765]:
+                - button "V1" [ref=e1766] [cursor=pointer]
+                - button "Later" [ref=e1767] [cursor=pointer]
+                - button "Not needed" [ref=e1768] [cursor=pointer]
+                - button "+ Note" [ref=e1769] [cursor=pointer]
+          - listitem [ref=e1770]:
+            - generic [ref=e1771]: "9.8"
+            - generic [ref=e1772]:
+              - generic [ref=e1773]: Inventory Balance
+              - generic [ref=e1774]: Inventory
+              - generic [ref=e1775]:
+                - button "V1" [ref=e1776] [cursor=pointer]
+                - button "Later" [ref=e1777] [cursor=pointer]
+                - button "Not needed" [ref=e1778] [cursor=pointer]
+                - button "+ Note" [ref=e1779] [cursor=pointer]
+          - listitem [ref=e1780]:
+            - generic [ref=e1781]: "9.9"
+            - generic [ref=e1782]:
+              - generic [ref=e1783]: Inventory Reconciliation
+              - generic [ref=e1784]: Inventory
+              - generic [ref=e1785]:
+                - button "V1" [ref=e1786] [cursor=pointer]
+                - button "Later" [ref=e1787] [cursor=pointer]
+                - button "Not needed" [ref=e1788] [cursor=pointer]
+                - button "+ Note" [ref=e1789] [cursor=pointer]
+          - listitem [ref=e1790]:
+            - generic [ref=e1791]: "9.10"
+            - generic [ref=e1792]:
+              - generic [ref=e1793]: Inventory Velocity
+              - generic [ref=e1794]: Inventory
+              - generic [ref=e1795]:
+                - button "V1" [ref=e1796] [cursor=pointer]
+                - button "Later" [ref=e1797] [cursor=pointer]
+                - button "Not needed" [ref=e1798] [cursor=pointer]
+                - button "+ Note" [ref=e1799] [cursor=pointer]
+          - listitem [ref=e1800]:
+            - generic [ref=e1801]: "9.11"
+            - generic [ref=e1802]:
+              - generic [ref=e1803]: Inventory with No Location
+              - generic [ref=e1804]: Inventory
+              - generic [ref=e1805]:
+                - button "V1" [ref=e1806] [cursor=pointer]
+                - button "Later" [ref=e1807] [cursor=pointer]
+                - button "Not needed" [ref=e1808] [cursor=pointer]
+                - button "+ Note" [ref=e1809] [cursor=pointer]
+          - listitem [ref=e1810]:
+            - generic [ref=e1811]: "9.12"
+            - generic [ref=e1812]:
+              - generic [ref=e1813]: Parts To Be Returned
+              - generic [ref=e1814]: Inventory
+              - generic [ref=e1815]:
+                - button "V1" [ref=e1816] [cursor=pointer]
+                - button "Later" [ref=e1817] [cursor=pointer]
+                - button "Not needed" [ref=e1818] [cursor=pointer]
+                - button "+ Note" [ref=e1819] [cursor=pointer]
+          - listitem [ref=e1820]:
+            - generic [ref=e1821]: "9.13"
+            - generic [ref=e1822]:
+              - generic [ref=e1823]: Returned Parts
+              - generic [ref=e1824]: Inventory
+              - generic [ref=e1825]:
+                - button "V1" [ref=e1826] [cursor=pointer]
+                - button "Later" [ref=e1827] [cursor=pointer]
+                - button "Not needed" [ref=e1828] [cursor=pointer]
+                - button "+ Note" [ref=e1829] [cursor=pointer]
+          - listitem [ref=e1830]:
+            - generic [ref=e1831]: "9.14"
+            - generic [ref=e1832]:
+              - generic [ref=e1833]: Shortage
+              - generic [ref=e1834]: Inventory
+              - generic [ref=e1835]:
+                - button "V1" [ref=e1836] [cursor=pointer]
+                - button "Later" [ref=e1837] [cursor=pointer]
+                - button "Not needed" [ref=e1838] [cursor=pointer]
+                - button "+ Note" [ref=e1839] [cursor=pointer]
+          - listitem [ref=e1840]:
+            - generic [ref=e1841]: "9.15"
+            - generic [ref=e1842]:
+              - generic [ref=e1843]: Sold Parts
+              - generic [ref=e1844]: Inventory
+              - generic [ref=e1845]:
+                - button "V1" [ref=e1846] [cursor=pointer]
+                - button "Later" [ref=e1847] [cursor=pointer]
+                - button "Not needed" [ref=e1848] [cursor=pointer]
+                - button "+ Note" [ref=e1849] [cursor=pointer]
+          - listitem [ref=e1850]:
+            - generic [ref=e1851]: "9.16"
+            - generic [ref=e1852]:
+              - generic [ref=e1853]: Special Order Velocity
+              - generic [ref=e1854]: Inventory
+              - generic [ref=e1855]:
+                - button "V1" [ref=e1856] [cursor=pointer]
+                - button "Later" [ref=e1857] [cursor=pointer]
+                - button "Not needed" [ref=e1858] [cursor=pointer]
+                - button "+ Note" [ref=e1859] [cursor=pointer]
+          - listitem [ref=e1860]:
+            - generic [ref=e1861]: "9.17"
+            - generic [ref=e1862]:
+              - generic [ref=e1863]: Vendor
+              - generic [ref=e1864]: Inventory
+              - generic [ref=e1865]:
+                - button "V1" [ref=e1866] [cursor=pointer]
+                - button "Later" [ref=e1867] [cursor=pointer]
+                - button "Not needed" [ref=e1868] [cursor=pointer]
+                - button "+ Note" [ref=e1869] [cursor=pointer]
+          - listitem [ref=e1870]:
+            - generic [ref=e1871]: "9.18"
+            - generic [ref=e1872]:
+              - generic [ref=e1873]: WIP Details
+              - generic [ref=e1874]: Work in progress
+              - generic [ref=e1875]:
+                - button "V1" [ref=e1876] [cursor=pointer]
+                - button "Later" [ref=e1877] [cursor=pointer]
+                - button "Not needed" [ref=e1878] [cursor=pointer]
+                - button "+ Note" [ref=e1879] [cursor=pointer]
+          - listitem [ref=e1880]:
+            - generic [ref=e1881]: "9.19"
+            - generic [ref=e1882]:
+              - generic [ref=e1883]: WIP Parts
+              - generic [ref=e1884]: Work in progress
+              - generic [ref=e1885]:
+                - button "V1" [ref=e1886] [cursor=pointer]
+                - button "Later" [ref=e1887] [cursor=pointer]
+                - button "Not needed" [ref=e1888] [cursor=pointer]
+                - button "+ Note" [ref=e1889] [cursor=pointer]
+          - listitem [ref=e1890]:
+            - generic [ref=e1891]: "9.20"
+            - generic [ref=e1892]:
+              - generic [ref=e1893]: WIP Summary
+              - generic [ref=e1894]: Work in progress
+              - generic [ref=e1895]:
+                - button "V1" [ref=e1896] [cursor=pointer]
+                - button "Later" [ref=e1897] [cursor=pointer]
+                - button "Not needed" [ref=e1898] [cursor=pointer]
+                - button "+ Note" [ref=e1899] [cursor=pointer]
+          - listitem [ref=e1900]:
+            - generic [ref=e1901]: "9.21"
+            - generic [ref=e1902]:
+              - generic [ref=e1903]: Bill To
+              - generic [ref=e1904]: Customer
+              - generic [ref=e1905]:
+                - button "V1" [ref=e1906] [cursor=pointer]
+                - button "Later" [ref=e1907] [cursor=pointer]
+                - button "Not needed" [ref=e1908] [cursor=pointer]
+                - button "+ Note" [ref=e1909] [cursor=pointer]
+          - listitem [ref=e1910]:
+            - generic [ref=e1911]: "9.22"
+            - generic [ref=e1912]:
+              - generic [ref=e1913]: "Customer Communications: Text Messages"
+              - generic [ref=e1914]: Customer
+              - generic [ref=e1915]:
+                - button "V1" [ref=e1916] [cursor=pointer]
+                - button "Later" [ref=e1917] [cursor=pointer]
+                - button "Not needed" [ref=e1918] [cursor=pointer]
+                - button "+ Note" [ref=e1919] [cursor=pointer]
+          - listitem [ref=e1920]:
+            - generic [ref=e1921]: "9.23"
+            - generic [ref=e1922]:
+              - generic [ref=e1923]: Equipment Utilization
+              - generic [ref=e1924]: Customer
+              - generic [ref=e1925]:
+                - button "V1" [ref=e1926] [cursor=pointer]
+                - button "Later" [ref=e1927] [cursor=pointer]
+                - button "Not needed" [ref=e1928] [cursor=pointer]
+                - button "+ Note" [ref=e1929] [cursor=pointer]
+          - listitem [ref=e1930]:
+            - generic [ref=e1931]: "9.24"
+            - generic [ref=e1932]:
+              - generic [ref=e1933]: Fleet Cost per Unit
+              - generic [ref=e1934]: Customer
+              - generic [ref=e1935]:
+                - button "V1" [ref=e1936] [cursor=pointer]
+                - button "Later" [ref=e1937] [cursor=pointer]
+                - button "Not needed" [ref=e1938] [cursor=pointer]
+                - button "+ Note" [ref=e1939] [cursor=pointer]
+          - listitem [ref=e1940]:
+            - generic [ref=e1941]: "9.25"
+            - generic [ref=e1942]:
+              - generic [ref=e1943]: Fleet
+              - generic [ref=e1944]: Customer
+              - generic [ref=e1945]:
+                - button "V1" [ref=e1946] [cursor=pointer]
+                - button "Later" [ref=e1947] [cursor=pointer]
+                - button "Not needed" [ref=e1948] [cursor=pointer]
+                - button "+ Note" [ref=e1949] [cursor=pointer]
+          - listitem [ref=e1950]:
+            - generic [ref=e1951]: "9.26"
+            - generic [ref=e1952]:
+              - generic [ref=e1953]: Global Services / PMs
+              - generic [ref=e1954]: Customer
+              - generic [ref=e1955]:
+                - button "V1" [ref=e1956] [cursor=pointer]
+                - button "Later" [ref=e1957] [cursor=pointer]
+                - button "Not needed" [ref=e1958] [cursor=pointer]
+                - button "+ Note" [ref=e1959] [cursor=pointer]
+          - listitem [ref=e1960]:
+            - generic [ref=e1961]: "9.27"
+            - generic [ref=e1962]:
+              - generic [ref=e1963]: Invoices Created When Customer Was Over Limit Or Past Due
+              - generic [ref=e1964]: Customer
+              - generic [ref=e1965]:
+                - button "V1" [ref=e1966] [cursor=pointer]
+                - button "Later" [ref=e1967] [cursor=pointer]
+                - button "Not needed" [ref=e1968] [cursor=pointer]
+                - button "+ Note" [ref=e1969] [cursor=pointer]
+          - listitem [ref=e1970]:
+            - generic [ref=e1971]: "9.28"
+            - generic [ref=e1972]:
+              - generic [ref=e1973]: Pending Repairs
+              - generic [ref=e1974]: Customer
+              - generic [ref=e1975]:
+                - button "V1" [ref=e1976] [cursor=pointer]
+                - button "Later" [ref=e1977] [cursor=pointer]
+                - button "Not needed" [ref=e1978] [cursor=pointer]
+                - button "+ Note" [ref=e1979] [cursor=pointer]
+          - listitem [ref=e1980]:
+            - generic [ref=e1981]: "9.29"
+            - generic [ref=e1982]:
+              - generic [ref=e1983]: Shop Utilization
+              - generic [ref=e1984]: Customer
+              - generic [ref=e1985]:
+                - button "V1" [ref=e1986] [cursor=pointer]
+                - button "Later" [ref=e1987] [cursor=pointer]
+                - button "Not needed" [ref=e1988] [cursor=pointer]
+                - button "+ Note" [ref=e1989] [cursor=pointer]
+          - listitem [ref=e1990]:
+            - generic [ref=e1991]: "9.30"
+            - generic [ref=e1992]:
+              - generic [ref=e1993]: Unit Possession (Receive / Release)
+              - generic [ref=e1994]: Customer
+              - generic [ref=e1995]:
+                - button "V1" [ref=e1996] [cursor=pointer]
+                - button "Later" [ref=e1997] [cursor=pointer]
+                - button "Not needed" [ref=e1998] [cursor=pointer]
+                - button "+ Note" [ref=e1999] [cursor=pointer]
+          - listitem [ref=e2000]:
+            - generic [ref=e2001]: "9.31"
+            - generic [ref=e2002]:
+              - generic [ref=e2003]: Warranty
+              - generic [ref=e2004]: Customer
+              - generic [ref=e2005]:
+                - button "V1" [ref=e2006] [cursor=pointer]
+                - button "Later" [ref=e2007] [cursor=pointer]
+                - button "Not needed" [ref=e2008] [cursor=pointer]
+                - button "+ Note" [ref=e2009] [cursor=pointer]
+          - listitem [ref=e2010]:
+            - generic [ref=e2011]: "9.32"
+            - generic [ref=e2012]:
+              - generic [ref=e2013]: Clocked Hours
+              - generic [ref=e2014]: Employee
+              - generic [ref=e2015]:
+                - button "V1" [ref=e2016] [cursor=pointer]
+                - button "Later" [ref=e2017] [cursor=pointer]
+                - button "Not needed" [ref=e2018] [cursor=pointer]
+                - button "+ Note" [ref=e2019] [cursor=pointer]
+          - listitem [ref=e2020]:
+            - generic [ref=e2021]: "9.33"
+            - generic [ref=e2022]:
+              - generic [ref=e2023]: Completed Hours
+              - generic [ref=e2024]: Employee
+              - generic [ref=e2025]:
+                - button "V1" [ref=e2026] [cursor=pointer]
+                - button "Later" [ref=e2027] [cursor=pointer]
+                - button "Not needed" [ref=e2028] [cursor=pointer]
+                - button "+ Note" [ref=e2029] [cursor=pointer]
+          - listitem [ref=e2030]:
+            - generic [ref=e2031]: "9.34"
+            - generic [ref=e2032]:
+              - generic [ref=e2033]: Employee Statistics
+              - generic [ref=e2034]: Employee
+              - generic [ref=e2035]:
+                - button "V1" [ref=e2036] [cursor=pointer]
+                - button "Later" [ref=e2037] [cursor=pointer]
+                - button "Not needed" [ref=e2038] [cursor=pointer]
+                - button "+ Note" [ref=e2039] [cursor=pointer]
+          - listitem [ref=e2040]:
+            - generic [ref=e2041]: "9.35"
+            - generic [ref=e2042]:
+              - generic [ref=e2043]: Invoiced Hours
+              - generic [ref=e2044]: Employee
+              - generic [ref=e2045]:
+                - button "V1" [ref=e2046] [cursor=pointer]
+                - button "Later" [ref=e2047] [cursor=pointer]
+                - button "Not needed" [ref=e2048] [cursor=pointer]
+                - button "+ Note" [ref=e2049] [cursor=pointer]
+          - listitem [ref=e2050]:
+            - generic [ref=e2051]: "9.36"
+            - generic [ref=e2052]:
+              - generic [ref=e2053]: Payroll Advance
+              - generic [ref=e2054]: Employee
+              - generic [ref=e2055]:
+                - button "V1" [ref=e2056] [cursor=pointer]
+                - button "Later" [ref=e2057] [cursor=pointer]
+                - button "Not needed" [ref=e2058] [cursor=pointer]
+                - button "+ Note" [ref=e2059] [cursor=pointer]
+          - listitem [ref=e2060]:
+            - generic [ref=e2061]: "9.37"
+            - generic [ref=e2062]:
+              - generic [ref=e2063]: SO Hours
+              - generic [ref=e2064]: Employee
+              - generic [ref=e2065]:
+                - button "V1" [ref=e2066] [cursor=pointer]
+                - button "Later" [ref=e2067] [cursor=pointer]
+                - button "Not needed" [ref=e2068] [cursor=pointer]
+                - button "+ Note" [ref=e2069] [cursor=pointer]
+          - listitem [ref=e2070]:
+            - generic [ref=e2071]: "9.38"
+            - generic [ref=e2072]:
+              - generic [ref=e2073]: Timesheet
+              - generic [ref=e2074]: Employee
+              - generic [ref=e2075]:
+                - button "V1" [ref=e2076] [cursor=pointer]
+                - button "Later" [ref=e2077] [cursor=pointer]
+                - button "Not needed" [ref=e2078] [cursor=pointer]
+                - button "+ Note" [ref=e2079] [cursor=pointer]
+          - listitem [ref=e2080]:
+            - generic [ref=e2081]: "9.39"
+            - generic [ref=e2082]:
+              - generic [ref=e2083]:
+                - text: Do you export reports, or just read them on screen?
+                - generic [ref=e2084]: Key
+              - generic [ref=e2085]: Changes whether export formats matter at all.
+              - generic [ref=e2086]:
+                - button "V1" [ref=e2087] [cursor=pointer]
+                - button "Later" [ref=e2088] [cursor=pointer]
+                - button "Not needed" [ref=e2089] [cursor=pointer]
+                - button "+ Note" [ref=e2090] [cursor=pointer]
+      - generic [ref=e2091]:
+        - generic [ref=e2092]:
+          - generic [ref=e2093]: "10"
+          - heading "Mobile & Tablets" [level=2] [ref=e2094]
+          - generic [ref=e2095]: 2/6 marked
+        - paragraph [ref=e2096]: You already told us techs use the web app bookmarked to an iPad or phone home screen, and nobody uses the native apps. The one thing still open is what happens when the wifi drops.
+        - list [ref=e2097]:
+          - listitem [ref=e2098]:
+            - generic [ref=e2099]: "10.1"
+            - generic [ref=e2100]:
+              - generic [ref=e2101]:
+                - text: Web app bookmarked to the home screen
+                - generic [ref=e2102]: Confirmed
+              - generic [ref=e2103]: Your actual pattern today, on iPad and phone.
+              - generic [ref=e2104]:
+                - button "V1" [pressed] [ref=e2105] [cursor=pointer]
+                - button "Later" [ref=e2106] [cursor=pointer]
+                - button "Not needed" [ref=e2107] [cursor=pointer]
+                - button "+ Note" [ref=e2108] [cursor=pointer]
+          - listitem [ref=e2109]:
+            - generic [ref=e2110]: "10.2"
+            - generic [ref=e2111]:
+              - generic [ref=e2112]:
+                - text: Native iOS / Android app
+                - generic [ref=e2113]: Confirmed
+              - generic [ref=e2114]: Exists, but you told us nobody uses it.
+              - generic [ref=e2115]:
+                - button "V1" [ref=e2116] [cursor=pointer]
+                - button "Later" [ref=e2117] [cursor=pointer]
+                - button "Not needed" [pressed] [ref=e2118] [cursor=pointer]
+                - button "+ Note" [ref=e2119] [cursor=pointer]
+          - listitem [ref=e2120]:
+            - generic [ref=e2121]: "10.3"
+            - generic [ref=e2122]:
+              - generic [ref=e2123]:
+                - text: How bad is the wifi in the bays, honestly?
+                - generic [ref=e2124]: Key
+              - generic [ref=e2125]: If a tech loses connection mid-job and it costs them work, the new system needs offline support — and that roughly doubles the build. This is the biggest single swing in the whole project.
+              - generic [ref=e2126]:
+                - button "V1" [ref=e2127] [cursor=pointer]
+                - button "Later" [ref=e2128] [cursor=pointer]
+                - button "Not needed" [ref=e2129] [cursor=pointer]
+                - button "+ Note" [ref=e2130] [cursor=pointer]
+          - listitem [ref=e2131]:
+            - generic [ref=e2132]: "10.4"
+            - generic [ref=e2133]:
+              - generic [ref=e2134]: Mileage capture on mobile
+              - generic [ref=e2135]: Recording miles from a phone.
+              - generic [ref=e2136]:
+                - button "V1" [ref=e2137] [cursor=pointer]
+                - button "Later" [ref=e2138] [cursor=pointer]
+                - button "Not needed" [ref=e2139] [cursor=pointer]
+                - button "+ Note" [ref=e2140] [cursor=pointer]
+          - listitem [ref=e2141]:
+            - generic [ref=e2142]: "10.5"
+            - generic [ref=e2143]:
+              - generic [ref=e2144]: Paperless order / estimate / invoice on mobile
+              - generic [ref=e2145]: Full job on a device.
+              - generic [ref=e2146]:
+                - button "V1" [ref=e2147] [cursor=pointer]
+                - button "Later" [ref=e2148] [cursor=pointer]
+                - button "Not needed" [ref=e2149] [cursor=pointer]
+                - button "+ Note" [ref=e2150] [cursor=pointer]
+          - listitem [ref=e2151]:
+            - generic [ref=e2152]: "10.6"
+            - generic [ref=e2153]:
+              - generic [ref=e2154]: Taking payment in the field
+              - generic [ref=e2155]: Mobile payment collection.
+              - generic [ref=e2156]:
+                - button "V1" [ref=e2157] [cursor=pointer]
+                - button "Later" [ref=e2158] [cursor=pointer]
+                - button "Not needed" [ref=e2159] [cursor=pointer]
+                - button "+ Note" [ref=e2160] [cursor=pointer]
+      - generic [ref=e2161]:
+        - generic [ref=e2162]:
+          - generic [ref=e2163]: "11"
+          - heading "Integrations" [level=2] [ref=e2164]
+          - generic [ref=e2165]: 4/17 marked
+        - paragraph [ref=e2166]: Each live integration is real work to replace. Each dead one is free. Several are already answered.
+        - list [ref=e2167]:
+          - listitem [ref=e2168]:
+            - generic [ref=e2169]: "11.1"
+            - generic [ref=e2170]:
+              - generic [ref=e2171]:
+                - text: FullBay API
+                - generic [ref=e2172]: Key
+              - generic [ref=e2173]: We've confirmed it only returns invoice detail. Nothing else answers usefully, and there's no way to write anything back in.
+              - generic [ref=e2174]:
+                - button "V1" [ref=e2175] [cursor=pointer]
+                - button "Later" [ref=e2176] [cursor=pointer]
+                - button "Not needed" [ref=e2177] [cursor=pointer]
+                - button "+ Note" [ref=e2178] [cursor=pointer]
+          - listitem [ref=e2179]:
+            - generic [ref=e2180]: "11.2"
+            - generic [ref=e2181]:
+              - generic [ref=e2182]:
+                - text: Can FullBay export your data at all?
+                - generic [ref=e2183]: Key
+              - generic [ref=e2184]: Any report, CSV or data dump. The API can't supply history, so this is the only path. The single highest-risk unknown in the project.
+              - generic [ref=e2185]:
+                - button "V1" [ref=e2186] [cursor=pointer]
+                - button "Later" [ref=e2187] [cursor=pointer]
+                - button "Not needed" [ref=e2188] [cursor=pointer]
+                - button "+ Note" [ref=e2189] [cursor=pointer]
+          - listitem [ref=e2190]:
+            - generic [ref=e2191]: "11.3"
+            - generic [ref=e2192]:
+              - generic [ref=e2193]:
+                - text: QuickBooks
+                - generic [ref=e2194]: Confirmed
+              - generic [ref=e2195]: Confirmed in active use.
+              - generic [ref=e2196]:
+                - button "V1" [pressed] [ref=e2197] [cursor=pointer]
+                - button "Later" [ref=e2198] [cursor=pointer]
+                - button "Not needed" [ref=e2199] [cursor=pointer]
+                - button "+ Note" [ref=e2200] [cursor=pointer]
+          - listitem [ref=e2201]:
+            - generic [ref=e2202]: "11.4"
+            - generic [ref=e2203]:
+              - generic [ref=e2204]:
+                - text: Spike (in-app AI help assistant)
+                - generic [ref=e2205]: Confirmed
+              - generic [ref=e2206]: You told us your guys use this a lot for figuring out FullBay. Worth noting as a real need — in-app help — not necessarily an AI feature to rebuild.
+              - generic [ref=e2207]:
+                - button "V1" [ref=e2208] [cursor=pointer]
+                - button "Later" [pressed] [ref=e2209] [cursor=pointer]
+                - button "Not needed" [ref=e2210] [cursor=pointer]
+                - button "+ Note" [ref=e2211] [cursor=pointer]
+          - listitem [ref=e2212]:
+            - generic [ref=e2213]: "11.5"
+            - generic [ref=e2214]:
+              - generic [ref=e2215]:
+                - text: AI Receptionist (Claudia)
+                - generic [ref=e2216]: Confirmed
+              - generic [ref=e2217]: "You told us: not used, not trialed, not a fit."
+              - generic [ref=e2218]:
+                - button "V1" [ref=e2219] [cursor=pointer]
+                - button "Later" [ref=e2220] [cursor=pointer]
+                - button "Not needed" [pressed] [ref=e2221] [cursor=pointer]
+                - button "+ Note" [ref=e2222] [cursor=pointer]
+          - listitem [ref=e2223]:
+            - generic [ref=e2224]: "11.6"
+            - generic [ref=e2225]:
+              - generic [ref=e2226]:
+                - text: VMRS coding
+                - generic [ref=e2227]: Confirmed
+              - generic [ref=e2228]: Nothing in your live configuration, and your own contact wasn't familiar with it.
+              - generic [ref=e2229]:
+                - button "V1" [ref=e2230] [cursor=pointer]
+                - button "Later" [ref=e2231] [cursor=pointer]
+                - button "Not needed" [pressed] [ref=e2232] [cursor=pointer]
+                - button "+ Note" [ref=e2233] [cursor=pointer]
+          - listitem [ref=e2234]:
+            - generic [ref=e2235]: "11.7"
+            - generic [ref=e2236]:
+              - generic [ref=e2237]:
+                - text: MOTOR
+                - generic [ref=e2238]: Key
+              - generic [ref=e2239]: Labor time guide, HD service guide, parts cross-reference.
+              - generic [ref=e2240]:
+                - button "V1" [ref=e2241] [cursor=pointer]
+                - button "Later" [ref=e2242] [cursor=pointer]
+                - button "Not needed" [ref=e2243] [cursor=pointer]
+                - button "+ Note" [ref=e2244] [cursor=pointer]
+          - listitem [ref=e2245]:
+            - generic [ref=e2246]: "11.8"
+            - generic [ref=e2247]:
+              - generic [ref=e2248]: Mitchell 1 (ProDemand / TruckSeries)
+              - generic [ref=e2249]: Labor guide and repair information.
+              - generic [ref=e2250]:
+                - button "V1" [ref=e2251] [cursor=pointer]
+                - button "Later" [ref=e2252] [cursor=pointer]
+                - button "Not needed" [ref=e2253] [cursor=pointer]
+                - button "+ Note" [ref=e2254] [cursor=pointer]
+          - listitem [ref=e2255]:
+            - generic [ref=e2256]: "11.9"
+            - generic [ref=e2257]:
+              - generic [ref=e2258]: Whip Around
+              - generic [ref=e2259]: Driver DVIR intake.
+              - generic [ref=e2260]:
+                - button "V1" [ref=e2261] [cursor=pointer]
+                - button "Later" [ref=e2262] [cursor=pointer]
+                - button "Not needed" [ref=e2263] [cursor=pointer]
+                - button "+ Note" [ref=e2264] [cursor=pointer]
+          - listitem [ref=e2265]:
+            - generic [ref=e2266]: "11.10"
+            - generic [ref=e2267]:
+              - generic [ref=e2268]: Pitstop
+              - generic [ref=e2269]: Predictive maintenance and fault codes.
+              - generic [ref=e2270]:
+                - button "V1" [ref=e2271] [cursor=pointer]
+                - button "Later" [ref=e2272] [cursor=pointer]
+                - button "Not needed" [ref=e2273] [cursor=pointer]
+                - button "+ Note" [ref=e2274] [cursor=pointer]
+          - listitem [ref=e2275]:
+            - generic [ref=e2276]: "11.11"
+            - generic [ref=e2277]:
+              - generic [ref=e2278]: FleetNet
+              - generic [ref=e2279]: Emergency and roadside intake.
+              - generic [ref=e2280]:
+                - button "V1" [ref=e2281] [cursor=pointer]
+                - button "Later" [ref=e2282] [cursor=pointer]
+                - button "Not needed" [ref=e2283] [cursor=pointer]
+                - button "+ Note" [ref=e2284] [cursor=pointer]
+          - listitem [ref=e2285]:
+            - generic [ref=e2286]: "11.12"
+            - generic [ref=e2287]:
+              - generic [ref=e2288]:
+                - text: Two-way texting
+                - generic [ref=e2289]: Key
+              - generic [ref=e2290]: Texting customers and techs from inside FullBay.
+              - generic [ref=e2291]:
+                - button "V1" [ref=e2292] [cursor=pointer]
+                - button "Later" [ref=e2293] [cursor=pointer]
+                - button "Not needed" [ref=e2294] [cursor=pointer]
+                - button "+ Note" [ref=e2295] [cursor=pointer]
+          - listitem [ref=e2296]:
+            - generic [ref=e2297]: "11.13"
+            - generic [ref=e2298]:
+              - generic [ref=e2299]: FullBay Payments (Stripe)
+              - generic [ref=e2300]: Card, ACH, wallet and BNPL processing.
+              - generic [ref=e2301]:
+                - button "V1" [ref=e2302] [cursor=pointer]
+                - button "Later" [ref=e2303] [cursor=pointer]
+                - button "Not needed" [ref=e2304] [cursor=pointer]
+                - button "+ Note" [ref=e2305] [cursor=pointer]
+          - listitem [ref=e2306]:
+            - generic [ref=e2307]: "11.14"
+            - generic [ref=e2308]:
+              - generic [ref=e2309]: FullBay Marketplace / FinditParts
+              - generic [ref=e2310]: In-app parts ordering.
+              - generic [ref=e2311]:
+                - button "V1" [ref=e2312] [cursor=pointer]
+                - button "Later" [ref=e2313] [cursor=pointer]
+                - button "Not needed" [ref=e2314] [cursor=pointer]
+                - button "+ Note" [ref=e2315] [cursor=pointer]
+          - listitem [ref=e2316]:
+            - generic [ref=e2317]: "11.15"
+            - generic [ref=e2318]:
+              - generic [ref=e2319]:
+                - text: GPS / telematics
+                - generic [ref=e2320]: Key
+              - generic [ref=e2321]: "Nine providers supported: Azuga, Geotab, GeoForce, GPS Trackit, Linxup, Motive, Samsara, US Fleet Tracking, Verizon Connect. Any of them live?"
+              - generic [ref=e2322]:
+                - button "V1" [ref=e2323] [cursor=pointer]
+                - button "Later" [ref=e2324] [cursor=pointer]
+                - button "Not needed" [ref=e2325] [cursor=pointer]
+                - button "+ Note" [ref=e2326] [cursor=pointer]
+          - listitem [ref=e2327]:
+            - generic [ref=e2328]: "11.16"
+            - generic [ref=e2329]:
+              - generic [ref=e2330]: Dieselmatic
+              - generic [ref=e2331]: Shop website and marketing add-on.
+              - generic [ref=e2332]:
+                - button "V1" [ref=e2333] [cursor=pointer]
+                - button "Later" [ref=e2334] [cursor=pointer]
+                - button "Not needed" [ref=e2335] [cursor=pointer]
+                - button "+ Note" [ref=e2336] [cursor=pointer]
+          - listitem [ref=e2337]:
+            - generic [ref=e2338]: "11.17"
+            - generic [ref=e2339]:
+              - generic [ref=e2340]: Anything else you pay for that touches FullBay?
+              - generic [ref=e2341]: Free text — anything we missed.
+              - generic [ref=e2342]:
+                - button "V1" [ref=e2343] [cursor=pointer]
+                - button "Later" [ref=e2344] [cursor=pointer]
+                - button "Not needed" [ref=e2345] [cursor=pointer]
+                - button "+ Note" [ref=e2346] [cursor=pointer]
+    - generic [ref=e2347]:
+      - heading "Results" [level=2] [ref=e2348]
+      - generic [ref=e2349]:
+        - paragraph [ref=e2350]: Builds a plain-text summary grouped by V1 / Later / Not needed, with every comment attached. Copy it and paste it anywhere — email, Notes, a message to Dave. Do this before you close the tab if you want a copy off this device.
+        - generic [ref=e2351]:
+          - button "Build summary" [ref=e2352] [cursor=pointer]
+          - button "Copy to clipboard" [ref=e2353] [cursor=pointer]
+          - button "Print / Save PDF" [ref=e2354] [cursor=pointer]
+          - button "Start over" [ref=e2355] [cursor=pointer]
+  - contentinfo [ref=e2356]: "Sources: logged-in FullBay walkthrough + help center (12 collections, ~440 articles), FullBay marketing, and answers OTC already gave. Rows marked confirmed are things you’ve already told us — just check we got them right."

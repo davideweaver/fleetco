@@ -1,0 +1,2 @@
+[     132ms] [WARNING] <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes"> @ http://localhost:8731/fullbay-punch-list.html:0
+[     134ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8731/favicon.ico:0

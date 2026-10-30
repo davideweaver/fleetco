@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FullBay Surface Map — scope of what Fleetco must replace</title>
+<style>
+.viz-root{
+  color-scheme: light;
+  --surface-0:#f4f4f2; --surface-1:#fcfcfb; --surface-2:#eeeeec;
+  --text-primary:#0b0b0b; --text-secondary:#52514e; --text-muted:#78776f;
+  --rule:#dcdcd6;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100;
+  --s5:#e87ba4; --s6:#008300; --s7:#4a3aa7; --s8:#e34948;
+  --accent:#2a78d6;
+}
+@media (prefers-color-scheme: dark){
+  :root:where(:not([data-theme="light"])) .viz-root{
+    color-scheme: dark;
+    --surface-0:#141413; --surface-1:#1a1a19; --surface-2:#232321;
+    --text-primary:#ffffff; --text-secondary:#c3c2b7; --text-muted:#8d8c82;
+    --rule:#33332f;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
+    --s5:#d55181; --s6:#008300; --s7:#9085e9; --s8:#e66767;
+    --accent:#3987e5;
+  }
+}
+:root[data-theme="dark"] .viz-root{
+  color-scheme: dark;
+  --surface-0:#141413; --surface-1:#1a1a19; --surface-2:#232321;
+  --text-primary:#ffffff; --text-secondary:#c3c2b7; --text-muted:#8d8c82;
+  --rule:#33332f;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
+  --s5:#d55181; --s6:#008300; --s7:#9085e9; --s8:#e66767;
+  --accent:#3987e5;
+}
+*{box-sizing:border-box}
+body{margin:0;font:15px/1.55 ui-sans-serif,-apple-system,"Segoe UI",system-ui,sans-serif;}
+.viz-root{background:var(--surface-0);color:var(--text-primary);min-height:100vh;padding:40px 28px 80px}
+.wrap{max-width:1180px;margin:0 auto}
+h1{font-size:26px;margin:0 0 6px;letter-spacing:-.02em}
+.sub{color:var(--text-secondary);margin:0 0 4px;font-size:15px}
+.meta{color:var(--text-muted);font-size:12.5px;margin:0 0 30px}
+h2{font-size:17px;margin:42px 0 4px;letter-spacing:-.01em}
+h2 .n{color:var(--text-muted);font-weight:400;font-size:14px;margin-left:8px}
+.lede{color:var(--text-secondary);font-size:14px;margin:0 0 18px;max-width:74ch}
+
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:0 0 8px}
+.tile{background:var(--surface-1);border:1px solid var(--rule);border-radius:10px;padding:16px 16px 14px}
+.tile .v{font-size:30px;font-weight:650;letter-spacing:-.03em;line-height:1}
+.tile .l{font-size:12.5px;color:var(--text-secondary);margin-top:7px}
+.tile .n{font-size:11.5px;color:var(--text-muted);margin-top:3px}
+.tile.hero{background:var(--surface-2);border-color:var(--accent)}
+.tile.hero .v{color:var(--accent)}
+
+.call{background:var(--surface-1);border:1px solid var(--rule);border-left:3px solid var(--accent);
+  border-radius:8px;padding:16px 18px;margin:26px 0 0;max-width:86ch}
+.call b{color:var(--text-primary)}
+.call p{margin:0 0 9px;color:var(--text-secondary);font-size:14px}
+.call p:last-child{margin:0}
+
+table{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:6px}
+th{text-align:left;font-weight:600;color:var(--text-secondary);font-size:11.5px;
+  text-transform:uppercase;letter-spacing:.055em;padding:0 10px 8px 0;border-bottom:1px solid var(--rule)}
+td{padding:9px 10px 9px 0;border-bottom:1px solid var(--rule);vertical-align:top;color:var(--text-secondary)}
+td.pri{color:var(--text-primary)}
+th.num,td.num{text-align:right;padding-right:0;font-variant-numeric:tabular-nums}
+
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:550;
+  padding:3px 9px 3px 7px;border-radius:20px;background:var(--surface-2);
+  border:1px solid var(--rule);color:var(--text-primary);white-space:nowrap}
+.dot{width:9px;height:9px;border-radius:50%;flex:none}
+.a1{background:var(--s1)}.a2{background:var(--s2)}.a3{background:var(--s3)}.a4{background:var(--s4)}
+.a5{background:var(--s5)}.a6{background:var(--s6)}.a7{background:var(--s7)}.a8{background:var(--s8)}
+
+.bar{height:9px;border-radius:4px;background:var(--surface-2);overflow:hidden;min-width:70px}
+.bar>i{display:block;height:100%;border-radius:4px;background:var(--accent)}
+
+.mods{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px;margin-top:8px}
+.mod{background:var(--surface-1);border:1px solid var(--rule);border-radius:10px;padding:15px 16px 13px}
+.mod h3{margin:0 0 2px;font-size:14.5px;display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.mod h3 em{font-style:normal;font-size:11.5px;color:var(--text-muted);font-weight:400;white-space:nowrap}
+.mod .mm{font-size:11.5px;color:var(--text-muted);margin:0 0 11px}
+.scr{display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-top:1px solid var(--rule);font-size:13px}
+.scr:first-of-type{border-top:none}
+.scr .nm{flex:1;color:var(--text-primary)}
+.scr .nm s{display:block;color:var(--text-muted);font-size:11.5px;text-decoration:none;margin-top:1px}
+.heavy{box-shadow:inset 3px 0 0 var(--s8)}
+
+.foot{margin-top:46px;padding-top:18px;border-top:1px solid var(--rule);
+  font-size:12.5px;color:var(--text-muted);max-width:84ch}
+.foot b{color:var(--text-secondary)}
+.toggle{position:fixed;top:14px;right:16px;background:var(--surface-1);color:var(--text-secondary);
+  border:1px solid var(--rule);border-radius:7px;padding:6px 11px;font-size:12px;cursor:pointer;font-family:inherit}
+</style>
+</head>
+<body>
+<div class="viz-root">
+<button class="toggle" onclick="document.documentElement.dataset.theme=document.documentElement.dataset.theme==='dark'?'light':'dark'">theme</button>
+<div class="wrap">
+
+<h1>FullBay Surface Map</h1>
+<p class="sub">How big the thing Fleetco wants replaced actually is — and where the work concentrates.</p>
+<p class="meta">Derived from <strong>Feature Inventory Draft.md</strong> (public sources + a logged-in walkthrough of a live account), 2026-10-09.
+Screen and entity counts are <strong>inferred from observed navigation and features</strong>, not a screen-by-screen audit — treat as ±20%.</p>
+
+<div class="tiles">
+  <div class="tile"><div class="v">~64</div><div class="l">Distinct screens</div><div class="n">55 shop · 9 portal</div></div>
+  <div class="tile"><div class="v">~58</div><div class="l">Data entities</div><div class="n">~20 are core</div></div>
+  <div class="tile hero"><div class="v">8</div><div class="l">Page archetypes</div><div class="n">the number that matters</div></div>
+  <div class="tile"><div class="v">38</div><div class="l">Canned reports</div><div class="n">1 screen, 38 configs</div></div>
+  <div class="tile"><div class="v">2</div><div class="l">Nav depth, shop</div><div class="n">section → record</div></div>
+  <div class="tile"><div class="v">1</div><div class="l">Nav depth, portal</div><div class="n">genuinely flat</div></div>
+</div>
+
+<div class="call">
+  <p><b>The headline: 64 screens is not 64 problems.</b> Every screen in FullBay reduces to one of
+  <b>eight archetypes</b>. Build the eight well and the rest is configuration — a model, a column set,
+  a form schema. That is the difference between a two-year build and a tractable one.</p>
+  <p><b>Three things inflate the apparent size and shouldn't.</b> The service-order list has
+  <b>13 tabs</b>, but they are 13 saved filters over one list — one screen. <b>38 reports</b> are one
+  parameterised viewer. <b>~20 settings pages</b> are one form archetype repeated. Together that is
+  ~70 apparent pages collapsing to three real ones.</p>
+  <p><b>And one thing is genuinely hard.</b> The Service Order → Action Item editor is a nested,
+  multi-tab, multi-role editor with parts, labor, authorization state, and photos per line. It is
+  one screen and plausibly a quarter of the entire frontend effort. Everything else is ordinary.</p>
+</div>
+
+<h2>The eight archetypes <span class="n">build these, configure the rest</span></h2>
+<p class="lede">Effort share is a judgement call, not measured — it reflects how much of the frontend build each archetype plausibly consumes.</p>
+<table>
+<thead><tr><th>Archetype</th><th>What it is</th><th class="num">Screens</th><th style="width:130px">Effort share</th></tr></thead>
+<tbody>
+<tr><td><span class="badge"><i class="dot a8"></i>Nested editor</span></td><td class="pri">SO → Action Items → Parts / Labor tabs, per-line authorization state. <b>The hard one.</b></td><td class="num">1</td><td><div class="bar"><i style="width:100%"></i></div></td></tr>
+<tr><td><span class="badge"><i class="dot a2"></i>List + saved views</span></td><td>Filterable, sortable table with named saved filters. SOs, customers, units, parts, POs, invoices, timesheets.</td><td class="num">11</td><td><div class="bar"><i style="width:62%"></i></div></td></tr>
+<tr><td><span class="badge"><i class="dot a3"></i>Record detail</span></td><td>Master–detail: header fields plus related-record tabs. Customer, unit, part, vendor, PO.</td><td class="num">9</td><td><div class="bar"><i style="width:52%"></i></div></td></tr>
+<tr><td><span class="badge"><i class="dot a7"></i>Settings form</span></td><td>Config form over one entity. Roles, rates, pricing matrices, unit types, tax, accounts, integrations.</td><td class="num">~20</td><td><div class="bar"><i style="width:34%"></i></div></td></tr>
+<tr><td><span class="badge"><i class="dot a1"></i>Board / kanban</span></td><td>Stage-column pipeline with drag between stages. Shop service board, portal active services.</td><td class="num">2</td><td><div class="bar"><i style="width:30%"></i></div></td></tr>
+<tr><td><span class="badge"><i class="dot a4"></i>Wizard / flow</span></td><td>Multi-step guided task. New SO, send estimate, receive PO, counter sale, cycle count.</td><td class="num">6</td><td><div class="bar"><i style="width:28%"></i></div></td></tr>
+<tr><td><span class="badge"><i class="dot a5"></i>Report viewer</span></td><td>Parameterised canned report — filters, table, export. One screen, 38 configurations.</td><td class="num">1</td><td><div class="bar"><i style="width:18%"></i></div></td></tr>
+<tr><td><span class="badge"><i class="dot a6"></i>Dashboard / stats</span></td><td>Read-only tile grid. Tech Home (Comp. hrs, Efficiency, Utilization), shop overview.</td><td class="num">2</td><td><div class="bar"><i style="width:12%"></i></div></td></tr>
+</tbody>
+</table>
+
+<h2>Module map <span class="n">shop application</span></h2>
+<p class="lede">Red left-edge marks the screen that carries disproportionate complexity.</p>
+<div class="mods">
+
+<div class="mod"><h3>Service Orders <em>8 screens</em></h3><div class="mm">ServiceOrder · ActionItem · LaborLine · PartLine · ServiceRequest · Sublet</div>
+<div class="scr heavy"><span class="nm">SO detail + Action Item editor<s>nested tabs, per-line auth, photos</s></span><span class="badge"><i class="dot a8"></i>Nested</span></div>
+<div class="scr"><span class="nm">Service board<s>Unassigned → Assign → Diagnose → Price → Authorize → Repair</s></span><span class="badge"><i class="dot a1"></i>Board</span></div>
+<div class="scr"><span class="nm">SO list<s>13 saved views: In Process, On Hold, PMs, Estimates…</s></span><span class="badge"><i class="dot a2"></i>List</span></div>
+<div class="scr"><span class="nm">Quick SO / Quick Estimate<s>two lighter creation paths</s></span><span class="badge"><i class="dot a4"></i>Wizard</span></div>
+<div class="scr"><span class="nm">Service requests<s>intake queue, urgency field</s></span><span class="badge"><i class="dot a2"></i>List</span></div>
+<div class="scr"><span class="nm">Schedule / calendar<s>bay + employee work schedules</s></span><span class="badge"><i class="dot a3"></i>Detail</span></div>
+</div>
+
+<div class="mod"><h3>Estimates &amp; Authorization <em>3 screens</em></h3><div class="mm">Estimate · Authorization · GlobalService · PartKit</div>
+<div class="scr"><span class="nm">Send for authorization<s>portal / text / email</s></span><span class="badge"><i class="dot a4"></i>Wizard</span></div>
+<div class="scr"><span class="nm">Canned jobs / part kits<s>reusable labor+parts templates</s></span><span class="badge"><i class="dot a2"></i>List</span></div>
+<div class="scr"><span class="nm">Canned job editor</span><span class="badge"><i class="dot a3"></i>Detail</span></div>
+</div>
+
+<div class="mod"><h3>Parts &amp; Inventory <em>12 screens</em></h3><div class="mm">Part · Bin · Vendor · PO · POLine · Core · CounterSale · Adjustment · CycleCount · Transfer</div>
+<div class="scr"><span class="nm">Parts list<s>search tags, min/max, locations</s></span><span class="badge"><i class="dot a2"></i>List</span></div>
+<div class="scr"><span class="nm">Part detail<s>cores, pricing scales, cost floor</s></span><span class="badge"><i class="dot a3"></i>Detail</span></div>
+<div class="scr"><span class="nm">Purchase orders<s>combined POs, needs-ordered list</s></span><span class="badge"><i class="dot a2"></i>List</span></div>
+<div class="scr"><span class="nm">PO detail + receive<s>partial receipt, returns</s></span><span class="badge"><i class="dot a4"></i>Wizard</span></div>
+<div class="scr"><span class="nm">Vendors<s>bills, payments, credit memos</s></span><span class="badge"><i class="dot a3"></i>Detail</span></div>
+<div class="scr"><span class="nm">Counter sale<s>walk-in, no SO</s></span><span class="badge"><i class="dot a4"></i>Wizard</span></div>
+<div class="scr"><span class="nm">Cycle count / adjustments<s>+ intra-company transfers</s></span><span class="badge"><i class="dot a4"></i>Wizard</span></div>
+</div>
+
+<div class="mod"><h3>Customers &amp; Units <em>6 screens</em></h3><div class="mm">Customer · Contact · Address · Unit · UnitType · MeterReading</div>
+<div class="scr"><span class="nm">Customer list</span><span class="badge"><i class="dot a2"></i>List</span></div>
+<div class="scr"><span class="nm">Customer detail<s>4 delegated decision-maker roles, portal link</s></span><span class="badge"><i class="dot a3"></i>Detail</span></div>
+<div class="scr"><span class="nm">Unit list<s>status filter, fleet report</s></span><span class="badge"><i class="dot a2"></i>List</span></div>
+<div class="scr"><span class="nm">Unit detail<s>PM history, meters, location</s></span><span class="badge"><i class="dot a3"></i>Detail</span></div>
+</div>
+
+<div class="mod"><h3>PM Scheduling <em>4 screens</em></h3><div class="mm">PMSchedule · PMDefinition · Procedure · UnitType</div>
+<div class="scr"><span class="nm">PM due list<s>coming-due window, auto-gen SOs</s></span><span class="badge"><i class="dot a2"></i>List</span></div>
+<div class="scr"><span class="nm">PM definition editor<s>mileage / hours / calendar intervals</s></span><span class="badge"><i class="dot a3"></i>Detail</span></div>
+<div class="scr"><span class="nm">Batch add PM to units</span><span class="badge"><i class="dot a4"></i>Wizard</span></div>
+</div>
+
+<div class="mod"><h3>Labor &amp; Time <em>4 screens</em></h3><div class="mm">Timesheet · TimeEntry · Activity · Employee</div>
+<div class="scr"><span class="nm">Tech Home<s>Comp. hrs · Efficiency · Utilization · Clocked</s></span><span class="badge"><i class="dot a6"></i>Stats</span></div>
+<div class="scr"><span class="nm">Clock in / out<s>per job, optional GPS stamp</s></span><span class="badge"><i class="dot a6"></i>Stats</span></div>
+<div class="scr"><span class="nm">Timesheet list + correction<s>manager approval before payroll</s></span><span class="badge"><i class="dot a2"></i>List</span></div>
+</div>
+
+<div class="mod"><h3>Invoicing &amp; Payments <em>7 screens</em></h3><div class="mm">Invoice · Payment · CreditMemo · Refund · Statement · ChartOfAccount · TaxRate</div>
+<div class="scr"><span class="nm">Invoice list<s>A/R aging</s></span><span class="badge"><i class="dot a2"></i>List</span></div>
+<div class="scr"><span class="nm">Invoice detail<s>shop supplies, tax breakout</s></span><span class="badge"><i class="dot a3"></i>Detail</span></div>
+<div class="scr"><span class="nm">Take payment<s>card / ACH / signature</s></span><span class="badge"><i class="dot a4"></i>Wizard</span></div>
+<div class="scr"><span class="nm">Statements / credit memos</span><span class="badge"><i class="dot a2"></i>List</span></div>
+<div class="scr"><span class="nm">Quick Charge<s>payment with no SO</s></span><span class="badge"><i class="dot a4"></i>Wizard</span></div>
+</div>
+
+<div class="mod"><h3>Reporting <em>2 screens</em></h3><div class="mm">no new entities — reads everything</div>
+<div class="scr"><span class="nm">Report index<s>5 categories</s></span><span class="badge"><i class="dot a2"></i>List</span></div>
+<div class="scr"><span class="nm">Report viewer<s><b>38 canned reports</b>, no builder — one screen</s></span><span class="badge"><i class="dot a5"></i>Report</span></div>
+</div>
+
+<div class="mod"><h3>Settings &amp; Admin <em>~20 screens</em></h3><div class="mm">Role · LaborRate · PricingMatrix · UnitType · TaxRate · Account · Shop · Integration</div>
+<div class="scr"><span class="nm">Employees &amp; roles<s>custom roles, change history</s></span><span class="badge"><i class="dot a7"></i>Settings</span></div>
+<div class="scr"><span class="nm">Labor rates / pricing matrices / cost floor</span><span class="badge"><i class="dot a7"></i>Settings</span></div>
+<div class="scr"><span class="nm">Unit types, PM templates, tax, accounts</span><span class="badge"><i class="dot a7"></i>Settings</span></div>
+<div class="scr"><span class="nm">Shop config &amp; integrations<s>~15 more of the same shape</s></span><span class="badge"><i class="dot a7"></i>Settings</span></div>
+</div>
+
+</div>
+
+<h2>Module map <span class="n">customer portal — genuinely small</span></h2>
+<p class="lede">Seven flat sections plus an authorize view. No login to build: access is a per-customer tokenised URL.</p>
+<div class="mods">
+<div class="mod"><h3>Customer Portal <em>9 screens</em></h3><div class="mm">reuses shop entities · no new models · no auth system</div>
+<div class="scr"><span class="nm">Active Services<s>own stage names: Submitted → Evaluating → Ready to authorize → In progress</s></span><span class="badge"><i class="dot a1"></i>Board</span></div>
+<div class="scr heavy"><span class="nm">Estimate authorize view<s>Concern/Cause/Correction, per-line Yes/No, Toggle All</s></span><span class="badge"><i class="dot a8"></i>Nested</span></div>
+<div class="scr"><span class="nm">Units<s>+ customer can add their own</s></span><span class="badge"><i class="dot a2"></i>List</span></div>
+<div class="scr"><span class="nm">Invoices<s>Current / Coming Due / Past Due, batch pay</s></span><span class="badge"><i class="dot a2"></i>List</span></div>
+<div class="scr"><span class="nm">Payments &amp; methods<s>self-add card / ACH</s></span><span class="badge"><i class="dot a4"></i>Wizard</span></div>
+<div class="scr"><span class="nm">Messages · Contacts · Configuration</span><span class="badge"><i class="dot a7"></i>Settings</span></div>
+<div class="scr"><span class="nm">Request service</span><span class="badge"><i class="dot a4"></i>Wizard</span></div>
+</div>
+</div>
+
+<h2>Does the navigation need hierarchy?</h2>
+<div class="call">
+  <p><b>No — two levels is enough on the shop side, one on the portal.</b> Nothing observed in FullBay
+  goes deeper than <em>section → record → tab</em>, and the tabs are within-record, not navigation.</p>
+  <p><b>What the shell needs:</b> a flat primary nav of roughly nine sections (Service, Schedule,
+  Customers, Units, Parts, Purchasing, Time, Invoicing, Reports) plus Settings; <b>saved views</b> as a
+  first-class concept on every list, because that is how FullBay's 13 SO tabs actually work; and a
+  <b>global search</b>, since deep hierarchy is what you'd otherwise need to find a unit by VIN.</p>
+  <p><b>Role changes the nav, not its depth.</b> A technician sees Tech Home and their jobs — perhaps
+  three items. A service writer sees most of it. That is permission filtering over one flat structure,
+  not a second information architecture.</p>
+</div>
+
+<h2>What this implies for scope</h2>
+<table>
+<thead><tr><th>Observation</th><th>Consequence for the build</th></tr></thead>
+<tbody>
+<tr><td class="pri">8 archetypes cover 64 screens</td><td>Build the archetypes as real components first. Then most screens are a schema plus a column set — exactly the shape agent-written code is good at.</td></tr>
+<tr><td class="pri">One screen is disproportionately hard</td><td>The SO → Action Item editor should be prototyped early, by hand if necessary. It is the main schedule risk on the frontend.</td></tr>
+<tr><td class="pri">38 reports, no report builder</td><td>Reports are a data problem, not a UI one. One viewer plus 38 queries — and the client will not need all 38 at cutover.</td></tr>
+<tr><td class="pri">Portal needs no auth system</td><td>Tokenised per-customer URL. Removes a whole subsystem — but note it also means link-holder-equals-access.</td></tr>
+<tr><td class="pri">~58 entities, ~20 core</td><td>The long tail (statements, credit memos, core returns, vendor bills) is where replacement projects overrun. Most are not needed for customer one.</td></tr>
+<tr><td class="pri">No native app in use</td><td>Fleetco already runs the web app bookmarked to a home screen. A PWA covers it; two native apps are avoidable.</td></tr>
+</tbody>
+</table>
+
+<div class="foot">
+<p><b>Confidence and provenance.</b> Module and feature names come from the Feature Inventory Draft, which combined public sources with a logged-in walkthrough of a live FullBay account — so module boundaries, the service-board stages, the portal sections, and the 38 report names are observed, not guessed.</p>
+<p><b>What is inferred and should be checked:</b> the screen counts, the entity count, the archetype assignment, and every effort-share bar. Those are my reading of the inventory, not a screen-by-screen audit. The settings count (~20) is the softest number here. Use this to size the problem and brief the client — not to estimate a schedule.</p>
+<p><b>Known gap:</b> this maps FullBay as it exists. It says nothing about which parts Fleetco actually uses — that is the markup exercise (M3), and it will remove a meaningful fraction.</p>
+</div>
+
+</div></div></body></html>
