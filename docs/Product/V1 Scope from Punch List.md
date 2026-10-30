@@ -2,7 +2,7 @@
 created: 2026-10-28
 tags: [fleetco, otc, scope, v1, product, punch-list]
 source: Cameron's completed punch list, returned 2026-10-28
-status: scope drafted from Cameron's marks — three items need confirmation before it's a contract
+status: scope drafted from Cameron's marks — portal and QBO answered 2026-10-30, accounting handoff still to pick
 ---
 
 **Source:** `Meetings/Punchlist From Cam for v1/` — `Key decisions.md`, `Notes left on items.md`,
@@ -43,6 +43,9 @@ status: scope drafted from Cameron's marks — three items need confirmation bef
 
 ### 1. The customer portal is out of V1 — and that contradicts the meeting
 
+> **Confirmed 2026-10-30:** portal out, no in-app email or texting. See
+> [[2026-10-30 Cameron Reply to V1 Alignment]].
+
 **All 20 portal rows are marked Later**, with the same note repeated: *"Full customer portal is
 outside graphics V1."* Approval links are out too (2.12, 1.2): *"No customer approval links in V1;
 portal approvals are Later."*
@@ -60,6 +63,9 @@ invoices, and the portal was the most visible differentiator from FullBay. Worth
 means "later," not "never," and that he's fine with the gap.
 
 ### 2. QuickBooks Online two-way sync is marked **required**, and manual entry was explicitly rejected
+
+> **Reversed 2026-10-30:** Cameron says two-way sync is not a firm requirement and asked for the
+> simplest practical handoff, manual steps allowed. See [[2026-10-30 Cameron Reply to V1 Alignment]].
 
 7.24, 11.3, and 7.25 all point the same way. 7.25 — *"Could the bookkeeper key or import invoices by
 hand at first?"* — is marked **Not needed** with the note: **"NO — user requires QuickBooks Online

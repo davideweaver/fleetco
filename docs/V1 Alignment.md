@@ -1,7 +1,7 @@
 ---
 created: 2026-10-29
 tags: [fleetco, otc, v1, alignment, client-facing]
-status: draft for Dave to send to Dan and Cameron
+status: sent. Cameron replied 2026-10-30, see [[2026-10-30 Cameron Reply to V1 Alignment]]
 audience: OTC (Dan and Cameron). Business readers, not engineers.
 source: Claude Code (Xerro), from [[V1 Scope from Punch List]] and [[V1 Vision and Gaps]]
 ---
