@@ -352,13 +352,13 @@ function estimateScreen() {
   <div class="toggle-row">
     <span class="small muted">Show:</span>
     <div class="seg" role="group" aria-label="Estimate view">
-      <button data-cv="0" aria-pressed="${!cv}">Cam's view (itemized)</button>
-      <button data-cv="1" aria-pressed="${cv}">What the customer sees</button>
+      <button data-cv="0" aria-pressed="${!cv}">Internal view (itemized)</button>
+      <button data-cv="1" aria-pressed="${cv}">Customer view</button>
     </div>
     <span class="mark">1</span>
   </div>
   <div class="tbl-wrap"><table><thead>${head}</thead><tbody>${pkgRows("Unit 14", false)}${pkgRows("Unit 17", true)}</tbody></table></div>
-  <div class="note"><span class="badge">1</span><span>Same estimate, two views. Inks, vinyl and laminate roll up under one line per van. ${cv ? "This is what goes to the customer." : "Click “What the customer sees”."}</span></div>
+  <div class="note"><span class="badge">1</span><span>Same estimate, two views. Inks, vinyl and laminate roll up under one line per van. ${cv ? "This is what goes to the customer." : "Click “Customer view”."}</span></div>
   <div class="two">
     <div class="box"><h3>Approval record <span class="mark">2</span></h3>
       <div class="kv"><dt>Unit 14</dt><dd>Approved</dd><dt>Unit 17</dt><dd>Declined</dd><dt>By</dt><dd>Mike Dorsey</dd><dt>How</dt><dd>Phone call</dd><dt>When</dt><dd>Oct 27, 10:14 AM</dd><dt>Recorded by</dt><dd>Cam</dd></div>
