@@ -191,8 +191,9 @@ function jobDetails() {
           <div style="margin-top:6px">Wrap both sides and the rear. Keep the logo clear of the fuel door. Customer drops the van at 7:30 AM on install day.</div></div>
         <div class="box" data-k="files"><h3>Files</h3><div style="display:flex;gap:22px;flex-wrap:wrap">
           <div class="file"><div class="ph"></div>Artwork v3.pdf</div><div class="file"><div class="ph"></div>Measurements.jpg</div><div class="file"><div class="ph"></div>Panel layout.pdf</div><div class="file"><div class="ph" style="border-style:dashed;background:none"></div><span class="muted">+ Upload</span></div></div></div>
-        <div class="box"><h3>Photos</h3><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">${[0, 1].map(() => `<div class="ph" style="aspect-ratio:4/3"></div>`).join("")}<div class="add" style="aspect-ratio:4/3;border:1.5px dashed var(--ink-2);border-radius:2px;display:grid;place-items:center;color:var(--ink-2)">+</div></div>
+        <div class="box"><h3>Photos</h3><div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px">${[0, 1].map(() => `<div class="ph" style="aspect-ratio:4/3"></div>`).join("")}<div class="add" style="aspect-ratio:4/3;border:1.5px dashed var(--ink-2);border-radius:2px;display:grid;place-items:center;color:var(--ink-2)">+</div></div>
           <div class="small muted" style="margin-top:8px">2 “before” photos, Oct 26. Completion photos from the technician land here.</div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start">
         <div class="box" data-k="checklist"><h3>Checklist</h3><div class="stack" style="gap:6px">
           <div><span class="chk"></span>Before install: vehicle condition checked</div>
           <div><span class="chk"></span>Final quality check</div></div>
@@ -200,7 +201,7 @@ function jobDetails() {
         <div class="box"><h3>Job notes</h3><div class="stack" style="gap:8px">
           <div class="nt"><b>Oct 30 · Technician 1</b>Printing done, laminating overnight.</div>
           <div class="nt"><b>Oct 28 · Owner</b>Artwork v3 is final. Start printing.</div>
-          <div class="input small muted">Add a note…</div></div></div>
+          <div class="input small muted">Add a note…</div></div></div></div>
       </div>
       <div class="stack">
         <div class="box"><h3>Who and where</h3><div class="kv"><dt>Assigned</dt><dd><span class="av sm">T1</span> Technician 1</dd><dt>Stage</dt><dd>${T.stages[1]}</dd><dt>Priority</dt><dd>High</dd></div></div>
@@ -272,7 +273,7 @@ const PICTURES = {
   async "2.5"() {
     S.extra = ""; go("jobDetails", "owner");
     const r = document.querySelector('[data-k="checklist"]').getBoundingClientRect();
-    S.extra = hn("left:850px;top:300px;max-width:150px;font-size:24px", "? proofs") + hn(`left:${r.right - 250}px;top:${r.top + 8}px;max-width:240px`, "? which checklist items");
+    S.extra = hn("left:850px;top:300px;max-width:150px;font-size:24px", "? proofs") + hn(`left:${r.left + 10}px;top:${r.bottom + 14}px;max-width:260px`, "? which checklist items");
     render();
   },
 };
