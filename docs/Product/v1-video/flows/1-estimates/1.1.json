@@ -1,7 +1,22 @@
 [
-  {"id": "1.1-title", "text": "Here is how the owner builds an estimate from a saved package."},
-  {"id": "1.1-customer", "text": "The owner starts a new estimate and picks the customer, Ridgeline Plumbing and Heating. Then they add Unit 14, one of the customer's vans."},
-  {"id": "1.1-package", "text": "They add the Full wrap saved package, and every material and labor line fills in. Then they do the same for Unit 17."},
-  {"id": "1.1-margin", "text": "Each line shows the owner's cost, the price, and the margin. The totals add up on the right."},
-  {"id": "1.1-edit", "text": "Unit 17 is a longer van, so it needs more film. The owner changes the amount, and the price updates. Every line can be changed."}
+  {
+    "id": "1.1-title",
+    "text": "Here is how the owner builds an estimate from a saved package."
+  },
+  {
+    "id": "1.1-customer",
+    "text": "The owner starts a new estimate and picks the customer, Ridgeline Plumbing and Heating. Then they add Unit 14, one of the customer's vans."
+  },
+  {
+    "id": "1.1-package",
+    "text": "They add the Full wrap saved package, and every material and labor line fills in at once: film, laminate, ink, supplies, design and installation. Then they do the same for Unit 17."
+  },
+  {
+    "id": "1.1-margin",
+    "text": "Each line shows what it costs the shop, what the customer pays, and the margin. The totals for the whole estimate add up on the right."
+  },
+  {
+    "id": "1.1-edit",
+    "text": "Unit 17 is a longer van, so it needs more film. The owner changes the amount, and the price updates. Every line can be changed."
+  }
 ]
