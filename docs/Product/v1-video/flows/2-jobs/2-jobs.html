@@ -265,10 +265,6 @@ const PICTURES = {
   async "2.3"() { S.extra = hn("left:236px;top:545px;max-width:520px", "Same jobs as the job board. Move a card there and its stage changes here too.", 1); go("jobList", "owner"); },
   async "2.4"() { S.extra = ""; go("schedule", "owner"); },
   async "2.5"() { S.extra = hn("left:850px;top:300px;max-width:150px;font-size:24px", "? proofs"); go("jobDetails", "owner"); },
-  // temporary checks of video screens
-  async "t-board"() { S.extra = ""; S.hl = "G-1048"; go("board", "owner"); },
-  async "t-qv"() { S.extra = ""; S.qv = "G-1044"; S.g1044note = true; S.jobs.find((j) => j.no === "G-1044").stage = 1; go("board", "owner"); },
-  async "t-title"() { S.extra = ""; S.title = "Job board"; go("title", null); },
 };
 boot();
 </script>
