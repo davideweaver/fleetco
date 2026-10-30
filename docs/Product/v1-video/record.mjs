@@ -49,13 +49,13 @@ const webm = join(videoDir, readdirSync(videoDir).find((f) => f.endsWith(".webm"
 const args = ["-y", "-i", webm];
 narration.forEach((s) => args.push("-i", join(audioDir, s.id + ".wav")));
 const delays = starts.map((s, i) => `[${i + 1}:a]adelay=${s.at}|${s.at}[a${i}]`).join(";");
-const mix = starts.map((_, i) => `[a${i}]`).join("") + `amix=inputs=${starts.length}:normalize=0[aout]`;
+const mix = starts.map((_, i) => `[a${i}]`).join("") + `amix=inputs=${starts.length}:normalize=0,loudnorm=I=-16:TP=-1.5,aresample=48000,aformat=channel_layouts=stereo[aout]`;
 args.push(
   "-filter_complex", `${delays};${mix}`,
   "-map", "0:v", "-map", "[aout]",
   "-t", String(endAt / 1000),
   "-c:v", "libx264", "-preset", "slow", "-crf", "20", "-pix_fmt", "yuv420p",
-  "-c:a", "aac", "-b:a", "160k", "-movflags", "+faststart",
+  "-c:a", "aac", "-b:a", "160k", "-ar", "48000", "-ac", "2", "-movflags", "+faststart",
   outFile,
 );
 execFileSync("ffmpeg", args, { stdio: ["ignore", "ignore", "inherit"] });

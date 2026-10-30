@@ -8,7 +8,7 @@ import soundfile as sf
 from kokoro_onnx import Kokoro
 
 model_dir, narration, out_dir = sys.argv[1:4]
-voice = sys.argv[4] if len(sys.argv) > 4 else "am_michael"
+voice = sys.argv[4] if len(sys.argv) > 4 else "af_heart"
 os.makedirs(out_dir, exist_ok=True)
 k = Kokoro(os.path.join(model_dir, "kokoro.onnx"), os.path.join(model_dir, "voices-v1.0.bin"))
 durations = {}
