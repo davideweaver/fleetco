@@ -2,7 +2,7 @@
 created: 2026-10-30
 tags: [fleetco, otc, v1, alignment, quickbooks, decisions]
 source: Cameron's written reply to [[V1 Alignment]]
-status: portal, in-app email and two-way QBO settled. Accounting handoff needs a bookkeeper conversation
+status: portal, in-app email and two-way QBO settled. Dave replied, accounting handoff is Dave's to research
 ---
 
 # Cameron's Reply to V1 Alignment — 2026-10-30
@@ -132,7 +132,15 @@ the workflow is proven.** Either way, build now:
 
 ---
 
-## Draft reply to Cameron
+## Dave's reply (sent 2026-10-30)
+
+> Thanks. That sounds good. I'll look into the accounting options.
+
+Sent instead of the draft below. So the accounting handoff is now Dave's to research before going
+back to Cameron with a recommendation. **Not yet asked:** the deposit link question, the rest of
+section 4 (4.4, 4.6–4.9), and a call with the bookkeeper. Carry those into the next message.
+
+## Draft reply to Cameron (not sent)
 
 > Thanks Cam, that's clear and it makes V1 meaningfully smaller. Locked in: no portal, no emailing
 > or texting from the system. You export the PDF and copy a payment link, and the invoice balance
