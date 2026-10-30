@@ -99,6 +99,7 @@ h2 { font: 700 30px/1.1 var(--hand); margin: 0; text-wrap: balance; }
 .nlist div::before { content: "✗"; color: var(--ink-2); font-weight: 700; }
 .nlist b { display: block; }
 .nlist span { color: var(--ink-2); font-size: 13px; }
+.nlist .flag { display: inline-block; margin-top: 3px; font-size: 14px; color: var(--pencil); }
 
 .foot { font: 16px var(--hand); color: var(--ink-2); border-top: 1.5px solid var(--ink-3); padding-top: 12px; }
 
@@ -117,7 +118,7 @@ h2 { font: 700 30px/1.1 var(--hand); margin: 0; text-wrap: balance; }
 
 <div class="wrap">
   <header>
-    <div class="eyebrow">OTC Fleet Services · Version 1 · Graphics division</div>
+    <div class="eyebrow">OTC Fleet Graphix · Version 1</div>
     <h1>What's in version 1</h1>
     <p class="lede">Start with the 3-minute overview video. Below it, each part of the system is broken into short videos and pictures you can open one at a time.</p>
     <div class="stamp">These are sketches · they show what each screen does, not the final design</div>
@@ -133,13 +134,13 @@ h2 { font: 700 30px/1.1 var(--hand); margin: 0; text-wrap: balance; }
       <div class="eyebrow">Start here</div>
       <h3>One job, from estimate to paid invoice</h3>
       <ol class="chapters">
-        <li class="t">0:16</li><li>Build an estimate from templates</li>
-        <li class="t">0:43</li><li>Customer approves, pays the deposit</li>
+        <li class="t">0:16</li><li>Build an estimate from saved packages</li>
+        <li class="t">0:43</li><li>Customer approves, deposit recorded</li>
         <li class="t">0:56</li><li>The job moves across the board</li>
         <li class="t">1:07</li><li>The technician does the job</li>
-        <li class="t">1:28</li><li>Owner approves the work and sends the invoice</li>
+        <li class="t">1:28</li><li>Owner reviews, closes the job, sends the invoice</li>
         <li class="t">1:57</li><li>Timesheets and payroll</li>
-        <li class="t">2:09</li><li>Settings for other divisions</li>
+        <li class="t">2:09</li><li>Built for the repair shops to join later</li>
         <li class="t">2:31</li><li>What isn't in V1</li>
       </ol>
     </div>
@@ -174,82 +175,91 @@ const mmss = (sec) => `${Math.floor(sec / 60)}:${String(Math.round(sec) % 60).pa
 // ask: an open question that has to be settled before the flow is final.
 const AREAS = [
   { id: "estimates", n: 1, loop: true, title: "Estimates and approval", short: "Price the job, get the customer's OK",
-    blurb: "Price the job, get the customer's approval, and collect a deposit.",
+    blurb: "Price the job, record the customer's approval, and record a deposit.",
     flows: [
-      { t: "Build an estimate from a saved package", d: "Add a vehicle and every material and labor line fills in, with your cost, price and margin.", kind: "video", len: "1:00", img: "estimate" },
+      { t: "Build an estimate from a saved package", d: "Add a vehicle, pick a saved package, and every line fills in, with your cost, price and margin.", kind: "video", len: "1:00", img: "estimate" },
       { t: "What you see vs. what the customer sees", d: "You see every line. The customer sees one line and one price per vehicle.", kind: "picture", img: "custview" },
-      { t: "Customer approval", d: "The customer can approve some vehicles and turn down others. The system records who said yes, when, and how.", kind: "video", len: "0:45", img: "approval", ask: "Approve with one click from the email?" },
-      { t: "Deposit by card", d: "Email the customer a link to pay the deposit. It comes off the final invoice.", kind: "picture", ask: "Collect deposits by card link?" },
-      { t: "Customers and their vehicles", d: "Each customer's vehicles, trailers and signs, plus optional PO numbers.", kind: "picture", ask: "Track signs and walls like vehicles?" },
+      { t: "Customer approval", d: "Record which vehicles the customer approved or turned down, who said yes, when, and how.", kind: "video", len: "0:45", img: "approval", ask: "Approve with one click from the email?" },
+      { t: "Deposits", d: "Record a deposit and it comes off the final invoice. Taking it by card link is a choice still to make.", kind: "picture", ask: "Collect deposits by card link?" },
+      { t: "Customers and their vehicles", d: "Each customer's vehicles and trailers, plus optional PO numbers.", kind: "picture", ask: "Track signs and walls like vehicles?" },
     ] },
   { id: "jobs", n: 2, loop: true, title: "Scheduling and tracking jobs", short: "See every job and where it stands",
     blurb: "Every open job in one place: who's on it, what stage it's in, and when it's due.",
     flows: [
-      { t: "Approved estimate becomes a job", d: "The approved lines carry over. Nothing gets typed twice.", kind: "picture" },
-      { t: "Job board", d: "Each job is a card that moves through six stages, like In production and Ready for install.", kind: "video", len: "0:45", img: "board" },
+      { t: "Approved estimate becomes a job", d: "Click Create job on the approved estimate. The approved lines carry over, so nothing is typed twice.", kind: "picture" },
+      { t: "Job board", d: "Each job is a card that moves through six stages, like In production and Ready for installation.", kind: "video", len: "0:45", img: "board" },
       { t: "Job list", d: "The same jobs as a searchable list. Filter by stage, customer, technician or date.", kind: "picture" },
       { t: "Schedule", d: "A calendar with production dates and install dates kept separate.", kind: "picture" },
       { t: "Job details", d: "Instructions, files, photos, who's assigned, and notes, all on one page.", kind: "picture", ask: "How should design proofs work?" },
     ] },
   { id: "phone", n: 3, loop: true, title: "Doing the job", short: "What the technician uses, at a computer or on a phone",
-    blurb: "The technician uses the same system at a shop computer or on a phone at the vehicle. Either way, they see only their own jobs and no prices.",
+    blurb: "The technician uses the same system at a shop computer or on a phone at the vehicle. Either way, they see only their own jobs, and never costs, markup or profit.",
     flows: [
       { t: "My jobs at the shop computer", d: "The technician's own jobs on the board and schedule, with instructions and files.", kind: "picture" },
       { t: "Clock in and out", d: "Clocking in for the day is separate from time spent on jobs. Works from the computer or the phone.", kind: "picture" },
-      { t: "Track time on a job", d: "Start and stop a timer from the computer or the phone. Only one runs at a time, so hours aren't counted twice.", kind: "video", len: "0:40", img: "phone" },
-      { t: "Finish with photos", d: "Take photos on the phone, or upload them at the computer, and send the job to the owner to check.", kind: "video", len: "0:30" },
-      { t: "What a technician can't see", d: "No costs, prices, profit, estimates or invoices.", kind: "picture" },
+      { t: "Track time and finish with photos", d: "Start a timer at the computer, finish at the van with photos on the phone, and send the job for review. Only one timer runs at a time.", kind: "video", len: "1:12" },
+      { t: "What a technician can't see", d: "Costs, markup and profit stay hidden.", kind: "picture" },
+      { t: "Before-and-after checklist", d: "Note the vehicle's condition before installing, and do a final quality check.", kind: "picture", ask: "Which checklist items?" },
     ] },
   { id: "invoicing", n: 4, loop: true, title: "Invoicing and payments", short: "Bill the customer and get paid",
-    blurb: "Check the finished work, send the invoice, and collect payment.",
+    blurb: "Review the finished work, close the job, send the invoice, and record payment.",
     flows: [
-      { t: "Approve the finished job", d: "Look at the photos, compare estimated and actual hours, and mark it done. The invoice is created for you.", kind: "video", len: "0:40", img: "review" },
+      { t: "Review and close the finished job", d: "Look at the photos, compare estimated and actual hours, and close the job. The draft invoice is created for you.", kind: "video", len: "0:40", img: "review" },
       { t: "What the invoice looks like", d: "One line per vehicle, the deposit already taken off, and any other unpaid invoices listed.", kind: "picture", img: "invoice", ask: "Need sales tax rates from accounting" },
-      { t: "Get paid by card", d: "The invoice is emailed with a pay link. The balance updates when they pay.", kind: "video", len: "0:35" },
+      { t: "Get paid by card", d: "Download the invoice PDF with its pay link and email it the way you do now. The balance updates when they pay.", kind: "video", len: "0:35", ask: "Card processor and fees to confirm" },
       { t: "Recording checks and bank payments", d: "Enter payments that came in another way.", kind: "picture" },
-      { t: "Connecting to QuickBooks", d: "Invoices and payments show up in QuickBooks Online.", kind: "picture", ask: "Two-way sync, or send invoices only?" },
+      { t: "Connecting to QuickBooks", d: "Invoices and payments are sent to QuickBooks Online.", kind: "picture", ask: "Two-way sync, or send invoices only?" },
     ] },
   { id: "materials", n: 5, title: "Materials and ordering", short: "Prices, saved packages, vendor orders",
     blurb: "What materials cost, what you charge for them, and ordering from vendors.",
     flows: [
       { t: "Materials list", d: "Each material with what you pay and what you charge.", kind: "picture" },
       { t: "Saved packages", d: "Save a common job, like a full wrap, once. Add it to any estimate in one step.", kind: "picture" },
-      { t: "Ordering from vendors", d: "Create a purchase order, download it as a PDF, and mark it received. Your costs update.", kind: "video", len: "0:45" },
+      { t: "Ordering from vendors", d: "Create a purchase order and email the PDF from your own account. When it all arrives, mark the order received and your costs update.", kind: "video", len: "0:45" },
     ] },
-  { id: "payroll", n: 6, title: "Time and payroll", short: "Hours, payroll, who sees what",
-    blurb: "Check employee hours, send them to payroll, and control what each person can see.",
+  { id: "payroll", n: 6, title: "Time and payroll", short: "Hours, payroll export, who sees what",
+    blurb: "Check employee hours, export them for payroll, and control what each person can see.",
     flows: [
-      { t: "Approve timesheets", d: "Fix missed clock-ins and approve the week.", kind: "video", len: "0:35", img: "time" },
-      { t: "Send hours to payroll", d: "Approved hours by employee and day, as a spreadsheet or printout.", kind: "picture" },
-      { t: "Who can see what", d: "Two roles to start: owner and technician.", kind: "picture" },
+      { t: "Approve timesheets", d: "Fix missed clock-ins and approve the pay period.", kind: "video", len: "0:35", img: "time" },
+      { t: "Export hours for payroll", d: "Approved hours by employee and day, as a spreadsheet or printout. No pay rates or payroll connection.", kind: "picture" },
+      { t: "Who can see what", d: "Two roles to start: owner and technician.", kind: "picture", ask: "Confirm what a technician can see" },
     ] },
-  { id: "reports", n: 7, title: "Reports", short: "Ten reports to print or export",
-    blurb: "The reports you use today. Each one prints and exports to a spreadsheet.",
+  { id: "reports", n: 7, title: "Reports", short: "Nine reports to print or export",
+    blurb: "The reports you picked from FullBay's list. Each one prints and exports to a spreadsheet.",
     flows: [
       { t: "Money reports", d: "Who owes you, revenue, jobs ready to bill, and payments received.", kind: "picture" },
-      { t: "Work in progress", d: "Jobs that are started but not billed yet.", kind: "picture", ask: "What should count here?" },
+      { t: "Work in progress", d: "Two views of work that's under way. What counts is still to be decided.", kind: "picture", ask: "What should count here?" },
       { t: "Time reports", d: "Hours clocked, hours per job, and timesheets.", kind: "picture" },
     ] },
   { id: "setup", n: 8, title: "Setup and moving off FullBay", short: "Settings, devices, the switch",
-    blurb: "Settings that let other divisions use this later, the devices it runs on, and the move off FullBay.",
+    blurb: "Built so other divisions can join later, the devices it runs on, and the move off FullBay.",
     flows: [
-      { t: "Using your own words", d: "Each division can name things its own way. Graphics says job. A repair shop can say service order.", kind: "video", len: "0:30", img: "terms" },
+      { t: "Using your own words", d: "Graphics is the only division in version 1. Each division can use its own words, so a repair shop could say service order.", kind: "video", len: "0:30", img: "terms" },
       { t: "Computer, phone or tablet", d: "Everyone uses the same system in a web browser. On a phone it fits the small screen and saves to the home screen.", kind: "picture" },
-      { t: "Moving off FullBay", d: "Bringing over open jobs and unpaid invoices.", kind: "picture", ask: "Who enters them, and when?" },
+      { t: "Moving off FullBay", d: "A plan for bringing over open jobs and unpaid invoices.", kind: "picture", ask: "Who enters them, and when? Plus invoice number and tax rates" },
     ] },
 ];
 
 const NOT_V1 = [
-  ["A customer website or login", "Invoices go out by email with a pay link"],
+  ["A customer website or login", "Invoices go out as a PDF with a pay link", "Confirm no customer portal"],
+  ["Sending email from the system", "Download the PDF and email it the way you do today"],
   ["Counting stock on the shelf", "The materials list keeps costs and prices. Stock is still checked by eye"],
   ["The repair shops", "Lancaster, mobile and postal stay on FullBay for now"],
+  ["Switching between shops or departments", "One department, graphics, at launch"],
   ["Leads, sales follow-up, texting", "These stay in GoHighLevel. Approved jobs are typed in"],
-  ["Maintenance schedules and inspections", "Part of the repair shops, later"],
+  ["Fleet features like QR driver reports and insurance tracking", "These stay in myOTCFleet"],
+  ["Maintenance schedules, inspections and DVIR", "Part of the repair shops, later"],
+  ["Vendor portal and paying vendors", "Orders go out as a PDF from your own email"],
+  ["Partial deliveries on orders", "An order is marked received as a whole"],
+  ["Automatic markup", "You set each selling price yourself"],
+  ["Pay rates, paychecks or a payroll connection", "Hours export as a spreadsheet or printout"],
+  ["Building your own reports, or scheduled report emails", "The nine reports print and export"],
+  ["More roles, like office or accounting", "Owner and technician to start"],
   ["An app from the App Store", "It runs in the phone's browser instead"],
   ["Working without internet", "Needs wifi or a cell signal"],
   ["Bank transfer (ACH) by link", "Card by link. Checks and bank transfers entered by hand"],
   ["Old records from FullBay", "Open work moves over. Old records stay in FullBay to look up"],
-  ["Repair labor guides and parts websites", "Repair-shop tools, for later"],
+  ["Repair labor guides, VMRS codes and parts websites", "Repair-shop tools, for later"],
 ];
 
 const $ = (s) => document.querySelector(s);
@@ -276,7 +286,7 @@ $("#areas").innerHTML = AREAS.map((a) => {
     <div class="counts">${v} video${v === 1 ? "" : "s"} · ${p} picture${p === 1 ? "" : "s"}</div></div><div class="flows">${cards}</div></section>`;
 }).join("");
 
-$("#nlist").innerHTML = NOT_V1.map(([a, b]) => `<div><span><b>${a}</b><span>${b}</span></span></div>`).join("");
+$("#nlist").innerHTML = NOT_V1.map(([a, b, ask]) => `<div><span><b>${a}</b><span>${b}</span>${ask ? `<span class="flag">? ${ask}</span>` : ""}</span></div>`).join("");
 
 function open(key) {
   const f = key === "overview"

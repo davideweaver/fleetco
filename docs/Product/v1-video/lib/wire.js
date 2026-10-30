@@ -11,9 +11,9 @@
 
 const DIVISIONS = {
   graphics: {
-    name: "Graphics", work: "Job", works: "Jobs", board: "Job board", worker: "Installer", asset: "Vehicle or sign",
-    stages: ["Ready for production", "In production", "Production complete", "Ready for install", "Install in progress", "Completed"],
-    assets: ["Vehicle", "Trailer", "Sign / wall"],
+    name: "Graphics", work: "Job", works: "Jobs", board: "Job board", worker: "Technician", asset: "Vehicle",
+    stages: ["Ready for production", "In production", "Production complete", "Ready for installation", "Installation in progress", "Completed"],
+    assets: ["Vehicle", "Trailer"],
   },
   mechanical: {
     name: "Mechanical", work: "Service order", works: "Service orders", board: "Repair board", worker: "Technician", asset: "Unit",
@@ -60,7 +60,7 @@ function shell(active, body, url) {
   return `<div class="frame">
     <div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">app.otcfleet.com/${url}</span></div>
     <div class="topbar"><div class="logo">LOGO</div><div class="search">Search customers, ${T.works.toLowerCase()}, invoices…</div><div class="grow"></div>
-      <span class="division">Division: ${T.name}</span><span class="user"><span class="av">OW</span>Owner</span></div>
+      <span class="division">OTC Fleet Graphix</span><span class="user"><span class="av">OW</span>Owner</span></div>
     <div class="app"><div class="nav">${OWNER_NAV.map((n) => `<div class="${n === active ? "on" : ""}" data-k="nav-${slug(n)}">${n}</div>`).join("")}<div class="sep"></div><div class="${active === "Settings" ? "on" : ""}" data-k="nav-settings">Settings</div></div>
     <div class="screen">${body}</div></div></div>`;
 }
