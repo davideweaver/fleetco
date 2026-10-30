@@ -38,7 +38,7 @@
 <body>
 <script src="../../lib/wire.js"></script>
 <script>
-/* Section 3 · Doing the job. Pictures 3.1, 3.2, 3.5. Screens match doing-the-job.mp4 (screens.html techShell/techBoard/techJob/techPhone/techTime). */
+/* Section 3 · Doing the job. Pictures 3.1, 3.2, 3.4, 3.5. Screens match doing-the-job.mp4 (screens.html techShell/techBoard/techJob/techPhone/techTime). */
 const S = { screen: "title", who: null };
 const go = (screen, who) => { S.screen = screen; S.who = who; render(); };
 
@@ -48,7 +48,12 @@ const MY_JOBS = [
   { no: "G-1044", cust: "Keystone Dairy Co-op", what: "Tanker DOT lettering", who: "T1", date: "Tomorrow", pri: "High", stage: 3 },
   { no: "G-1046", cust: "Brightway Movers", what: "Rear door graphics", who: "T1", date: "Nov 4", pri: "Normal", stage: 2 },
   { no: "G-1052", cust: "Lancaster Kitchen Supply", what: "Box truck logo kit", who: "T1", date: "Nov 5", pri: "Normal", stage: 0 },
+  { no: "G-1043", cust: "Millport School District", what: "Shop wall mural", who: "T1", date: "Oct 29", pri: "Normal", stage: 4 },
+  { no: "G-1041", cust: "Ridgeline Plumbing", what: "Unit 9 · decal refresh", who: "T1", date: "Oct 27", pri: "Normal", stage: 5 },
 ];
+const FILES = (big) => [`Artwork v3.pdf`, `Measurements.jpg`, ...(big ? [`Panel layout.pdf`] : [])].map((f) => `<div class="file"><div class="ph"></div>${f}</div>`).join("");
+const chkStyle = `display:inline-block;width:15px;height:15px;border:1.5px solid var(--ink);border-radius:2px;vertical-align:-3px;margin-right:8px`;
+const checklistBox = `<div class="box"><h3>Checklist</h3><div class="small"><div><span style="${chkStyle}"></span>Before install: vehicle condition checked</div><div style="margin-top:4px"><span style="${chkStyle}"></span>Final quality check</div></div></div>`;
 const clockedIn = `<span class="pill solid">Clocked in 7:02 AM</span>`;
 
 /* ---------- 3.1 My jobs at the shop computer ---------- */
@@ -62,11 +67,12 @@ function myJobs() {
       <div class="meta">${T.asset}: 2024 Ford Transit 250 · Install date: today · Assigned: Technician 1</div></div>
     <button class="btn primary" style="align-self:flex-start">Start timer · Installation</button>
     <div class="box"><h3>Instructions</h3><div class="small">Wrap both sides and the rear. Keep the logo clear of the fuel door. Customer drops the van at 7:30 AM.</div></div>
-    <div class="box"><h3>Files</h3><div class="gap" style="gap:8px"><div class="file"><div class="ph"></div>Proof v3 (approved).pdf</div><div class="file"><div class="ph"></div>Measurements.jpg</div><div class="file"><div class="ph"></div>Panel layout.pdf</div></div></div>
+    <div class="box"><h3>Files</h3><div style="display:flex;gap:14px;flex-wrap:wrap">${FILES(true)}</div></div>
+    ${checklistBox}
     <div class="box"><h3>Notes</h3><div class="small">Oct 30 · Printing done, laminating overnight.</div></div>
-    <div class="box"><h3>Completion photos</h3><div class="small muted">None yet. Add them from the phone, or upload them here.</div></div>
+    <div class="box"><h3>Completion photos</h3><div class="small muted">None yet. Add them from the phone, or upload them here. When the work is done: Done · send for review. The job stays in ${T.stages[4]}, tagged Needs review, until the owner closes it.</div></div>
   </div>`;
-  const body = `<div class="head"><div><h2>${T.board}</h2><div class="meta">Showing only ${T.works.toLowerCase()} assigned to you · no prices</div></div>
+  const body = `<div class="head"><div><h2>${T.board}</h2><div class="meta">Showing only ${T.works.toLowerCase()} assigned to you · no costs, markup or profit</div></div>
     <div class="btns"><span class="pill solid">Assigned to me</span><div class="seg"><button class="on">Board</button><button>List</button><button>Schedule</button></div></div></div>
     <div class="with-panel"><div class="board">${cols}</div>${drawer}</div>`;
   return techShell("My jobs", body, "my-jobs/G-1048", clockedIn);
@@ -74,9 +80,9 @@ function myJobs() {
 
 /* ---------- 3.2 Clock in and out ---------- */
 function clockPair() {
-  const deskBody = `<div class="head"><div><h2>My time · today</h2><div class="meta">Mon Nov 2, 11:40 AM · The owner reviews and approves this</div></div></div>
+  const deskBody = `<div class="head"><div><h2>My time · today</h2><div class="meta">Mon Nov 2, 11:40 AM · The owner approves this each pay period</div></div></div>
     <div class="gap">
-      <div class="tbl"><table><thead><tr><th>Clock punches</th><th>Where</th><th class="num">Time</th></tr></thead><tbody>
+      <div class="tbl"><table><thead><tr><th>Clock in and out</th><th>Where</th><th class="num">Time</th></tr></thead><tbody>
         <tr><td>Clock in</td><td>Shop computer</td><td class="num">7:02 AM</td></tr>
         <tr><td>Clock out</td><td class="muted">Not yet</td><td class="num">—</td></tr>
         <tr><td><strong>Hours so far</strong></td><td></td><td class="num"><strong>4.6 h</strong></td></tr>
@@ -92,14 +98,14 @@ function clockPair() {
       <div class="p-h">Mon Nov 2</div><div style="font:600 34px var(--mono)">3:32 PM</div>
       <span class="pill dash">Clocked out</span></div>
     <div class="p-sec"><button class="wide solid">Clock in</button><div class="small muted" style="text-align:center">One tap for the day. Job timers are separate.</div></div>
-    <div class="p-sec"><div class="p-h">Today's punches</div>
+    <div class="p-sec"><div class="p-h">Today's clock in and out</div>
       <div style="display:flex;justify-content:space-between" class="small"><span>Clock in · shop computer</span><span class="num">7:02 AM</span></div>
       <div style="display:flex;justify-content:space-between" class="small"><span>Clock out · this phone</span><span class="num">3:32 PM</span></div>
       <div class="rule"></div>
       <div style="display:flex;justify-content:space-between"><strong>Hours today</strong><strong class="num">8.5 h</strong></div></div>
     <div class="p-sec" style="border:0"><div class="p-h">This week</div>
       <div style="display:flex;justify-content:space-between" class="small"><span>Mon Nov 2</span><span class="num">8.5 h</span></div>
-      <div class="small muted">Waiting for the owner to approve</div></div>`;
+      <div class="small muted">The owner approves each pay period</div></div>`;
   return `<div class="pair" style="grid-template-columns:1fr 430px">
     <div class="pane"><div class="pane-label">At the shop computer · top bar</div><div class="pane-body">${desk}</div>
       <div class="callout" style="right:24px;top:128px;max-width:560px"><div class="note"><span class="badge">1</span><span>↑ Clock in once for the day, from the top bar or the phone.</span></div></div>
@@ -108,20 +114,20 @@ function clockPair() {
   </div>`;
 }
 
-/* ---------- 3.5 What a technician can't see ---------- */
+/* ---------- 3.4 What a technician can't see ---------- */
 function ownerJob() {
   const lines = WRAP.map((r) => `<tr><td>${r[0]}</td><td class="num">${r[1]} ${r[2]}</td><td class="num">${money(r[1] * r[3])}</td><td class="num">${money(r[1] * r[4])}</td></tr>`).join("");
   const body = `<div class="head"><div><div class="crumb">${T.works} › G-1048</div><h2>Ridgeline Plumbing · Unit 14 full wrap</h2>
       <div class="meta">${T.asset}: 2024 Ford Transit 250 · Assigned: Technician 1 · Stage: ${T.stages[4]}</div></div></div>
     <div class="gap">
       <div class="box"><h3>Instructions</h3><div class="small">Wrap both sides and the rear. Keep the logo clear of the fuel door.</div></div>
-      <div class="tbl"><table><thead><tr><th>Line items <span class="mark">1</span></th><th class="num">Qty</th><th class="num">Cost</th><th class="num">Price</th></tr></thead><tbody>${lines}
+      <div class="tbl"><table><thead><tr><th>Line items · cost <span class="mark">1</span></th><th class="num">Qty</th><th class="num">Cost</th><th class="num">Price</th></tr></thead><tbody>${lines}
         <tr class="group"><td>Total</td><td></td><td class="num">${money(COST)}</td><td class="num">${money(PRICE)}</td></tr></tbody></table></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
         <div class="box"><h3>Margin <span class="mark">2</span></h3><div class="kv"><dt>Price</dt><dd>${money(PRICE)}</dd><dt>Cost</dt><dd>${money(COST)}</dd><div class="rule"></div><dt><strong>Margin</strong></dt><dd><strong>${money(PRICE - COST)} · ${Math.round((PRICE - COST) / PRICE * 1000) / 10}%</strong></dd></div></div>
-        <div class="box"><h3>Estimate &amp; invoice <span class="mark">3</span></h3><div class="kv"><dt>Estimate</dt><dd>Approved Oct 26</dd><dt>Deposit paid</dt><dd>${money(PRICE / 2)}</dd><dt>Invoice</dt><dd>Draft on close</dd><dt>Other open</dt><dd>$420.00</dd></div></div>
+        <div class="box"><h3>Estimate &amp; invoice</h3><div class="kv"><dt>Estimate</dt><dd>Approved Oct 26</dd><dt>Deposit recorded</dt><dd>${money(PRICE / 2)}</dd><dt>Invoice</dt><dd>Draft on close</dd><dt>Other open</dt><dd>$420.00</dd></div></div>
       </div>
-      <div class="box"><h3>Files</h3><div style="display:flex;gap:18px"><div class="file"><div class="ph"></div>Proof v3 (approved).pdf</div><div class="file"><div class="ph"></div>Measurements.jpg</div></div></div>
+      <div class="box"><h3>Files</h3><div style="display:flex;gap:18px">${FILES(false)}</div></div>
     </div>`;
   return `<div class="slim" style="position:absolute;inset:0">${shell(T.works, body, "jobs/G-1048")}</div>`;
 }
@@ -132,12 +138,12 @@ function techSameJob() {
     <div class="gap">
       <div class="box"><h3>Instructions</h3><div class="small">Wrap both sides and the rear. Keep the logo clear of the fuel door.</div></div>
       <div class="box"><h3>Work to do</h3><div class="small">Design · Print and laminate 62 ft · Install supplies · Installation</div><div class="small muted" style="margin-top:4px">Expected install time: 9 h</div></div>
-      <div class="missing"><div class="note"><span class="badge">1</span><span>No line prices or material costs</span></div></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div class="missing"><div class="note"><span class="badge">2</span><span>No margin or profit</span></div></div>
-        <div class="missing"><div class="note"><span class="badge">3</span><span>No estimate, deposit or invoices</span></div></div>
+        <div class="missing"><div class="note"><span class="badge">1</span><span>No costs or markup</span></div></div>
+        <div class="missing"><div class="note"><span class="badge">2</span><span>No profit</span></div></div>
       </div>
-      <div class="box"><h3>Files</h3><div style="display:flex;gap:18px"><div class="file"><div class="ph"></div>Proof v3 (approved).pdf</div><div class="file"><div class="ph"></div>Measurements.jpg</div></div></div>
+      <div class="box"><h3>Files</h3><div style="display:flex;gap:18px">${FILES(false)}</div></div>
+      ${checklistBox}
       <div class="box"><h3>Completion photos</h3><div class="small muted">None yet. Add them from the phone, or upload them here.</div></div>
     </div>`;
   return `<div class="slim" style="position:absolute;inset:0">${techShell("My jobs", body, "my-jobs/G-1048", clockedIn)}</div>`;
@@ -149,10 +155,42 @@ function splitView() {
   </div>`;
 }
 
+/* ---------- 3.5 Before-and-after checklist ---------- */
+function checklistJob() {
+  const item = (on, label, photo, sub = "") => `<div style="display:grid;grid-template-columns:28px 1fr 230px;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--fill-2)">
+      <span style="${chkStyle};width:20px;height:20px;${on ? "background:var(--ink)" : ""}"></span>
+      <div><div style="font-size:15px">${label}</div>${sub ? `<div class="small muted">${sub}</div>` : ""}</div>
+      <div style="display:flex;gap:6px;justify-content:flex-end;align-items:center">${photo}</div></div>`;
+  const ph = (n) => Array.from({ length: n }, () => `<div class="ph" style="width:48px;height:36px"></div>`).join("");
+  const addPh = `<span class="btn dash" style="font-size:12.5px">+ Photo (optional)</span>`;
+  const body = `<div class="head"><div><div class="crumb">My ${T.works.toLowerCase()} › G-1048</div><h2>Ridgeline Plumbing · Unit 14 full wrap</h2>
+      <div class="meta">${T.asset}: 2024 Ford Transit 250 · Install date: today · Stage: ${T.stages[4]}</div></div>
+      <div class="btns"><button class="btn">Stop timer · Installation 3:52</button><button class="btn primary" disabled>Done · send for review</button></div></div>
+    <div style="display:grid;grid-template-columns:1fr 340px;gap:16px;align-items:start">
+      <div class="box" data-k="checklist" style="border-width:2px;box-shadow:5px 5px 0 var(--fill-2)"><h3 style="font-size:13px">Checklist</h3>
+        <div class="p-h" style="font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);margin:8px 0 2px">Before install · vehicle condition</div>
+        ${item(true, "Existing damage noted", ph(1), "Small dent, rear passenger door. Customer told at drop-off.")}
+        ${item(true, "Photos of each side", ph(4), "Driver, passenger, front, rear")}
+        <div class="p-h" style="font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);margin:18px 0 2px">Final quality check</div>
+        ${item(false, "Edges sealed", addPh)}
+        ${item(false, "No bubbles", addPh)}
+        ${item(false, "Customer walkaround", addPh)}
+        <div class="small muted" style="margin-top:10px">Tick each item as you go. Photos are optional. The owner sees the same checklist on the job details.</div>
+      </div>
+      <div class="gap">
+        <div class="box"><h3>Instructions</h3><div class="small">Wrap both sides and the rear. Keep the logo clear of the fuel door.</div></div>
+        <div class="box"><h3>Files</h3><div class="gap" style="gap:8px">${FILES(true)}</div></div>
+        <div class="box"><h3>When you're done</h3><div class="small">Tap Done · send for review. The job stays in ${T.stages[4]} with a Needs review tag until the owner closes it.</div></div>
+      </div></div>`;
+  const r = `<span class="pill solid">Clocked in 7:02 AM</span>`;
+  return techShell("My jobs", body, "my-jobs/G-1048", r)
+    + `<div class="callout" style="left:760px;top:236px"><div class="note"><span class="badge">?</span><span>which checklist items</span></div></div>`;
+}
+
 function render() {
   $("#root").innerHTML = {
     title: () => cardScreen("Version 1 · Doing the job", "Doing the job"),
-    myjobs: myJobs, clock: clockPair, split: splitView,
+    myjobs: myJobs, clock: clockPair, split: splitView, checklist: checklistJob,
   }[S.screen]();
   setWho(S.who);
 }
@@ -161,7 +199,8 @@ const SCENES = {};
 const PICTURES = {
   async "3.1"() { go("myjobs", "tech-desk"); },
   async "3.2"() { go("clock", null); },
-  async "3.5"() { go("split", null); },
+  async "3.4"() { go("split", null); },
+  async "3.5"() { go("checklist", "tech-desk"); },
 };
 boot();
 </script>
