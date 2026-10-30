@@ -26,7 +26,7 @@ tr.total td { font-weight: 600; border-top: 1.5px solid var(--ink); }
 const S = { screen: "title", who: null, edit: false, outTxt: "", why: "", fixed: false, approved: false, hlThu: false };
 const go = (screen, who) => { S.screen = screen; S.who = who; render(); };
 
-// Week of Mon Oct 26 – Fri Oct 30. [day, in, out, punched, on jobs, shop]
+// Pay period Mon Oct 26 – Fri Oct 30. [day, in, out, clocked, on jobs, shop]
 const WEEK = {
   "Technician 1": [
     ["Mon Oct 26", "7:00 AM", "3:00 PM", 8.0, 7.1, 0.9],
@@ -63,9 +63,9 @@ function timesheets() {
       return `<tr class="${thu && S.hlThu ? "hl" : ""}" ${thu ? 'data-k="thu"' : ""}><td>${r[0]}</td><td class="num">${r[1]}</td><td class="num">${r[2] || `<span class="muted">none</span>`}</td><td class="num">${h(r[3])}</td><td class="num">${h(r[4])}</td><td class="num">${h(r[5])}</td><td>${status(name, r)}</td></tr>`;
     }).join("");
   }).join("");
-  const body = `<div class="head"><div><div class="crumb">Time &amp; payroll › Timesheets</div><h2>Week of Oct 26 – Oct 30</h2><div class="meta">Payroll uses punched hours. Job time and shop time sit inside them.</div></div>
-    <div class="btns"><button class="btn">Send to payroll</button><button class="btn primary" data-k="approve" ${S.approved ? "disabled" : ""}>${S.approved ? "Week approved" : "Approve week"}</button></div></div>
-    <div class="tbl"><table><thead><tr><th>Day</th><th class="num">Clock in</th><th class="num">Clock out</th><th class="num">Punched</th><th class="num">On ${T.works.toLowerCase()}</th><th class="num">Shop time</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>
+  const body = `<div class="head"><div><div class="crumb">Time &amp; payroll › Timesheets</div><h2>Pay period · Oct 26 – Oct 30</h2><div class="meta">Payroll uses clocked hours. Job time and shop time sit inside them.</div></div>
+    <div class="btns"><button class="btn">Export for payroll</button><button class="btn primary" data-k="approve" ${S.approved ? "disabled" : ""}>${S.approved ? "Pay period approved" : "Approve pay period"}</button></div></div>
+    <div class="tbl"><table><thead><tr><th>Day</th><th class="num">Clock in</th><th class="num">Clock out</th><th class="num">Clocked</th><th class="num">On ${T.works.toLowerCase()}</th><th class="num">Shop time</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>
     ${S.edit ? editModal() : ""}`;
   return shell("Time & payroll", body, "time/week-of-oct-27");
 }
@@ -85,13 +85,13 @@ async function typeInto(field, text, ms = 45) {
   for (const ch of text) { S[field] += ch; render(); await wait(ms); }
 }
 
-/* ---------- 6.2 send hours to payroll ---------- */
+/* ---------- 6.2 export hours for payroll ---------- */
 function exportScreen() {
   const days = ["Mon 10/26", "Tue 10/27", "Wed 10/28", "Thu 10/29", "Fri 10/30"];
   const people = Object.keys(WEEK).map((n) => [n, weekRows(n).map((r) => r[3])]);
   const colTot = days.map((_, i) => people.reduce((a, p) => a + p[1][i], 0));
   const all = colTot.reduce((a, b) => a + b, 0);
-  const body = `<div class="head"><div><div class="crumb">Time &amp; payroll › Send to payroll</div><h2>Approved hours for payroll</h2><div class="meta">Hours only. Pay rates and paychecks stay with your payroll service.</div></div>
+  const body = `<div class="head"><div><div class="crumb">Time &amp; payroll › Export for payroll</div><h2>Approved hours for payroll</h2><div class="meta">Hours only. Pay rates and paychecks stay with your payroll service.</div></div>
     <div class="btns"><button class="btn">Print</button><button class="btn primary">Download spreadsheet</button></div></div>
     <div style="display:flex;gap:14px;align-items:center;margin-bottom:16px">
       <span class="muted small">Dates</span><div class="input" style="width:150px">Oct 26</div><span class="muted">to</span><div class="input" style="width:150px">Oct 30</div>
@@ -102,8 +102,8 @@ function exportScreen() {
           ${people.map(([n, hs]) => `<tr><td>${n}</td>${hs.map((x) => `<td class="num">${x.toFixed(1)}</td>`).join("")}<td class="num"><strong>${hs.reduce((a, b) => a + b, 0).toFixed(1)}</strong></td></tr>`).join("")}
           <tr class="total"><td>All employees</td>${colTot.map((x) => `<td class="num">${x.toFixed(1)}</td>`).join("")}<td class="num">${all.toFixed(1)}</td></tr>
         </tbody></table></div>
-        <div class="callout"><div class="note"><span class="badge">1</span><span>These are punched hours. Job timers are already inside them, so nothing is counted twice.</span></div></div>
-        <div class="callout"><div class="note"><span class="badge">2</span><span>No wages and no payroll connection in version 1. Send the file or printout to whoever runs payroll.</span></div></div>
+        <div class="callout"><div class="note"><span class="badge">1</span><span>These are clocked hours. Job timers are already inside them, so nothing is counted twice.</span></div></div>
+        <div class="callout"><div class="note"><span class="badge">2</span><span>No wages and no payroll connection in version 1. Export to spreadsheet, or print, and give it to whoever runs payroll.</span></div></div>
       </div>
       <div class="box"><h3>What's in the spreadsheet</h3>
         <div class="csv">Employee,Date,Clock in,Clock out,Hours
@@ -126,17 +126,17 @@ function team() {
     ["See jobs", "All jobs", "Only jobs assigned to them"],
     ["Instructions, files and photos", Y, "On their jobs"],
     ["Clock in and out, job timers", Y, Y],
-    ["Add completion photos, send to the owner to check", Y, Y],
-    ["Prices, costs and margin", Y, N],
+    ["Add completion photos, Done · send for review", Y, Y],
+    ["Costs, markup and profit", Y, N],
     ["Estimates", Y, N],
     ["Invoices and payments", Y, N],
     ["Fix time and approve timesheets", Y, N],
-    ["Close jobs", Y, N],
+    ["Review and close jobs", Y, N],
     ["Materials list and ordering from vendors", Y, N],
     ["Reports", Y, N],
     ["Settings and adding people", Y, N],
   ];
-  const body = `<div class="head"><div><div class="crumb">Settings › Team</div><h2>Team and roles</h2><div class="meta">Two roles in version 1. Everyone signs in with their own email.</div></div>
+  const body = `<div class="head"><div><div class="crumb">Settings › Team</div><h2>Team and roles</h2><div class="meta">Two roles in version 1. Each person has their own login.</div></div>
     <div class="btns"><button class="btn primary">+ Add person</button></div></div>
     <div class="cols" style="grid-template-columns:420px 1fr;margin-top:0">
       <div style="display:flex;flex-direction:column;gap:16px">
@@ -144,12 +144,16 @@ function team() {
           <tr><td><span class="user"><span class="av">OW</span>Owner</span></td><td>Owner</td><td><span class="pill">Active</span></td></tr>
           <tr><td><span class="user"><span class="av">T1</span>Technician 1</span></td><td>Technician</td><td><span class="pill">Active</span></td></tr>
         </tbody></table></div>
-        <div class="box" style="border-style:dashed"><h3>Roles</h3><div class="small"><strong>Owner</strong> sees and does everything.</div><div class="small" style="margin-top:6px"><strong>Technician</strong> sees only their own jobs, with no money on them.</div></div>
+        <div class="box" style="border-style:dashed"><h3>Roles</h3><div class="small"><strong>Owner</strong> sees and does everything.</div><div class="small" style="margin-top:6px"><strong>Technician</strong> sees only their own jobs, without costs, markup and profit.</div></div>
         <div class="callout"><div class="note"><span class="badge">1</span><span>More roles later, like office or accounting, with their own settings. Version 1 has these two.</span></div></div>
       </div>
-      <div class="tbl"><table><thead><tr><th>What</th><th>Owner</th><th>Technician</th></tr></thead><tbody>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:baseline;gap:12px"><h3 style="margin:0">Proposed · who can see what</h3><span class="pill dash">Proposed</span></div>
+        <div class="tbl"><table><thead><tr><th>What</th><th>Owner</th><th>Technician</th></tr></thead><tbody>
         ${perms.map((p) => `<tr><td>${p[0]}</td><td>${p[1]}</td><td>${p[2]}</td></tr>`).join("")}
-      </tbody></table></div>
+        </tbody></table></div>
+        <div class="note"><span class="badge">2</span><span>? confirm what a technician can see</span></div>
+      </div>
     </div>`;
   return shell("Settings", body, "settings/team");
 }
@@ -182,7 +186,7 @@ const SCENES = {
   async "6.1-approve"() {
     await click("save", () => { S.edit = false; S.fixed = true; }, 1600);
     await click("approve", () => { S.approved = true; S.hlThu = false; }, 200);
-    toast("Week approved · ready to send to payroll", 3500);
+    toast("Pay period approved · ready to export for payroll", 3500);
   },
 };
 const PICTURES = {
