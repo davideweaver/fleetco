@@ -51,9 +51,9 @@ function aging() {
   const rows = AGING.map((r) => `<tr><td>${r[0]}</td>${[1, 2, 3, 4].map((c) => cell(r[c])).join("")}<td class="num">${money(r[1] + r[2] + r[3] + r[4])}</td></tr>`).join("");
   const max = 6000; // scale end, so bars are drawn to scale
   const bars = tot.map((t, i) => `<div class="bar"><span class="small">${BUCKETS[i].replace(" days", "")}</span><div class="track"><div class="fillb" style="width:${(t / max) * 100}%"></div></div><span class="num small">${money(t)}</span></div>`).join("");
-  const body = `${reportHead("Receivables aging", "Unpaid invoices by how long they have been due · as of Oct 30", "Money",
+  const body = `${reportHead("Receivables aging", "Unpaid invoices by how long they have been due · as of Oct 29", "Money",
       ["Receivables aging", "Revenue", "Ready to invoice", "Payments"], "Receivables aging")}
-      <span class="chip">As of: Oct 30</span><span class="chip">All customers</span></div>
+      <span class="chip">As of: Oct 29</span><span class="chip">All customers</span></div>
     <div style="display:grid;grid-template-columns:1fr 440px;gap:16px;align-items:start">
       <div class="tbl"><table><thead><tr><th>Customer</th>${BUCKETS.map((b) => `<th class="num">${b}</th>`).join("")}<th class="num">Total owed</th></tr></thead>
         <tbody>${rows}<tr class="total"><td>Total</td>${tot.map((t) => `<td class="num">${money(t)}</td>`).join("")}<td class="num">${money(all)}</td></tr></tbody></table></div>
@@ -75,9 +75,9 @@ const WIP = [
 function wip() {
   const val = WIP.reduce((a, r) => a + r[4], 0), hrs = WIP.reduce((a, r) => a + r[5], 0);
   const rows = WIP.map((r) => `<tr><td class="num" style="text-align:left">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td><span class="pill">${T.stages[r[3]]}</span></td><td class="num">${money(r[4])}</td><td class="num">${r[5].toFixed(1)} h <span class="muted">of ${r[6]} h</span></td></tr>`).join("");
-  const body = `${reportHead("Work in progress", "Jobs that are started but not billed yet · as of Oct 30", "Work in progress",
+  const body = `${reportHead("Work in progress", "Jobs that are started but not billed yet · as of Oct 29", "Work in progress",
       ["Work in progress"], "Work in progress")}
-      <span class="chip">As of: Oct 30</span><span class="chip">All stages</span></div>
+      <span class="chip">As of: Oct 29</span><span class="chip">All stages</span></div>
     <div class="tbl"><table><thead><tr><th>${T.work}</th><th>Customer</th><th>What</th><th>Stage</th><th class="num">Estimated value</th><th class="num">Hours so far</th></tr></thead>
       <tbody>${rows}<tr class="total"><td colspan="4">${WIP.length} ${T.works.toLowerCase()} started, not billed</td><td class="num">${money(val)}</td><td class="num">${hrs.toFixed(1)} h</td></tr></tbody></table></div>
     <div class="small muted" style="margin-top:10px">Estimated value is the approved estimate. Hours so far come from job timers.</div>
@@ -89,10 +89,10 @@ function wip() {
 /* ---------- 7.3 time reports ---------- */
 // [employee, day, clocked, on jobs, status]
 const TIME = [
-  ["Technician 1", "Mon Oct 27", 8.0, 7.1, "ok"], ["Technician 1", "Tue Oct 28", 8.5, 7.6, "ok"], ["Technician 1", "Wed Oct 29", 8.2, 6.8, "ok"],
-  ["Technician 1", "Thu Oct 30", 8.3, 7.5, "review"], ["Technician 1", "Fri Oct 31", 8.0, 7.2, "ok"],
-  ["Owner", "Mon Oct 27", 9.0, 3.0, "ok"], ["Owner", "Tue Oct 28", 8.5, 2.5, "ok"], ["Owner", "Wed Oct 29", 9.5, 4.0, "ok"],
-  ["Owner", "Thu Oct 30", 9.0, 3.5, "review"], ["Owner", "Fri Oct 31", 7.5, 2.0, "ok"],
+  ["Technician 1", "Mon Oct 26", 8.0, 7.1, "ok"], ["Technician 1", "Tue Oct 27", 8.5, 7.6, "ok"], ["Technician 1", "Wed Oct 28", 8.2, 6.8, "ok"],
+  ["Technician 1", "Thu Oct 29", 8.3, 7.5, "review"], ["Technician 1", "Fri Oct 30", 8.0, 7.2, "ok"],
+  ["Owner", "Mon Oct 26", 9.0, 3.0, "ok"], ["Owner", "Tue Oct 27", 8.5, 2.5, "ok"], ["Owner", "Wed Oct 28", 9.5, 4.0, "ok"],
+  ["Owner", "Thu Oct 29", 9.0, 3.5, "review"], ["Owner", "Fri Oct 30", 7.5, 2.0, "ok"],
 ];
 function timeRep() {
   const pill = (s) => (s === "ok" ? `<span class="pill solid">Approved</span>` : `<span class="pill dash">Needs review</span>`);
@@ -103,9 +103,9 @@ function timeRep() {
     rows += `<tr class="group"><td>${emp}</td><td></td><td class="num">${c.toFixed(1)} h</td><td class="num">${j.toFixed(1)} h</td><td class="num">${(c - j).toFixed(1)} h</td><td>${rs.some((r) => r[4] === "review") ? `<span class="pill dash">1 day needs review</span>` : pill("ok")}</td></tr>`;
     rows += rs.map((r) => `<tr class="sub"><td></td><td>${r[1]}</td><td class="num">${r[2].toFixed(1)} h</td><td class="num">${r[3].toFixed(1)} h</td><td class="num">${(r[2] - r[3]).toFixed(1)} h</td><td>${pill(r[4])}</td></tr>`).join("");
   });
-  const body = `${reportHead("Clocked hours and job hours", "Week of Oct 27 – Oct 31 · Job hours sit inside clocked hours. They are never added on top.", "Time",
+  const body = `${reportHead("Clocked hours and job hours", "Week of Oct 26 – Oct 30 · Job hours sit inside clocked hours. They are never added on top.", "Time",
       ["Clocked hours", "Job hours", "Timesheets"], "Clocked hours")}
-      <span class="chip">Week: Oct 27 – Oct 31</span><span class="chip">All employees</span></div>
+      <span class="chip">Week: Oct 26 – Oct 30</span><span class="chip">All employees</span></div>
     <div class="tbl"><table><thead><tr><th>Employee</th><th>Day</th><th class="num">Clocked in</th><th class="num">On ${T.works.toLowerCase()}</th><th class="num">Shop time</th><th>Timesheet</th></tr></thead>
       <tbody>${rows}</tbody></table></div>`;
   return shell("Reports", body, "reports/time");

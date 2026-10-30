@@ -30,15 +30,15 @@
 const VENDOR = "Keystone Sign Supply";
 // [name, vendor, unit, cost, price, last updated]
 const MATS = [
-  ["Avery MPI 1105 wrap film (54 in)", VENDOR, "ft", 3.10, 7.50, "Oct 14 · PO-0027"],
-  ["Avery DOL 1460Z overlaminate (54 in)", VENDOR, "ft", 2.05, 4.50, "Oct 14 · PO-0027"],
-  ["3M IJ180Cv3 wrap film (54 in)", "Susquehanna Graphic Supply", "ft", 3.45, 8.00, "Sep 30 · PO-0024"],
-  ["3M 8518 overlaminate (54 in)", "Susquehanna Graphic Supply", "ft", 2.20, 4.75, "Sep 30 · PO-0024"],
-  ["Oracal 651 cut vinyl (24 in)", VENDOR, "ft", 0.95, 3.00, "Oct 2 · PO-0025"],
+  ["Avery MPI 1105 wrap film (54 in)", VENDOR, "ft", 3.10, 7.50, "Oct 13 · PO-0027"],
+  ["Avery DOL 1460Z overlaminate (54 in)", VENDOR, "ft", 2.05, 4.50, "Oct 13 · PO-0027"],
+  ["3M IJ180Cv3 wrap film (54 in)", "Susquehanna Graphic Supply", "ft", 3.45, 8.00, "Sep 29 · PO-0024"],
+  ["3M 8518 overlaminate (54 in)", "Susquehanna Graphic Supply", "ft", 2.20, 4.75, "Sep 29 · PO-0024"],
+  ["Oracal 651 cut vinyl (24 in)", VENDOR, "ft", 0.95, 3.00, "Oct 1 · PO-0025"],
   ["Reflective DOT tape (2 in)", "Susquehanna Graphic Supply", "ft", 0.85, 2.50, "Aug 19 · PO-0019"],
-  ["Application tape (24 in)", VENDOR, "ft", 0.30, 0.90, "Oct 2 · PO-0025"],
-  ["Coroplast sign blank 24 × 36", "Lehigh Plastics Co.", "each", 6.40, 18.00, "Sep 9 · PO-0021"],
-  ["Latex ink", "Susquehanna Graphic Supply", "job", 38.00, 85.00, "Sep 30 · entered by hand"],
+  ["Application tape (24 in)", VENDOR, "ft", 0.30, 0.90, "Oct 1 · PO-0025"],
+  ["Coroplast sign blank 24 × 36", "Lehigh Plastics Co.", "each", 6.40, 18.00, "Sep 8 · PO-0021"],
+  ["Latex ink", "Susquehanna Graphic Supply", "job", 38.00, 85.00, "Sep 29 · entered by hand"],
   ["Install supplies", VENDOR, "job", 22.00, 45.00, "Jul 7 · entered by hand"],
 ];
 // Lines the owner adds to the new order. [material index, qty, new price per ft]
@@ -57,7 +57,7 @@ function materials() {
   const rows = MATS.map((m, i) => {
     const upd = S.updated && (i === 0 || i === 1);
     const cost = upd ? PO_LINES[i][2] : m[3];
-    const when = upd ? "Nov 6 · PO-0031 received" : m[5];
+    const when = upd ? "Nov 5 · PO-0031 received" : m[5];
     return `<tr class="${upd ? "upd rowin" : ""}"><td>${m[0]}</td><td>${m[1]}</td><td>${m[2]}</td>
       <td class="num">${upd ? `<span class="was">${money(m[3])}</span>` : ""}${money(cost)}</td><td class="num">${money(m[4])}</td><td class="muted">${when}</td></tr>`;
   }).join("");
@@ -95,15 +95,15 @@ function packages() {
 
 /* ---------- 5.3 purchase orders ---------- */
 function poTotal() { return PO_LINES.slice(0, S.po.lines).reduce((a, l) => a + l[1] * l[2], 0); }
-function recvPill() { return S.po.recv === "yes" ? `<span class="pill solid">Received Nov 6</span>` : `<span class="pill dash">Not received</span>`; }
+function recvPill() { return S.po.recv === "yes" ? `<span class="pill solid">Received Nov 5</span>` : `<span class="pill dash">Not received</span>`; }
 
 function poList() {
   const rows = [
-    ["PO-0031", VENDOR, "Oct 30", money(1605), recvPill(), true],
-    ["PO-0030", "Lehigh Plastics Co.", "Oct 24", money(256), `<span class="pill solid">Received Oct 28</span>`],
-    ["PO-0029", "Susquehanna Graphic Supply", "Oct 20", money(1180.5), `<span class="pill solid">Received Oct 23</span>`],
-    ["PO-0028", VENDOR, "Oct 16", money(412), `<span class="pill solid">Received Oct 21</span>`],
-    ["PO-0027", VENDOR, "Oct 9", money(1534.5), `<span class="pill solid">Received Oct 14</span>`],
+    ["PO-0031", VENDOR, "Oct 29", money(1605), recvPill(), true],
+    ["PO-0030", "Lehigh Plastics Co.", "Oct 23", money(256), `<span class="pill solid">Received Oct 27</span>`],
+    ["PO-0029", "Susquehanna Graphic Supply", "Oct 19", money(1180.5), `<span class="pill solid">Received Oct 22</span>`],
+    ["PO-0028", VENDOR, "Oct 15", money(412), `<span class="pill solid">Received Oct 20</span>`],
+    ["PO-0027", VENDOR, "Oct 8", money(1534.5), `<span class="pill solid">Received Oct 13</span>`],
   ];
   const showNew = S.screen === "poListLater";
   const body = `<div class="head"><div><h2>Materials &amp; ordering</h2><div class="meta">Orders to your vendors. Download the PDF and send it from your own email.</div></div>
@@ -122,13 +122,13 @@ function poForm() {
     : p.menu === "mat"
     ? `<div class="menu" style="left:24px;top:${300 + p.lines * 31}px;width:360px">${MATS.filter((m) => m[1] === VENDOR).slice(0, 4).map((m, i) => `<div data-k="pick-mat-${i}"><span>${m[0]}</span><span class="muted small">${m[2]}</span></div>`).join("")}</div>`
     : "";
-  const body = `<div class="head"><div><div class="crumb">Purchase orders › PO-0031</div><h2>Purchase order PO-0031 ${recvPill()}</h2><div class="meta">${p.recv === "yes" ? "Marked received Nov 6 by Owner" : "Ordered Oct 30"}</div></div>
+  const body = `<div class="head"><div><div class="crumb">Purchase orders › PO-0031</div><h2>Purchase order PO-0031 ${recvPill()}</h2><div class="meta">${p.recv === "yes" ? "Marked received Nov 5 by Owner" : "Ordered Oct 29"}</div></div>
     <div class="btns"><button class="btn" data-k="pdf" ${p.lines ? "" : "disabled"}>Download PDF</button>
       ${p.recv === "yes" ? `<button class="btn" disabled>Order received</button>` : `<button class="btn primary" data-k="recv" ${p.lines === 2 ? "" : "disabled"}>Mark whole order received</button>`}</div></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
       <div class="box"><h3>Vendor</h3><div class="field"><label>Vendor</label><div class="input" data-k="vendor">${p.vendor ? VENDOR : `<span class="muted">Choose a vendor…</span>`}</div></div>
         <div class="small muted" style="margin-top:8px;min-height:18px">${p.vendor ? "1180 Industrial Rd, York, PA · orders@keystonesign.example" : ""}</div></div>
-      <div class="box"><h3>Ship to</h3><div class="small">OTC Fleet Services · Graphics<br>Shop address from settings<br>Needed by: Nov 5</div></div>
+      <div class="box"><h3>Ship to</h3><div class="small">OTC Fleet Services · Graphics<br>Shop address from settings<br>Needed by: Nov 4</div></div>
     </div>
     <div class="tbl"><table><thead><tr><th>Material</th><th class="num">Qty</th><th>Unit</th><th class="num">Price each</th><th class="num">Line total</th></tr></thead>
       <tbody>${lines}<tr><td colspan="5"><button class="btn dash" data-k="add-mat" ${p.vendor ? "" : "disabled"}>+ Add material</button></td></tr></tbody></table></div>
@@ -147,8 +147,8 @@ function pdfPreview() {
   return `<div class="scrim" style="flex-direction:column;display:flex;align-items:center;justify-content:center">
     <div class="pdfbar"><span>PO-0031.pdf · preview</span><span class="btns"><button class="btn">Close</button><button class="btn primary" data-k="save-pdf">Download</button></span></div>
     <div class="doc">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start"><div class="logo">LOGO</div><div style="text-align:right"><h5>Purchase order</h5><div class="num" style="text-align:right">PO-0031 · Oct 30</div></div></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div><div class="muted">Vendor</div><strong>${VENDOR}</strong><br>1180 Industrial Rd<br>York, PA</div><div><div class="muted">Ship to</div><strong>OTC Fleet Services · Graphics</strong><br>Needed by Nov 5</div></div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start"><div class="logo">LOGO</div><div style="text-align:right"><h5>Purchase order</h5><div class="num" style="text-align:right">PO-0031 · Oct 29</div></div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div><div class="muted">Vendor</div><strong>${VENDOR}</strong><br>1180 Industrial Rd<br>York, PA</div><div><div class="muted">Ship to</div><strong>OTC Fleet Services · Graphics</strong><br>Needed by Nov 4</div></div>
       <div class="tbl"><table><thead><tr><th>Item</th><th class="num">Qty</th><th class="num">Price</th><th class="num">Total</th></tr></thead><tbody>${lines}</tbody></table></div>
       <div class="kv" style="width:220px;margin-left:auto"><dt>Order total</dt><dd><strong>${money(1605)}</strong></dd></div>
       <div class="muted" style="border-top:1px solid var(--fill-2);padding-top:10px">Please confirm by email. Questions: call the shop.</div>

@@ -201,21 +201,25 @@ const WRAP = [
 ];
 const PRICE = WRAP.reduce((a, r) => a + r[1] * r[4], 0);
 const COST = WRAP.reduce((a, r) => a + r[1] * r[3], 0);
+// Lines for one vehicle. The owner lengthens Unit 17's film to 74 ft in the estimate scene (matches flow 1.1).
+const unitLines = (u) => WRAP.map((w, i) => (i === 0 && u === 17 && S.est.film17 ? [w[0], S.est.film17, ...w.slice(2)] : w));
+const unitPrice = (u) => unitLines(u).reduce((a, r) => a + r[1] * r[4], 0);
+const unitCost = (u) => unitLines(u).reduce((a, r) => a + r[1] * r[3], 0);
 const money = (n) => (n < 0 ? "−" : "") + "$" + Math.abs(n).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 const OTHER_JOBS = [
-  { no: "G-1052", cust: "Lancaster Kitchen Supply", what: "Box truck logo kit", who: "T1", date: "Nov 4", pri: "Normal", stage: 0 },
-  { no: "G-1053", cust: "Conestoga Tree Care", what: "Bucket truck doors ×3", who: "OW", date: "Nov 5", pri: "Low", stage: 0 },
-  { no: "G-1046", cust: "Brightway Movers", what: "Rear door graphics", who: "T1", date: "Nov 1", pri: "Normal", stage: 2 },
-  { no: "G-1044", cust: "Keystone Dairy Co-op", what: "Tanker DOT lettering", who: "T1", date: "Oct 31", pri: "High", stage: 3 },
-  { no: "G-1043", cust: "Millport School District", what: "Shop wall mural", who: "T1", date: "Oct 30", pri: "Normal", stage: 4 },
-  { no: "G-1041", cust: "Ridgeline Plumbing", what: "Unit 9 · decal refresh", who: "T1", date: "Oct 28", pri: "Normal", stage: 5 },
+  { no: "G-1052", cust: "Lancaster Kitchen Supply", what: "Box truck logo kit", who: "T1", date: "Nov 3", pri: "Normal", stage: 0 },
+  { no: "G-1053", cust: "Conestoga Tree Care", what: "Bucket truck doors ×3", who: "OW", date: "Nov 4", pri: "Low", stage: 0 },
+  { no: "G-1046", cust: "Brightway Movers", what: "Rear door graphics", who: "T1", date: "Oct 31", pri: "Normal", stage: 2 },
+  { no: "G-1044", cust: "Keystone Dairy Co-op", what: "Tanker DOT lettering", who: "T1", date: "Oct 30", pri: "High", stage: 3 },
+  { no: "G-1043", cust: "Millport School District", what: "Shop wall mural", who: "T1", date: "Oct 29", pri: "Normal", stage: 4 },
+  { no: "G-1041", cust: "Ridgeline Plumbing", what: "Unit 9 · decal refresh", who: "T1", date: "Oct 27", pri: "Normal", stage: 5 },
 ];
 
 /* ===================== state ===================== */
 const S = {
   screen: "title", who: null,
-  est: { units: [], custView: false, menu: false, modal: false, declined17: false, approved: false, deposit: "none" },
+  est: { units: [], film17: 0, custView: false, menu: false, modal: false, declined17: false, approved: false, deposit: "none" },
   job: { stage: null, review: false, hl: false, lifted: false },
   phone: { view: "list", punched: false, timer: false, secs: 0, photos: 0, finished: false },
   inv: "draft",
@@ -248,16 +252,16 @@ function estimate() {
   e.units.forEach((u) => {
     const dec = e.approved && u === 17 && e.declined17 ? "declined" : "";
     if (cv) {
-      rows += `<tr class="${dec}"><td><span class="strike">Unit ${u} · 2024 Ford Transit 250 · full wrap</span><div class="small muted">Design, print, laminate and install</div></td><td class="num"><span class="strike">${money(PRICE)}</span></td><td>${status(u)}</td></tr>`;
+      rows += `<tr class="${dec}"><td><span class="strike">Unit ${u} · 2024 Ford Transit 250 · full wrap</span><div class="small muted">Design, print, laminate and install</div></td><td class="num"><span class="strike">${money(unitPrice(u))}</span></td><td>${status(u)}</td></tr>`;
     } else {
-      rows += `<tr class="group ${dec} rowin"><td><span class="strike">Unit ${u} · 2024 Ford Transit 250 · Full wrap package</span></td><td></td><td class="num">${money(COST)}</td><td class="num">${money(PRICE)}</td><td class="num">${Math.round(((PRICE - COST) / PRICE) * 100)}%</td><td>${status(u)}</td></tr>`;
-      rows += WRAP.map((w, i) => `<tr class="sub ${dec} rowin" style="animation-delay:${(i + 1) * 60}ms"><td><span class="strike">${w[0]}</span></td><td class="num">${w[1]} ${w[2]}</td><td class="num">${money(w[1] * w[3])}</td><td class="num">${money(w[1] * w[4])}</td><td></td><td></td></tr>`).join("");
+      rows += `<tr class="group ${dec} rowin"><td><span class="strike">Unit ${u} · 2024 Ford Transit 250 · Full wrap package</span></td><td></td><td class="num">${money(unitCost(u))}</td><td class="num">${money(unitPrice(u))}</td><td class="num">${Math.round(((unitPrice(u) - unitCost(u)) / unitPrice(u)) * 100)}%</td><td>${status(u)}</td></tr>`;
+      rows += unitLines(u).map((w, i) => `<tr class="sub ${dec} rowin" style="animation-delay:${(i + 1) * 60}ms"><td><span class="strike">${w[0]}</span></td><td class="num"${i === 0 ? ` data-k="qty-${u}"` : ""}>${w[1]} ${w[2]}</td><td class="num">${money(w[1] * w[3])}</td><td class="num">${money(w[1] * w[4])}</td><td></td><td></td></tr>`).join("");
     }
   });
   const head = cv
     ? `<tr><th>Description</th><th class="num">Price</th><th style="width:120px">Status</th></tr>`
     : `<tr><th>Item</th><th class="num">Qty</th><th class="num">Cost</th><th class="num">Price</th><th class="num">Margin</th><th style="width:120px">Status</th></tr>`;
-  const approvedTotal = e.approved ? PRICE * (e.declined17 ? 1 : 2) : PRICE * e.units.length;
+  const approvedTotal = e.approved ? (e.declined17 ? unitPrice(14) : unitPrice(14) + unitPrice(17)) : e.units.reduce((a, u) => a + unitPrice(u), 0);
   const dep = { none: `<button class="btn" data-k="send-deposit" ${e.approved ? "" : "disabled"}>Send deposit link</button>`, sent: `<span class="pill dash">Link emailed</span>`, paid: `<span class="pill solid">Paid by card</span>` }[e.deposit];
   const body = `
   <div class="head"><div><div class="crumb">Estimates › E-2207</div><h2>Ridgeline Plumbing &amp; Heating</h2><div class="meta">Contact: Mike Dorsey · Customer PO 7781</div></div>
@@ -269,16 +273,16 @@ function estimate() {
   ${e.menu ? `<div class="menu" style="right:258px;top:62px"><div data-k="tpl-wrap"><span>Full wrap</span><span class="muted small">6 lines</span></div><div><span>Partial wrap</span><span class="muted small">6 lines</span></div><div><span>Door logos (pair)</span><span class="muted small">4 lines</span></div><div><span>DOT lettering</span><span class="muted small">3 lines</span></div></div>` : ""}
   <div class="cols">
     <div class="box"><h3>Approval record</h3>${e.approved
-      ? `<div class="kv"><dt>Unit 14</dt><dd>Approved</dd><dt>Unit 17</dt><dd>Declined</dd><dt>Approved by</dt><dd>Mike Dorsey</dd><dt>Method</dt><dd>Phone call</dd><dt>When</dt><dd>Oct 27, 10:14 AM</dd><dt>Recorded by</dt><dd>Owner</dd></div>`
+      ? `<div class="kv"><dt>Unit 14</dt><dd>Approved</dd><dt>Unit 17</dt><dd>Declined</dd><dt>Approved by</dt><dd>Mike Dorsey</dd><dt>Method</dt><dd>Phone call</dd><dt>When</dt><dd>Oct 26, 10:14 AM</dd><dt>Recorded by</dt><dd>Owner</dd></div>`
       : `<div class="muted small">Not approved yet</div>`}</div>
     <div class="box"><h3>Totals</h3><div class="kv"><dt>${e.approved ? "Approved" : "Estimate total"}</dt><dd>${money(approvedTotal)}</dd><dt>Sales tax</dt><dd>per settings</dd><div class="rule"></div><dt>Deposit (50%)</dt><dd>${money(approvedTotal / 2)}</dd></div><div style="margin-top:12px;display:flex;justify-content:flex-end">${dep}</div></div>
   </div>
   ${e.modal ? `<div class="scrim"><div class="modal"><h4>Record customer approval</h4>
     <div class="choice"><span>Unit 14 · full wrap · ${money(PRICE)}</span><div class="seg"><button class="on">Approve</button><button>Decline</button></div></div>
-    <div class="choice"><span>Unit 17 · full wrap · ${money(PRICE)}</span><div class="seg"><button class="${e.declined17 ? "" : "on"}">Approve</button><button class="${e.declined17 ? "on" : ""}" data-k="decline-17">Decline</button></div></div>
+    <div class="choice"><span>Unit 17 · full wrap · ${money(unitPrice(17))}</span><div class="seg"><button class="${e.declined17 ? "" : "on"}">Approve</button><button class="${e.declined17 ? "on" : ""}" data-k="decline-17">Decline</button></div></div>
     <div class="field"><label>Approved by</label><div class="input">Mike Dorsey</div></div>
     <div class="field"><label>How</label><div class="input">Phone call</div></div>
-    <div class="field"><label>When</label><div class="input">Oct 27, 10:14 AM (now)</div></div>
+    <div class="field"><label>When</label><div class="input">Oct 26, 10:14 AM (now)</div></div>
     <div class="btns"><button class="btn">Cancel</button><button class="btn primary" data-k="save-approval">Save approval</button></div></div></div>` : ""}`;
   return shell("Estimates", body, "estimates/E-2207");
 }
@@ -290,7 +294,7 @@ function boardCard(j, extra = "") {
 }
 function board() {
   const jobs = [...OTHER_JOBS];
-  if (S.job.stage !== null) jobs.push({ no: "G-1048", cust: "Ridgeline Plumbing", what: "Unit 14 · full wrap", who: "T1", date: "Nov 3", pri: "High", stage: S.job.stage, note: S.job.review ? "Needs review" : "", mine: true });
+  if (S.job.stage !== null) jobs.push({ no: "G-1048", cust: "Ridgeline Plumbing", what: "Unit 14 · full wrap", who: "T1", date: "Nov 2", pri: "High", stage: S.job.stage, note: S.job.review ? "Needs review" : "", mine: true });
   const cols = T.stages.map((s, i) => {
     const cs = jobs.filter((j) => j.stage === i);
     return `<div class="col" data-k="col-${i}"><div class="col-head"><span>${s}</span><span>${cs.length}</span></div><div class="cards">${cs.map((j) => boardCard(j, j.mine ? [S.job.hl ? "hl" : "", S.job.lifted ? "lifted" : "", "pop"].join(" ") : "")).join("")}</div></div>`;
@@ -310,7 +314,7 @@ function phone() {
     const mine = [
       { no: "G-1048", cust: "Ridgeline Plumbing", what: "Unit 14 · full wrap", stage: "Install in progress", date: "Today" },
       { no: "G-1044", cust: "Keystone Dairy Co-op", what: "Tanker DOT lettering", stage: "Ready for install", date: "Tomorrow" },
-      { no: "G-1052", cust: "Lancaster Kitchen Supply", what: "Box truck logo kit", stage: "Ready for production", date: "Nov 4" },
+      { no: "G-1052", cust: "Lancaster Kitchen Supply", what: "Box truck logo kit", stage: "Ready for production", date: "Nov 3" },
     ];
     body = `<div class="p-sec"><div class="p-h">Assigned to me · 3</div>${mine.map((j) => `<div class="p-job" data-k="pjob-${j.no}"><div class="row"><span>${j.no}</span><span>${j.date}</span></div><strong>${j.cust}</strong><span>${j.what}</span><span class="small muted">${j.stage}</span></div>`).join("")}</div>`;
   } else if (p.finished) {
@@ -332,10 +336,10 @@ function jobRecord() {
     <div class="btns"><span class="pill dash">Needs review</span><button class="btn">Send back</button><button class="btn primary" data-k="close-job">Close ${T.work.toLowerCase()}</button></div></div>
     <div class="cols" style="margin-top:0">
       <div class="box"><h3>Completion photos · from the technician</h3><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px" data-k="photos">${[0, 1, 2].map(() => `<div class="ph" style="aspect-ratio:4/3"></div>`).join("")}</div>
-        <div class="small muted" style="margin-top:10px">Uploaded Nov 3, 3:52 PM</div></div>
+        <div class="small muted" style="margin-top:10px">Uploaded Nov 2, 3:52 PM</div></div>
       <div style="display:flex;flex-direction:column;gap:16px">
         <div class="box" data-k="costing"><h3>Estimated vs. actual</h3><div class="kv"><dt>Hours, estimated</dt><dd>13.0</dd><dt>Hours, actual</dt><dd>12.6</dd><dt>Materials, estimated</dt><dd>${money(379.3)}</dd><dt>Materials, actual</dt><dd>${money(391.4)}</dd></div></div>
-        <div class="box"><h3>Notes</h3><div class="small">Oct 31 · Printing done, laminating overnight.</div><div class="small" style="margin-top:6px">Nov 3 · Install done. Fuel door clear.</div></div>
+        <div class="box"><h3>Notes</h3><div class="small">Oct 30 · Printing done, laminating overnight.</div><div class="small" style="margin-top:6px">Nov 2 · Install done. Fuel door clear.</div></div>
       </div></div>`;
   return shell(T.works, body, "jobs/G-1048");
 }
@@ -350,12 +354,12 @@ function invoice() {
         <div style="display:flex;justify-content:space-between"><div class="logo">LOGO</div><div class="small" style="text-align:right">Bill to<br><strong>Ridgeline Plumbing &amp; Heating</strong><br>Customer PO: 7781</div></div>
         <div class="tbl" style="margin-top:16px" data-k="inv-line"><table><thead><tr><th>Description</th><th class="num">Amount</th></tr></thead>
           <tbody><tr><td>Unit 14 · 2024 Ford Transit 250 · full wrap<div class="small muted">Design, print, laminate and install</div></td><td class="num">${money(PRICE)}</td></tr></tbody></table></div>
-        <div class="kv" style="max-width:300px;margin:14px 0 0 auto" data-k="inv-totals"><dt>Subtotal</dt><dd>${money(PRICE)}</dd><dt>Sales tax</dt><dd>per settings</dd><dt>Deposit paid Oct 27</dt><dd>${money(-dep)}</dd><div class="rule"></div>
+        <div class="kv" style="max-width:300px;margin:14px 0 0 auto" data-k="inv-totals"><dt>Subtotal</dt><dd>${money(PRICE)}</dd><dt>Sales tax</dt><dd>per settings</dd><dt>Deposit paid Oct 26</dt><dd>${money(-dep)}</dd><div class="rule"></div>
           <dt><strong>Balance due</strong></dt><dd><strong>${money(st === "paid" ? 0 : PRICE - dep)}</strong></dd></div>
-        <div class="box" style="margin-top:16px;border-style:dashed" data-k="inv-other"><h3>Your other open invoices</h3><div class="kv"><dt>OTC-G-0398 · Unit 9 decal refresh · due Nov 27</dt><dd>$420.00</dd></div></div>
+        <div class="box" style="margin-top:16px;border-style:dashed" data-k="inv-other"><h3>Your other open invoices</h3><div class="kv"><dt>OTC-G-0398 · Unit 9 decal refresh · due Nov 26</dt><dd>$420.00</dd></div></div>
       </div>
       <div style="display:flex;flex-direction:column;gap:16px">
-        <div class="box"><h3>Payment</h3><div class="small">${st === "draft" ? "Not sent yet" : st === "sent" ? "Payment link emailed to Mike Dorsey" : `<span class="pill solid">Paid by card</span> Nov 6 · ${money(PRICE - dep)}`}</div></div>
+        <div class="box"><h3>Payment</h3><div class="small">${st === "draft" ? "Not sent yet" : st === "sent" ? "Payment link emailed to Mike Dorsey" : `<span class="pill solid">Paid by card</span> Nov 5 · ${money(PRICE - dep)}`}</div></div>
         <div class="box" data-k="qb"><h3>QuickBooks Online</h3><div class="small">${st === "draft" ? "Syncs when sent" : st === "sent" ? "Invoice synced" : "Invoice and payment synced"}</div></div>
       </div></div>`;
   return shell("Invoices", body, "invoices/" + (st === "draft" ? "draft" : "OTC-G-0412"));
@@ -365,12 +369,12 @@ function timeScreen() {
   const a = S.time.approved;
   const st = (r) => (a ? `<span class="pill solid">Approved</span>` : r);
   const rows = [
-    ["Technician 1", "Mon Nov 3", "8.5", "6.9", "1.6", `<span class="pill dash">Needs review</span>`],
-    ["Technician 1", "Fri Oct 31", "8.0", "7.2", "0.8", `<span class="pill solid">Approved</span>`],
-    ["Technician 1", "Thu Oct 30", "8.3", "7.5", "0.8", `<span class="pill dash">Needs review</span>`],
-    ["Owner", "Mon Nov 3", "9.0", "3.5", "5.5", `<span class="pill dash">Needs review</span>`],
+    ["Technician 1", "Mon Nov 2", "8.5", "6.9", "1.6", `<span class="pill dash">Needs review</span>`],
+    ["Technician 1", "Fri Oct 30", "8.0", "7.2", "0.8", `<span class="pill solid">Approved</span>`],
+    ["Technician 1", "Thu Oct 29", "8.3", "7.5", "0.8", `<span class="pill dash">Needs review</span>`],
+    ["Owner", "Mon Nov 2", "9.0", "3.5", "5.5", `<span class="pill dash">Needs review</span>`],
   ];
-  const body = `<div class="head"><div><h2>Time &amp; payroll</h2><div class="meta">Week of Oct 27 – Nov 2 · Payroll gets punched hours. Job time sits inside them.</div></div>
+  const body = `<div class="head"><div><h2>Time &amp; payroll</h2><div class="meta">Week of Oct 26 – Nov 1 · Payroll gets punched hours. Job time sits inside them.</div></div>
     <div class="btns"><button class="btn" data-k="export">Export for payroll (CSV)</button><button class="btn primary" data-k="approve-week" ${a ? "disabled" : ""}>${a ? "Week approved" : "Approve week"}</button></div></div>
     <div class="tbl"><table><thead><tr><th>Employee</th><th>Day</th><th class="num">Punched in</th><th class="num">On ${T.works.toLowerCase()}</th><th class="num">Shop time</th><th>Status</th></tr></thead>
     <tbody>${rows.map((r) => `<tr><td>${r[0]}</td><td>${r[1]}</td><td class="num">${r[2]} h</td><td class="num">${r[3]} h</td><td class="num">${r[4]} h</td><td>${st(r[5])}</td></tr>`).join("")}</tbody></table></div>`;
@@ -420,8 +424,8 @@ setInterval(() => {
 const MY_JOBS = [
   { no: "G-1048", cust: "Ridgeline Plumbing", what: "Unit 14 · full wrap", who: "T1", date: "Today", pri: "High" },
   { no: "G-1044", cust: "Keystone Dairy Co-op", what: "Tanker DOT lettering", who: "T1", date: "Tomorrow", pri: "High", stage: 3 },
-  { no: "G-1046", cust: "Brightway Movers", what: "Rear door graphics", who: "T1", date: "Nov 5", pri: "Normal", stage: 2 },
-  { no: "G-1052", cust: "Lancaster Kitchen Supply", what: "Box truck logo kit", who: "T1", date: "Nov 6", pri: "Normal", stage: 0 },
+  { no: "G-1046", cust: "Brightway Movers", what: "Rear door graphics", who: "T1", date: "Nov 4", pri: "Normal", stage: 2 },
+  { no: "G-1052", cust: "Lancaster Kitchen Supply", what: "Box truck logo kit", who: "T1", date: "Nov 5", pri: "Normal", stage: 0 },
 ];
 
 function techShell(active, body, url) {
@@ -464,7 +468,7 @@ function techJob() {
         <div class="box"><h3>Completion photos</h3><div class="muted small">None yet. Add them from the phone, or upload them here.</div></div>
       </div>
       <div style="display:flex;flex-direction:column;gap:16px">
-        <div class="box"><h3>Notes</h3><div class="small">Oct 31 · Printing done, laminating overnight.</div></div>
+        <div class="box"><h3>Notes</h3><div class="small">Oct 30 · Printing done, laminating overnight.</div></div>
         <div class="box" style="border-style:dashed" data-k="noprices"><h3>Not shown to technicians</h3><div class="small muted">Prices, costs, margin and the customer's invoices.</div></div>
       </div></div>`;
   return techShell("My jobs", body, "my-jobs/G-1048");
@@ -483,7 +487,7 @@ function techPhone() {
 }
 
 function techTime() {
-  const body = `<div class="head"><div><h2>My time · today</h2><div class="meta">Mon Nov 3 · The owner reviews and approves this</div></div>
+  const body = `<div class="head"><div><h2>My time · today</h2><div class="meta">Mon Nov 2 · The owner reviews and approves this</div></div>
     <div class="btns">${TS.clockedOut ? `<span class="pill dash">Clocked out</span>` : `<button class="btn primary" data-k="clock-out">Clock out</button>`}</div></div>
     <div class="cols" style="margin-top:0;grid-template-columns:1fr 300px">
       <div class="tbl"><table><thead><tr><th>What</th><th>From</th><th class="num">Hours</th></tr></thead><tbody>
@@ -562,8 +566,10 @@ const SCENES = {
       await click("tpl-wrap", () => { S.est.menu = false; S.est.units.push(u); }, 1600);
     }
     await moveTo("cv-int", 0, 160, 900);
-    await wait(1500);
-    await moveTo("cv-int", 0, 420, 1100);
+    await wait(1200);
+    await click("qty-17", () => (S.est.film17 = 74), 300);
+    toast("Unit 17 film changed to 74 ft · price updated");
+    await wait(1400);
   },
 
   async "customer-view"() {
@@ -659,7 +665,7 @@ const SCENES = {
     await wait(2600);
     await click("approve-week", () => (S.time.approved = true), 1800);
     await click("export", null, 200);
-    toast("payroll-hours-oct27-nov2.csv downloaded");
+    toast("payroll-hours-oct26-nov1.csv downloaded");
     await wait(1500);
   },
 

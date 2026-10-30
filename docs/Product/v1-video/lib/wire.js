@@ -40,13 +40,13 @@ const hms = (s) => `${Math.floor(s / 3600)}:${String(Math.floor(s / 60) % 60).pa
 
 // Jobs on the board. "T1" = Technician 1, "OW" = Owner. Story job is G-1048 (Ridgeline Plumbing, Unit 14 full wrap).
 const JOBS = [
-  { no: "G-1052", cust: "Lancaster Kitchen Supply", what: "Box truck logo kit", who: "T1", date: "Nov 4", pri: "Normal", stage: 0 },
-  { no: "G-1053", cust: "Conestoga Tree Care", what: "Bucket truck doors ×3", who: "OW", date: "Nov 5", pri: "Low", stage: 0 },
-  { no: "G-1048", cust: "Ridgeline Plumbing", what: "Unit 14 · full wrap", who: "T1", date: "Nov 3", pri: "High", stage: 1 },
-  { no: "G-1046", cust: "Brightway Movers", what: "Rear door graphics", who: "T1", date: "Nov 1", pri: "Normal", stage: 2 },
-  { no: "G-1044", cust: "Keystone Dairy Co-op", what: "Tanker DOT lettering", who: "T1", date: "Oct 31", pri: "High", stage: 3 },
-  { no: "G-1043", cust: "Millport School District", what: "Shop wall mural", who: "T1", date: "Oct 30", pri: "Normal", stage: 4 },
-  { no: "G-1041", cust: "Ridgeline Plumbing", what: "Unit 9 · decal refresh", who: "T1", date: "Oct 28", pri: "Normal", stage: 5 },
+  { no: "G-1052", cust: "Lancaster Kitchen Supply", what: "Box truck logo kit", who: "T1", date: "Nov 3", pri: "Normal", stage: 0 },
+  { no: "G-1053", cust: "Conestoga Tree Care", what: "Bucket truck doors ×3", who: "OW", date: "Nov 4", pri: "Low", stage: 0 },
+  { no: "G-1048", cust: "Ridgeline Plumbing", what: "Unit 14 · full wrap", who: "T1", date: "Nov 2", pri: "High", stage: 1 },
+  { no: "G-1046", cust: "Brightway Movers", what: "Rear door graphics", who: "T1", date: "Oct 31", pri: "Normal", stage: 2 },
+  { no: "G-1044", cust: "Keystone Dairy Co-op", what: "Tanker DOT lettering", who: "T1", date: "Oct 30", pri: "High", stage: 3 },
+  { no: "G-1043", cust: "Millport School District", what: "Shop wall mural", who: "T1", date: "Oct 29", pri: "Normal", stage: 4 },
+  { no: "G-1041", cust: "Ridgeline Plumbing", what: "Unit 9 · decal refresh", who: "T1", date: "Oct 27", pri: "Normal", stage: 5 },
 ];
 const CUSTOMERS = ["Ridgeline Plumbing & Heating", "Keystone Dairy Co-op", "Lancaster Kitchen Supply", "Conestoga Tree Care", "Brightway Movers", "Millport School District"];
 

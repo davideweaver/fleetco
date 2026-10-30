@@ -76,7 +76,7 @@ function job() {
     <div class="btns">${btns}</div></div>${hint}
     <div class="cols" style="margin-top:0;grid-template-columns:1fr 340px">
       <div class="box"><h3>Completion photos · from the technician</h3><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px" data-k="photos">${["Driver side", "Passenger side", "Rear doors"].map((c) => `<div><div class="ph" style="aspect-ratio:4/3"></div><div class="small muted" style="margin-top:4px">${c}</div></div>`).join("")}</div>
-        <div class="small muted" style="margin-top:10px">Uploaded Nov 3, 3:52 PM · Marked finished by Technician 1</div></div>
+        <div class="small muted" style="margin-top:10px">Uploaded Nov 2, 3:52 PM · Marked finished by Technician 1</div></div>
       <div style="display:flex;flex-direction:column;gap:16px">
         <div class="box" data-k="costing"><h3>Estimated vs. actual</h3>
           <div class="tbl"><table><thead><tr><th></th><th class="num">Estimated</th><th class="num">Actual</th></tr></thead><tbody>
@@ -85,7 +85,7 @@ function job() {
             <tr><td>Materials</td><td class="num">${money(379.3)}</td><td class="num">${money(391.4)}</td></tr>
           </tbody></table></div>
           <div class="small muted" style="margin-top:8px">Hours from the job timers. Materials from the materials list.</div></div>
-        <div class="box"><h3>Notes</h3><div class="small">Oct 31 · Printing done, laminating overnight.</div><div class="small" style="margin-top:6px">Nov 3 · Install done. Fuel door clear.</div></div>
+        <div class="box"><h3>Notes</h3><div class="small">Oct 30 · Printing done, laminating overnight.</div><div class="small" style="margin-top:6px">Nov 2 · Install done. Fuel door clear.</div></div>
       </div></div>`;
   return shell(T.works, body, "jobs/G-1048");
 }
@@ -100,7 +100,7 @@ function invoice() {
       <div class="choice"><span>Include a link to pay by card</span><span class="check on">✓</span></div>
       <div class="choice"><span>Attach PDF</span><span class="check on">✓</span></div>
       <div class="btns"><button class="btn">Cancel</button><button class="btn primary" data-k="send-now">Send</button></div></div></div>` : "";
-  const payBox = st === "draft" ? "Not sent yet" : st === "sent" ? `Emailed with a card payment link to ${BILL_EMAIL}` : `<span class="pill solid">Paid by card</span><div style="margin-top:6px">Nov 6 · ${money(BAL)}</div>`;
+  const payBox = st === "draft" ? "Not sent yet" : st === "sent" ? `Emailed with a card payment link to ${BILL_EMAIL}` : `<span class="pill solid">Paid by card</span><div style="margin-top:6px">Nov 5 · ${money(BAL)}</div>`;
   const body = `<div class="head"><div><div class="crumb">Invoices › OTC-G-0412</div><h2>Invoice OTC-G-0412 ${pill}</h2><div class="meta">Created when G-1048 was closed · Ridgeline Plumbing &amp; Heating</div></div>
     <div class="btns"><button class="btn">Edit</button><button class="btn">PDF</button>${st === "draft" ? `<button class="btn primary" data-k="send-inv">Send with payment link</button>` : ""}</div></div>
     <div class="cols" style="margin-top:0">
@@ -108,32 +108,32 @@ function invoice() {
         <div style="display:flex;justify-content:space-between"><div class="logo">LOGO</div><div class="small" style="text-align:right">Bill to<br><strong>Ridgeline Plumbing &amp; Heating</strong><br>Customer PO: 7781</div></div>
         <div class="tbl" style="margin-top:16px"><table><thead><tr><th>Description</th><th class="num">Amount</th></tr></thead>
           <tbody><tr><td>Unit 14 · 2024 Ford Transit 250 · full wrap<div class="small muted">Design, print, laminate and install</div></td><td class="num">${money(PRICE)}</td></tr></tbody></table></div>
-        <div class="kv" style="max-width:320px;margin:14px 0 0 auto" data-k="inv-totals"><dt>Subtotal</dt><dd>${money(PRICE)}</dd><dt>Sales tax</dt><dd>per settings</dd><dt>Deposit paid Oct 27</dt><dd>${money(-DEP)}</dd>${st === "paid" ? `<dt>Paid by card Nov 6</dt><dd>${money(-BAL)}</dd>` : ""}<div class="rule"></div>
+        <div class="kv" style="max-width:320px;margin:14px 0 0 auto" data-k="inv-totals"><dt>Subtotal</dt><dd>${money(PRICE)}</dd><dt>Sales tax</dt><dd>per settings</dd><dt>Deposit paid Oct 26</dt><dd>${money(-DEP)}</dd>${st === "paid" ? `<dt>Paid by card Nov 5</dt><dd>${money(-BAL)}</dd>` : ""}<div class="rule"></div>
           <dt><strong>Balance due</strong></dt><dd data-k="balance"><strong>${money(st === "paid" ? 0 : BAL)}</strong></dd></div>
-        <div class="box" style="margin-top:16px;border-style:dashed"><h3>Your other open invoices</h3><div class="kv"><dt>OTC-G-0398 · Unit 9 decal refresh · due Nov 27</dt><dd>$420.00</dd></div></div>
+        <div class="box" style="margin-top:16px;border-style:dashed"><h3>Your other open invoices</h3><div class="kv"><dt>OTC-G-0398 · Unit 9 decal refresh · due Nov 26</dt><dd>$420.00</dd></div></div>
       </div>
       <div style="display:flex;flex-direction:column;gap:16px">
         <div class="box" data-k="paybox"><h3>Payment</h3><div class="small">${payBox}</div></div>
-        <div class="box"><h3>Job</h3><div class="small">G-1048 · Unit 14 full wrap<br><span class="muted">Closed Nov 3</span></div></div>
+        <div class="box"><h3>Job</h3><div class="small">G-1048 · Unit 14 full wrap<br><span class="muted">Closed Nov 2</span></div></div>
       </div></div>${modal}`;
   return shell("Invoices", body, "invoices/OTC-G-0412");
 }
 
 /* ---------- owner: invoices list ---------- */
 const INVOICES = [
-  ["OTC-G-0412", "Ridgeline Plumbing & Heating", "G-1048 · Unit 14 full wrap", "Nov 4", PRICE, "card"],
-  ["OTC-G-0411", "Brightway Movers", "G-1046 · Rear door graphics", "Nov 3", 1150, "open"],
-  ["OTC-G-0410", "Keystone Dairy Co-op", "G-1039 · Office door lettering", "Oct 31", 310, "open"],
-  ["OTC-G-0407", "Keystone Dairy Co-op", "G-1036 · Tanker DOT lettering, Unit 5", "Oct 24", 925, "open"],
-  ["OTC-G-0401", "Keystone Dairy Co-op", "G-1031 · Tanker DOT lettering, Unit 3", "Oct 16", 1240, "open"],
-  ["OTC-G-0398", "Ridgeline Plumbing & Heating", "G-1041 · Unit 9 decal refresh", "Oct 28", 420, "open"],
+  ["OTC-G-0412", "Ridgeline Plumbing & Heating", "G-1048 · Unit 14 full wrap", "Nov 3", PRICE, "card"],
+  ["OTC-G-0411", "Brightway Movers", "G-1046 · Rear door graphics", "Nov 2", 1150, "open"],
+  ["OTC-G-0410", "Keystone Dairy Co-op", "G-1039 · Office door lettering", "Oct 30", 310, "open"],
+  ["OTC-G-0407", "Keystone Dairy Co-op", "G-1036 · Tanker DOT lettering, Unit 5", "Oct 23", 925, "open"],
+  ["OTC-G-0401", "Keystone Dairy Co-op", "G-1031 · Tanker DOT lettering, Unit 3", "Oct 15", 1240, "open"],
+  ["OTC-G-0398", "Ridgeline Plumbing & Heating", "G-1041 · Unit 9 decal refresh", "Oct 27", 420, "open"],
 ];
 function invoiceList(modal = "") {
   const rows = INVOICES.map(([no, c, j, d, total, st]) => {
     const isPaid = st === "card" && S.inv === "paid";
     const paid = no === "OTC-G-0412" ? (isPaid ? PRICE : DEP) : 0;
     const status = isPaid ? `<span class="pill solid">Paid</span>` : no === "OTC-G-0412" ? `<span class="pill">Sent</span>` : `<span class="pill">Open</span>`;
-    const lastPay = no === "OTC-G-0412" ? (isPaid ? "Card · Nov 6" : "Deposit · Oct 27") : "—";
+    const lastPay = no === "OTC-G-0412" ? (isPaid ? "Card · Nov 5" : "Deposit · Oct 26") : "—";
     return `<tr class="${no === "OTC-G-0412" && isPaid ? "rowin" : ""}" ${no === "OTC-G-0412" ? `data-k="row-0412"` : ""}><td class="num" style="text-align:left">${no}</td><td>${c}</td><td>${j}</td><td>${d}</td><td class="num">${money(total)}</td><td class="num">${money(paid)}</td><td class="num"><strong>${money(total - paid)}</strong></td><td>${lastPay}</td><td>${status}</td></tr>`;
   }).join("");
   const body = `<div class="head"><div><h2>Invoices</h2><div class="meta">Open and recently paid · balances update when a payment comes in</div></div>
@@ -148,13 +148,13 @@ function email() {
     <div class="mail-list"><div class="p-h" style="padding:4px 2px">Inbox</div>
       <div class="mail-item on"><strong>OTC Fleet Services</strong><span>Invoice OTC-G-0412</span><span class="small muted">Today, 9:41 AM</span></div>
       <div class="mail-item"><strong>Supply house</strong><span>Your order shipped</span><span class="small muted">Yesterday</span></div>
-      <div class="mail-item"><strong>Fuel card</strong><span>October statement</span><span class="small muted">Nov 2</span></div></div>
+      <div class="mail-item"><strong>Fuel card</strong><span>October statement</span><span class="small muted">Nov 1</span></div></div>
     <div style="padding:26px 40px;display:flex;flex-direction:column;gap:14px;min-width:0">
       <div><h2 style="margin:0;font-size:21px">Invoice OTC-G-0412 from OTC Fleet Services</h2><div class="meta">To: ${BILL_EMAIL} · Attachment: OTC-G-0412.pdf</div></div>
       <div class="doc" style="padding:24px 28px;max-width:640px;display:flex;flex-direction:column;gap:14px">
         <div class="logo">LOGO</div>
         <div>Thank you for your business. Your invoice for <strong>Unit 14 · full wrap</strong> is attached.</div>
-        <div class="kv" style="max-width:360px"><dt>Total</dt><dd>${money(PRICE)}</dd><dt>Deposit paid</dt><dd>${money(-DEP)}</dd><div class="rule"></div><dt><strong>Balance due</strong></dt><dd><strong>${money(BAL)}</strong></dd><dt>Due</dt><dd>Dec 4</dd></div>
+        <div class="kv" style="max-width:360px"><dt>Total</dt><dd>${money(PRICE)}</dd><dt>Deposit paid</dt><dd>${money(-DEP)}</dd><div class="rule"></div><dt><strong>Balance due</strong></dt><dd><strong>${money(BAL)}</strong></dd><dt>Due</dt><dd>Dec 3</dd></div>
         <div><button class="btn primary" style="padding:10px 22px;font-size:15px" data-k="pay-link">Pay by card</button></div>
         <div class="small muted">You also have 1 other open invoice: OTC-G-0398 · $420.00</div>
       </div></div></div>`;
@@ -183,15 +183,15 @@ function custInvoice() {
     <div class="doc" style="width:820px;align-self:flex-start;padding:26px 34px;display:flex;flex-direction:column;gap:14px">
       <div style="display:flex;justify-content:space-between;align-items:flex-start">
         <div><div class="logo">LOGO</div><div class="small muted" style="margin-top:8px">OTC Fleet Services · Graphics<br>Lancaster, PA</div></div>
-        <div style="text-align:right"><div style="font:700 26px var(--ui)">Invoice</div><div class="kv" style="margin-top:6px"><dt>Invoice no.</dt><dd>OTC-G-0412</dd><dt>Date</dt><dd>Nov 4</dd><dt>Due</dt><dd>Dec 4</dd></div></div></div>
+        <div style="text-align:right"><div style="font:700 26px var(--ui)">Invoice</div><div class="kv" style="margin-top:6px"><dt>Invoice no.</dt><dd>OTC-G-0412</dd><dt>Date</dt><dd>Nov 3</dd><dt>Due</dt><dd>Dec 3</dd></div></div></div>
       <div style="display:flex;justify-content:space-between;gap:20px" class="small">
         <div><span class="muted">Bill to</span><br><strong>Ridgeline Plumbing &amp; Heating</strong><br>Accounts payable</div>
         <div style="text-align:right"><span class="muted">Customer PO</span><br><strong style="font-family:var(--mono)">7781</strong><br><span class="muted">Job G-1048</span></div></div>
       <div class="tbl" data-k="lines"><table><thead><tr><th>Description</th><th class="num">Qty</th><th class="num">Amount</th></tr></thead>
         <tbody><tr><td><strong>Unit 14 · 2024 Ford Transit 250 · full wrap</strong><div class="small muted">Design, print, laminate and install. Both sides and rear.</div></td><td class="num">1</td><td class="num">${money(PRICE)}</td></tr></tbody></table></div>
       <div style="display:flex;justify-content:space-between;gap:24px;align-items:flex-start">
-        <div class="box" style="border-style:dashed;flex:1"><h3>Your other open invoices</h3><div class="kv"><dt>OTC-G-0398 · Unit 9 decal refresh · due Nov 27</dt><dd>$420.00</dd></div></div>
-        <div class="kv" style="width:300px" data-k="totals"><dt>Subtotal</dt><dd>${money(PRICE)}</dd><dt>Sales tax</dt><dd>per settings</dd><dt>Deposit paid Oct 27</dt><dd>${money(-DEP)}</dd><div class="rule"></div><dt><strong>Balance due</strong></dt><dd><strong>${money(BAL)}</strong></dd></div></div>
+        <div class="box" style="border-style:dashed;flex:1"><h3>Your other open invoices</h3><div class="kv"><dt>OTC-G-0398 · Unit 9 decal refresh · due Nov 26</dt><dd>$420.00</dd></div></div>
+        <div class="kv" style="width:300px" data-k="totals"><dt>Subtotal</dt><dd>${money(PRICE)}</dd><dt>Sales tax</dt><dd>per settings</dd><dt>Deposit paid Oct 26</dt><dd>${money(-DEP)}</dd><div class="rule"></div><dt><strong>Balance due</strong></dt><dd><strong>${money(BAL)}</strong></dd></div></div>
       <div style="display:flex;justify-content:space-between;align-items:center;border-top:1.5px solid var(--ink-3);padding-top:14px">
         <span class="small muted">Questions about this invoice? Reply to the email it came with.</span>
         <button class="btn primary" style="padding:10px 22px;font-size:15px">Pay by card</button></div>
@@ -217,7 +217,7 @@ function recordModal() {
     <div class="field"><label>Method</label><div><div class="seg"><button class="on">Check</button><button>Bank transfer</button><button>Cash</button></div></div></div>
     <div class="field"><label>Check number</label><div class="input" style="font-family:var(--mono)">10482</div></div>
     <div class="field"><label>Amount received</label><div class="input" style="font-family:var(--mono)">${money(2165)}</div></div>
-    <div class="field"><label>Date received</label><div class="input">Nov 10</div></div>
+    <div class="field"><label>Date received</label><div class="input">Nov 9</div></div>
     <div><div class="p-h" style="margin-bottom:6px">Apply to open invoices</div>
       <div class="tbl"><table><thead><tr><th></th><th>Invoice</th><th>Job</th><th class="num">Balance</th><th class="num">Apply</th></tr></thead><tbody>
       ${rows.map(([no, j, b, on]) => `<tr><td style="width:30px"><span class="check ${on ? "on" : ""}">${on ? "✓" : ""}</span></td><td style="font-family:var(--mono)">${no}</td><td>${j}</td><td class="num">${money(b)}</td><td class="num">${on ? money(b) : "—"}</td></tr>`).join("")}
@@ -230,18 +230,18 @@ function recordModal() {
 /* ---------- 4.5 Settings › QuickBooks Online ---------- */
 function qbSettings() {
   const log = [
-    ["Nov 10, 3:05 PM", "Payment", "Check #10482 · OTC-G-0401, OTC-G-0407", "Keystone Dairy Co-op", 2165],
-    ["Nov 6, 4:12 PM", "Payment", "Card · OTC-G-0412", "Ridgeline Plumbing & Heating", BAL],
-    ["Nov 4, 9:40 AM", "Invoice", "OTC-G-0412", "Ridgeline Plumbing & Heating", PRICE],
-    ["Nov 3, 2:18 PM", "Invoice", "OTC-G-0411", "Brightway Movers", 1150],
-    ["Oct 31, 11:02 AM", "Invoice", "OTC-G-0410", "Keystone Dairy Co-op", 310],
-    ["Oct 27, 10:15 AM", "Payment", "Deposit · G-1048", "Ridgeline Plumbing & Heating", DEP],
+    ["Nov 9, 3:05 PM", "Payment", "Check #10482 · OTC-G-0401, OTC-G-0407", "Keystone Dairy Co-op", 2165],
+    ["Nov 5, 4:12 PM", "Payment", "Card · OTC-G-0412", "Ridgeline Plumbing & Heating", BAL],
+    ["Nov 3, 9:40 AM", "Invoice", "OTC-G-0412", "Ridgeline Plumbing & Heating", PRICE],
+    ["Nov 2, 2:18 PM", "Invoice", "OTC-G-0411", "Brightway Movers", 1150],
+    ["Oct 30, 11:02 AM", "Invoice", "OTC-G-0410", "Keystone Dairy Co-op", 310],
+    ["Oct 26, 10:15 AM", "Payment", "Deposit · G-1048", "Ridgeline Plumbing & Heating", DEP],
   ];
   const body = `<div class="head"><div><div class="crumb">Settings › QuickBooks Online</div><h2>QuickBooks Online</h2><div class="meta">Invoices and payments are sent to QuickBooks so the books stay up to date</div></div>
     <div class="btns"><button class="btn">Send now</button><button class="btn">Disconnect</button></div></div>
     <div class="cols" style="margin-top:0;grid-template-columns:330px 1fr">
       <div style="display:flex;flex-direction:column;gap:16px">
-        <div class="box"><h3>Connection</h3><div class="kv"><dt>Status</dt><dd><span class="pill solid">Connected</span></dd><dt>Company file</dt><dd>OTC Fleet Services</dd><dt>Connected</dt><dd>Oct 20</dd><dt>Last sent</dt><dd>Nov 10, 3:05 PM</dd></div></div>
+        <div class="box"><h3>Connection</h3><div class="kv"><dt>Status</dt><dd><span class="pill solid">Connected</span></dd><dt>Company file</dt><dd>OTC Fleet Services</dd><dt>Connected</dt><dd>Oct 19</dd><dt>Last sent</dt><dd>Nov 9, 3:05 PM</dd></div></div>
         <div class="box" style="position:relative"><h3>What gets sent</h3>
           <div class="flowline"><span>Invoices</span><span class="grow"></span><span class="arrow">→</span><span>QuickBooks</span></div>
           <div class="flowline"><span>Payments</span><span class="grow"></span><span class="arrow">→</span><span>QuickBooks</span></div>

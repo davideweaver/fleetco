@@ -46,8 +46,8 @@ const go = (screen, who) => { S.screen = screen; S.who = who; render(); };
 const MY_JOBS = [
   { no: "G-1048", cust: "Ridgeline Plumbing", what: "Unit 14 · full wrap", who: "T1", date: "Today", pri: "High", stage: 4 },
   { no: "G-1044", cust: "Keystone Dairy Co-op", what: "Tanker DOT lettering", who: "T1", date: "Tomorrow", pri: "High", stage: 3 },
-  { no: "G-1046", cust: "Brightway Movers", what: "Rear door graphics", who: "T1", date: "Nov 5", pri: "Normal", stage: 2 },
-  { no: "G-1052", cust: "Lancaster Kitchen Supply", what: "Box truck logo kit", who: "T1", date: "Nov 6", pri: "Normal", stage: 0 },
+  { no: "G-1046", cust: "Brightway Movers", what: "Rear door graphics", who: "T1", date: "Nov 4", pri: "Normal", stage: 2 },
+  { no: "G-1052", cust: "Lancaster Kitchen Supply", what: "Box truck logo kit", who: "T1", date: "Nov 5", pri: "Normal", stage: 0 },
 ];
 const clockedIn = `<span class="pill solid">Clocked in 7:02 AM</span>`;
 
@@ -63,7 +63,7 @@ function myJobs() {
     <button class="btn primary" style="align-self:flex-start">Start timer · Installation</button>
     <div class="box"><h3>Instructions</h3><div class="small">Wrap both sides and the rear. Keep the logo clear of the fuel door. Customer drops the van at 7:30 AM.</div></div>
     <div class="box"><h3>Files</h3><div class="gap" style="gap:8px"><div class="file"><div class="ph"></div>Proof v3 (approved).pdf</div><div class="file"><div class="ph"></div>Measurements.jpg</div><div class="file"><div class="ph"></div>Panel layout.pdf</div></div></div>
-    <div class="box"><h3>Notes</h3><div class="small">Oct 31 · Printing done, laminating overnight.</div></div>
+    <div class="box"><h3>Notes</h3><div class="small">Oct 30 · Printing done, laminating overnight.</div></div>
     <div class="box"><h3>Completion photos</h3><div class="small muted">None yet. Add them from the phone, or upload them here.</div></div>
   </div>`;
   const body = `<div class="head"><div><h2>${T.board}</h2><div class="meta">Showing only ${T.works.toLowerCase()} assigned to you · no prices</div></div>
@@ -74,7 +74,7 @@ function myJobs() {
 
 /* ---------- 3.2 Clock in and out ---------- */
 function clockPair() {
-  const deskBody = `<div class="head"><div><h2>My time · today</h2><div class="meta">Mon Nov 3, 11:40 AM · The owner reviews and approves this</div></div></div>
+  const deskBody = `<div class="head"><div><h2>My time · today</h2><div class="meta">Mon Nov 2, 11:40 AM · The owner reviews and approves this</div></div></div>
     <div class="gap">
       <div class="tbl"><table><thead><tr><th>Clock punches</th><th>Where</th><th class="num">Time</th></tr></thead><tbody>
         <tr><td>Clock in</td><td>Shop computer</td><td class="num">7:02 AM</td></tr>
@@ -89,7 +89,7 @@ function clockPair() {
   const desk = `<div class="slim" style="position:absolute;inset:0">${techShell("My time", deskBody, "my-time",
     `<span class="pill solid" data-k="desk-clock">Clocked in 7:02 AM</span><button class="btn">Clock out</button>`)}</div>`;
   const phoneBody = `<div class="p-sec" style="align-items:center;text-align:center;padding:18px 6px">
-      <div class="p-h">Mon Nov 3</div><div style="font:600 34px var(--mono)">3:32 PM</div>
+      <div class="p-h">Mon Nov 2</div><div style="font:600 34px var(--mono)">3:32 PM</div>
       <span class="pill dash">Clocked out</span></div>
     <div class="p-sec"><button class="wide solid">Clock in</button><div class="small muted" style="text-align:center">One tap for the day. Job timers are separate.</div></div>
     <div class="p-sec"><div class="p-h">Today's punches</div>
@@ -98,7 +98,7 @@ function clockPair() {
       <div class="rule"></div>
       <div style="display:flex;justify-content:space-between"><strong>Hours today</strong><strong class="num">8.5 h</strong></div></div>
     <div class="p-sec" style="border:0"><div class="p-h">This week</div>
-      <div style="display:flex;justify-content:space-between" class="small"><span>Mon Nov 3</span><span class="num">8.5 h</span></div>
+      <div style="display:flex;justify-content:space-between" class="small"><span>Mon Nov 2</span><span class="num">8.5 h</span></div>
       <div class="small muted">Waiting for the owner to approve</div></div>`;
   return `<div class="pair" style="grid-template-columns:1fr 430px">
     <div class="pane"><div class="pane-label">At the shop computer · top bar</div><div class="pane-body">${desk}</div>
@@ -119,7 +119,7 @@ function ownerJob() {
         <tr class="group"><td>Total</td><td></td><td class="num">${money(COST)}</td><td class="num">${money(PRICE)}</td></tr></tbody></table></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
         <div class="box"><h3>Margin <span class="mark">2</span></h3><div class="kv"><dt>Price</dt><dd>${money(PRICE)}</dd><dt>Cost</dt><dd>${money(COST)}</dd><div class="rule"></div><dt><strong>Margin</strong></dt><dd><strong>${money(PRICE - COST)} · ${Math.round((PRICE - COST) / PRICE * 1000) / 10}%</strong></dd></div></div>
-        <div class="box"><h3>Estimate &amp; invoice <span class="mark">3</span></h3><div class="kv"><dt>Estimate</dt><dd>Approved Oct 27</dd><dt>Deposit paid</dt><dd>${money(PRICE / 2)}</dd><dt>Invoice</dt><dd>Draft on close</dd><dt>Other open</dt><dd>$420.00</dd></div></div>
+        <div class="box"><h3>Estimate &amp; invoice <span class="mark">3</span></h3><div class="kv"><dt>Estimate</dt><dd>Approved Oct 26</dd><dt>Deposit paid</dt><dd>${money(PRICE / 2)}</dd><dt>Invoice</dt><dd>Draft on close</dd><dt>Other open</dt><dd>$420.00</dd></div></div>
       </div>
       <div class="box"><h3>Files</h3><div style="display:flex;gap:18px"><div class="file"><div class="ph"></div>Proof v3 (approved).pdf</div><div class="file"><div class="ph"></div>Measurements.jpg</div></div></div>
     </div>`;

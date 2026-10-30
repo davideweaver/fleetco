@@ -95,16 +95,16 @@ function sidePanel() {
   const live = E.units.filter((x) => !isDec(x.u));
   const c = live.reduce((a, x) => a + lineSum(x.lines, 3), 0), p = live.reduce((a, x) => a + lineSum(x.lines, 4), 0);
   const dep = { none: `<button class="btn" data-k="send-deposit" ${E.approved ? "" : "disabled"}>Send deposit link</button>`,
-    sent: `<span class="pill dash">Link emailed Oct 27</span>`,
-    paid: `<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><span class="small muted">Link emailed Oct 27, 10:20 AM</span><span class="pill solid" data-k="dep-paid">Paid by card · Oct 27, 2:41 PM</span><span class="small muted">Comes off the final invoice</span></div>` }[E.deposit];
+    sent: `<span class="pill dash">Link emailed Oct 26</span>`,
+    paid: `<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><span class="small muted">Link emailed Oct 26, 10:20 AM</span><span class="pill solid" data-k="dep-paid">Paid by card · Oct 26, 2:41 PM</span><span class="small muted">Comes off the final invoice</span></div>` }[E.deposit];
   const totals = `<div class="box" data-k="totals"><h3>Totals</h3><div class="kv">
     ${E.view === "int" ? `<dt>Your cost</dt><dd>${money(c)}</dd>` : ""}<dt>${E.approved ? "Approved price" : "Price"}</dt><dd>${money(p)}</dd>
     ${E.view === "int" ? `<dt>Margin</dt><dd>${p ? money(p - c) + " · " + pct(c, p) : "—"}</dd>` : ""}<dt>Sales tax</dt><dd>per settings</dd>
     ${E.approved ? `<div class="rule"></div><dt>Deposit (50%)</dt><dd>${money(p / 2)}</dd>` : ""}</div>
     ${E.approved ? `<div style="margin-top:12px;display:flex;justify-content:flex-end">${dep}</div>` : ""}</div>`;
   const appr = `<div class="box" data-k="approval-box"><h3>Approval record</h3>${E.approved
-    ? `<div class="kv"><dt>Unit 14</dt><dd>Approved</dd><dt>Unit 17</dt><dd>${E.dec17 ? "Declined" : "Approved"}</dd><dt>Approved by</dt><dd>${CONTACT}</dd><dt>How</dt><dd>${E.method}</dd><dt>When</dt><dd>Oct 27, 10:14 AM</dd><dt>Recorded by</dt><dd>Owner</dd></div>`
-    : `<div class="muted small">${E.sent ? "Sent to the customer Oct 24. Not approved yet." : "Not sent yet."}</div>`}</div>`;
+    ? `<div class="kv"><dt>Unit 14</dt><dd>Approved</dd><dt>Unit 17</dt><dd>${E.dec17 ? "Declined" : "Approved"}</dd><dt>Approved by</dt><dd>${CONTACT}</dd><dt>How</dt><dd>${E.method}</dd><dt>When</dt><dd>Oct 26, 10:14 AM</dd><dt>Recorded by</dt><dd>Owner</dd></div>`
+    : `<div class="muted small">${E.sent ? "Sent to the customer Oct 23. Not approved yet." : "Not sent yet."}</div>`}</div>`;
   return S.compact ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start">${totals}${appr}</div>` : `<div style="display:flex;flex-direction:column;gap:14px">${totals}${appr}</div>`;
 }
 function estimate() {
@@ -145,7 +145,7 @@ function approvalModal() {
     <div class="choice"><span>Unit 17 · Full wrap · ${money(lineSum(unit(17).lines, 4))}</span>${seg(17, E.dec17)}</div>
     <div class="field"><label>Approved by</label><div class="input">${CONTACT} · Ridgeline</div></div>
     <div class="field"><label>How</label><div class="seg">${["Phone call", "Email reply", "In person"].map((m) => `<button class="${E.method === m ? "on" : ""}" data-k="m-${slug(m)}">${m}</button>`).join("")}</div></div>
-    <div class="field"><label>When</label><div class="input">Oct 27, 10:14 AM</div></div>
+    <div class="field"><label>When</label><div class="input">Oct 26, 10:14 AM</div></div>
     <div class="field"><label>Note</label><div class="input">Unit 17 maybe in the spring</div></div>
     <div class="btns"><button class="btn">Cancel</button><button class="btn primary" data-k="save-approval">Save approval</button></div></div></div>`;
 }
@@ -153,7 +153,7 @@ function approvalModal() {
 /* ---------- picture-only layouts ---------- */
 function custDoc() {
   const us = storyUnits();
-  return `<div class="doc"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div class="logo">LOGO</div><div style="text-align:right"><div class="lab">Estimate</div><div style="font:600 18px var(--mono)">E-2207</div><div class="small muted">Oct 24</div></div></div>
+  return `<div class="doc"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div class="logo">LOGO</div><div style="text-align:right"><div class="lab">Estimate</div><div style="font:600 18px var(--mono)">E-2207</div><div class="small muted">Oct 23</div></div></div>
     <div class="small"><div class="lab">Prepared for</div>Ridgeline Plumbing &amp; Heating<br>Attn: ${CONTACT} · PO 7781</div>
     <div class="tbl"><table><thead><tr><th>Description</th><th class="num">Price</th></tr></thead><tbody>
       ${us.map((x) => `<tr><td style="padding:10px"><b>Unit ${x.u} · ${VEH[x.u].ymm}</b><div>Full wrap</div><div class="small muted">Design, print, laminate and install</div></td><td class="num" style="vertical-align:top;padding:10px">${money(lineSum(x.lines, 4))}</td></tr>`).join("")}
@@ -173,9 +173,9 @@ function mailDoc() {
 }
 function customerPage() {
   const veh = [
-    ["Unit 9", "Vehicle", VEH[9].ymm, "Decal refresh · Oct 28"],
+    ["Unit 9", "Vehicle", VEH[9].ymm, "Decal refresh · Oct 27"],
     ["Unit 14", "Vehicle", VEH[14].ymm, "Full wrap · in production"],
-    ["Unit 17", "Vehicle", VEH[17].ymm, "Declined Oct 27"],
+    ["Unit 17", "Vehicle", VEH[17].ymm, "Declined Oct 26"],
     ["Unit 21", "Vehicle", VEH[21].ymm, "—"],
     ["T-3", "Trailer", "2019 Wells Cargo 7×14 enclosed", "—"],
   ];
@@ -197,7 +197,7 @@ function customerPage() {
         <div class="tbl"><table><thead><tr><th style="width:120px">Type</th><th style="width:110px">Number</th><th>What</th><th style="width:110px">PO / ref</th><th style="width:170px">Status</th><th class="num" style="width:110px">Amount</th></tr></thead><tbody>
           <tr><td>Estimate</td><td class="num" style="text-align:left">E-2207</td><td>Units 14 &amp; 17 · full wrap</td><td>PO 7781</td><td><span class="pill solid">Partly approved</span></td><td class="num">${money(PRICE)}</td></tr>
           <tr><td>${T.work}</td><td class="num" style="text-align:left">G-1048</td><td>Unit 14 · full wrap</td><td>PO 7781</td><td><span class="pill">In production</span></td><td class="num"></td></tr>
-          <tr><td>Invoice</td><td class="num" style="text-align:left">INV-3311</td><td>Unit 9 · decal refresh</td><td class="muted">—</td><td><span class="pill dash">Unpaid</span></td><td class="num">${money(420)}</td></tr>
+          <tr><td>Invoice</td><td class="num" style="text-align:left">OTC-G-0398</td><td>Unit 9 · decal refresh</td><td class="muted">—</td><td><span class="pill dash">Unpaid</span></td><td class="num">${money(420)}</td></tr>
         </tbody></table></div></div>
     </div></div>`;
   return shell("Customers", body, "customers/ridgeline-plumbing");
