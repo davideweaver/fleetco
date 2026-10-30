@@ -172,9 +172,6 @@ const SCENES = {
 const PICTURES = {
   async "8.2"() { go("devices", "owner"); $("#who").innerHTML = `<span class="av">T1</span><span><b>Owner or Technician</b> · any screen</span>`; },
   async "8.3"() { go("switchover", "owner"); },
-  // temporary check stills for the 8.1 video
-  async "tmp-8.1-g"() { S.div = "graphics"; go("settings", "owner"); },
-  async "tmp-8.1-m"() { S.div = "mechanical"; go("settings", "owner"); },
 };
 boot();
 </script>

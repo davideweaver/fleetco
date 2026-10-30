@@ -167,7 +167,7 @@ h2 { font: 700 30px/1.1 var(--hand); margin: 0; text-wrap: balance; }
 
 <script>
 // Filled in by build.py from each section's manifest: { "1.1": { kind, file, thumb, seconds } }
-const MEDIA = {};
+const MEDIA = {"3.1": {"file": "3.1.png", "kind": "picture"}, "3.2": {"file": "3.2.png", "kind": "picture"}, "3.3": {"file": "doing-the-job.mp4", "kind": "video", "seconds": 72}, "3.4": {"file": "doing-the-job.mp4", "kind": "video", "seconds": 72}, "3.5": {"file": "3.5.png", "kind": "picture"}, "7.1": {"file": "7.1.png", "kind": "picture"}, "7.2": {"file": "7.2.png", "kind": "picture"}, "7.3": {"file": "7.3.png", "kind": "picture"}, "8.1": {"file": "8.1.mp4", "kind": "video", "seconds": 30}, "8.2": {"file": "8.2.png", "kind": "picture"}, "8.3": {"file": "8.3.png", "kind": "picture"}};
 const mmss = (sec) => `${Math.floor(sec / 60)}:${String(Math.round(sec) % 60).padStart(2, "0")}`;
 
 // kind: "video" or "picture". len: rough video length. img: a frame from the overview, where one exists.

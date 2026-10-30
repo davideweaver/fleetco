@@ -187,7 +187,7 @@ const SCENES = {
     await click("confirm-recv", () => { S.po.confirm = false; S.po.recv = "yes"; toast("PO-0031 marked received. Costs updated."); }, 600);
   },
   async "5.3-cost"() {
-    await click("tab-materials-list", () => { S.screen = "materials"; S.updated = true; }, 400);
+    await click("nav-materials-ordering", () => { S.screen = "materials"; S.updated = true; }, 400);
   },
 };
 
