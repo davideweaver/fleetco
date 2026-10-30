@@ -314,11 +314,6 @@ const PICTURES = {
     NOTES = [{ badge: "?", text: "Signs and walls as their own type? Not decided yet.", pos: `left:${r.right - 500}px;top:${r.bottom + 4}px;max-width:430px` }];
     render();
   },
-  // temporary checks of video screens
-  async "chk-1.1"() { S.E = freshE(); S.E.cust = CUSTOMERS[0]; S.E.units = storyUnits(); S.E.units[1].open = true; S.E.changed = { u: 17, i: 0 }; go("estimate", "owner"); },
-  async "chk-menu"() { S.E = freshE(); S.E.cust = CUSTOMERS[0]; S.E.units = [{ u: 14, lines: [], open: true }]; go("estimate", "owner"); _pkgTop = below("pkg-14"); S.E.pkgMenu = 14; render(); },
-  async "chk-1.3"() { S.E = freshE(); S.E.cust = CUSTOMERS[0]; S.E.units = storyUnits(); S.E.view = "cust"; S.E.sent = true; S.E.modal = true; S.E.dec17 = true; go("estimate", "owner"); },
-  async "chk-1.3b"() { S.E = freshE(); S.E.cust = CUSTOMERS[0]; S.E.units = storyUnits(); S.E.view = "cust"; S.E.sent = true; S.E.approved = true; S.E.dec17 = true; go("estimate", "owner"); },
 };
 boot();
 </script>
