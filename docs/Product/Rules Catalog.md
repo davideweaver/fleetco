@@ -95,11 +95,22 @@ records.
 **Source:** PL 1.10 · **Status:** Confirmed · **Phase:** V1
 
 ### PLAT-006 Every business record belongs to a department
-**Rule:** customers are shared across the company; jobs, estimates, invoices, POs, catalog
-materials and time entries each carry a department. V1 has one department, Graphics, and the UI
-never shows it.
-**Source:** PL 1.23 (switcher Later), V1 Alignment §1 (QuickBooks class) · **Status:** Proposed ·
-**Phase:** V1 (data), Later (UI)
+**Rule:** jobs, estimates, invoices, POs, catalog materials and time entries each carry a
+department. V1 has one department, Graphics, and the UI never shows it.
+
+**Design choice, not a FullBay fact:** in the new system, one company is one customer record shared
+by every department. A customer has no department.
+
+This is **not** how FullBay appears to work. Customer lists export one shop at a time (MTG
+00:00:45), a customer is "set up with the Lancaster shop" (MTG 00:04:52), and myOTCFleet uses a
+separate FullBay API key per shop. What FullBay shares across shops is configuration (parts markups,
+labor rates; MTG 00:22:53), not customers. We chose one shared record because Cam's biggest FullBay
+complaint was one company split into many customer records (G5).
+
+**Consequence:** if FullBay holds one record per shop, the shop cutover must merge duplicates across
+shop exports and match them to QuickBooks (QBO-005). See D-C18.
+**Source:** PL 1.23 (switcher Later), V1 Alignment §1 (QuickBooks class), G5 · **Status:** Proposed
+(FullBay's actual behavior is D-C18) · **Phase:** V1 (data), Later (UI)
 
 ### PLAT-007 External IDs are stored, not synced
 **Rule:** customers and jobs can store a GoHighLevel contact ID and opportunity ID. Migrated
@@ -920,6 +931,7 @@ Grouped by who answers. Each references the rules it unblocks.
 | D-C15 | Collect deposits by card link? (Alignment 4.3) | PAY-003 |
 | D-C16 | If a deposit ends up bigger than the final invoice, refund it or hold it? | PAY-004 |
 | D-C17 | What should work in progress show you? (Alignment 4.7) | RPT-005 |
+| D-C18 | If a company uses both graphics and the Lancaster shop, is it one customer in FullBay or two? Roughly how many graphics customers also use the shops? Is it the same in QuickBooks? | PLAT-006, QBO-005, MIG-001 |
 
 ### For accounting
 
@@ -964,7 +976,7 @@ detail in brackets; those details are what Cam should skim.
 | MIG Migration | 3 | 1 | 0 | 2 | 0 |
 | **Total** | **131** | **84** | **7** | **20** | **20** |
 
-Plus 12 Later constraints (§14) and 24 questions (§15).
+Plus 12 Later constraints (§14) and 25 questions (§15).
 
 **Where the risk sits:** the Decision-needed rules cluster in money: tax, rounding, deposits,
 surcharge, QuickBooks. Those are also the rules hardest to change after invoices exist. Workflow
@@ -975,6 +987,7 @@ and permissions are mostly Confirmed, because Cam's notes were precise about the
 | Date | Change |
 |---|---|
 | 2026-10-31 | First draft. Mined from Cam's punch-list notes, the 10/23 debrief, V1 Vision and Gaps, V1 Alignment, Domain Model and Code Standards. No new FullBay access. |
+| 2026-10-31 | PLAT-006 reworded: shared customers is our design choice, and evidence suggests FullBay keeps customers per shop. Added D-C18. |
 
 ## Related
 
