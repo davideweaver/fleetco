@@ -1,0 +1,770 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>V1 Video Screens</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Kalam:wght@400;700&display=swap">
+<style>
+/* Screens-only wireframe for the narrated V1 video. Recorded at 1600x900 by record.mjs.
+   Grayscale ink on graph paper; pencil blue only for the cursor, highlights and title cards. */
+:root {
+  --paper: #fbfbf9; --grid: #eceae4; --ink: #2b2b2b; --ink-2: #6b6b6b; --ink-3: #a3a3a0;
+  --fill: #efefec; --fill-2: #e2e2de; --pencil: #2f5fa8;
+  --hand: "Kalam", cursive; --ui: "IBM Plex Sans", system-ui, sans-serif; --mono: "IBM Plex Mono", monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; height: 100%; background: var(--paper); color: var(--ink); overflow: hidden; }
+body {
+  font: 15px var(--ui);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: default; }
+#root { position: absolute; inset: 30px 40px; }
+
+/* ---------- desktop frame ---------- */
+.frame { position: absolute; inset: 0; background: var(--paper); border: 2px solid var(--ink); border-radius: 5px; display: flex; flex-direction: column; overflow: hidden; }
+.frame-bar { display: flex; align-items: center; gap: 8px; border-bottom: 2px solid var(--ink); padding: 8px 12px; flex: none; }
+.dot { width: 11px; height: 11px; border: 1.5px solid var(--ink); border-radius: 50%; }
+.url { flex: 1; border: 1.5px solid var(--ink-3); border-radius: 3px; padding: 3px 10px; font: 12px var(--mono); color: var(--ink-2); }
+.topbar { display: flex; align-items: center; gap: 12px; border-bottom: 1.5px solid var(--ink); padding: 8px 16px; flex: none; }
+.logo { border: 1.5px solid var(--ink); width: 150px; height: 30px; display: grid; place-items: center; font: 10px var(--mono); letter-spacing: .12em; color: var(--ink-2); }
+.search { flex: 1; max-width: 420px; border: 1.5px solid var(--ink-3); border-radius: 3px; height: 30px; padding: 5px 10px; color: var(--ink-3); font-size: 13px; }
+.grow { flex: 1; }
+.division { font: 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; border: 1.5px solid var(--ink); border-radius: 3px; padding: 4px 8px; }
+.user { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.av { display: inline-grid; place-items: center; width: 26px; height: 26px; border: 1.5px solid var(--ink); border-radius: 50%; font: 10px var(--mono); flex: none; }
+.av.sm { width: 20px; height: 20px; font-size: 9px; }
+.app { flex: 1; display: grid; grid-template-columns: 210px 1fr; min-height: 0; }
+.nav { border-right: 1.5px solid var(--ink); padding: 14px 10px; display: flex; flex-direction: column; gap: 3px; }
+.nav div { padding: 7px 10px; border: 1.5px solid transparent; border-radius: 3px; font-size: 14px; }
+.nav div.on { border-color: var(--ink); background: var(--fill); font-weight: 600; }
+.nav .sep { flex: 1; }
+.screen { padding: 20px 24px; overflow: hidden; min-width: 0; position: relative; }
+.head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 16px; }
+.head h2 { margin: 0; font-size: 21px; }
+.meta { color: var(--ink-2); font-size: 13px; margin-top: 4px; }
+.crumb { font: 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 4px; }
+.btns { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+.btn { border: 1.5px solid var(--ink); background: var(--paper); border-radius: 3px; padding: 6px 12px; font-size: 13px; font-weight: 500; white-space: nowrap; }
+.btn.primary { background: var(--ink); color: var(--paper); }
+.btn.dash { border-style: dashed; }
+.btn[disabled] { border-color: var(--ink-3); color: var(--ink-3); background: var(--paper); }
+.pill { display: inline-block; font: 10.5px var(--mono); letter-spacing: .05em; text-transform: uppercase; border: 1.5px solid var(--ink); border-radius: 10px; padding: 1px 8px; white-space: nowrap; }
+.pill.solid { background: var(--ink); color: var(--paper); }
+.pill.dash { border-style: dashed; color: var(--ink-2); border-color: var(--ink-2); }
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+.muted { color: var(--ink-2); }
+.small { font-size: 12.5px; }
+.seg { display: inline-flex; border: 1.5px solid var(--ink); border-radius: 3px; overflow: hidden; }
+.seg button { padding: 5px 12px; font-size: 13px; }
+.seg button.on { background: var(--ink); color: var(--paper); }
+
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+.tbl { border: 1.5px solid var(--ink); border-radius: 3px; overflow: hidden; }
+th { text-align: left; font: 600 10.5px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); border-bottom: 1.5px solid var(--ink); padding: 8px 10px; background: var(--fill); }
+th.num { text-align: right; }
+td { padding: 6px 10px; border-bottom: 1px solid var(--fill-2); }
+tr.group td { background: var(--fill); font-weight: 600; border-bottom: 1.5px solid var(--ink-3); }
+tr.sub td:first-child { padding-left: 30px; }
+tr.declined td { color: var(--ink-3); }
+tr.declined td .strike { text-decoration: line-through; }
+.empty { border: 1.5px dashed var(--ink-3); border-radius: 3px; padding: 36px; text-align: center; color: var(--ink-3); }
+.rowin { animation: rowin .35s ease-out both; }
+@keyframes rowin { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+.cols { display: grid; grid-template-columns: 1fr 300px; gap: 16px; margin-top: 16px; align-items: start; }
+.box { border: 1.5px solid var(--ink); border-radius: 3px; padding: 12px 14px; }
+.box h3 { margin: 0 0 10px; font: 600 10.5px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 5px 12px; font-size: 13.5px; }
+.kv dt { color: var(--ink-2); }
+.kv dd { margin: 0; text-align: right; font-family: var(--mono); }
+.rule { border-top: 1.5px solid var(--ink); margin: 4px 0; grid-column: 1 / -1; }
+
+/* dropdown + modal */
+.menu { position: absolute; z-index: 5; background: var(--paper); border: 1.5px solid var(--ink); border-radius: 3px; box-shadow: 4px 4px 0 var(--fill-2); width: 260px; }
+.menu div { padding: 8px 12px; border-bottom: 1px solid var(--fill-2); font-size: 13.5px; display: flex; justify-content: space-between; }
+.menu div:last-child { border-bottom: 0; }
+.scrim { position: absolute; inset: 0; background: rgba(251,251,249,.75); display: grid; place-items: center; z-index: 6; }
+.modal { background: var(--paper); border: 2px solid var(--ink); border-radius: 4px; width: 520px; padding: 18px 20px; display: flex; flex-direction: column; gap: 12px; box-shadow: 6px 6px 0 var(--fill-2); }
+.modal h4 { margin: 0; font-size: 18px; }
+.field { display: grid; grid-template-columns: 130px 1fr; align-items: center; gap: 10px; font-size: 13.5px; }
+.field label { color: var(--ink-2); }
+.input { border: 1.5px solid var(--ink-3); border-radius: 3px; padding: 5px 9px; min-height: 30px; }
+.choice { display: flex; align-items: center; justify-content: space-between; border: 1.5px solid var(--ink-3); border-radius: 3px; padding: 8px 10px; font-size: 13.5px; }
+
+/* board */
+.board { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+.col { border: 1.5px solid var(--ink-3); border-radius: 3px; min-height: 560px; display: flex; flex-direction: column; }
+.col-head { font: 10.5px var(--mono); letter-spacing: .04em; text-transform: uppercase; padding: 8px 9px; border-bottom: 1.5px solid var(--ink-3); display: flex; justify-content: space-between; gap: 4px; color: var(--ink-2); min-height: 44px; }
+.cards { padding: 7px; display: flex; flex-direction: column; gap: 7px; }
+.card { border: 1.5px solid var(--ink); border-radius: 3px; padding: 8px 9px; background: var(--paper); font-size: 13px; display: flex; flex-direction: column; gap: 3px; }
+.card .row { display: flex; justify-content: space-between; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-2); }
+.card .no { font: 11px var(--mono); color: var(--ink-2); }
+.card .cust { font-weight: 600; }
+.card.hl { border-color: var(--pencil); box-shadow: 4px 4px 0 var(--pencil); }
+.card.ghost { position: fixed; z-index: 40; width: 220px; pointer-events: none; transform: rotate(2deg); box-shadow: 6px 8px 0 var(--fill-2); }
+.card.lifted { opacity: .35; }
+
+/* image placeholder */
+.ph { border: 1.5px solid var(--ink-2); border-radius: 2px; background-color: var(--fill);
+  background-image:
+    linear-gradient(to top right, transparent calc(50% - 1px), var(--ink-3) calc(50% - .5px), var(--ink-3) calc(50% + .5px), transparent calc(50% + 1px)),
+    linear-gradient(to bottom right, transparent calc(50% - 1px), var(--ink-3) calc(50% - .5px), var(--ink-3) calc(50% + .5px), transparent calc(50% + 1px)); }
+.pop { animation: pop .3s ease-out both; }
+@keyframes pop { from { transform: scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* phone */
+.phone-stage { position: absolute; inset: 0; display: grid; place-items: center; }
+.phone { width: 390px; height: 820px; border: 3px solid var(--ink); border-radius: 40px; padding: 16px 14px; background: var(--paper); display: flex; flex-direction: column; box-shadow: 10px 10px 0 var(--fill-2); }
+.notch { width: 110px; height: 10px; border: 1.5px solid var(--ink); border-radius: 6px; margin: 0 auto 12px; flex: none; }
+.p-top { display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid var(--ink); padding: 0 6px 10px; font-size: 14px; }
+.p-body { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+.p-sec { padding: 12px 6px; border-bottom: 1px solid var(--fill-2); display: flex; flex-direction: column; gap: 8px; }
+.p-h { font: 600 10.5px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+.p-job { border: 1.5px solid var(--ink); border-radius: 4px; padding: 10px; display: flex; flex-direction: column; gap: 3px; font-size: 13.5px; }
+.p-job .row { display: flex; justify-content: space-between; font-size: 12px; color: var(--ink-2); }
+.wide { width: 100%; padding: 11px; border: 2px solid var(--ink); border-radius: 5px; font-weight: 600; font-size: 14px; text-align: center; }
+.wide.solid { background: var(--ink); color: var(--paper); }
+.timer { border: 2px solid var(--ink); border-radius: 5px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; }
+.timer .t { font: 600 26px var(--mono); font-variant-numeric: tabular-nums; }
+.photos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.photos .ph, .photos .add { aspect-ratio: 1; }
+.photos .add { border: 1.5px dashed var(--ink-2); border-radius: 2px; display: grid; place-items: center; font-size: 22px; color: var(--ink-2); }
+.file { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+.file .ph { width: 28px; height: 32px; flex: none; }
+.qnote { font: 17px var(--hand); color: var(--pencil); }
+.check { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.check .bx { width: 14px; height: 14px; border: 1.5px solid var(--ink); border-radius: 2px; flex: none; }
+.done { border: 2px dashed var(--ink); border-radius: 5px; padding: 18px; text-align: center; display: flex; flex-direction: column; gap: 6px; margin: 6px; }
+
+/* settings */
+.term-in { border: 1.5px solid var(--ink); border-radius: 3px; padding: 4px 9px; font-weight: 600; display: inline-block; min-width: 200px; }
+.term-in.changed { border-color: var(--pencil); box-shadow: 3px 3px 0 var(--pencil); }
+.stages { display: flex; flex-wrap: wrap; gap: 6px; }
+.stages span { border: 1.5px solid var(--ink); border-radius: 3px; padding: 3px 8px; font-size: 12.5px; }
+.preview { border: 1.5px dashed var(--ink-2); border-radius: 3px; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+.mini-nav { display: flex; flex-direction: column; gap: 3px; font-size: 13px; }
+.mini-nav div { border: 1.5px solid var(--ink-3); border-radius: 3px; padding: 4px 8px; }
+
+/* cards: title, not-in-v1, end */
+.card-screen { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding: 0 140px; gap: 18px; }
+.eyebrow { font: 600 14px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); }
+.big { font: 700 74px/1.05 var(--hand); margin: 0; }
+.lede { font: 28px/1.35 var(--hand); color: var(--ink-2); max-width: 30ch; margin: 0; }
+.stamp { font: 13px/1.5 var(--mono); letter-spacing: .08em; text-transform: uppercase; border: 1.5px dashed var(--ink-2); color: var(--ink-2); padding: 8px 12px; }
+.outlist { display: flex; flex-direction: column; gap: 14px; margin-top: 10px; }
+.outlist div { font: 34px var(--hand); display: flex; align-items: baseline; gap: 18px; animation: rowin .45s ease-out both; }
+.outlist .x { color: var(--ink-2); width: 30px; }
+.outlist .why { font: 15px var(--mono); color: var(--ink-2); text-transform: uppercase; letter-spacing: .06em; border: 1.5px solid var(--ink-3); border-radius: 3px; padding: 2px 8px; }
+
+/* overlays */
+#cursor { position: fixed; left: 800px; top: 950px; z-index: 50; width: 28px; height: 34px; pointer-events: none; transition: left .7s cubic-bezier(.45,.05,.3,1), top .7s cubic-bezier(.45,.05,.3,1); }
+#cursor.tap { width: 40px; height: 40px; }
+.ripple { position: fixed; z-index: 49; width: 46px; height: 46px; margin: -23px 0 0 -23px; border: 2.5px solid var(--pencil); border-radius: 50%; pointer-events: none; animation: ripple .5s ease-out forwards; }
+@keyframes ripple { from { transform: scale(.3); opacity: 1; } to { transform: scale(1.3); opacity: 0; } }
+#who { position: fixed; left: 56px; bottom: 44px; z-index: 30; font: 22px var(--hand); background: var(--paper); border: 2px solid var(--ink); border-radius: 4px; padding: 6px 14px; display: flex; gap: 10px; align-items: center; box-shadow: 4px 4px 0 var(--fill-2); }
+#who b { font: 600 12px var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+.toast { position: fixed; left: 50%; bottom: 60px; transform: translateX(-50%); z-index: 45; background: var(--ink); color: var(--paper); padding: 10px 18px; border-radius: 4px; font-size: 15px; animation: rowin .25s ease-out both; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div id="who" hidden></div>
+<svg id="cursor" viewBox="0 0 28 34" aria-hidden="true"><path d="M3 2 L3 27 L9.5 21 L14 31 L18.5 29 L14 19.5 L23 19.5 Z" fill="#fbfbf9" stroke="#2b2b2b" stroke-width="2" stroke-linejoin="round"/></svg>
+<div id="toasts"></div>
+
+<script>
+/* ===================== terminology per division ===================== */
+const DIVISIONS = {
+  graphics: {
+    name: "Graphics", work: "Job", works: "Jobs", board: "Job board", worker: "Technician", asset: "Vehicle",
+    stages: ["Ready for production", "In production", "Production complete", "Ready for installation", "Installation in progress", "Completed"],
+    assets: ["Vehicle", "Trailer"],
+  },
+  mechanical: {
+    name: "Mechanical", work: "Service order", works: "Service orders", board: "Repair board", worker: "Technician", asset: "Unit",
+    stages: ["Waiting to start", "Diagnosis", "Waiting on approval", "In repair", "Quality check", "Completed"],
+    assets: ["Truck", "Trailer", "Equipment"],
+  },
+};
+const T = DIVISIONS.graphics;
+
+/* ===================== data ===================== */
+const WRAP = [
+  ["Avery MPI 1105 wrap film", 62, "ft", 3.10, 7.50],
+  ["Avery DOL 1460Z overlaminate", 62, "ft", 2.05, 4.50],
+  ["Latex ink", 1, "job", 38, 85],
+  ["Install supplies", 1, "job", 22, 45],
+  ["Design", 4, "hr", 35, 95],
+  ["Installation", 9, "hr", 28, 85],
+];
+const PRICE = WRAP.reduce((a, r) => a + r[1] * r[4], 0);
+const COST = WRAP.reduce((a, r) => a + r[1] * r[3], 0);
+// Lines for one vehicle. The owner lengthens Unit 17's film to 74 ft in the estimate scene (matches flow 1.1).
+const unitLines = (u) => WRAP.map((w, i) => (i === 0 && u === 17 && S.est.film17 ? [w[0], S.est.film17, ...w.slice(2)] : w));
+const unitPrice = (u) => unitLines(u).reduce((a, r) => a + r[1] * r[4], 0);
+const unitVehicle = (u) => (u === 17 ? "2023 Ford Transit 350 HD" : "2024 Ford Transit 250");
+const unitCost = (u) => unitLines(u).reduce((a, r) => a + r[1] * r[3], 0);
+const money = (n) => (n < 0 ? "−" : "") + "$" + Math.abs(n).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+const OTHER_JOBS = [
+  { no: "G-1052", cust: "Lancaster Kitchen Supply", what: "Box truck logo kit", who: "T1", date: "Nov 3", pri: "Normal", stage: 0 },
+  { no: "G-1053", cust: "Conestoga Tree Care", what: "Bucket truck doors ×3", who: "OW", date: "Nov 4", pri: "Low", stage: 0 },
+  { no: "G-1046", cust: "Brightway Movers", what: "Rear door graphics", who: "T1", date: "Oct 31", pri: "Normal", stage: 2 },
+  { no: "G-1044", cust: "Keystone Dairy Co-op", what: "Tanker DOT lettering", who: "T1", date: "Oct 30", pri: "High", stage: 3 },
+  { no: "G-1043", cust: "Millport School District", what: "Shop wall mural", who: "T1", date: "Oct 29", pri: "Normal", stage: 4 },
+  { no: "G-1041", cust: "Ridgeline Plumbing", what: "Unit 9 · decal refresh", who: "T1", date: "Oct 27", pri: "Normal", stage: 5 },
+];
+
+/* ===================== state ===================== */
+const S = {
+  screen: "title", who: null,
+  est: { units: [], film17: 0, custView: false, menu: false, modal: false, declined17: false, approved: false, deposit: false },
+  job: { stage: null, review: false, hl: false, lifted: false },
+  phone: { view: "list", clocked: false, timer: false, secs: 0, photos: 0, finished: false },
+  inv: "draft",
+  time: { approved: false },
+  div: "graphics",
+  out: 0,
+};
+
+const $ = (s) => document.querySelector(s);
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+/* ===================== screens ===================== */
+function shell(active, body, url) {
+  const nav = [T.board, T.works, "Schedule", "Estimates", "Customers", "Invoices", "Time & payroll", "Materials & ordering", "Reports"];
+  return `<div class="frame">
+    <div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">app.otcfleet.com/${url}</span></div>
+    <div class="topbar"><div class="logo">LOGO</div><div class="search">Search customers, ${T.works.toLowerCase()}, invoices…</div><div class="grow"></div>
+      <span class="division">OTC Fleet Graphix</span><span class="user"><span class="av">OW</span>Owner</span></div>
+    <div class="app"><div class="nav">${nav.map((n) => `<div class="${n === active ? "on" : ""}">${n}</div>`).join("")}<div class="sep"></div><div class="${active === "Settings" ? "on" : ""}" data-k="nav-settings">Settings</div></div>
+    <div class="screen">${body}</div></div></div>`;
+}
+
+function estimate() {
+  const e = S.est, cv = e.custView;
+  const status = (u) => {
+    if (!e.approved) return `<span class="pill dash">Pending</span>`;
+    return u === 17 && e.declined17 ? `<span class="pill dash">Declined</span>` : `<span class="pill solid">Approved</span>`;
+  };
+  let rows = "";
+  e.units.forEach((u) => {
+    const dec = e.approved && u === 17 && e.declined17 ? "declined" : "";
+    if (cv) {
+      rows += `<tr class="${dec}"><td><span class="strike">Unit ${u} · ${unitVehicle(u)} · full wrap</span><div class="small muted">Design, print, laminate and install</div></td><td class="num"><span class="strike">${money(unitPrice(u))}</span></td><td>${status(u)}</td></tr>`;
+    } else {
+      rows += `<tr class="group ${dec} rowin"><td><span class="strike">Unit ${u} · ${unitVehicle(u)} · Full wrap package</span></td><td></td><td class="num">${money(unitCost(u))}</td><td class="num">${money(unitPrice(u))}</td><td class="num">${Math.round(((unitPrice(u) - unitCost(u)) / unitPrice(u)) * 100)}%</td><td>${status(u)}</td></tr>`;
+      rows += unitLines(u).map((w, i) => `<tr class="sub ${dec} rowin" style="animation-delay:${(i + 1) * 60}ms"><td><span class="strike">${w[0]}</span></td><td class="num"${i === 0 ? ` data-k="qty-${u}"` : ""}>${w[1]} ${w[2]}</td><td class="num">${money(w[1] * w[3])}</td><td class="num">${money(w[1] * w[4])}</td><td></td><td></td></tr>`).join("");
+    }
+  });
+  const head = cv
+    ? `<tr><th>Description</th><th class="num">Price</th><th style="width:120px">Status</th></tr>`
+    : `<tr><th>Item</th><th class="num">Qty</th><th class="num">Cost</th><th class="num">Price</th><th class="num">Margin</th><th style="width:120px">Status</th></tr>`;
+  const approvedTotal = e.approved ? (e.declined17 ? unitPrice(14) : unitPrice(14) + unitPrice(17)) : e.units.reduce((a, u) => a + unitPrice(u), 0);
+  const dep = e.deposit ? `<span class="pill solid" data-k="deposit-done">Deposit recorded · ${money(PRICE / 2)} · Check</span>` : `<button class="btn" data-k="record-deposit" ${e.approved ? "" : "disabled"}>Record deposit</button>`;
+  const body = `
+  <div class="head"><div><div class="crumb">Estimates › E-2207</div><h2>Ridgeline Plumbing &amp; Heating</h2><div class="meta">Contact: Mike Dorsey · Customer PO 7781</div></div>
+    <div class="btns"><div class="seg"><button class="${cv ? "" : "on"}" data-k="cv-int">Your view</button><button class="${cv ? "on" : ""}" data-k="cv-cust">Customer view</button></div>
+    <button class="btn dash" data-k="add-tpl">+ Add saved package</button>
+    <button class="btn" data-k="record-approval" ${e.units.length ? "" : "disabled"}>Record approval</button>
+    <button class="btn primary" data-k="create-job" ${e.approved ? "" : "disabled"}>Create ${T.work.toLowerCase()}</button></div></div>
+  ${e.units.length ? `<div class="tbl"><table><thead>${head}</thead><tbody>${rows}</tbody></table></div>` : `<div class="empty">No items yet. Add a vehicle from a saved package to start.</div>`}
+  ${e.menu ? `<div class="menu" style="right:258px;top:62px"><div data-k="tpl-wrap"><span>Full wrap</span><span class="muted small">6 lines</span></div><div><span>Partial wrap</span><span class="muted small">5 lines</span></div><div><span>Door logos (pair)</span><span class="muted small">4 lines</span></div><div><span>DOT lettering</span><span class="muted small">3 lines</span></div></div>` : ""}
+  <div class="cols">
+    <div class="box"><h3>Approval record</h3>${e.approved
+      ? `<div class="kv"><dt>Unit 14</dt><dd>Approved</dd><dt>Unit 17</dt><dd>Declined</dd><dt>Approved by</dt><dd>Mike Dorsey</dd><dt>Method</dt><dd>Phone call</dd><dt>When</dt><dd>Oct 26, 10:14 AM</dd><dt>Recorded by</dt><dd>Owner</dd></div>`
+      : `<div class="muted small">Not approved yet</div>`}</div>
+    <div class="box"><h3>Totals</h3><div class="kv"><dt>${e.approved ? "Approved" : "Estimate total"}</dt><dd>${money(approvedTotal)}</dd><dt>Sales tax</dt><dd>per settings</dd><div class="rule"></div><dt>Deposit</dt><dd>${money(PRICE / 2)}</dd></div><div style="margin-top:12px;display:flex;justify-content:flex-end">${dep}</div></div>
+  </div>
+  ${e.modal ? `<div class="scrim"><div class="modal"><h4>Record customer approval</h4>
+    <div class="choice"><span>Unit 14 · full wrap · ${money(unitPrice(14))}</span><div class="seg"><button class="on">Approve</button><button>Decline</button></div></div>
+    <div class="choice"><span>Unit 17 · full wrap · ${money(unitPrice(17))}</span><div class="seg"><button class="${e.declined17 ? "" : "on"}">Approve</button><button class="${e.declined17 ? "on" : ""}" data-k="decline-17">Decline</button></div></div>
+    <div class="field"><label>Approved by</label><div class="input">Mike Dorsey</div></div>
+    <div class="field"><label>How</label><div class="input">Phone call</div></div>
+    <div class="field"><label>When</label><div class="input">Oct 26, 10:14 AM (now)</div></div>
+    <div class="btns"><button class="btn">Cancel</button><button class="btn primary" data-k="save-approval">Save approval</button></div></div></div>` : ""}`;
+  return shell("Estimates", body, "estimates/E-2207");
+}
+
+function boardCard(j, extra = "") {
+  return `<div class="card ${extra}" data-k="card-${j.no}"><div class="row"><span class="no">${j.no}</span>${j.pri === "High" ? `<span class="pill solid">High</span>` : `<span class="pill">${j.pri}</span>`}</div>
+    <div class="cust">${j.cust}</div><div>${j.what}</div>
+    <div class="row"><span>${j.date}</span><span class="av sm">${j.who}</span></div>${j.note ? `<div class="small"><span class="pill dash">${j.note}</span></div>` : ""}</div>`;
+}
+function board() {
+  const jobs = [...OTHER_JOBS];
+  if (S.job.stage !== null) jobs.push({ no: "G-1048", cust: "Ridgeline Plumbing", what: "Unit 14 · full wrap", who: "T1", date: "Nov 2", pri: "High", stage: S.job.stage, note: S.job.review ? "Needs review" : "", mine: true });
+  const cols = T.stages.map((s, i) => {
+    const cs = jobs.filter((j) => j.stage === i);
+    return `<div class="col" data-k="col-${i}"><div class="col-head"><span>${s}</span><span>${cs.length}</span></div><div class="cards">${cs.map((j) => boardCard(j, j.mine ? [S.job.hl ? "hl" : "", S.job.lifted ? "lifted" : "", "pop"].join(" ") : "")).join("")}</div></div>`;
+  }).join("");
+  const body = `<div class="head"><div><h2>${T.board}</h2><div class="meta">Every active ${T.work.toLowerCase()} in the division</div></div>
+    <div class="btns"><div class="seg"><button class="on">Board</button><button>List</button><button>Schedule</button></div><button class="btn primary">+ ${T.work}</button></div></div>
+    <div class="board">${cols}</div>`;
+  return shell(T.board, body, "board");
+}
+
+function phoneChecklist() {
+  return `<div class="p-sec"><div class="p-h">Checklist <span class="qnote" style="text-transform:none;letter-spacing:0">? which checklist items</span></div>
+    <div class="check"><span class="bx"></span>Before install: vehicle condition checked</div><div class="check"><span class="bx"></span>Final quality check</div></div>`;
+}
+function phone() {
+  const p = S.phone;
+  const hms = (s) => `${Math.floor(s / 3600)}:${String(Math.floor(s / 60) % 60).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+  const top = `<div class="p-top"><strong>My ${T.works.toLowerCase()}</strong>${p.clocked ? `<span class="pill solid">Clocked in 7:02 AM</span>` : `<button class="btn primary" data-k="clock-in">Clock in</button>`}</div>`;
+  let body;
+  if (p.view === "list") {
+    const mine = [
+      { no: "G-1048", cust: "Ridgeline Plumbing", what: "Unit 14 · full wrap", stage: T.stages[4], date: "Today" },
+      { no: "G-1043", cust: "Millport School District", what: "Shop wall mural", stage: T.stages[4], date: "Oct 29" },
+      { no: "G-1044", cust: "Keystone Dairy Co-op", what: "Tanker DOT lettering", stage: T.stages[3], date: "Oct 30" },
+      { no: "G-1046", cust: "Brightway Movers", what: "Rear door graphics", stage: T.stages[2], date: "Oct 31" },
+      { no: "G-1052", cust: "Lancaster Kitchen Supply", what: "Box truck logo kit", stage: T.stages[0], date: "Nov 3" },
+    ];
+    body = `<div class="p-sec"><div class="p-h">Assigned to me · ${mine.length}</div>${mine.map((j) => `<div class="p-job" data-k="pjob-${j.no}"><div class="row"><span>${j.no}</span><span>${j.date}</span></div><strong>${j.cust}</strong><span>${j.what}</span><span class="small muted">${j.stage}</span></div>`).join("")}</div>`;
+  } else if (p.finished) {
+    body = `<div class="done pop"><strong>Sent for review</strong><span class="small muted">The owner reviews the photos and closes the ${T.work.toLowerCase()}.</span></div>`;
+  } else {
+    body = `<div class="p-sec"><div class="p-h">G-1048 · High priority</div><strong>Ridgeline Plumbing · Unit 14</strong><span class="small">2024 Ford Transit 250 · full wrap</span><span class="small muted">Wrap both sides and rear. Keep the logo clear of the fuel door.</span></div>
+      <div class="p-sec"><div class="p-h">Files</div><div class="file"><div class="ph"></div>Artwork v3.pdf</div></div>
+      ${phoneChecklist()}
+      <div class="p-sec"><div class="p-h">Job timer</div>${p.timer
+        ? `<div class="timer"><div><div class="small muted">Installation</div><div class="t">${hms(p.secs)}</div></div><button class="btn primary">Stop</button></div>`
+        : `<button class="wide" data-k="start-timer">Start install timer</button>`}</div>
+      <div class="p-sec"><div class="p-h">Completion photos</div><div class="photos">${Array.from({ length: p.photos }, () => `<div class="ph pop"></div>`).join("")}<div class="add" data-k="add-photo">+</div></div></div>
+      <div class="p-sec" style="border:0"><button class="wide solid" data-k="finish" ${p.photos ? "" : "disabled"}>Done · send for review</button></div>`;
+  }
+  return `<div class="phone-stage"><div class="phone"><div class="notch"></div>${top}<div class="p-body">${body}</div></div></div>`;
+}
+
+function jobRecord() {
+  const body = `<div class="head"><div><div class="crumb">${T.works} › G-1048</div><h2>Ridgeline Plumbing · Unit 14 full wrap</h2><div class="meta">${T.asset}: 2024 Ford Transit 250 · Assigned: Technician 1 · Stage: ${T.stages[S.job.stage ?? 4]}</div></div>
+    <div class="btns">${S.job.review ? `<span class="pill dash">Needs review</span><button class="btn">Send back</button><button class="btn primary" data-k="review-close">Review and close</button>` : `<span class="pill solid">${T.stages[5]}</span>`}</div></div>
+    <div class="cols" style="margin-top:0">
+      <div class="box"><h3>Completion photos · from the technician</h3><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px" data-k="photos">${[0, 1, 2].map(() => `<div class="ph" style="aspect-ratio:4/3"></div>`).join("")}</div>
+        <div class="small muted" style="margin-top:10px">Uploaded Nov 2, 3:52 PM</div></div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="box" data-k="costing"><h3>Estimated vs. actual</h3><div class="kv"><dt>Hours, estimated</dt><dd>13.0</dd><dt>Hours, actual · from the job timers</dt><dd>12.6</dd><dt>Materials, estimated</dt><dd>${money(379.3)}</dd><dt>Materials, actual · as entered on the job</dt><dd>${money(391.4)}</dd></div></div>
+        <div class="box"><h3>Notes</h3><div class="small">Oct 30 · Printing done, laminating overnight.</div><div class="small" style="margin-top:6px">Nov 2 · Install done. Fuel door clear.</div></div>
+      </div></div>`;
+  return shell(T.works, body, "jobs/G-1048");
+}
+
+function invoice() {
+  const dep = PRICE / 2, st = S.inv;
+  const pill = { draft: `<span class="pill dash">Draft</span>`, sent: `<span class="pill">Sent</span>`, paid: `<span class="pill solid">Paid</span>` }[st];
+  const body = `<div class="head"><div><div class="crumb">Invoices › ${st === "draft" ? "Draft" : "OTC-G-0412"}</div><h2>Invoice ${pill}</h2><div class="meta">Created when G-1048 was closed</div></div>
+    <div class="btns"><button class="btn">Edit</button><button class="btn" data-k="dl-pdf">Download PDF</button>${st === "draft" ? `<button class="btn primary" data-k="mark-sent">Mark as sent</button>` : ""}</div></div>
+    <div class="cols" style="margin-top:0">
+      <div class="box" style="padding:18px">
+        <div style="display:flex;justify-content:space-between"><div><div class="logo">LOGO</div><div style="font-weight:600;margin-top:6px">OTC Fleet Graphix</div></div><div class="small" style="text-align:right">Bill to<br><strong>Ridgeline Plumbing &amp; Heating</strong><br>Customer PO: 7781</div></div>
+        <div class="tbl" style="margin-top:16px" data-k="inv-line"><table><thead><tr><th>Description</th><th class="num">Amount</th></tr></thead>
+          <tbody><tr><td>Unit 14 · ${unitVehicle(14)} · full wrap<div class="small muted">Design, print, laminate and install</div></td><td class="num">${money(PRICE)}</td></tr></tbody></table></div>
+        <div class="kv" style="max-width:300px;margin:14px 0 0 auto" data-k="inv-totals"><dt>Subtotal</dt><dd>${money(PRICE)}</dd><dt>Sales tax</dt><dd>per settings</dd><dt>Deposit received Oct 26</dt><dd>${money(-dep)}</dd><div class="rule"></div>
+          <dt><strong>Balance due</strong></dt><dd><strong>${money(st === "paid" ? 0 : PRICE - dep)}</strong></dd></div>
+        <div class="box" style="margin-top:16px;border-style:dashed" data-k="inv-other"><h3>Other unpaid invoices</h3><div class="kv"><dt>OTC-G-0398 · Unit 9 decal refresh · due Nov 26</dt><dd>$420.00</dd><div class="rule"></div><dt><strong>Total of other unpaid invoices</strong></dt><dd><strong>$420.00</strong></dd></div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="box"><h3>Payment</h3><div class="small">${st === "draft" ? "Not sent yet. The PDF includes a pay-by-card link." : st === "sent" ? "Marked as sent · the owner emailed the PDF with its pay-by-card link" : `<span class="pill solid">Paid by card</span> Nov 5 · ${money(PRICE - dep)}`}</div></div>
+        <div class="box" data-k="qb"><h3>QuickBooks Online</h3><div class="small">${st === "draft" ? "Not sent to QuickBooks yet" : st === "sent" ? "Sent to QuickBooks" : "Invoice and payment sent to QuickBooks"}</div></div>
+      </div></div>`;
+  return shell("Invoices", body, "invoices/" + (st === "draft" ? "draft" : "OTC-G-0412"));
+}
+
+function timeScreen() {
+  const a = S.time.approved;
+  const st = (r) => (a ? `<span class="pill solid">Approved</span>` : r);
+  const rows = [
+    ["Technician 1", "Mon Nov 2", "8.5", "6.9", "1.6", `<span class="pill dash">Needs review</span>`],
+    ["Technician 1", "Fri Oct 30", "8.0", "7.2", "0.8", `<span class="pill solid">Approved</span>`],
+    ["Technician 1", "Thu Oct 29", "8.3", "7.5", "0.8", `<span class="pill dash">Needs review</span>`],
+    ["Owner", "Mon Nov 2", "9.0", "3.5", "5.5", `<span class="pill dash">Needs review</span>`],
+  ];
+  const body = `<div class="head"><div><h2>Time &amp; payroll</h2><div class="meta">Pay period Oct 26 – Nov 1 · Payroll gets clocked hours. Job time sits inside them.</div></div>
+    <div class="btns"><button class="btn" data-k="export">Export to spreadsheet</button><button class="btn primary" data-k="approve-week" ${a ? "disabled" : ""}>${a ? "Pay period approved" : "Approve pay period"}</button></div></div>
+    <div class="tbl"><table><thead><tr><th>Employee</th><th>Day</th><th class="num">Clocked in</th><th class="num">On ${T.works.toLowerCase()}</th><th class="num">Shop time</th><th>Status</th></tr></thead>
+    <tbody>${rows.map((r) => `<tr><td>${r[0]}</td><td>${r[1]}</td><td class="num">${r[2]} h</td><td class="num">${r[3]} h</td><td class="num">${r[4]} h</td><td>${st(r[5])}</td></tr>`).join("")}</tbody></table></div>`;
+  return shell("Time & payroll", body, "time");
+}
+
+function settings() {
+  const d = DIVISIONS[S.div], changed = S.div !== "graphics" ? "changed" : "";
+  const body = `<div class="head"><div><div class="crumb">Settings › Divisions</div><h2>Terminology &amp; stages</h2><div class="meta">Each division names things its own way. Same records underneath.</div><div style="margin-top:8px"><span class="pill solid">Only Graphics is set up in version 1</span></div></div>
+    <div class="btns"><div class="seg"><button class="${S.div === "graphics" ? "on" : ""}" data-k="div-g">Graphics</button><button class="${S.div === "mechanical" ? "on" : ""}" data-k="div-m">Repair shop · example, later</button></div></div></div>
+    <div class="cols" style="grid-template-columns:1fr 330px;margin-top:0">
+      <div class="tbl"><table><thead><tr><th>Built-in name</th><th>What this division calls it</th></tr></thead><tbody>
+        <tr><td>Work order</td><td><span class="term-in ${changed}">${d.work}</span></td></tr>
+        <tr><td>Work board</td><td><span class="term-in ${changed}">${d.board}</span></td></tr>
+        <tr><td>Field worker</td><td><span class="term-in ${changed}">${d.worker}</span></td></tr>
+        <tr><td>Asset types</td><td><div class="stages">${d.assets.map((s) => `<span>${s}</span>`).join("")}</div></td></tr>
+        <tr><td>Board stages</td><td><div class="stages">${d.stages.map((s) => `<span>${s}</span>`).join("")}</div></td></tr>
+      </tbody></table></div>
+      <div class="preview" data-k="preview"><div class="p-h">Preview · menu</div><div class="mini-nav"><div>${d.board}</div><div>${d.works}</div><div>Estimates</div><div>Invoices</div></div>
+        <div class="p-h" style="margin-top:6px">Preview · card</div><div class="card"><div class="row"><span class="no">${S.div === "graphics" ? "G-1048" : "M-2210"}</span><span class="pill">${d.stages[1]}</span></div><div class="cust">${d.work} for Ridgeline Plumbing</div><div class="small muted">${d.worker}: assigned</div></div></div>
+    </div>`;
+  return shell("Settings", body, "settings/divisions");
+}
+
+function titleCard() {
+  return `<div class="card-screen"><div class="eyebrow">OTC Fleet Services · Version 1</div><h1 class="big">The Graphics division,<br>off FullBay.</h1>
+    <p class="lede">One job, from the first estimate to the paid invoice.</p><div class="stamp">Wireframe · shows what each screen does, not how it will look</div></div>`;
+}
+function notV1() {
+  const items = [["Live inventory counts", "Later"], ["Customer portal", "Later"], ["Repair shops", "Later"], ["Leads & texting", "Stays in GoHighLevel"]];
+  return `<div class="card-screen"><div class="eyebrow">Not in version 1</div><div class="outlist">${items.slice(0, S.out).map(([a, b]) => `<div><span class="x">✗</span>${a}<span class="why">${b}</span></div>`).join("")}</div></div>`;
+}
+function endCard() {
+  return `<div class="card-screen"><div class="eyebrow">Version 1 · Graphics division</div><h1 class="big">Off FullBay,<br>on a foundation built to grow.</h1><div class="stamp">Wireframe preview · details to confirm together</div></div>`;
+}
+
+/* ===================== technician flow: shop computer + phone ===================== */
+// One technician's day across both screens. Used by narration-doing-the-job.json.
+const TS = { clocked: false, timer: false, secs: 0, photos: 0, sent: false, clockedOut: false, card: null };
+const hms = (s) => `${Math.floor(s / 3600)}:${String(Math.floor(s / 60) % 60).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+setInterval(() => {
+  if (!TS.timer) return;
+  TS.secs++;
+  document.querySelectorAll(".tick").forEach((el) => (el.textContent = hms(TS.secs)));
+}, 1000);
+
+const MY_JOBS = [
+  { no: "G-1048", cust: "Ridgeline Plumbing", what: "Unit 14 · full wrap", who: "T1", date: "Today", pri: "High" },
+  { no: "G-1044", cust: "Keystone Dairy Co-op", what: "Tanker DOT lettering", who: "T1", date: "Today", pri: "High", stage: 3 },
+  { no: "G-1046", cust: "Brightway Movers", what: "Rear door graphics", who: "T1", date: "Oct 31", pri: "Normal", stage: 2 },
+  { no: "G-1052", cust: "Lancaster Kitchen Supply", what: "Box truck logo kit", who: "T1", date: "Nov 3", pri: "Normal", stage: 0 },
+  { no: "G-1043", cust: "Millport School District", what: "Shop wall mural", who: "T1", date: "Oct 29", pri: "Normal", stage: 4 },
+  { no: "G-1041", cust: "Ridgeline Plumbing", what: "Unit 9 · decal refresh", who: "T1", date: "Oct 27", pri: "Normal", stage: 5 },
+];
+
+function techShell(active, body, url) {
+  const nav = ["My jobs", "Schedule", "My time"];
+  const clock = TS.clockedOut ? `<span class="pill dash">Clocked out 3:32 PM</span>`
+    : TS.clocked ? `<span class="pill solid">Clocked in 7:02 AM</span>` : `<button class="btn primary" data-k="clock-in">Clock in</button>`;
+  const timer = TS.timer ? `<span class="division" data-k="timer-chip">Timer · G-1048 · <span class="tick">${hms(TS.secs)}</span></span>` : "";
+  return `<div class="frame">
+    <div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">app.otcfleet.com/${url}</span></div>
+    <div class="topbar"><div class="logo">LOGO</div><div class="search">Search my ${T.works.toLowerCase()}…</div><div class="grow"></div>
+      ${timer}${clock}<span class="user"><span class="av">T1</span>Technician</span></div>
+    <div class="app"><div class="nav">${nav.map((n) => `<div class="${n === active ? "on" : ""}" data-k="tnav-${n.split(" ")[1]}">${n}</div>`).join("")}</div>
+    <div class="screen">${body}</div></div></div>`;
+}
+
+function techBoard() {
+  const jobs = MY_JOBS.map((j) => (j.no === "G-1048" ? { ...j, stage: 4, note: TS.sent ? "Needs review" : "" } : j));
+  const cols = T.stages.map((s, i) => {
+    const cs = jobs.filter((j) => j.stage === i);
+    return `<div class="col"><div class="col-head"><span>${s}</span><span>${cs.length}</span></div><div class="cards">${cs.map((j) => boardCard(j, j.no === "G-1048" && TS.card ? "hl" : "")).join("")}</div></div>`;
+  }).join("");
+  const body = `<div class="head"><div><h2>${T.board}</h2><div class="meta">Showing only ${T.works.toLowerCase()} assigned to you</div></div>
+    <div class="btns"><span class="pill">Assigned to me</span><div class="seg"><button class="on">Board</button><button>List</button><button>Schedule</button></div></div></div>
+    <div class="board">${cols}</div>`;
+  return techShell("My jobs", body, "my-jobs");
+}
+
+function techJob() {
+  const body = `<div class="head"><div><div class="crumb">My ${T.works.toLowerCase()} › G-1048</div><h2>Ridgeline Plumbing · Unit 14 full wrap</h2>
+      <div class="meta">${T.asset}: 2024 Ford Transit 250 · Install date: today · Stage: ${T.stages[4]}</div></div>
+    <div class="btns">${TS.timer
+      ? `<div class="timer" style="padding:6px 12px;gap:14px"><div><div class="small muted">Installation</div><div class="t tick" style="font-size:20px">${hms(TS.secs)}</div></div><button class="btn">Stop</button></div>`
+      : `<button class="btn primary" data-k="desk-start">Start timer · Installation</button>`}</div></div>
+    <div class="cols" style="margin-top:0">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="box" data-k="instructions"><h3>Instructions</h3><div>Wrap both sides and the rear. Keep the logo clear of the fuel door. Customer drops the van at 7:30 AM.</div></div>
+        <div class="box" data-k="files"><h3>Files</h3><div style="display:flex;gap:20px;flex-wrap:wrap">
+          <div class="file"><div class="ph"></div>Artwork v3.pdf</div><div class="file"><div class="ph"></div>Measurements.jpg</div><div class="file"><div class="ph"></div>Panel layout.pdf</div></div></div>
+        <div class="box" data-k="checklist"><h3>Checklist <span class="qnote" style="text-transform:none;letter-spacing:0;margin-left:8px">? which checklist items</span></h3>
+          <div style="display:flex;flex-direction:column;gap:6px"><div class="check"><span class="bx"></span>Before install: vehicle condition checked</div><div class="check"><span class="bx"></span>Final quality check</div></div></div>
+        <div class="box"><h3>Completion photos</h3><div class="muted small">None yet. Add them from the phone, or upload them here.</div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="box"><h3>Notes</h3><div class="small">Oct 30 · Printing done, laminating overnight.</div></div>
+        <div class="box" style="border-style:dashed" data-k="noprices"><h3>Not shown to technicians</h3><div class="small muted">Costs, markup and profit.</div></div>
+      </div></div>`;
+  return techShell("My jobs", body, "my-jobs/G-1048");
+}
+
+function techPhone() {
+  const top = `<div class="p-top"><strong>G-1048</strong><span class="pill solid">Clocked in 7:02 AM</span></div>`;
+  const body = TS.sent
+    ? `<div class="done pop"><strong>Sent for review</strong><span class="small muted">The timer stopped at <span>${hms(TS.secs)}</span>.</span></div>`
+    : `<div class="p-sec"><strong>Ridgeline Plumbing · Unit 14</strong><span class="small">2024 Ford Transit 250 · full wrap</span><span class="small muted">Wrap both sides and the rear. Keep the logo clear of the fuel door.</span></div>
+      <div class="p-sec"><div class="p-h">Job timer</div><div class="timer" data-k="phone-timer"><div><div class="small muted">Installation · started at the computer</div><div class="t tick">${hms(TS.secs)}</div></div><button class="btn primary">Stop</button></div></div>
+      <div class="p-sec"><div class="p-h">Files</div><div class="file"><div class="ph"></div>Artwork v3.pdf</div></div>
+      ${phoneChecklist()}
+      <div class="p-sec"><div class="p-h">Completion photos</div><div class="photos">${Array.from({ length: TS.photos }, () => `<div class="ph pop"></div>`).join("")}<div class="add" data-k="t-add-photo">+</div></div></div>
+      <div class="p-sec" style="border:0"><button class="wide solid" data-k="t-finish">Done · send for review</button></div>`;
+  return `<div class="phone-stage"><div class="phone"><div class="notch"></div>${top}<div class="p-body">${body}</div></div></div>`;
+}
+
+function techTime() {
+  const body = `<div class="head"><div><h2>My time · today</h2><div class="meta">Mon Nov 2 · The owner reviews and approves this</div></div>
+    <div class="btns">${TS.clockedOut ? `<span class="pill dash">Clocked out</span>` : `<button class="btn primary" data-k="clock-out">Clock out</button>`}</div></div>
+    <div class="cols" style="margin-top:0;grid-template-columns:1fr 300px">
+      <div class="tbl"><table><thead><tr><th>What</th><th>From</th><th class="num">Hours</th></tr></thead><tbody>
+        <tr><td>G-1048 · Ridgeline · Installation</td><td>Computer, then phone</td><td class="num">6.4</td></tr>
+        <tr><td>G-1044 · Keystone Dairy · Prep</td><td>Computer</td><td class="num">0.5</td></tr>
+        <tr><td>Shop time · cleanup and restock</td><td>Phone</td><td class="num">1.6</td></tr>
+      </tbody></table></div>
+      <div class="box" data-k="day-total"><h3>Today</h3><div class="kv"><dt>Clocked in</dt><dd>7:02 AM</dd><dt>Clocked out</dt><dd>${TS.clockedOut ? "3:32 PM" : "—"}</dd><div class="rule"></div><dt>On jobs</dt><dd>6.9 h</dd><dt>Shop time</dt><dd>1.6 h</dd><dt><strong>Total</strong></dt><dd><strong>8.5 h</strong></dd></div></div>
+    </div>`;
+  return techShell("My time", body, "my-time");
+}
+
+function genericCard() {
+  const c = S.card;
+  return `<div class="card-screen"><div class="eyebrow">${c.eyebrow}</div><h1 class="big">${c.big}</h1>${c.lede ? `<p class="lede">${c.lede}</p>` : ""}<div class="stamp">Sketch · shows what each screen does, not the final design</div></div>`;
+}
+
+function render() {
+  const view = { title: titleCard, estimate, board, phone, job: jobRecord, invoice, time: timeScreen, settings, notv1: notV1, end: endCard,
+    card: genericCard, tboard: techBoard, tjob: techJob, tphone: techPhone, ttime: techTime }[S.screen];
+  $("#root").innerHTML = view();
+  const w = $("#who");
+  w.hidden = !S.who;
+  if (S.who === "owner") w.innerHTML = `<span class="av">OW</span><span><b>Owner</b> · at the desk</span>`;
+  if (S.who === "tech" || S.who === "tech-phone") w.innerHTML = `<span class="av">T1</span><span><b>Technician</b> · on a phone at the van</span>`;
+  if (S.who === "tech-desk") w.innerHTML = `<span class="av">T1</span><span><b>Technician</b> · at the shop computer</span>`;
+}
+
+/* ===================== cursor + director ===================== */
+const cur = $("#cursor");
+function center(k) {
+  const el = document.querySelector(`[data-k="${k}"]`);
+  if (!el) throw new Error("missing " + k);
+  const r = el.getBoundingClientRect();
+  return [r.left + r.width / 2, r.top + r.height / 2];
+}
+async function moveTo(k, dx = 0, dy = 0, ms = 700) {
+  const [x, y] = Array.isArray(k) ? k : center(k);
+  cur.style.transitionDuration = ms + "ms";
+  cur.style.left = x + dx - 3 + "px";
+  cur.style.top = y + dy - 2 + "px";
+  await wait(ms + 60);
+}
+function ripple() {
+  const r = document.createElement("div");
+  r.className = "ripple";
+  r.style.left = parseFloat(cur.style.left) + 3 + "px";
+  r.style.top = parseFloat(cur.style.top) + 2 + "px";
+  document.body.appendChild(r);
+  setTimeout(() => r.remove(), 600);
+}
+async function click(k, fn, after = 350) {
+  await moveTo(k);
+  ripple();
+  await wait(120);
+  if (fn) { fn(); render(); }
+  await wait(after);
+}
+function toast(msg, ms = 2200) {
+  const t = document.createElement("div");
+  t.className = "toast"; t.textContent = msg;
+  $("#toasts").appendChild(t);
+  setTimeout(() => t.remove(), ms);
+}
+function go(screen, who) { S.screen = screen; S.who = who; render(); }
+function parkCursor() { cur.style.transitionDuration = "0ms"; cur.style.left = "1560px"; cur.style.top = "940px"; }
+
+const SCENES = {
+  async title() { parkCursor(); go("title", null); },
+
+  async estimate() {
+    go("estimate", "owner");
+    await wait(900);
+    for (const u of [14, 17]) {
+      await click("add-tpl", () => (S.est.menu = true), 500);
+      await click("tpl-wrap", () => { S.est.menu = false; S.est.units.push(u); }, 1600);
+    }
+    await moveTo("cv-int", 0, 160, 900);
+    await wait(1200);
+    await click("qty-17", () => (S.est.film17 = 74), 300);
+    toast("Unit 17 film changed to 74 ft · price updated");
+    await wait(1400);
+  },
+
+  async "customer-view"() {
+    await wait(800);
+    await click("cv-cust", () => (S.est.custView = true), 3500);
+    await click("cv-int", () => (S.est.custView = false), 600);
+  },
+
+  async approval() {
+    await click("record-approval", () => (S.est.modal = true), 700);
+    await click("decline-17", () => (S.est.declined17 = true), 900);
+    await click("save-approval", () => { S.est.modal = false; S.est.approved = true; }, 2600);
+    await click("record-deposit", () => (S.est.deposit = true), 200);
+    toast("Deposit recorded · " + money(PRICE / 2) + " · Check");
+    await wait(1600);
+    await moveTo("create-job", 0, 0, 800);
+    await wait(900);
+  },
+
+  async board() {
+    await click("create-job", () => { S.job.stage = 0; S.job.hl = true; go("board", "owner"); }, 2600);
+    // drag the new card from column 0 to column 1
+    await moveTo("card-G-1048");
+    const src = document.querySelector('[data-k="card-G-1048"]');
+    const r = src.getBoundingClientRect();
+    const ghost = src.cloneNode(true);
+    ghost.classList.add("ghost"); ghost.classList.remove("pop");
+    ghost.style.left = r.left + "px"; ghost.style.top = r.top + "px"; ghost.style.width = r.width + "px";
+    document.body.appendChild(ghost);
+    S.job.lifted = true; render();
+    const [tx, ty] = center("col-1");
+    const dx = tx - (r.left + r.width / 2), dy = ty - 200 - (r.top + r.height / 2);
+    ghost.style.transition = "left .9s cubic-bezier(.45,.05,.3,1), top .9s cubic-bezier(.45,.05,.3,1)";
+    cur.style.transitionDuration = "900ms";
+    ghost.style.left = r.left + dx + "px"; ghost.style.top = r.top + dy + "px";
+    cur.style.left = parseFloat(cur.style.left) + dx + "px"; cur.style.top = parseFloat(cur.style.top) + dy + "px";
+    await wait(950);
+    ghost.remove();
+    S.job.stage = 1; S.job.lifted = false; render();
+    ripple();
+    await wait(1200);
+  },
+
+  async technician() {
+    S.job.hl = false;
+    parkCursor();
+    go("phone", "tech");
+    await wait(2200);
+    await click("clock-in", () => (S.phone.clocked = true), 1600);
+    await click("pjob-G-1048", () => (S.phone.view = "job"), 2200);
+    await click("start-timer", () => { S.phone.timer = true; S.phone.secs = 0; }, 100);
+    // run the timer quickly up to 3:41 to suggest a morning of work
+    for (let i = 0; i <= 60; i++) { S.phone.secs = Math.round((i / 60) * 13260); $(".t").textContent = (() => { const s = S.phone.secs; return `${Math.floor(s / 3600)}:${String(Math.floor(s / 60) % 60).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`; })(); await wait(45); }
+    await wait(2200);
+    for (let i = 0; i < 3; i++) await click("add-photo", () => S.phone.photos++, 500);
+    await wait(600);
+    await click("finish", () => (S.phone.finished = true), 1500);
+  },
+
+  async review() {
+    S.job.stage = 4; S.job.review = true; S.job.hl = true;
+    parkCursor();
+    go("board", "owner");
+    await wait(1200);
+    await click("card-G-1048", () => go("job", "owner"), 1200);
+    await moveTo("photos", 0, 0, 800);
+    await wait(1700);
+    await moveTo("costing", 0, 0, 800);
+    await wait(1600);
+    await click("review-close", () => { S.job.stage = 5; S.job.review = false; }, 300);
+    go("board", "owner");
+    toast("Job completed · draft invoice created");
+    await moveTo("card-G-1048", 0, 0, 800);
+    await wait(1300);
+    S.job.hl = false;
+  },
+
+  async invoice() {
+    S.inv = "draft"; go("invoice", "owner");
+    await wait(800);
+    await moveTo("inv-line", -200, 0, 800); await wait(1300);
+    await moveTo("inv-totals", 0, 30, 800); await wait(1300);
+    await moveTo("inv-other", 0, 0, 800); await wait(1600);
+    await click("dl-pdf", null, 200);
+    toast("PDF downloaded");
+    await wait(1600);
+    await click("mark-sent", () => (S.inv = "sent"), 200);
+    toast("Marked as sent");
+    await wait(2000);
+    S.inv = "paid"; render();
+    toast("Payment received · balance $0.00");
+    await moveTo("qb", 0, 0, 900);
+    await wait(1500);
+  },
+
+  async time() {
+    go("time", "owner");
+    await wait(2600);
+    await click("approve-week", () => (S.time.approved = true), 1800);
+    await click("export", null, 200);
+    toast("Spreadsheet downloaded · pay period Oct 26 – Nov 1");
+    await wait(1500);
+  },
+
+  async terms() {
+    S.div = "graphics"; go("settings", "owner");
+    await wait(4500);
+    await moveTo("preview", 0, -40, 900); await wait(2500);
+    await click("div-m", () => (S.div = "mechanical"), 4000);
+    await moveTo("preview", 0, -40, 900); await wait(3500);
+    await click("div-g", () => (S.div = "graphics"), 800);
+  },
+
+  async "not-v1"() {
+    parkCursor();
+    S.out = 0; go("notv1", null);
+    await wait(2600);
+    for (const ms of [1800, 1300, 1700, 1500]) { S.out++; render(); await wait(ms); }
+  },
+
+  async end() { go("end", null); },
+
+  /* ---------- flow video: Doing the job (computer + phone) ---------- */
+  async "tech-title"() {
+    parkCursor();
+    S.card = { eyebrow: "Version 1 · Doing the job", big: "A technician's day,<br>at the computer and the van.", lede: "Same system, same job, whichever screen is closest." };
+    go("card", null);
+  },
+
+  async "tech-desk"() {
+    parkCursor();
+    go("tboard", "tech-desk");
+    await wait(1600);
+    await click("clock-in", () => (TS.clocked = true), 2200);
+    await moveTo("card-G-1048", 0, 0, 900);
+    await wait(2400);
+  },
+
+  async "tech-job"() {
+    await click("card-G-1048", () => go("tjob", "tech-desk"), 1400);
+    await moveTo("instructions", 0, 0, 800); await wait(1300);
+    await moveTo("files", -200, 0, 800); await wait(1300);
+    await moveTo("checklist", 0, 0, 800); await wait(1300);
+    await moveTo("noprices", 0, 0, 800); await wait(1400);
+    await click("desk-start", () => { TS.timer = true; TS.secs = 0; }, 2400);
+  },
+
+  async "tech-phone"() {
+    parkCursor();
+    TS.secs = 6 * 3600 + 21 * 60; // about 6.4 h, matching My time
+    go("tphone", "tech-phone");
+    await wait(2600);
+    await moveTo("phone-timer", 40, 10, 900);
+    await wait(3600);
+    for (let i = 0; i < 3; i++) await click("t-add-photo", () => TS.photos++, 650);
+    await wait(900);
+    await click("t-finish", () => { TS.sent = true; TS.timer = false; }, 1500);
+  },
+
+  async "tech-back"() {
+    parkCursor();
+    TS.card = true;
+    go("tboard", "tech-desk");
+    await wait(1200);
+    await moveTo("card-G-1048", 0, 0, 900);
+    await wait(2600);
+    await click("tnav-time", () => go("ttime", "tech-desk"), 1400);
+    await moveTo("day-total", 0, 0, 800); await wait(2400);
+    await click("clock-out", () => (TS.clockedOut = true), 1200);
+  },
+
+  async "tech-end"() {
+    parkCursor();
+    S.card = { eyebrow: "Version 1 · Doing the job", big: "Only their jobs.<br>No costs or profit. Any screen.", lede: "" };
+    go("card", null);
+  },
+};
+
+window.director = { run: (id) => SCENES[id](), ids: Object.keys(SCENES) };
+render();
+</script>
+</body>
+</html>

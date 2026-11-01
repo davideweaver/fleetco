@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Materials and ordering</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Kalam:wght@400;700&display=swap">
+<link rel="stylesheet" href="../../lib/wire.css">
+<style>
+  /* handwritten callouts (from v1-walkthrough-sample.html) */
+  .note { font-family: var(--hand); color: var(--pencil); font-size: 17px; line-height: 1.3; display: flex; gap: 8px; align-items: flex-start; }
+  .note .badge { flex: none; width: 24px; height: 24px; border: 1.5px solid var(--pencil); border-radius: 50%; display: grid; place-items: center; font-size: 13px; font-weight: 700; }
+  .tabs { margin-bottom: 14px; }
+  tr.upd td { font-weight: 600; background: var(--fill); }
+  tr.upd td .was { font-weight: 400; color: var(--ink-3); text-decoration: line-through; margin-right: 6px; }
+  .pkgs { display: grid; grid-template-columns: 250px 1fr; gap: 16px; align-items: start; }
+  .pkg { border: 1.5px solid var(--ink-3); border-radius: 3px; padding: 9px 11px; display: flex; flex-direction: column; gap: 2px; font-size: 13.5px; }
+  .pkg.on { border-color: var(--ink); background: var(--fill); font-weight: 600; }
+  .pkg .small { font-weight: 400; }
+  .desc { border: 1.5px solid var(--ink-3); border-radius: 3px; padding: 7px 10px; font-size: 13.5px; min-height: 52px; }
+  .doc { background: #fff; border: 1.5px solid var(--ink-2); width: 560px; padding: 28px 32px; display: flex; flex-direction: column; gap: 14px; font-size: 12.5px; box-shadow: 6px 6px 0 var(--fill-2); }
+  .doc h5 { margin: 0; font-size: 20px; }
+  .doc table { font-size: 12px; }
+  .pdfbar { display: flex; justify-content: space-between; align-items: center; width: 560px; margin-bottom: 8px; font: 12px var(--mono); }
+</style>
+</head>
+<body>
+<script src="../../lib/wire.js"></script>
+<script>
+/* 5 · Materials and ordering: 5.1 Materials list (picture), 5.2 Saved packages (picture), 5.3 Ordering from vendors (video). */
+const VENDOR = "Keystone Sign Supply";
+// [name, vendor, unit, cost, price, last updated]
+const MATS = [
+  ["Avery MPI 1105 wrap film (54 in)", VENDOR, "ft", 3.10, 7.50, "Oct 13 · PO-0027"],
+  ["Avery DOL 1460Z overlaminate (54 in)", VENDOR, "ft", 2.05, 4.50, "Oct 13 · PO-0027"],
+  ["3M IJ180Cv3 wrap film (54 in)", "Susquehanna Graphic Supply", "ft", 3.45, 8.00, "Sep 29 · PO-0024"],
+  ["3M 8518 overlaminate (54 in)", "Susquehanna Graphic Supply", "ft", 2.20, 4.75, "Sep 29 · PO-0024"],
+  ["Oracal 651 cut vinyl (24 in)", VENDOR, "ft", 0.95, 3.00, "Oct 1 · PO-0025"],
+  ["Reflective DOT tape (2 in)", "Susquehanna Graphic Supply", "ft", 0.85, 2.50, "Aug 19 · PO-0019"],
+  ["Application tape (24 in)", VENDOR, "ft", 0.30, 0.90, "Oct 1 · PO-0025"],
+  ["Coroplast sign blank 24 × 36", "Lehigh Plastics Co.", "each", 6.40, 18.00, "Sep 8 · PO-0021"],
+  ["Latex ink", "Susquehanna Graphic Supply", "job", 38.00, 85.00, "Sep 29 · entered by hand"],
+  ["Install supplies", VENDOR, "job", 22.00, 45.00, "Jul 7 · entered by hand"],
+];
+// Lines the owner adds to the new order. [material index, qty, new price per ft]
+const PO_LINES = [[0, 300, 3.20], [1, 300, 2.15]];
+
+const S = { screen: "title", who: null, po: { vendor: false, lines: 0, menu: null, pdf: false, recv: "no", confirm: false }, updated: false };
+const go = (screen, who) => { S.screen = screen; S.who = who; render(); };
+
+function tabs(on) {
+  const t = ["Materials list", "Saved packages", "Purchase orders"];
+  return `<div class="seg tabs">${t.map((x) => `<button class="${x === on ? "on" : ""}" data-k="tab-${slug(x)}">${x}</button>`).join("")}</div>`;
+}
+
+/* ---------- 5.1 materials list ---------- */
+function materials() {
+  const rows = MATS.map((m, i) => {
+    const upd = S.updated && (i === 0 || i === 1);
+    const cost = upd ? PO_LINES[i][2] : m[3];
+    const when = upd ? "Nov 5 · PO-0031 received" : m[5];
+    return `<tr class="${upd ? "upd rowin" : ""}"><td>${m[0]}</td><td>${m[1]}</td><td>${m[2]}</td>
+      <td class="num">${upd ? `<span class="was">${money(m[3])}</span>` : ""}${money(cost)}</td><td class="num">${money(m[4])}</td><td class="muted">${when}</td></tr>`;
+  }).join("");
+  const body = `<div class="head"><div><h2>Materials &amp; ordering</h2><div class="meta">${MATS.length} graphics materials · What you pay updates when an order is marked received</div></div>
+    <div class="btns"><button class="btn">Export to spreadsheet</button><button class="btn primary">+ Add material</button></div></div>
+    ${tabs("Materials list")}
+    <div class="tbl"><table><thead><tr><th>Material</th><th>Vendor</th><th>Unit</th><th class="num">What you pay</th><th class="num">What you charge</th><th>Last updated</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="small muted" style="margin-top:10px">What you pay is the price on the last order you received. What you charge is set by you.</div>
+    ${S.screen === "materials" && !S.updated ? `<div class="note" style="position:absolute;right:40px;bottom:34px;max-width:330px"><span class="badge">1</span><span>No shelf counts in V1. This list keeps costs and prices. Stock is still checked by eye.</span></div>` : ""}`;
+  return shell("Materials & ordering", body, "materials");
+}
+
+/* ---------- 5.2 saved packages ---------- */
+function packages() {
+  const list = [["Full wrap", "6 lines", true], ["Partial wrap", "5 lines"], ["Door logos (pair)", "4 lines"], ["DOT lettering", "3 lines"]];
+  const rows = WRAP.map((w) => `<tr><td>${w[0]}</td><td class="num">${w[1]}</td><td>${w[2]}</td><td class="num">${money(w[3])}</td><td class="num">${money(w[4])}</td><td class="num">${money(w[1] * w[4])}</td></tr>`).join("");
+  const body = `<div class="head"><div><h2>Materials &amp; ordering</h2><div class="meta">Save a common job once. Add it to any estimate in one step, then adjust it for that customer.</div></div>
+    <div class="btns"><button class="btn primary">+ New saved package</button></div></div>
+    ${tabs("Saved packages")}
+    <div class="pkgs">
+      <div style="display:flex;flex-direction:column;gap:8px">${list.map((p) => `<div class="pkg ${p[2] ? "on" : ""}"><span>${p[0]}</span><span class="small muted">${p[1]}</span></div>`).join("")}</div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="head" style="margin:0"><div><div class="crumb">Saved packages › Full wrap</div><h2>Full wrap</h2></div>
+          <div class="btns"><button class="btn">Duplicate</button><button class="btn dash">+ Add line</button><button class="btn primary">Save package</button></div></div>
+        <div class="field" style="grid-template-columns:110px 1fr"><label>Description</label><div class="desc">Design, print, laminate and install a full vehicle wrap. Printed on cast film with matching overlaminate. Shows on the customer's estimate.</div></div>
+        <div class="tbl"><table><thead><tr><th>Item</th><th class="num">Qty</th><th>Unit</th><th class="num">Cost each</th><th class="num">Price each</th><th class="num">Line price</th></tr></thead><tbody>${rows}</tbody></table></div>
+        <div style="display:flex;gap:16px;align-items:flex-start">
+          <div class="note" style="flex:1;padding-top:6px"><span class="badge">1</span><span>Adding this to an estimate copies these lines in. Change any quantity or price for that customer. The saved package stays the same.</span></div>
+          <div class="box" style="width:300px"><h3>Package totals</h3><div class="kv"><dt>Your cost</dt><dd>${money(COST)}</dd><dt>Price to customer</dt><dd>${money(PRICE)}</dd><div class="rule"></div><dt>Margin</dt><dd>${Math.round(((PRICE - COST) / PRICE) * 100)}%</dd><dt>Sales tax</dt><dd>per settings</dd></div></div>
+        </div>
+      </div>
+    </div>`;
+  return shell("Materials & ordering", body, "materials/packages/full-wrap");
+}
+
+/* ---------- 5.3 purchase orders ---------- */
+function poTotal() { return PO_LINES.slice(0, S.po.lines).reduce((a, l) => a + l[1] * l[2], 0); }
+function recvPill() { return S.po.recv === "yes" ? `<span class="pill solid">Received Nov 5</span>` : `<span class="pill dash">Not received</span>`; }
+
+function poList() {
+  const rows = [
+    ["PO-0031", VENDOR, "Oct 29", money(1605), recvPill(), true],
+    ["PO-0030", "Lehigh Plastics Co.", "Oct 23", money(256), `<span class="pill solid">Received Oct 27</span>`],
+    ["PO-0029", "Susquehanna Graphic Supply", "Oct 19", money(1180.5), `<span class="pill solid">Received Oct 22</span>`],
+    ["PO-0028", VENDOR, "Oct 15", money(412), `<span class="pill solid">Received Oct 20</span>`],
+    ["PO-0027", VENDOR, "Oct 8", money(1534.5), `<span class="pill solid">Received Oct 13</span>`],
+  ];
+  const showNew = S.screen === "poListLater";
+  const body = `<div class="head"><div><h2>Materials &amp; ordering</h2><div class="meta">Orders to your vendors. Download the PDF and send it from your own email.</div></div>
+    <div class="btns"><button class="btn primary" data-k="new-po">+ New purchase order</button></div></div>
+    ${tabs("Purchase orders")}
+    <div class="tbl"><table><thead><tr><th>Order</th><th>Vendor</th><th>Ordered</th><th class="num">Total</th><th>Status</th><th></th></tr></thead>
+    <tbody>${rows.filter((r) => showNew || !r[5]).map((r) => `<tr><td class="num" style="text-align:left">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td class="num">${r[3]}</td><td>${r[4]}</td><td>${r[5] ? `<button class="btn" data-k="open-po">Open</button>` : ""}</td></tr>`).join("")}</tbody></table></div>`;
+  return shell("Materials & ordering", body, "materials/orders");
+}
+
+function poForm() {
+  const p = S.po;
+  const lines = PO_LINES.slice(0, p.lines).map((l) => `<tr class="rowin"><td>${MATS[l[0]][0]}</td><td class="num">${l[1]}</td><td>${MATS[l[0]][2]}</td><td class="num">${money(l[2])}</td><td class="num">${money(l[1] * l[2])}</td></tr>`).join("");
+  const menu = p.menu === "vendor"
+    ? `<div class="menu" style="left:179px;top:174px;width:452px"><div data-k="pick-vendor"><span>${VENDOR}</span><span class="muted small">York, PA</span></div><div><span>Susquehanna Graphic Supply</span><span class="muted small">Harrisburg</span></div><div><span>Lehigh Plastics Co.</span><span class="muted small">Allentown</span></div></div>`
+    : p.menu === "mat"
+    ? `<div class="menu" style="left:24px;top:${300 + p.lines * 31}px;width:360px">${MATS.filter((m) => m[1] === VENDOR).slice(0, 4).map((m, i) => `<div data-k="pick-mat-${i}"><span>${m[0]}</span><span class="muted small">${m[2]}</span></div>`).join("")}</div>`
+    : "";
+  const body = `<div class="head"><div><div class="crumb">Purchase orders › PO-0031</div><h2>Purchase order PO-0031 ${recvPill()}</h2><div class="meta">${p.recv === "yes" ? "Marked received Nov 5 by Owner" : "Ordered Oct 29"}</div></div>
+    <div class="btns"><button class="btn" data-k="pdf" ${p.lines ? "" : "disabled"}>Download PDF</button>
+      ${p.recv === "yes" ? `<button class="btn" disabled>Order received</button>` : `<button class="btn primary" data-k="recv" ${p.lines === 2 ? "" : "disabled"}>Mark whole order received</button>`}</div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+      <div class="box"><h3>Vendor</h3><div class="field"><label>Vendor</label><div class="input" data-k="vendor">${p.vendor ? VENDOR : `<span class="muted">Choose a vendor…</span>`}</div></div>
+        <div class="small muted" style="margin-top:8px;min-height:18px">${p.vendor ? "1180 Industrial Rd, York, PA · orders@keystonesign.example" : ""}</div></div>
+      <div class="box"><h3>Ship to</h3><div class="small">OTC Fleet Graphix<br>Shop address from settings<br>Needed by: Nov 4</div></div>
+    </div>
+    <div class="tbl"><table><thead><tr><th>Material</th><th class="num">Qty</th><th>Unit</th><th class="num">Price each</th><th class="num">Line total</th></tr></thead>
+      <tbody>${lines}<tr><td colspan="5"><button class="btn dash" data-k="add-mat" ${p.vendor ? "" : "disabled"}>+ Add material</button></td></tr></tbody></table></div>
+    <div class="kv" style="max-width:300px;margin:14px 0 0 auto"><dt>Order total</dt><dd><strong>${money(poTotal())}</strong></dd></div>
+    ${menu}
+    ${p.pdf ? pdfPreview() : ""}
+    ${p.confirm ? `<div class="scrim"><div class="modal"><h4>Mark the whole order received?</h4>
+      <div class="small">Everything on PO-0031 arrived. What you pay for these materials changes to the prices on this order.</div>
+      ${PO_LINES.map((l) => `<div class="choice"><span>${MATS[l[0]][0]}</span><span class="num">${money(MATS[l[0]][3])} → ${money(l[2])} / ft</span></div>`).join("")}
+      <div class="btns"><button class="btn">Cancel</button><button class="btn primary" data-k="confirm-recv">Mark received</button></div></div></div>` : ""}`;
+  return shell("Materials & ordering", body, "materials/orders/PO-0031");
+}
+
+function pdfPreview() {
+  const lines = PO_LINES.map((l) => `<tr><td>${MATS[l[0]][0]}</td><td class="num">${l[1]} ${MATS[l[0]][2]}</td><td class="num">${money(l[2])}</td><td class="num">${money(l[1] * l[2])}</td></tr>`).join("");
+  return `<div class="scrim" style="flex-direction:column;display:flex;align-items:center;justify-content:center">
+    <div class="pdfbar"><span>PO-0031.pdf · preview</span><span class="btns"><button class="btn">Close</button><button class="btn primary" data-k="save-pdf">Download</button></span></div>
+    <div class="doc">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start"><div class="logo">LOGO</div><div style="text-align:right"><h5>Purchase order</h5><div class="num" style="text-align:right">PO-0031 · Oct 29</div></div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div><div class="muted">Vendor</div><strong>${VENDOR}</strong><br>1180 Industrial Rd<br>York, PA</div><div><div class="muted">Ship to</div><strong>OTC Fleet Graphix</strong><br>Needed by Nov 4</div></div>
+      <div class="tbl"><table><thead><tr><th>Item</th><th class="num">Qty</th><th class="num">Price</th><th class="num">Total</th></tr></thead><tbody>${lines}</tbody></table></div>
+      <div class="kv" style="width:220px;margin-left:auto"><dt>Order total</dt><dd><strong>${money(1605)}</strong></dd></div>
+      <div class="muted" style="border-top:1px solid var(--fill-2);padding-top:10px">Please confirm by email. Questions: call the shop.</div>
+    </div></div>`;
+}
+
+function render() {
+  const screens = {
+    title: () => cardScreen("Version 1 · Materials and ordering", "Ordering from vendors"),
+    materials, packages, poList, poListLater: poList, poForm,
+  };
+  $("#root").innerHTML = screens[S.screen]();
+  setWho(S.who);
+}
+
+const SCENES = {
+  async "5.3-title"() { parkCursor(); go("title", null); },
+  async "5.3-create"() {
+    go("poList", "owner"); await wait(500);
+    await click("new-po", () => { S.screen = "poForm"; }, 400);
+    await click("vendor", () => { S.po.menu = "vendor"; }, 250);
+    await click("pick-vendor", () => { S.po.vendor = true; S.po.menu = null; }, 350);
+    await click("add-mat", () => { S.po.menu = "mat"; }, 250);
+    await click("pick-mat-0", () => { S.po.lines = 1; S.po.menu = null; }, 350);
+    await click("add-mat", () => { S.po.menu = "mat"; }, 250);
+    await click("pick-mat-1", () => { S.po.lines = 2; S.po.menu = null; }, 300);
+  },
+  async "5.3-pdf"() {
+    await click("pdf", () => { S.po.pdf = true; }, 1800);
+    await click("save-pdf", () => { S.po.pdf = false; toast("PDF downloaded · send it from your own email"); }, 600);
+  },
+  async "5.3-recv"() {
+    go("poListLater", "owner"); toast("A few days later: the rolls arrive", 1800); await wait(1600);
+    await click("open-po", () => { S.screen = "poForm"; }, 500);
+    await click("recv", () => { S.po.confirm = true; }, 1600);
+    await click("confirm-recv", () => { S.po.confirm = false; S.po.recv = "yes"; toast("PO-0031 marked received. Costs updated."); }, 600);
+  },
+  async "5.3-cost"() {
+    await click("nav-materials-ordering", () => { S.screen = "materials"; S.updated = true; }, 400);
+  },
+};
+
+const PICTURES = {
+  async "5.1"() { go("materials", "owner"); },
+  async "5.2"() { go("packages", "owner"); },
+};
+boot();
+</script>
+</body>
+</html>

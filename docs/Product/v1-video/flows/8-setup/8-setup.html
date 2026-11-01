@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Setup flows</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Kalam:wght@400;700&display=swap">
+<link rel="stylesheet" href="../../lib/wire.css">
+<style>
+/* handwritten callouts (same as .note in v1-walkthrough-sample.html) */
+.note { font-family: var(--hand); color: var(--pencil); font-size: 19px; line-height: 1.3; display: flex; gap: 8px; align-items: flex-start; }
+.note .badge { flex: none; width: 26px; height: 26px; border: 1.5px solid var(--pencil); border-radius: 50%; display: grid; place-items: center; font-size: 15px; font-weight: 700; }
+/* 8.2 devices */
+.devices { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; gap: 22px; padding-bottom: 40px; }
+.devices .top { display: flex; justify-content: space-between; align-items: flex-end; }
+.devices .top h2 { margin: 0; font: 700 34px var(--hand); }
+.dev-row { display: flex; gap: 40px; align-items: flex-end; justify-content: center; }
+.dev { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.dev .lbl { font: 600 12px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); text-align: center; }
+.dev .lbl span { display: block; font: 400 12px var(--mono); text-transform: none; letter-spacing: 0; margin-top: 3px; }
+.scaled { position: relative; overflow: hidden; flex: none; }
+.scaled > .inner { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+.tablet { width: 640px; height: 860px; border: 3px solid var(--ink); border-radius: 28px; padding: 22px 18px; background: var(--paper); display: flex; flex-direction: column; box-shadow: 10px 10px 0 var(--fill-2); }
+.tablet .scr { flex: 1; border: 1.5px solid var(--ink); border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; }
+.tablet .tbar { display: flex; align-items: center; gap: 10px; border-bottom: 1.5px solid var(--ink); padding: 8px 12px; }
+.tablet .tbody { padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
+.burger { width: 22px; height: 16px; border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); position: relative; }
+.burger::after { content: ""; position: absolute; left: 0; right: 0; top: 5px; border-top: 2px solid var(--ink); }
+/* 8.3 switchover */
+.check { display: inline-grid; place-items: center; width: 18px; height: 18px; border: 1.5px solid var(--ink); border-radius: 3px; font-size: 12px; font-weight: 700; }
+.check.on { background: var(--ink); color: var(--paper); }
+.blank { display: inline-block; min-width: 150px; border: 1.5px dashed var(--ink-3); border-radius: 3px; padding: 3px 9px; color: var(--ink-3); font-family: var(--mono); font-size: 12.5px; }
+.sw td { padding: 11px 10px; vertical-align: middle; }
+</style>
+</head>
+<body>
+<script src="../../lib/wire.js"></script>
+<script>
+const S = { screen: "title", who: null, div: "graphics", title: ["Version 1 · Setup and moving off FullBay", "Using your own words"] };
+const go = (screen, who) => { S.screen = screen; S.who = who; render(); };
+
+/* ---------- 8.1 Terminology & stages (copied from screens.html, plus a "only Graphics is live" note) ---------- */
+function settings() {
+  const d = DIVISIONS[S.div], mech = S.div !== "graphics", changed = mech ? "changed" : "";
+  const body = `<div class="head"><div><div class="crumb">Settings › Divisions</div><h2>Terminology &amp; stages</h2><div class="meta">Each division names things its own way. Same records underneath.</div></div>
+    <div class="btns"><div class="seg"><button class="${!mech ? "on" : ""}" data-k="div-g">Graphics</button><button class="${mech ? "on" : ""}" data-k="div-m">Mechanical · later</button></div></div></div>
+    <div class="cols" style="grid-template-columns:1fr 330px;margin-top:0">
+      <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="tbl"><table><thead><tr><th>Built-in name</th><th>What this division calls it</th></tr></thead><tbody>
+        <tr><td>Work order</td><td><span class="term-in ${changed}">${d.work}</span></td></tr>
+        <tr><td>Work board</td><td><span class="term-in ${changed}">${d.board}</span></td></tr>
+        <tr><td>Field worker</td><td><span class="term-in ${d.worker !== DIVISIONS.graphics.worker ? changed : ""}">${d.worker}</span></td></tr>
+        <tr><td>Asset types</td><td><div class="stages">${d.assets.map((s) => `<span>${s}</span>`).join("")}</div></td></tr>
+        <tr><td>Board stages</td><td><div class="stages" data-k="stages">${d.stages.map((s) => `<span>${s}</span>`).join("")}</div></td></tr>
+      </tbody></table></div>
+      <div class="box" style="border-style:dashed" data-k="live">${mech
+        ? `<h3>Preview only · not live</h3><div class="small">Mechanical comes later. Only Graphics is set up in version 1. Nothing here changes the graphics screens.</div>`
+        : `<h3>Only Graphics is set up in version 1</h3><div class="small"><span class="pill solid">Graphics</span> &nbsp;is the only division set up. Other divisions come later and reuse these same records.</div>`}</div>
+      </div>
+      <div class="preview" data-k="preview"><div class="p-h">Preview · menu${mech ? " · later" : ""}</div><div class="mini-nav"><div>${d.board}</div><div>${d.works}</div><div>Estimates</div><div>Invoices</div></div>
+        <div class="p-h" style="margin-top:6px">Preview · card</div><div class="card"><div class="row"><span class="no">${mech ? "M-2210" : "G-1048"}</span><span class="pill">${d.stages[1]}</span></div><div class="cust">${d.work} for Ridgeline Plumbing &amp; Heating</div><div class="small muted">${d.worker}: assigned</div></div>
+        <div class="p-h" style="margin-top:6px">Preview · board columns</div><div class="mini-nav">${d.stages.slice(0, 4).map((s) => `<div>${s}</div>`).join("")}<div class="muted">+ ${d.stages.length - 4} more</div></div></div>
+    </div>`;
+  return shell("Settings", body, "settings/divisions");
+}
+
+/* ---------- 8.2 same job details at three sizes ---------- */
+function scaled(w, h, s, html) {
+  return `<div class="scaled" style="width:${Math.round(w * s)}px;height:${Math.round(h * s)}px"><div class="inner" style="width:${w}px;height:${h}px;transform:scale(${s})">${html}</div></div>`;
+}
+const FILES = ["Artwork v3.pdf", "Measurements.jpg", "Panel layout.pdf"];
+function deskJob() {
+  const body = `<div class="head"><div><div class="crumb">My ${T.works.toLowerCase()} › G-1048</div><h2>Ridgeline Plumbing &amp; Heating · Unit 14 full wrap</h2>
+      <div class="meta">${T.asset}: 2024 Ford Transit 250 · Install date: today · Stage: ${T.stages[4]}</div></div>
+    <div class="btns"><button class="btn primary">Start timer · Installation</button></div></div>
+    <div class="cols" style="margin-top:0">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="box"><h3>Instructions</h3><div>Wrap both sides and the rear. Keep the logo clear of the fuel door. Customer drops the van at 7:30 AM.</div></div>
+        <div class="box"><h3>Files</h3><div style="display:flex;gap:20px;flex-wrap:wrap">${FILES.map((f) => `<div class="file"><div class="ph"></div>${f}</div>`).join("")}</div></div>
+        <div class="box"><h3>Completion photos</h3><div class="photos" style="grid-template-columns:repeat(6,1fr)"><div class="ph"></div><div class="ph"></div><div class="add">+</div></div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="box"><h3>Notes</h3><div class="small">Oct 30 · Printing done, laminating overnight.</div></div>
+      </div></div>`;
+  return `<div style="position:relative;width:1280px;height:800px">${techShell("My jobs", body, "my-jobs/G-1048")}</div>`;
+}
+function tabletJob() {
+  return `<div class="tablet"><div class="notch" style="width:10px;height:10px;border-radius:50%"></div><div class="scr">
+    <div class="tbar"><div class="burger"></div><div class="logo" style="width:110px;height:26px">LOGO</div><div class="grow"></div><span class="av">T1</span></div>
+    <div class="tbody">
+      <div><div class="crumb">My ${T.works.toLowerCase()} › G-1048</div><h2 style="margin:0;font-size:21px">Ridgeline Plumbing &amp; Heating · Unit 14 full wrap</h2>
+        <div class="meta">${T.asset}: 2024 Ford Transit 250 · Stage: ${T.stages[4]}</div></div>
+      <button class="wide solid">Start timer · Installation</button>
+      <div class="box"><h3>Instructions</h3><div>Wrap both sides and the rear. Keep the logo clear of the fuel door. Customer drops the van at 7:30 AM.</div></div>
+      <div class="box"><h3>Files</h3><div style="display:flex;flex-direction:column;gap:8px">${FILES.map((f) => `<div class="file"><div class="ph"></div>${f}</div>`).join("")}</div></div>
+      <div class="box"><h3>Completion photos</h3><div class="photos"><div class="ph"></div><div class="ph"></div><div class="add">+</div></div></div>
+      <div class="box"><h3>Notes</h3><div class="small">Oct 30 · Printing done, laminating overnight.</div></div>
+    </div></div></div>`;
+}
+function phoneJob() {
+  return `<div class="phone"><div class="notch"></div><div class="p-top"><strong>G-1048</strong><span class="pill">${T.stages[4]}</span></div><div class="p-body">
+    <div class="p-sec"><strong>Ridgeline Plumbing · Unit 14</strong><span class="small">2024 Ford Transit 250 · full wrap</span><span class="small muted">Wrap both sides and the rear. Keep the logo clear of the fuel door.</span></div>
+    <div class="p-sec"><button class="wide solid">Start timer · Installation</button></div>
+    <div class="p-sec"><div class="p-h">Files</div>${FILES.map((f) => `<div class="file"><div class="ph"></div>${f}</div>`).join("")}</div>
+    <div class="p-sec"><div class="p-h">Completion photos</div><div class="photos"><div class="ph"></div><div class="ph"></div><div class="add">+</div></div></div>
+    <div class="p-sec" style="border:0"><div class="p-h">Notes</div><span class="small">Oct 30 · Printing done, laminating overnight.</span></div>
+  </div></div>`;
+}
+function devices() {
+  return `<div class="devices">
+    <div class="top"><div><div class="crumb">Same system · any screen</div><h2>One ${T.work.toLowerCase()}, three screens</h2></div>
+      <div class="note" style="max-width:520px"><span class="badge">1</span><span>It all runs in a web browser. Nothing to download from an app store.</span></div></div>
+    <div class="dev-row">
+      <div class="dev">${scaled(1280, 800, 0.62, deskJob())}<div class="lbl">Computer<span>Any web browser, at the desk or the shop</span></div></div>
+      <div class="dev">${scaled(640, 860, 0.6, tabletJob())}<div class="lbl">Tablet<span>Web browser, fits the screen</span></div></div>
+      <div class="dev">${scaled(400, 830, 0.62, phoneJob())}<div class="lbl">Phone<span>Saved to the home screen</span></div></div>
+    </div>
+    <div class="note" style="align-self:flex-end;max-width:470px"><span class="badge">2</span><span>Same ${T.work.toLowerCase()} details everywhere. The phone stacks it to fit a small screen.</span></div>
+  </div>`;
+}
+
+/* ---------- 8.3 switchover checklist ---------- */
+function switchover() {
+  const row = (done, item, sub, value, from, k = "") => `<tr ${k ? `data-k="${k}"` : ""}><td style="width:34px"><span class="check ${done ? "on" : ""}">${done ? "✓" : ""}</span></td>
+    <td><strong>${item}</strong><div class="small muted">${sub}</div></td><td>${value}</td><td>${from}</td></tr>`;
+  const body = `<div class="head"><div><div class="crumb">Plan · Moving off FullBay</div><h2>Switchover checklist</h2><div class="meta">A plan for moving off FullBay. Not a screen in the system.</div></div>
+    <div class="btns"><span class="pill dash">0 of 5 done</span></div></div>
+    <div class="cols" style="grid-template-columns:1fr 340px;margin-top:0">
+      <div class="tbl"><table class="sw"><thead><tr><th></th><th>What to bring over</th><th>Status</th><th>Comes from</th></tr></thead><tbody>
+        ${row(false, "Customers", "Graphics customers and their contacts", `<span class="pill dash">Not started</span>`, "FullBay export if available, otherwise typed in")}
+        ${row(false, "Open jobs to enter", `Started or scheduled, not finished. Typed into the ${T.board.toLowerCase()}.`, `<span class="num">0 of 14 entered</span>`, "FullBay, one by one", "sw-jobs")}
+        ${row(false, "Unpaid invoices to enter", "Balances customers still owe", `<span class="num">0 of 9 entered</span>`, "FullBay and QuickBooks", "sw-inv")}
+        ${row(false, "Starting invoice number", "So new numbers don't repeat old ones", `<span class="blank">OTC-G-____</span>`, `<span class="pill dash">from accounting</span>`)}
+        ${row(false, "Sales tax settings", "Rates and which items are taxed", `<span class="small">per settings · waiting on rates</span>`, `<span class="pill dash">from accounting</span>`)}
+      </tbody></table></div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="box" style="border-style:dashed"><h3>Old records stay in FullBay</h3><div class="small">Finished jobs and paid invoices are not copied over. Look them up in FullBay when you need them.</div></div>
+        <div class="box"><h3>Switch day</h3><div class="kv"><dt>Open jobs</dt><dd>14</dd><dt>Unpaid invoices</dt><dd>9</dd><div class="rule"></div><dt>Entered so far</dt><dd>0 of 23</dd></div></div>
+      </div>
+    </div>
+    <div class="note" style="position:absolute;right:30px;top:345px;width:330px;justify-content:center" data-k="ask"><span style="font-size:24px;font-weight:700;text-align:center">↑ ? who and when · invoice number and tax rates from accounting</span></div>`;
+  return shell("Settings", body, "plan/moving-off-fullbay");
+}
+
+function render() {
+  const views = {
+    title: () => cardScreen(S.title[0], S.title[1]),
+    settings, devices, switchover,
+  };
+  $("#root").innerHTML = views[S.screen]();
+  setWho(S.who);
+}
+
+const SCENES = {
+  async "8.1-title"() { parkCursor(); S.title = ["Version 1 · Setup and moving off FullBay", "Using your own words"]; S.div = "graphics"; go("title", null); },
+  async "8.1-graphics"() {
+    S.div = "graphics"; go("settings", "owner");
+    await wait(1200);
+    await moveTo("stages", 0, 0, 900); await wait(1600);
+    await moveTo("preview", 0, -60, 800); await wait(1200);
+  },
+  async "8.1-mech"() {
+    await click("div-m", () => (S.div = "mechanical"), 1200);
+    await moveTo("preview", 0, -60, 800); await wait(1200);
+    await moveTo("stages", 0, 0, 800); await wait(1000);
+  },
+  async "8.1-back"() {
+    await moveTo("live", 0, 0, 800); await wait(1600);
+    await click("div-g", () => (S.div = "graphics"), 1200);
+  },
+};
+
+const PICTURES = {
+  async "8.2"() { go("devices", "owner"); $("#who").innerHTML = `<span class="av">T1</span><span><b>Owner or Technician</b> · any screen</span>`; },
+  async "8.3"() { go("switchover", "owner"); },
+};
+boot();
+</script>
+</body>
+</html>

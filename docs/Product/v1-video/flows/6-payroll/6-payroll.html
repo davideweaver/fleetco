@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Time and payroll</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Kalam:wght@400;700&display=swap">
+<link rel="stylesheet" href="../../lib/wire.css">
+<style>
+.note { font-family: var(--hand); color: var(--pencil); font-size: 19px; line-height: 1.3; display: flex; gap: 8px; align-items: flex-start; }
+.note .badge { flex: none; width: 26px; height: 26px; border: 1.5px solid var(--pencil); border-radius: 50%; display: inline-grid; place-items: center; font: 700 14px var(--hand); }
+.callout { border: 1.5px dashed var(--pencil); border-radius: 4px; padding: 8px 12px; background: var(--paper); }
+tr.hl td { background: var(--fill); }
+tr.total td { font-weight: 600; border-top: 1.5px solid var(--ink); }
+.input.on { border-color: var(--ink); }
+.caret::after { content: "|"; animation: blink 1s steps(1) infinite; margin-left: 1px; }
+@keyframes blink { 50% { opacity: 0; } }
+.csv { font: 12px/1.6 var(--mono); color: var(--ink-2); white-space: pre; }
+.yes { font-weight: 700; }
+.no { color: var(--ink-3); }
+</style>
+</head>
+<body>
+<script src="../../lib/wire.js"></script>
+<script>
+/* Section 6 · Time and payroll. Video 6.1, pictures 6.2 and 6.3. */
+const S = { screen: "title", who: null, edit: false, outTxt: "", why: "", fixed: false, approved: false, hlThu: false };
+const go = (screen, who) => { S.screen = screen; S.who = who; render(); };
+
+// Pay period Mon Oct 26 – Fri Oct 30. [day, in, out, clocked, on jobs, shop]
+const WEEK = {
+  "Technician 1": [
+    ["Mon Oct 26", "7:00 AM", "3:00 PM", 8.0, 7.1, 0.9],
+    ["Tue Oct 27", "6:58 AM", "3:28 PM", 8.5, 7.6, 0.9],
+    ["Wed Oct 28", "7:05 AM", "3:05 PM", 8.0, 6.8, 1.2],
+    ["Thu Oct 29", "7:02 AM", null, null, 7.5, null],
+    ["Fri Oct 30", "7:00 AM", "3:00 PM", 8.0, 7.2, 0.8],
+  ],
+  Owner: [
+    ["Mon Oct 26", "7:30 AM", "4:30 PM", 9.0, 3.5, 5.5],
+    ["Tue Oct 27", "7:30 AM", "4:00 PM", 8.5, 2.0, 6.5],
+    ["Wed Oct 28", "7:15 AM", "4:15 PM", 9.0, 4.0, 5.0],
+    ["Thu Oct 29", "7:30 AM", "3:30 PM", 8.0, 3.0, 5.0],
+    ["Fri Oct 30", "7:30 AM", "3:00 PM", 7.5, 2.5, 5.0],
+  ],
+};
+const h = (n) => (n == null ? "—" : n.toFixed(1) + " h");
+function weekRows(name) {
+  return WEEK[name].map((r) => (name === "Technician 1" && r[0] === "Thu Oct 29" && S.fixed ? [r[0], r[1], "3:20 PM", 8.3, 7.5, 0.8] : r));
+}
+
+/* ---------- 6.1 timesheets ---------- */
+function timesheets() {
+  const status = (name, r) => {
+    if (S.approved) return `<span class="pill solid">Approved</span>`;
+    if (name === "Technician 1" && r[0] === "Thu Oct 29") return S.fixed ? `<span class="pill">Edited · reason saved</span>` : `<span class="pill solid">Missed clock-out</span>`;
+    return `<span class="pill dash">Needs review</span>`;
+  };
+  const rows = Object.keys(WEEK).map((name) => {
+    const rs = weekRows(name);
+    const tot = rs.reduce((a, r) => a + (r[3] || 0), 0);
+    return `<tr class="group"><td colspan="6">${name}</td><td class="num">${rs.some((r) => r[3] == null) ? h(tot) + " so far" : h(tot)}</td></tr>` + rs.map((r) => {
+      const thu = name === "Technician 1" && r[0] === "Thu Oct 29";
+      return `<tr class="${thu && S.hlThu ? "hl" : ""}" ${thu ? 'data-k="thu"' : ""}><td>${r[0]}</td><td class="num">${r[1]}</td><td class="num">${r[2] || `<span class="muted">none</span>`}</td><td class="num">${h(r[3])}</td><td class="num">${h(r[4])}</td><td class="num">${h(r[5])}</td><td>${status(name, r)}</td></tr>`;
+    }).join("");
+  }).join("");
+  const body = `<div class="head"><div><div class="crumb">Time &amp; payroll › Timesheets</div><h2>Pay period · Oct 26 – Oct 30</h2><div class="meta">Payroll uses clocked hours. Job time and shop time sit inside them.</div></div>
+    <div class="btns"><button class="btn">Export for payroll</button><button class="btn primary" data-k="approve" ${S.approved ? "disabled" : ""}>${S.approved ? "Pay period approved" : "Approve pay period"}</button></div></div>
+    <div class="tbl"><table><thead><tr><th>Day</th><th class="num">Clock in</th><th class="num">Clock out</th><th class="num">Clocked</th><th class="num">On ${T.works.toLowerCase()}</th><th class="num">Shop time</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>
+    ${S.edit ? editModal() : ""}`;
+  return shell("Time & payroll", body, "time/pay-period-oct-26");
+}
+function editModal() {
+  return `<div class="scrim"><div class="modal ${S.typing ? "" : "pop"}">
+    <h4>Fix time · Technician 1 · Thu Oct 29</h4>
+    <div class="small muted">No clock-out was recorded. Last job timer stopped at 3:14 PM.</div>
+    <div class="field"><label>Clock in</label><div class="input">7:02 AM</div></div>
+    <div class="field"><label>Clock out</label><div class="input ${S.edit === "out" ? "on caret" : ""}" data-k="out">${S.outTxt}</div></div>
+    <div class="field"><label>Reason (required)</label><div class="input ${S.edit === "why" ? "on caret" : ""}" data-k="why" style="min-height:52px">${S.why}</div></div>
+    <div class="small muted">The change is saved with who made it, when, and why.</div>
+    <div class="btns"><button class="btn">Cancel</button><button class="btn primary" data-k="save">Save change</button></div>
+  </div></div>`;
+}
+async function typeInto(field, text, ms = 45) {
+  S.typing = true;
+  for (const ch of text) { S[field] += ch; render(); await wait(ms); }
+}
+
+/* ---------- 6.2 export hours for payroll ---------- */
+function exportScreen() {
+  const days = ["Mon 10/26", "Tue 10/27", "Wed 10/28", "Thu 10/29", "Fri 10/30"];
+  const people = Object.keys(WEEK).map((n) => [n, weekRows(n).map((r) => r[3])]);
+  const colTot = days.map((_, i) => people.reduce((a, p) => a + p[1][i], 0));
+  const all = colTot.reduce((a, b) => a + b, 0);
+  const body = `<div class="head"><div><div class="crumb">Time &amp; payroll › Export for payroll</div><h2>Approved hours for payroll</h2><div class="meta">Hours only. Pay rates and paychecks stay with your payroll service.</div></div>
+    <div class="btns"><button class="btn">Print</button><button class="btn primary">Download spreadsheet</button></div></div>
+    <div style="display:flex;gap:14px;align-items:center;margin-bottom:16px">
+      <span class="muted small">Pay period</span><div class="input" style="width:150px">Oct 26</div><span class="muted">to</span><div class="input" style="width:150px">Oct 30</div>
+      <span class="pill solid">Approved hours only</span><span class="small muted">All timesheets in this range are approved.</span></div>
+    <div class="cols" style="grid-template-columns:1fr 400px;margin-top:0">
+      <div class="gap" style="display:flex;flex-direction:column;gap:16px">
+        <div class="tbl"><table><thead><tr><th>Employee</th>${days.map((d) => `<th class="num">${d}</th>`).join("")}<th class="num">Total</th></tr></thead><tbody>
+          ${people.map(([n, hs]) => `<tr><td>${n}</td>${hs.map((x) => `<td class="num">${x.toFixed(1)}</td>`).join("")}<td class="num"><strong>${hs.reduce((a, b) => a + b, 0).toFixed(1)}</strong></td></tr>`).join("")}
+          <tr class="total"><td>All employees</td>${colTot.map((x) => `<td class="num">${x.toFixed(1)}</td>`).join("")}<td class="num">${all.toFixed(1)}</td></tr>
+        </tbody></table></div>
+        <div class="callout"><div class="note"><span class="badge">1</span><span>These are clocked hours. Job timers are already inside them, so nothing is counted twice.</span></div></div>
+        <div class="callout"><div class="note"><span class="badge">2</span><span>No wages and no payroll connection in version 1. Export to spreadsheet, or print, and give it to whoever runs payroll.</span></div></div>
+      </div>
+      <div class="box"><h3>What's in the spreadsheet</h3>
+        <div class="csv">Employee,Date,Clock in,Clock out,Hours
+Technician 1,10/26,7:00 AM,3:00 PM,8.0
+Technician 1,10/27,6:58 AM,3:28 PM,8.5
+Technician 1,10/28,7:05 AM,3:05 PM,8.0
+Technician 1,10/29,7:02 AM,3:20 PM,8.3
+Technician 1,10/30,7:00 AM,3:00 PM,8.0
+Owner,10/26,7:30 AM,4:30 PM,9.0
+…</div>
+        <div class="small muted" style="margin-top:10px">One row per person per day, plus totals. The printout shows the same table.</div></div>
+    </div>`;
+  return shell("Time & payroll", body, "time/payroll-export");
+}
+
+/* ---------- 6.3 who can see what ---------- */
+function team() {
+  const Y = `<span class="yes">✓</span>`, N = `<span class="no">—</span>`;
+  const perms = [
+    ["See jobs", "All jobs", "Only jobs assigned to them"],
+    ["Instructions, files and photos", Y, "On their jobs"],
+    ["Clock in and out, job timers", Y, Y],
+    ["Add completion photos, Done · send for review", Y, Y],
+    ["Costs, markup and profit", Y, N],
+    ["Estimates", Y, N],
+    ["Invoices and payments", Y, N],
+    ["Fix time and approve timesheets", Y, N],
+    ["Review and close jobs", Y, N],
+    ["Materials list and ordering from vendors", Y, N],
+    ["Reports", Y, N],
+    ["Settings and adding people", Y, N],
+  ];
+  const body = `<div class="head"><div><div class="crumb">Settings › Team</div><h2>Team and roles</h2><div class="meta">Two roles in version 1. Each person has their own login.</div></div>
+    <div class="btns"><button class="btn primary">+ Add person</button></div></div>
+    <div class="cols" style="grid-template-columns:420px 1fr;margin-top:0">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="tbl"><table><thead><tr><th>Person</th><th>Role</th><th>Status</th></tr></thead><tbody>
+          <tr><td><span class="user"><span class="av">OW</span>Owner</span></td><td>Owner</td><td><span class="pill">Active</span></td></tr>
+          <tr><td><span class="user"><span class="av">T1</span>Technician 1</span></td><td>Technician</td><td><span class="pill">Active</span></td></tr>
+        </tbody></table></div>
+        <div class="box" style="border-style:dashed"><h3>Roles</h3><div class="small"><strong>Owner</strong> sees and does everything.</div><div class="small" style="margin-top:6px"><strong>Technician</strong> sees only their own jobs, without costs, markup and profit.</div></div>
+        <div class="callout"><div class="note"><span class="badge">1</span><span>More roles later, like office or accounting, with their own settings. Version 1 has these two.</span></div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:baseline;gap:12px"><h3 style="margin:0">Proposed · who can see what</h3><span class="pill dash">Proposed</span></div>
+        <div class="tbl"><table><thead><tr><th>What</th><th>Owner</th><th>Technician</th></tr></thead><tbody>
+        ${perms.map((p) => `<tr><td>${p[0]}</td><td>${p[1]}</td><td>${p[2]}</td></tr>`).join("")}
+        </tbody></table></div>
+        <div class="note"><span class="badge">2</span><span>? confirm what a technician can see</span></div>
+      </div>
+    </div>`;
+  return shell("Settings", body, "settings/team");
+}
+
+function render() {
+  $("#root").innerHTML = {
+    title: () => cardScreen("Version 1 · Time and payroll", "Approve timesheets"),
+    week: timesheets, export: exportScreen, team,
+  }[S.screen]();
+  setWho(S.who);
+}
+
+const SCENES = {
+  async "6.1-title"() { parkCursor(); go("title", null); },
+  async "6.1-week"() {
+    Object.assign(S, { edit: false, outTxt: "", why: "", fixed: false, approved: false, hlThu: false });
+    go("week", "owner");
+    await wait(1500);
+    await moveTo("thu", 380, 0, 900);
+    S.hlThu = true; render();
+  },
+  async "6.1-fix"() {
+    await click("thu", () => { S.edit = "out"; }, 500);
+    await moveTo("out", 0, 0, 500);
+    await typeInto("outTxt", "3:20 PM", 70);
+    S.edit = "why"; render();
+    await moveTo("why", 0, 0, 400);
+    await typeInto("why", "Forgot to clock out. Left after the last job, about 3:20.", 35);
+  },
+  async "6.1-approve"() {
+    await click("save", () => { S.edit = false; S.fixed = true; }, 1600);
+    await click("approve", () => { S.approved = true; S.hlThu = false; }, 200);
+    toast("Pay period approved · ready to export for payroll", 3500);
+  },
+};
+const PICTURES = {
+  async "6.2"() { S.fixed = true; S.approved = true; go("export", "owner"); },
+  async "6.3"() { go("team", "owner"); },
+};
+boot();
+</script>
+</body>
+</html>

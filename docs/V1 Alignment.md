@@ -74,13 +74,18 @@ it, gets paid, and closes the books with accounting, without going back to FullB
 - A QuickBooks Online connection
 
 **Reports**
-- Ten reports: accounts receivable aging, revenue, ready to invoice, payments, work in progress
+- Nine reports: accounts receivable aging, revenue, ready to invoice, payments, work in progress
   (two views), clocked hours, job hours, and timesheets. All of them export to a spreadsheet and
   print
 
 **Access and devices**
 - Two roles. Cam sees everything. Jason sees only his assigned jobs, and no costs, markup or profit
 - Works in a browser on phones and iPads, saved to the home screen. Nothing to download
+
+**Built to grow**
+- Each division can use its own words and stages. Graphics calls the work a job and tracks production
+  and installation. When the repair shops move over, they can call it a service order and use repair
+  stages, on the same records. Only graphics is set up in V1
 
 ## 3. What V1 does not deliver
 

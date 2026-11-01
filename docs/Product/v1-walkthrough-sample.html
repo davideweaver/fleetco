@@ -1,0 +1,565 @@
+<title>Graphics V1 Walkthrough</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Kalam:wght@400;700&display=swap">
+<style>
+/* Layout: a wireframe "sheet" with the app frame on the left and handwritten presenter margin notes on the right.
+   Deliberately grayscale, one pencil-blue for annotations only. Single committed look in both host themes. */
+:root {
+  --paper: #fbfbf9;
+  --grid: #eceae4;
+  --ink: #2b2b2b;
+  --ink-2: #6b6b6b;
+  --ink-3: #a3a3a0;
+  --fill: #efefec;
+  --fill-2: #e2e2de;
+  --pencil: #2f5fa8;
+  --hand: "Kalam", "Comic Sans MS", cursive;
+  --ui: "IBM Plex Sans", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--paper); color: var(--ink); }
+body {
+  font-family: var(--ui);
+  font-size: 14px;
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 16px 40px;
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, [tabindex]:focus-visible { outline: 2px dashed var(--pencil); outline-offset: 2px; }
+
+/* ---------- top: title + steps ---------- */
+.sheet-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; max-width: 1400px; margin: 0 auto 14px; }
+.sheet-title { font-family: var(--hand); font-size: 30px; font-weight: 700; line-height: 1.1; margin: 0; text-wrap: balance; }
+.sheet-sub { font-family: var(--hand); color: var(--ink-2); font-size: 17px; margin: 2px 0 0; }
+.stamp {
+  font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+  border: 1.5px dashed var(--ink-2); color: var(--ink-2); padding: 6px 10px; max-width: 34ch; line-height: 1.45;
+}
+.steps { display: flex; flex-wrap: wrap; gap: 8px; max-width: 1400px; margin: 0 auto 14px; align-items: center; }
+.step {
+  display: flex; align-items: center; gap: 8px; background: var(--paper);
+  border: 1.5px solid var(--ink-3); border-radius: 3px; padding: 6px 12px 6px 6px; color: var(--ink-2);
+}
+.step .n { font-family: var(--mono); font-size: 12px; width: 22px; height: 22px; border: 1.5px solid currentColor; border-radius: 50%; display: grid; place-items: center; }
+.step .when { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
+.step[aria-current="step"] { border-color: var(--ink); color: var(--ink); background: var(--fill); font-weight: 600; }
+.step[aria-current="step"] .n { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.arrow { color: var(--ink-3); font-family: var(--hand); }
+.spacer { flex: 1; }
+.role { display: flex; align-items: center; gap: 6px; font-family: var(--hand); font-size: 16px; color: var(--ink-2); }
+.role-toggle { display: flex; border: 1.5px solid var(--ink); border-radius: 3px; overflow: hidden; }
+.role-toggle button { border: 0; background: var(--paper); padding: 5px 10px; font-size: 13px; }
+.role-toggle button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+/* ---------- main layout ---------- */
+.stage { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 20px; max-width: 1400px; margin: 0 auto; align-items: start; }
+@media (max-width: 980px) { .stage { grid-template-columns: minmax(0, 1fr); } }
+
+/* the app frame */
+.frame { background: var(--paper); border: 2px solid var(--ink); border-radius: 4px; min-width: 0; }
+.frame-bar { display: flex; align-items: center; gap: 8px; border-bottom: 2px solid var(--ink); padding: 7px 10px; }
+.dot { width: 10px; height: 10px; border: 1.5px solid var(--ink); border-radius: 50%; }
+.url { flex: 1; border: 1.5px solid var(--ink-3); border-radius: 3px; padding: 2px 8px; font-family: var(--mono); font-size: 11px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.app { display: grid; grid-template-columns: 196px minmax(0, 1fr); min-height: 560px; }
+@media (max-width: 700px) { .app { grid-template-columns: minmax(0, 1fr); } .nav { border-right: 0 !important; border-bottom: 1.5px solid var(--ink); } }
+
+.nav { border-right: 1.5px solid var(--ink); padding: 12px 10px; display: flex; flex-direction: column; gap: 3px; }
+.logo-box { border: 1.5px solid var(--ink); height: 34px; display: grid; place-items: center; font-family: var(--mono); font-size: 10px; letter-spacing: .1em; color: var(--ink-2); margin-bottom: 8px; }
+.nav-label { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); margin: 10px 4px 3px; }
+.nav button { text-align: left; border: 1.5px solid transparent; background: none; padding: 5px 8px; border-radius: 3px; display: flex; justify-content: space-between; align-items: center; gap: 6px; font-size: 13px; }
+.nav button:hover { border-color: var(--ink-3); }
+.nav button.on { border-color: var(--ink); background: var(--fill); font-weight: 600; }
+.nav button.locked { color: var(--ink-3); border: 1.5px dashed var(--ink-3); margin-top: 3px; }
+.nav button.locked:hover { color: var(--ink-2); border-color: var(--ink-2); }
+.tag { font-family: var(--mono); font-size: 9px; letter-spacing: .08em; border: 1px solid currentColor; padding: 0 4px; border-radius: 2px; text-transform: uppercase; }
+
+.screen { padding: 16px 18px 22px; min-width: 0; }
+.screen-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 14px; }
+.screen-head h2 { margin: 0; font-size: 18px; font-weight: 700; }
+.screen-head .meta { color: var(--ink-2); font-size: 12px; margin-top: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 6px; }
+.btn { border: 1.5px solid var(--ink); background: var(--paper); border-radius: 3px; padding: 5px 10px; font-size: 12px; font-weight: 500; }
+.btn.primary { background: var(--ink); color: var(--paper); }
+.btn.ghost { border-style: dashed; color: var(--ink-2); border-color: var(--ink-2); }
+
+.pill { display: inline-block; font-family: var(--mono); font-size: 10px; letter-spacing: .05em; text-transform: uppercase; border: 1.5px solid var(--ink); border-radius: 10px; padding: 1px 7px; white-space: nowrap; }
+.pill.solid { background: var(--ink); color: var(--paper); }
+.pill.dash { border-style: dashed; color: var(--ink-2); border-color: var(--ink-2); }
+
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+.muted { color: var(--ink-2); }
+.small { font-size: 12px; }
+
+/* annotation callouts inside the wireframe */
+.note {
+  font-family: var(--hand); color: var(--pencil); font-size: 15px; line-height: 1.3;
+  display: flex; gap: 6px; align-items: flex-start; margin: 8px 0;
+}
+.note .badge { flex: none; width: 22px; height: 22px; border: 1.5px solid var(--pencil); border-radius: 50%; display: grid; place-items: center; font-size: 13px; font-weight: 700; }
+.mark { font-family: var(--hand); color: var(--pencil); font-weight: 700; border: 1.5px solid var(--pencil); border-radius: 50%; width: 20px; height: 20px; display: inline-grid; place-items: center; font-size: 12px; vertical-align: middle; margin-left: 4px; flex: none; }
+
+/* tables */
+.tbl-wrap { overflow-x: auto; border: 1.5px solid var(--ink); border-radius: 3px; }
+table { border-collapse: collapse; width: 100%; font-size: 12.5px; }
+th { text-align: left; font-family: var(--mono); font-weight: 600; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); border-bottom: 1.5px solid var(--ink); padding: 7px 8px; background: var(--fill); white-space: nowrap; }
+td { padding: 6px 8px; border-bottom: 1px solid var(--fill-2); vertical-align: top; }
+tr.group td { background: var(--fill); font-weight: 600; border-bottom: 1.5px solid var(--ink-3); }
+tr.sub td:first-child { padding-left: 26px; }
+tr.declined td { color: var(--ink-3); text-decoration: line-through; }
+tr.declined td.keep { text-decoration: none; }
+th.num { text-align: right; }
+.toggle-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 10px; }
+.seg { display: inline-flex; border: 1.5px solid var(--ink); border-radius: 3px; overflow: hidden; }
+.seg button { border: 0; background: var(--paper); padding: 4px 10px; font-size: 12px; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+.two { display: grid; grid-template-columns: minmax(0, 1fr) 250px; gap: 14px; margin-top: 14px; }
+@media (max-width: 1100px) { .two { grid-template-columns: minmax(0, 1fr); } }
+.box { border: 1.5px solid var(--ink); border-radius: 3px; padding: 10px 12px; min-width: 0; }
+.box h3 { margin: 0 0 8px; font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); font-weight: 600; }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; font-size: 12.5px; }
+.kv dt { color: var(--ink-2); }
+.kv dd { margin: 0; text-align: right; font-family: var(--mono); }
+.rule { border-top: 1.5px solid var(--ink); margin: 6px 0; grid-column: 1 / -1; }
+
+/* board */
+.board { display: grid; grid-template-columns: repeat(6, minmax(150px, 1fr)); gap: 8px; overflow-x: auto; padding-bottom: 6px; }
+.col { border: 1.5px solid var(--ink-3); border-radius: 3px; background: var(--paper); min-height: 330px; display: flex; flex-direction: column; }
+.col-head { font-family: var(--mono); font-size: 10px; letter-spacing: .05em; text-transform: uppercase; padding: 7px 8px; border-bottom: 1.5px solid var(--ink-3); display: flex; justify-content: space-between; gap: 4px; color: var(--ink-2); }
+.cards { padding: 6px; display: flex; flex-direction: column; gap: 6px; }
+.card { border: 1.5px solid var(--ink); border-radius: 3px; padding: 7px 8px; background: var(--paper); font-size: 12px; display: flex; flex-direction: column; gap: 3px; }
+.card.hl { box-shadow: 4px 4px 0 var(--pencil); border-color: var(--pencil); }
+.card .cust { font-weight: 600; }
+.card .row { display: flex; justify-content: space-between; gap: 6px; font-size: 11px; color: var(--ink-2); }
+.card .jobno { font-family: var(--mono); font-size: 10.5px; color: var(--ink-2); }
+.av { display: inline-grid; place-items: center; width: 18px; height: 18px; border: 1.5px solid var(--ink); border-radius: 50%; font-size: 9px; font-family: var(--mono); color: var(--ink); }
+.empty-col { border: 1.5px dashed var(--ink-3); border-radius: 3px; color: var(--ink-3); font-size: 11px; text-align: center; padding: 14px 6px; }
+
+/* image placeholder: box with an X */
+.ph {
+  border: 1.5px solid var(--ink-2); border-radius: 2px; position: relative; background: var(--fill);
+  background-image:
+    linear-gradient(to top right, transparent calc(50% - 1px), var(--ink-3) calc(50% - 0.5px), var(--ink-3) calc(50% + 0.5px), transparent calc(50% + 1px)),
+    linear-gradient(to bottom right, transparent calc(50% - 1px), var(--ink-3) calc(50% - 0.5px), var(--ink-3) calc(50% + 0.5px), transparent calc(50% + 1px));
+}
+
+/* phone */
+.phone-wrap { display: flex; flex-wrap: wrap; gap: 26px; justify-content: center; align-items: flex-start; padding: 18px 10px 26px; }
+.phone { width: 300px; max-width: 100%; border: 2.5px solid var(--ink); border-radius: 26px; padding: 12px 10px 16px; background: var(--paper); }
+.phone .notch { width: 80px; height: 8px; border: 1.5px solid var(--ink); border-radius: 6px; margin: 0 auto 10px; }
+.p-top { display: flex; justify-content: space-between; align-items: center; font-size: 11px; border-bottom: 1.5px solid var(--ink); padding: 0 4px 8px; }
+.p-sec { padding: 10px 4px; border-bottom: 1px solid var(--fill-2); display: flex; flex-direction: column; gap: 6px; }
+.p-sec:last-child { border-bottom: 0; }
+.p-h { font-family: var(--mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+.timer { border: 2px solid var(--ink); border-radius: 4px; padding: 8px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.timer .t { font-family: var(--mono); font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.file { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.file .ph { width: 26px; height: 30px; flex: none; }
+.photos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+.photos .ph { aspect-ratio: 1; max-width: 100%; }
+.photos .add { border: 1.5px dashed var(--ink-2); border-radius: 2px; aspect-ratio: 1; display: grid; place-items: center; font-size: 20px; color: var(--ink-2); }
+.wide-btn { width: 100%; padding: 9px; border: 2px solid var(--ink); border-radius: 4px; background: var(--ink); color: var(--paper); font-weight: 600; font-size: 13px; }
+.wide-btn.outline { background: var(--paper); color: var(--ink); }
+.phone-notes { max-width: 300px; display: flex; flex-direction: column; gap: 4px; padding-top: 30px; }
+
+/* no access */
+.denied { border: 2px dashed var(--ink-2); border-radius: 4px; padding: 30px 24px; text-align: center; max-width: 460px; margin: 60px auto; display: flex; flex-direction: column; gap: 8px; align-items: center; }
+.denied .ph { width: 54px; height: 54px; }
+
+/* presenter margin */
+.margin { font-family: var(--hand); background: var(--paper); border-left: 2px solid var(--ink); padding: 4px 0 4px 18px; display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+@media (max-width: 980px) { .margin { border-left: 0; border-top: 2px solid var(--ink); padding: 16px 0 0; } }
+.margin .label { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.margin h3 { margin: 2px 0 0; font-size: 22px; line-height: 1.15; font-weight: 700; text-wrap: balance; }
+.margin p { margin: 0; font-size: 16px; line-height: 1.4; color: var(--ink); }
+.margin ul { margin: 4px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 5px; }
+.margin li { font-size: 15.5px; line-height: 1.3; display: grid; grid-template-columns: 18px 1fr; gap: 4px; }
+.margin li::before { content: "✓"; font-weight: 700; }
+.margin .out li::before { content: "✗"; color: var(--ink-2); }
+.margin .out li { color: var(--ink-2); }
+.margin .out li b { color: var(--ink); font-weight: 700; }
+.ask { border: 1.5px solid var(--pencil); color: var(--pencil); border-radius: 3px; padding: 8px 10px; font-size: 15.5px; line-height: 1.35; }
+.ask b { display: block; font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; font-weight: 600; margin-bottom: 2px; }
+.pager { display: flex; gap: 8px; }
+.pager button { font-family: var(--ui); border: 1.5px solid var(--ink); background: var(--paper); border-radius: 3px; padding: 6px 12px; font-size: 13px; }
+.pager button:disabled { color: var(--ink-3); border-color: var(--ink-3); cursor: default; }
+.kbd { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
+
+/* locked-door card */
+.scrim { position: fixed; inset: 0; background: rgba(251,251,249,.82); display: grid; place-items: center; padding: 20px; z-index: 20; }
+.door { background: var(--paper); border: 2px dashed var(--ink); border-radius: 4px; max-width: 440px; width: 100%; padding: 20px 22px; display: flex; flex-direction: column; gap: 10px; }
+.door .tag { align-self: flex-start; font-size: 11px; padding: 2px 6px; }
+.door h4 { margin: 0; font-size: 19px; }
+.door p { margin: 0; line-height: 1.5; }
+.door .quote { font-family: var(--hand); color: var(--pencil); font-size: 16.5px; line-height: 1.35; border-left: 2px solid var(--pencil); padding-left: 10px; }
+.door .btn { align-self: flex-end; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(18px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--paper); padding: 8px 14px; border-radius: 3px; font-size: 13px; z-index: 30; }
+
+@media (prefers-reduced-motion: no-preference) { .screen { animation: in .18s ease-out; } @keyframes in { from { opacity: .4; } to { opacity: 1; } } }
+</style>
+
+<header class="sheet-head">
+  <div>
+    <h1 class="sheet-title">OTC Fleet Graphix: what V1 looks like</h1>
+    <p class="sheet-sub">One job, start to finish. Ridgeline Plumbing wants two vans wrapped.</p>
+  </div>
+  <div class="stamp">Wireframe. Shows what's on each screen and what it does. Colors, fonts and final layout come later.</div>
+</header>
+
+<nav class="steps" id="steps" aria-label="Walkthrough steps"></nav>
+
+<main class="stage">
+  <section class="frame" aria-label="App wireframe">
+    <div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url" id="url"></span></div>
+    <div id="app"></div>
+  </section>
+  <aside class="margin" id="margin" aria-live="polite"></aside>
+</main>
+
+<div id="layer"></div>
+
+<script>
+const STEPS = [
+  { id: "estimate", n: 1, label: "Estimate", when: "Oct 27" },
+  { id: "board",    n: 2, label: "Production board", when: "Oct 31" },
+  { id: "install",  n: 3, label: "Jason installs", when: "Nov 3" },
+  { id: "invoice",  n: 4, label: "Close & invoice", when: "Nov 4" },
+];
+
+const state = { step: "estimate", role: "cam", custView: false };
+
+const LOCKED = {
+  inventory: { title: "Inventory counts", tag: "Later",
+    body: "V1 has a material catalog with your costs and selling prices, plus vendor POs. It doesn't track how much is on the shelf.",
+    quote: "From the punch list: graphics stock is checked visually today, and V1 can launch without real stock counts." },
+  portal: { title: "Customer portal", tag: "Later · open question",
+    body: "Customers get an emailed invoice with a card payment link. They don't get a login.",
+    quote: "Open item 4.1: Cam mentioned wanting a portal in the meeting, but the punch list defers it. We need to settle this one." },
+  shops: { title: "Mechanical shops", tag: "Later",
+    body: "Lancaster, mobile and postal stay on FullBay. V1 runs graphics only, with Cam and Jason as the two users.",
+    quote: "Graphics goes first because it has its own installer, its own material shelf and its own class in QuickBooks." },
+  ghl: { title: "Leads & customer texting", tag: "Stays in GoHighLevel",
+    body: "Leads, the sales pipeline and SMS follow-ups stay in GoHighLevel. Once a customer says yes, Cam types the job in here. The two systems aren't connected in V1.",
+    quote: "From the punch list: don't rebuild the sales board or messaging. Keep GoHighLevel for that." },
+};
+
+const MARGIN = {
+  estimate: {
+    title: "Cam builds the estimate",
+    say: "Cam picks the \"Full wrap\" template for each van, and it fills in every material. Cam sees cost and margin on every line. The customer sees one line per van.",
+    inV1: ["Templates fill in all the materials at once", "Itemized for Cam, one line per vehicle for the customer", "Partial approval: Unit 14 yes, Unit 17 no", "A record of who approved, when and how", "Deposit collected by card link"],
+    out: [["Leads", "stay in GoHighLevel. Typed in by hand."], ["Automatic markup rules.", "Prices are set in the catalog."]],
+    ask: "Should customers approve with one click from the email (4.2), or does Cam record their yes like this?" },
+  board: {
+    title: "The job hits the board",
+    say: "The deposit is in, so Unit 14 moves into production. Cam can see every job in the shop on one board. Flip to Jason's view and he sees only the jobs assigned to him.",
+    inV1: ["Six stages, from ready for production to completed", "Cam can drag cards forward, back, or skip a stage", "Each card shows customer, job number, who, when and priority", "A Jobs table with filters works off the same jobs", "A calendar with separate production and install dates"],
+    out: [["Hold and waiting-for-materials flags.", "Delays go in job notes."], ["A board for the mechanical shops.", ""]],
+    ask: "Do these six stages match how a job actually moves through the shop?" },
+  install: {
+    title: "Jason installs, on his phone",
+    say: "Jason punches in for the day, starts a timer on Unit 14, and finishes with completion photos. He never sees a price or a cost.",
+    inV1: ["Daily punch clock, separate from job time", "One job timer at a time, so hours can't be counted twice", "Shop time is tracked separately from billable time", "Completion photos, then the job goes to Cam for review", "Works in the phone browser, saved to the home screen"],
+    out: [["Offline mode.", "Needs a signal in the bay."], ["An App Store app.", ""], ["Speed and utilization stats per tech.", ""]],
+    ask: "Is the wifi in the bay good enough for Jason to upload photos?" },
+  invoice: {
+    title: "Cam closes it, and the invoice is ready",
+    say: "Cam reviews Jason's photos and closes the job. The draft invoice is already there: one line, deposit taken off, and the customer's other unpaid invoices listed. Send it, and the customer pays by card.",
+    inV1: ["Draft invoice created when the job closes", "Card payment link, and the balance updates itself", "Deposits come off the final invoice", "Lists the customer's other open invoices", "Connects to QuickBooks Online", "Cam sees estimated vs. actual hours"],
+    out: [["ACH payments.", "Checks and ACH are recorded by hand."], ["A ledger of our own.", "QuickBooks stays the books."]],
+    ask: "Do we need full two-way QuickBooks sync, or just push invoices across (4.5)? Also needed: tax rates from accounting." },
+};
+
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const money = (n) => (n < 0 ? "−" : "") + "$" + Math.abs(n).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+/* ---------- estimate data (Unit 14 and Unit 17 use the same template) ---------- */
+const WRAP = [
+  { item: "Avery MPI 1105 EZRS wrap film", qty: 62, unit: "ft", cost: 3.10, price: 7.50 },
+  { item: "Avery DOL 1460Z overlaminate", qty: 62, unit: "ft", cost: 2.05, price: 4.50 },
+  { item: "Latex ink", qty: 1, unit: "job", cost: 38, price: 85 },
+  { item: "Install supplies (knifeless tape, primer)", qty: 1, unit: "job", cost: 22, price: 45 },
+  { item: "Design", qty: 4, unit: "hr", cost: 35, price: 95 },
+  { item: "Installation", qty: 9, unit: "hr", cost: 28, price: 85 },
+];
+const sum = (k) => WRAP.reduce((a, r) => a + r.qty * r[k], 0);
+const PKG_PRICE = sum("price"), PKG_COST = sum("cost");
+
+/* ---------- board data ---------- */
+const STAGES = ["Ready for production", "In production", "Production complete", "Ready for installation", "Installation in progress", "Completed"];
+const JOBS = [
+  { no: "G-1052", cust: "Lancaster Kitchen Supply", what: "Box truck logo kit", who: "JM", date: "Nov 4", pri: "Normal", stage: 0 },
+  { no: "G-1053", cust: "Conestoga Tree Care", what: "Bucket truck doors ×3", who: "CR", date: "Nov 5", pri: "Low", stage: 0 },
+  { no: "G-1048", cust: "Ridgeline Plumbing", what: "Unit 14 · full wrap", who: "CR", date: "Nov 3", pri: "High", stage: 1, hl: true, note: "Printing now" },
+  { no: "G-1046", cust: "Brightway Movers", what: "Rear door graphics", who: "JM", date: "Nov 1", pri: "Normal", stage: 2 },
+  { no: "G-1044", cust: "Keystone Dairy Co-op", what: "Tanker DOT lettering", who: "JM", date: "Oct 31", pri: "High", stage: 3 },
+  { no: "G-1043", cust: "Millport School District", what: "Shop wall mural (sign)", who: "JM", date: "Oct 30", pri: "Normal", stage: 4 },
+  { no: "G-1041", cust: "Ridgeline Plumbing", what: "Unit 9 · decal refresh", who: "JM", date: "Oct 28", pri: "Normal", stage: 5, note: "Waiting on Cam's review" },
+];
+
+/* ---------- renderers ---------- */
+function navHtml() {
+  const cam = state.role === "cam";
+  const active = { estimate: "Estimates", board: "Board", install: "Board", invoice: "Invoices" }[state.step];
+  const items = cam
+    ? ["Board", "Jobs", "Calendar", "Estimates", "Customers", "Invoices", "Time & payroll", "Materials & POs", "Reports"]
+    : ["Board", "My time"];
+  const go = { Board: "board", Estimates: "estimate", Invoices: "invoice" };
+  let h = `<div class="logo-box">LOGO</div>`;
+  h += items.map((i) => `<button class="${i === active ? "on" : ""}" data-go="${go[i] || ""}" data-name="${esc(i)}">${esc(i === "Board" && !cam ? "My jobs" : i)}</button>`).join("");
+  h += `<div class="nav-label">Not in V1</div>`;
+  h += [["inventory", "Inventory counts"], ["portal", "Customer portal"], ["shops", "Mechanical shops"], ["ghl", "Leads & texting"]]
+    .map(([k, l]) => `<button class="locked" data-lock="${k}"><span>${l}</span><span class="tag">${k === "ghl" ? "GHL" : "Later"}</span></button>`).join("");
+  return `<nav class="nav" aria-label="App menu">${h}</nav>`;
+}
+
+function denied(what) {
+  return `<div class="denied"><div class="ph"></div><strong>Jason can't open ${what}</strong>
+    <span class="muted small">Technicians see their assigned jobs, their own time, and photos. Prices, costs, markup and profit are hidden.</span>
+    <div class="note" style="justify-content:center"><span>This is the Owner / Technician split from the punch list.</span></div></div>`;
+}
+
+function estimateScreen() {
+  if (state.role !== "cam") return denied("estimates");
+  const cv = state.custView;
+  const pkgRows = (unit, declined) => {
+    const cls = declined ? "declined" : "";
+    const status = declined ? `<span class="pill dash">Declined</span>` : `<span class="pill solid">Approved</span>`;
+    if (cv) {
+      return `<tr class="${cls}"><td>${unit} · 2024 Ford Transit 250 · full wrap package<div class="small muted">Design, print, laminate and install</div></td>
+        <td class="num">1</td><td class="num">${money(PKG_PRICE)}</td><td class="keep">${status}</td></tr>`;
+    }
+    let r = `<tr class="group ${cls}"><td>${unit} · 2024 Ford Transit 250 · <em>Full wrap</em> template</td><td></td><td class="num">${money(PKG_COST)}</td><td class="num">${money(PKG_PRICE)}</td><td class="num">${(((PKG_PRICE - PKG_COST) / PKG_PRICE) * 100).toFixed(0)}%</td><td class="keep">${status}</td></tr>`;
+    r += WRAP.map((w) => `<tr class="sub ${cls}"><td>${esc(w.item)}</td><td class="num">${w.qty} ${w.unit}</td><td class="num">${money(w.qty * w.cost)}</td><td class="num">${money(w.qty * w.price)}</td><td></td><td></td></tr>`).join("");
+    return r;
+  };
+  const head = cv
+    ? `<tr><th>Description</th><th class="num">Qty</th><th class="num">Price</th><th>Status</th></tr>`
+    : `<tr><th>Item</th><th class="num">Qty</th><th class="num">Cost</th><th class="num">Price</th><th class="num">Margin</th><th>Status</th></tr>`;
+  return `
+  <div class="screen-head">
+    <div><h2>Estimate E-2207 · Ridgeline Plumbing &amp; Heating</h2>
+      <div class="meta">Contact: Mike Dorsey · Customer PO 7781 · Created Oct 24 by Cam</div></div>
+    <div class="btns"><button class="btn ghost" data-toast="Adds another vehicle from a template">+ Vehicle from template</button><button class="btn" data-toast="Downloads the customer PDF">PDF</button><button class="btn primary" data-toast="Turns the approved lines into job G-1048">Create job</button></div>
+  </div>
+  <div class="toggle-row">
+    <span class="small muted">Show:</span>
+    <div class="seg" role="group" aria-label="Estimate view">
+      <button data-cv="0" aria-pressed="${!cv}">Internal view (itemized)</button>
+      <button data-cv="1" aria-pressed="${cv}">Customer view</button>
+    </div>
+    <span class="mark">1</span>
+  </div>
+  <div class="tbl-wrap"><table><thead>${head}</thead><tbody>${pkgRows("Unit 14", false)}${pkgRows("Unit 17", true)}</tbody></table></div>
+  <div class="note"><span class="badge">1</span><span>Same estimate, two views. Inks, vinyl and laminate roll up under one line per van. ${cv ? "This is what goes to the customer." : "Click “Customer view”."}</span></div>
+  <div class="two">
+    <div class="box"><h3>Approval record <span class="mark">2</span></h3>
+      <div class="kv"><dt>Unit 14</dt><dd>Approved</dd><dt>Unit 17</dt><dd>Declined</dd><dt>By</dt><dd>Mike Dorsey</dd><dt>How</dt><dd>Phone call</dd><dt>When</dt><dd>Oct 27, 10:14 AM</dd><dt>Recorded by</dt><dd>Cam</dd></div>
+      <div class="note"><span class="badge">2</span><span>Partial approval: one van now, maybe the other in spring.</span></div>
+    </div>
+    <div class="box"><h3>Totals</h3>
+      <div class="kv"><dt>Approved</dt><dd>${money(PKG_PRICE)}</dd><dt>Sales tax</dt><dd>rate TBD</dd><div class="rule"></div><dt>Deposit (50%)</dt><dd>${money(PKG_PRICE / 2)}</dd><dt>Deposit status</dt><dd>Paid by card</dd></div>
+      <div style="margin-top:8px"><button class="btn" data-toast="Emails a card payment link for the deposit">Send deposit link</button></div>
+    </div>
+  </div>`;
+}
+
+function boardScreen() {
+  const cam = state.role === "cam";
+  const jobs = cam ? JOBS : JOBS.filter((j) => j.who === "JM");
+  const cols = STAGES.map((s, i) => {
+    const cs = jobs.filter((j) => j.stage === i);
+    const cards = cs.length
+      ? cs.map((j) => `<div class="card${j.hl ? " hl" : ""}">
+          <div class="row"><span class="jobno">${j.no}</span>${j.pri === "High" ? `<span class="pill solid">High</span>` : `<span class="pill">${j.pri}</span>`}</div>
+          <div class="cust">${esc(j.cust)}</div><div>${esc(j.what)}</div>
+          <div class="row"><span>${j.date}</span><span class="av" title="${j.who === "JM" ? "Jason" : "Cam"}">${j.who}</span></div>
+          ${j.note ? `<div class="small muted"><em>${esc(j.note)}</em></div>` : ""}</div>`).join("")
+      : `<div class="empty-col">Nothing here</div>`;
+    return `<div class="col"><div class="col-head"><span>${s}</span><span>${cs.length}</span></div><div class="cards">${cards}</div></div>`;
+  }).join("");
+  return `
+  <div class="screen-head">
+    <div><h2>${cam ? "Production &amp; installation board" : "My jobs"}</h2>
+      <div class="meta">${cam ? "Every graphics job in the shop · 7 active" : "Only jobs assigned to Jason"}</div></div>
+    <div class="btns"><div class="seg"><button aria-pressed="true">Board</button><button data-toast="Same jobs as a table you can filter">Table</button><button data-toast="Production and install dates on a calendar">Calendar</button></div>${cam ? `<button class="btn primary" data-toast="Starts a new job">+ Job</button>` : ""}</div>
+  </div>
+  <div class="board">${cols}</div>
+  ${cam
+    ? `<div class="note"><span class="badge">!</span><span>Unit 14 just moved to “In production” after the deposit cleared. Switch to Jason's view at the top and watch the board shrink to his jobs.</span></div>`
+    : `<div class="note"><span class="badge">!</span><span>Jason sees only his own jobs. There are no prices on any of these screens.</span></div>`}`;
+}
+
+function installScreen() {
+  const phone = `
+  <div class="phone" aria-label="Jason's phone">
+    <div class="notch"></div>
+    <div class="p-top"><strong>Jason M.</strong><span class="pill solid">Punched in 7:02 AM</span></div>
+    <div class="p-sec">
+      <div class="p-h">G-1048 · High priority</div>
+      <strong>Ridgeline Plumbing · Unit 14</strong>
+      <span class="small">2024 Ford Transit 250 · full wrap</span>
+      <span class="small muted">Instructions: wrap driver and passenger sides plus rear. Logo stays clear of the fuel door. Stage: Installation in progress.</span>
+    </div>
+    <div class="p-sec">
+      <div class="p-h">Files</div>
+      <div class="file"><div class="ph"></div>Proof v3 (approved).pdf</div>
+      <div class="file"><div class="ph"></div>Van measurements.jpg</div>
+    </div>
+    <div class="p-sec">
+      <div class="p-h">Job timer <span class="mark">1</span></div>
+      <div class="timer"><div><div class="small muted">Installation</div><div class="t">3:41:12</div></div><button class="btn primary" data-toast="Stops the timer. Time goes onto G-1048.">Stop</button></div>
+      <button class="btn ghost" data-toast="Switches the clock to non-billable shop time">Switch to shop time</button>
+    </div>
+    <div class="p-sec">
+      <div class="p-h">Completion photos <span class="mark">2</span></div>
+      <div class="photos"><div class="ph"></div><div class="ph"></div><div class="ph"></div><div class="add">+</div></div>
+    </div>
+    <div class="p-sec"><button class="wide-btn" data-toast="Moves the job to Completed and sends it to Cam for review">Mark finished, send to Cam</button></div>
+  </div>`;
+  const notes = `
+  <div class="phone-notes">
+    <div class="note"><span class="badge">1</span><span>One timer at a time. If Jason starts another job, this timer stops. Hours can't be counted twice.</span></div>
+    <div class="note"><span class="badge">2</span><span>Photos go onto the job record, so Cam reviews from the office.</span></div>
+    <div class="note"><span class="badge">3</span><span>No prices, costs or totals anywhere on Jason's screens.</span></div>
+    <div class="note"><span class="badge">4</span><span>A web page saved to his home screen. Nothing to install from the App Store.</span></div>
+  </div>`;
+  if (state.role === "cam") {
+    return `<div class="screen-head"><div><h2>Time &amp; payroll · this week</h2><div class="meta">Cam approves timesheets, then exports hours for payroll</div></div><div class="btns"><button class="btn" data-toast="Downloads a CSV of approved hours">Export CSV</button><button class="btn primary" data-toast="Locks the week for payroll">Approve week</button></div></div>
+    <div class="tbl-wrap"><table><thead><tr><th>Employee</th><th>Day</th><th class="num">Punched</th><th class="num">On jobs</th><th class="num">Shop time</th><th>Status</th></tr></thead><tbody>
+      <tr><td>Jason M.</td><td>Mon Nov 3</td><td class="num">8.5 h</td><td class="num">6.9 h</td><td class="num">1.6 h</td><td><span class="pill dash">Needs review</span></td></tr>
+      <tr><td>Jason M.</td><td>Fri Oct 31</td><td class="num">8.0 h</td><td class="num">7.2 h</td><td class="num">0.8 h</td><td><span class="pill solid">Approved</span></td></tr>
+      <tr><td>Cam R.</td><td>Mon Nov 3</td><td class="num">9.0 h</td><td class="num">3.5 h</td><td class="num">5.5 h</td><td><span class="pill dash">Needs review</span></td></tr>
+    </tbody></table></div>
+    <div class="note"><span class="badge">!</span><span>This is Cam's side of the same day. Switch to Jason at the top to see his phone.</span></div>
+    <div class="note"><span class="badge">!</span><span>Payroll gets punched hours. Job time sits inside them, so it is never added on top.</span></div>`;
+  }
+  return `<div class="phone-wrap">${phone}${notes}</div>`;
+}
+
+function invoiceScreen() {
+  if (state.role !== "cam") return denied("invoices");
+  const dep = PKG_PRICE / 2;
+  return `
+  <div class="screen-head">
+    <div><h2>Invoice · draft <span class="pill dash">Not sent</span></h2>
+      <div class="meta">Created automatically when Cam closed G-1048 on Nov 4 · Number assigned on send (prefix set at launch)</div></div>
+    <div class="btns"><button class="btn" data-toast="Opens the invoice for edits">Edit</button><button class="btn" data-toast="Downloads the PDF">PDF</button><button class="btn primary" data-toast="Emails the invoice with a card payment link and sends it to QuickBooks">Send with pay link</button></div>
+  </div>
+  <div class="two" style="margin-top:0">
+    <div class="box" style="padding:16px">
+      <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <div><div class="logo-box" style="width:120px">LOGO</div><div class="small">OTC Fleet Graphix</div></div>
+        <div class="small" style="text-align:right">Bill to<br><strong>Ridgeline Plumbing &amp; Heating</strong><br>Attn: Mike Dorsey<br>Customer PO: 7781</div>
+      </div>
+      <div class="tbl-wrap" style="margin-top:14px"><table>
+        <thead><tr><th>Description</th><th class="num">Amount</th></tr></thead>
+        <tbody><tr><td>Unit 14 · 2024 Ford Transit 250 · full wrap package<div class="small muted">Design, print, laminate and install</div></td><td class="num">${money(PKG_PRICE)}</td></tr></tbody>
+      </table></div>
+      <div class="kv" style="max-width:280px;margin:12px 0 0 auto">
+        <dt>Subtotal</dt><dd>${money(PKG_PRICE)}</dd>
+        <dt>Sales tax</dt><dd>rate TBD</dd>
+        <dt>Deposit paid Oct 27</dt><dd>${money(-dep)}</dd>
+        <div class="rule"></div>
+        <dt><strong>Balance due</strong></dt><dd><strong>${money(PKG_PRICE - dep)}</strong></dd>
+      </div>
+      <div class="box" style="margin-top:14px;border-style:dashed"><h3>Your other open invoices <span class="mark">1</span></h3>
+        <div class="kv"><dt>INV for G-1041 · Unit 9 decals · due Nov 27</dt><dd>$420.00</dd></div>
+      </div>
+      <div style="margin-top:12px;border:1.5px solid var(--ink);border-radius:3px;padding:8px;text-align:center" class="small">[ Pay by card ] button in the email <span class="mark">2</span></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;min-width:0">
+      <div class="box"><h3>Job costing · Cam only</h3>
+        <div class="kv"><dt>Hours, estimated</dt><dd>13.0</dd><dt>Hours, actual</dt><dd>12.6</dd><dt>Materials, estimated</dt><dd>${money(PKG_COST - 140 - 252)}</dd><dt>Materials, actual</dt><dd>$391.40</dd></div>
+      </div>
+      <div class="box"><h3>QuickBooks <span class="mark">3</span></h3>
+        <div class="small">Sent to QuickBooks Online when the invoice goes out. Payments come back automatically.</div>
+      </div>
+      <div class="note"><span class="badge">1</span><span>Every invoice lists the customer's other unpaid invoices.</span></div>
+      <div class="note"><span class="badge">2</span><span>The customer pays by card from the email. The balance updates itself.</span></div>
+      <div class="note"><span class="badge">3</span><span>How far the QuickBooks sync goes is still open (4.5).</span></div>
+    </div>
+  </div>`;
+}
+
+function marginHtml() {
+  const m = MARGIN[state.step];
+  const i = STEPS.findIndex((s) => s.id === state.step);
+  return `
+    <div><div class="label">Step ${i + 1} of ${STEPS.length} · ${STEPS[i].when}</div><h3>${m.title}</h3></div>
+    <p>${m.say}</p>
+    <div><div class="label">In V1</div><ul>${m.inV1.map((x) => `<li><span>${x}</span></li>`).join("")}</ul></div>
+    <div class="out"><div class="label">Not in V1</div><ul>${m.out.map(([a, b]) => `<li><span><b>${a}</b> ${b}</span></li>`).join("")}</ul></div>
+    <div class="ask"><b>Ask them</b>${m.ask}</div>
+    <div class="pager"><button data-nav="-1" ${i === 0 ? "disabled" : ""}>← Back</button><button data-nav="1" ${i === STEPS.length - 1 ? "disabled" : ""}>Next →</button></div>
+    <div class="kbd">← → arrow keys work too. Click any dashed menu item to see why it isn't in V1.</div>`;
+}
+
+function render() {
+  $("#steps").innerHTML = STEPS.map((s, i) =>
+    `${i ? `<span class="arrow">→</span>` : ""}<button class="step" data-step="${s.id}" ${s.id === state.step ? 'aria-current="step"' : ""}><span class="n">${s.n}</span><span>${s.label}</span><span class="when">${s.when}</span></button>`
+  ).join("") + `<span class="spacer"></span><div class="role"><span>Viewing as</span><div class="role-toggle" role="group" aria-label="Viewing as">
+      <button data-role="cam" aria-pressed="${state.role === "cam"}">Cam · Owner</button>
+      <button data-role="jason" aria-pressed="${state.role === "jason"}">Jason · Technician</button></div></div>`;
+  const path = { estimate: "estimates/E-2207", board: "board", install: state.role === "cam" ? "time" : "my-jobs/G-1048", invoice: "invoices/draft-G-1048" }[state.step];
+  $("#url").textContent = "graphics.otcfleet.app/" + path;
+  const body = { estimate: estimateScreen, board: boardScreen, install: installScreen, invoice: invoiceScreen }[state.step]();
+  const phoneOnly = state.step === "install" && state.role === "jason";
+  $("#app").innerHTML = phoneOnly ? `<div class="screen">${body}</div>` : `<div class="app">${navHtml()}<div class="screen">${body}</div></div>`;
+  $("#margin").innerHTML = marginHtml();
+}
+
+function go(step) {
+  state.step = step;
+  state.role = step === "install" ? "jason" : "cam";
+  state.custView = false;
+  if (location.hash.slice(1) !== step) history.replaceState(null, "", "#" + step);
+  render();
+}
+
+function toast(msg) {
+  const t = document.createElement("div");
+  t.className = "toast"; t.textContent = msg;
+  $("#layer").appendChild(t);
+  setTimeout(() => t.remove(), 2200);
+}
+
+function openDoor(k) {
+  const d = LOCKED[k];
+  $("#layer").innerHTML = `<div class="scrim" data-close="1"><div class="door" role="dialog" aria-modal="true" aria-label="${esc(d.title)}">
+    <span class="tag">${esc(d.tag)}</span><h4>${esc(d.title)}</h4><p>${esc(d.body)}</p><div class="quote">${esc(d.quote)}</div>
+    <button class="btn" data-close="1" id="door-close">Got it</button></div></div>`;
+  $("#door-close").focus();
+}
+
+document.addEventListener("click", (e) => {
+  const t = e.target.closest("button, .scrim");
+  if (!t) return;
+  if (t.dataset.close && (t.classList.contains("btn") || e.target === t)) { $("#layer").innerHTML = ""; return; }
+  if (t.dataset.step) return go(t.dataset.step);
+  if (t.dataset.role) { state.role = t.dataset.role; return render(); }
+  if (t.dataset.cv) { state.custView = t.dataset.cv === "1"; return render(); }
+  if (t.dataset.nav) { const i = STEPS.findIndex((s) => s.id === state.step) + Number(t.dataset.nav); if (STEPS[i]) go(STEPS[i].id); return; }
+  if (t.dataset.lock) return openDoor(t.dataset.lock);
+  if (t.dataset.go) return go(t.dataset.go);
+  if (t.dataset.name) return toast(`“${t.dataset.name}” isn't drawn in this sample yet`);
+  if (t.dataset.toast) return toast(t.dataset.toast);
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") { $("#layer").innerHTML = ""; return; }
+  if ($("#layer").innerHTML) return;
+  const i = STEPS.findIndex((s) => s.id === state.step);
+  if (e.key === "ArrowRight" && STEPS[i + 1]) go(STEPS[i + 1].id);
+  if (e.key === "ArrowLeft" && STEPS[i - 1]) go(STEPS[i - 1].id);
+});
+const fromHash = () => { const h = location.hash.slice(1); if (STEPS.some((s) => s.id === h)) go(h); else render(); };
+window.addEventListener("hashchange", fromHash);
+fromHash();
+</script>

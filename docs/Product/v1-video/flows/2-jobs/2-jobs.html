@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Scheduling and tracking jobs</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Kalam:wght@400;700&display=swap">
+<link rel="stylesheet" href="../../lib/wire.css">
+<style>
+/* page-local helpers (no new colors) */
+.hn { position: absolute; z-index: 20; font: 19px/1.25 var(--hand); color: var(--pencil); display: flex; gap: 8px; align-items: flex-start; max-width: 300px; background: var(--paper); padding: 4px 8px; border: 1.5px dashed var(--pencil); border-radius: 4px; }
+.hn .badge { flex: none; width: 24px; height: 24px; border: 1.5px solid var(--pencil); border-radius: 50%; display: grid; place-items: center; font-size: 14px; font-weight: 700; }
+.banner { border: 1.5px solid var(--ink); background: var(--fill); border-radius: 3px; padding: 7px 12px; font-size: 13.5px; display: flex; gap: 10px; align-items: center; margin-bottom: 14px; }
+.stack { display: flex; flex-direction: column; gap: 14px; }
+.drawer { position: absolute; top: 0; right: 0; bottom: 0; width: 400px; background: var(--paper); border-left: 2px solid var(--ink); box-shadow: -6px 0 0 var(--fill-2); padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; z-index: 8; animation: slide .3s ease-out both; }
+@keyframes slide { from { transform: translateX(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+.drawer h4 { margin: 0; font-size: 18px; }
+.nt { font-size: 13px; border-left: 2px solid var(--ink-3); padding: 2px 0 2px 8px; }
+.nt b { font: 600 11px var(--mono); color: var(--ink-2); display: block; }
+.nt.new { border-left-color: var(--ink); }
+.filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
+.flt { border: 1.5px solid var(--ink); border-radius: 3px; padding: 4px 10px; font-size: 13px; background: var(--paper); white-space: nowrap; }
+.flt b { font-weight: 600; }
+.chk { display: inline-block; width: 13px; height: 13px; border: 1.5px solid var(--ink); border-radius: 2px; margin-right: 8px; vertical-align: -2px; }
+.chk.on { background: var(--ink); }
+/* schedule */
+.cal { display: grid; grid-template-columns: 92px repeat(6, 1fr); border: 1.5px solid var(--ink); border-radius: 3px; overflow: hidden; }
+.cal .dh { background: var(--fill); border-bottom: 1.5px solid var(--ink); padding: 6px 8px; font: 600 10.5px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); border-left: 1px solid var(--fill-2); }
+.cal .dh.today { background: var(--ink); color: var(--paper); }
+.cal .wk { padding: 8px; font: 600 10.5px var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--ink-2); border-bottom: 1.5px solid var(--ink-3); }
+.cal .day { border-left: 1px solid var(--fill-2); border-bottom: 1.5px solid var(--ink-3); padding: 6px; min-height: 290px; display: flex; flex-direction: column; gap: 5px; }
+.cal .day .dn { font: 11px var(--mono); color: var(--ink-2); }
+.cal .day.today { background: var(--fill); }
+.cal .day.last, .cal .row2.wk { border-bottom: 0; }
+.ev { border-radius: 3px; padding: 4px 6px; font-size: 12px; line-height: 1.25; }
+.ev b { font: 600 10.5px var(--mono); }
+.ev .sm { color: var(--ink-2); font-size: 11px; }
+.ev.prod { border: 1.5px solid var(--ink); background: var(--fill-2); }
+.ev.inst { border: 1.5px dashed var(--ink); background: var(--paper); }
+.ev.past { opacity: .5; }
+.legend { display: flex; gap: 18px; align-items: center; font-size: 13px; }
+.legend .sw { display: inline-block; width: 30px; height: 16px; border-radius: 3px; vertical-align: -3px; margin-right: 6px; }
+</style>
+</head>
+<body>
+<script src="../../lib/wire.js"></script>
+<script>
+const SECTION = "Version 1 · Scheduling and tracking jobs";
+const S = { screen: "title", who: null, title: "", jobs: JOBS.map((j) => ({ ...j })), hl: null, lifted: null, qv: null, g1044note: false };
+const go = (screen, who) => { S.screen = screen; S.who = who; render(); };
+const DEPOSIT = PRICE / 2;
+const VEH = { "G-1048": "2024 Ford Transit 250 · Unit 14", "G-1044": "Tanker trailer · Unit T-3", "G-1046": "2019 Isuzu NPR box truck", "G-1043": "Shop wall, 24 × 10 ft", "G-1052": "2021 Hino 268 box truck", "G-1053": "Bucket trucks 4, 6 and 7", "G-1041": "2022 Ford Transit 250 · Unit 9" };
+const TECH = { T1: "Technician 1", OW: "Owner" };
+// Production and install dates (two-week view, Mon Oct 26 – Sat Nov 7). Install dates match the board card dates.
+const DATES = {
+  "G-1041": { p: ["Oct 26"], i: "Oct 27" },
+  "G-1043": { p: ["Oct 26", "Oct 27"], i: "Oct 29" },
+  "G-1044": { p: ["Oct 27", "Oct 28"], i: "Oct 30" },
+  "G-1046": { p: ["Oct 28"], i: "Oct 31" },
+  "G-1048": { p: ["Oct 28", "Oct 29", "Oct 30"], i: "Nov 2" },
+  "G-1052": { p: ["Nov 2"], i: "Nov 3" },
+  "G-1053": { p: ["Nov 3"], i: "Nov 4" },
+};
+const prodRange = (no) => { const p = DATES[no].p; return p.length > 1 ? `${p[0]} – ${p[p.length - 1].replace(/^\w+ /, "")}` : p[0]; };
+const priPill = (p) => (p === "High" ? `<span class="pill solid">High</span>` : `<span class="pill">${p}</span>`);
+const views = (on) => `<div class="seg">${["Board", "List", "Schedule"].map((v) => `<button class="${v === on ? "on" : ""}">${v}</button>`).join("")}</div>`;
+const hn = (style, html, badge) => `<div class="hn" style="${style}">${badge ? `<span class="badge">${badge}</span>` : ""}<span>${html}</span></div>`;
+
+/* ---------- 2.1 new job right after creation ---------- */
+function newJob() {
+  const lines = WRAP.map((w) => `<tr><td>${w[0]}</td><td class="num">${w[1]} ${w[2]}</td><td class="num">${money(w[1] * w[4])}</td></tr>`).join("");
+  const body = `<div class="head"><div><div class="crumb">${T.works} › G-1048 · from estimate E-2207</div><h2>Ridgeline Plumbing &amp; Heating · Unit 14 full wrap</h2>
+      <div class="meta">Created Oct 26, 2:40 PM · Stage: ${T.stages[0]}</div><div class="small muted" style="margin-top:2px">Created by Owner from estimate E-2207</div></div>
+    <div class="btns"><button class="btn">Edit</button><button class="btn">Set dates</button><button class="btn primary">Open on ${T.board.toLowerCase()}</button></div></div>
+    <div class="banner"><span class="pill solid">New</span><span>The owner clicked Create job on the approved estimate. The approved lines, customer, vehicle and deposit came across.</span></div>
+    <div class="cols" style="margin-top:0;grid-template-columns:1fr 340px">
+      <div class="stack">
+        <div class="tbl" data-k="lines"><table><thead><tr><th>Approved work carried over</th><th class="num">Qty</th><th class="num">Price</th></tr></thead><tbody>
+          <tr class="group"><td>Unit 14 · 2024 Ford Transit 250 · full wrap</td><td></td><td class="num">${money(PRICE)}</td></tr>
+          ${lines.replace(/<tr>/g, '<tr class="sub">')}
+          <tr class="declined"><td><span class="strike">Unit 17 · 2023 Ford Transit 350 HD · full wrap</span> <span class="pill dash">Declined</span><div class="small">Declined on the estimate, so it was not carried over</div></td><td></td><td class="num"><span class="strike">${money(2109)}</span></td></tr>
+        </tbody></table></div>
+        <div class="box"><h3>Instructions</h3><div class="muted small">Copied from the estimate notes:</div><div style="margin-top:4px">Wrap both sides and the rear. Keep the logo clear of the fuel door.</div></div>
+      </div>
+      <div class="stack">
+        <div class="box" data-k="cust"><h3>Customer</h3><div class="kv"><dt>Company</dt><dd>Ridgeline Plumbing &amp; Heating</dd><dt>Contact</dt><dd>Mike Dorsey</dd><dt>Customer PO</dt><dd>7781</dd></div></div>
+        <div class="box"><h3>${T.asset}</h3><div class="kv"><dt>Vehicle</dt><dd>Unit 14</dd><dt>Make, model</dt><dd>2024 Ford Transit 250</dd></div></div>
+        <div class="box" data-k="dep"><h3>Money</h3><div class="kv"><dt>Approved total</dt><dd>${money(PRICE)}</dd><dt>Sales tax</dt><dd>per settings</dd></div><div style="margin-top:10px;display:flex;flex-direction:column;align-items:flex-end;gap:4px"><span class="pill solid">Deposit recorded · ${money(DEPOSIT)}</span><span class="small muted">Check · Oct 26</span></div></div>
+        <div class="box"><h3>Still to do</h3><div class="kv"><dt>Technician</dt><dd>Technician 1</dd><dt>Production date</dt><dd class="muted">Not set</dd><dt>Install date</dt><dd class="muted">Not set</dd><dt>Hours, estimated</dt><dd>13.0</dd></div></div>
+      </div></div>`;
+  return shell(T.works, body, "jobs/G-1048");
+}
+
+/* ---------- 2.2 job board ---------- */
+function board() {
+  const cols = T.stages.map((s, i) => {
+    const cs = S.jobs.filter((j) => j.stage === i);
+    return `<div class="col" data-k="col-${i}"><div class="col-head" data-k="colh-${i}"><span>${s}</span><span>${cs.length}</span></div><div class="cards">${cs.map((j) => boardCard(j, [S.hl === j.no ? "hl" : "", S.lifted === j.no ? "lifted" : ""].join(" "))).join("")}</div></div>`;
+  }).join("");
+  const j = S.qv && S.jobs.find((x) => x.no === S.qv);
+  const drawer = j ? `<div class="drawer"><div style="display:flex;justify-content:space-between;align-items:center"><span class="crumb" style="margin:0">Quick view · ${j.no}</span><span class="muted">✕</span></div>
+      <div><h4>${j.cust}</h4><div class="meta">${j.what}</div></div>
+      <div class="kv"><dt>Stage</dt><dd>${T.stages[j.stage]}</dd><dt>Priority</dt><dd>${j.pri}</dd><dt>Assigned</dt><dd>${TECH[j.who]}</dd><dt>${T.asset}</dt><dd>${VEH[j.no]}</dd><dt>Production</dt><dd>${S.g1044note ? "Reprint Oct 29" : "Oct 27 – 29"}</dd><dt>Install date</dt><dd>${S.g1044note ? "Mon Nov 2" : j.date}</dd></div>
+      <div class="box" data-k="qv-notes"><h3>Job notes</h3><div class="stack" style="gap:8px">
+        ${S.g1044note ? `<div class="nt new rowin"><b>Oct 29 · Owner</b>Passenger side lettering peeled at one edge. Reprinting today. Install moves to Monday.</div>` : ""}
+        <div class="nt"><b>Oct 28 · Technician 1</b>Printed and laminated. Ready to install Friday.</div>
+        <div class="input small muted">Add a note…</div></div></div>
+      <div class="grow"></div><button class="btn primary" data-k="qv-open" style="align-self:stretch;padding:9px">Open job details</button></div>` : "";
+  const body = `<div class="head"><div><h2>${T.board}</h2><div class="meta">Every active ${T.work.toLowerCase()} in the division · drag a card to change its stage</div></div>
+    <div class="btns">${views("Board")}<button class="btn">All technicians ▾</button><button class="btn primary">+ ${T.work}</button></div></div>
+    <div class="board">${cols}</div>${drawer}`;
+  return shell(T.board, body, "board");
+}
+async function drag(no, to) {
+  await moveTo("card-" + no, 0, 0, 800);
+  const src = document.querySelector(`[data-k="card-${no}"]`);
+  const r = src.getBoundingClientRect();
+  const ghost = src.cloneNode(true);
+  ghost.classList.add("ghost"); ghost.classList.remove("hl", "lifted");
+  ghost.style.left = r.left + "px"; ghost.style.top = r.top + "px"; ghost.style.width = r.width + "px";
+  document.body.appendChild(ghost);
+  ripple();
+  S.lifted = no; render();
+  const target = document.querySelector(`[data-k="col-${to}"] .cards`);
+  const tr = target.getBoundingClientRect();
+  const last = target.lastElementChild;
+  const tx = tr.left + 7, ty = last ? last.getBoundingClientRect().bottom + 7 : tr.top + 7;
+  const dx = tx - r.left, dy = ty - r.top;
+  await wait(250);
+  ghost.style.transition = "left 1s cubic-bezier(.45,.05,.3,1), top 1s cubic-bezier(.45,.05,.3,1)";
+  cur.style.transitionDuration = "1000ms";
+  ghost.style.left = tx + "px"; ghost.style.top = ty + "px";
+  cur.style.left = parseFloat(cur.style.left) + dx + "px"; cur.style.top = parseFloat(cur.style.top) + dy + "px";
+  await wait(1050);
+  ghost.remove();
+  const i = S.jobs.findIndex((x) => x.no === no);
+  const [job] = S.jobs.splice(i, 1); job.stage = to; S.jobs.push(job);
+  S.lifted = null; S.hl = no; render();
+  ripple();
+}
+
+/* ---------- 2.3 job list ---------- */
+function jobList() {
+  const order = [...JOBS].sort((a, b) => a.stage - b.stage);
+  const active = order.filter((j) => j.stage < 5);
+  const rows = active.map((j) => `<tr><td class="num" style="text-align:left">${j.no}</td><td><strong>${j.cust}</strong></td><td>${j.what}</td><td>${T.stages[j.stage]}</td><td><span class="av sm">${j.who}</span> ${TECH[j.who]}</td><td>${priPill(j.pri)}</td><td>${prodRange(j.no)}</td><td>${DATES[j.no].i}</td></tr>`).join("");
+  const body = `<div class="head"><div><h2>${T.works}</h2><div class="meta">The same ${T.works.toLowerCase()} as the ${T.board.toLowerCase()}, as a list you can search and sort</div></div>
+    <div class="btns">${views("List")}<button class="btn">Export to spreadsheet</button><button class="btn primary">+ ${T.work}</button></div></div>
+    <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
+      <div class="seg"><button class="on">Active · 6</button><button>Completed · 38</button><button>All · 44</button></div>
+      <div class="input" style="flex:1;max-width:420px;color:var(--ink-3)">Search by ${T.work.toLowerCase()} #, customer, vehicle…</div></div>
+    <div class="filters" style="position:relative"><span class="small muted">Filter:</span>
+      <span class="flt" style="border-color:var(--ink);box-shadow:3px 3px 0 var(--fill-2)">Stage: <b>All</b> ▾</span><span class="flt">Customer: <b>All</b> ▾</span><span class="flt">Technician: <b>All</b> ▾</span><span class="flt">Priority: <b>All</b> ▾</span><span class="flt">Date: <b>Oct 26 – Nov 7</b> ▾</span></div>
+    <div class="tbl"><table><thead><tr><th style="width:80px">${T.work} #</th><th>Customer</th><th>Work</th><th>Stage</th><th>Technician</th><th>Priority</th><th>Production</th><th>Install</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="small muted" style="margin-top:8px">6 active ${T.works.toLowerCase()} · sorted by stage</div>`;
+  return shell(T.works, body, "jobs?tab=active");
+}
+
+/* ---------- 2.4 schedule ---------- */
+function schedule() {
+  const weeks = [["Oct 26", "Oct 27", "Oct 28", "Oct 29", "Oct 30", "Oct 31"], ["Nov 2", "Nov 3", "Nov 4", "Nov 5", "Nov 6", "Nov 7"]];
+  const wd = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const evs = (d) => {
+    let h = "";
+    JOBS.forEach((j) => {
+      const D = DATES[j.no], past = j.stage === 5 ? "past" : "";
+      if (D.p.includes(d)) h += `<div class="ev prod ${past}"><b>${j.no}</b> ${j.cust.split(" ")[0]}<div class="sm">Production · ${j.what.replace(/^Unit \d+ · /, "")} · ${j.who}</div></div>`;
+      if (D.i === d) h += `<div class="ev inst ${past}"><b>${j.no}</b> ${j.cust.split(" ")[0]}<div class="sm">Install · ${j.what.replace(/^Unit \d+ · /, "")} · ${j.who}${j.stage === 5 ? " · done" : ""}</div></div>`;
+    });
+    return h;
+  };
+  let grid = `<div class="dh"></div>${wd.map((w, i) => `<div class="dh">${w}</div>`).join("")}`;
+  weeks.forEach((wk, wi) => {
+    grid += `<div class="wk ${wi ? "row2" : ""}">Week of<br>${wk[0]}</div>`;
+    grid += wk.map((d) => `<div class="day ${wi ? "last" : ""} ${d === "Oct 29" ? "today" : ""}"><span class="dn">${d}${d === "Oct 29" ? " · today" : ""}</span>${evs(d)}</div>`).join("");
+  });
+  const body = `<div class="head"><div><h2>Schedule</h2><div class="meta">Oct 26 – Nov 7 · production and install dates for every ${T.work.toLowerCase()}</div></div>
+    <div class="btns"><div class="legend"><span><span class="sw" style="border:1.5px solid var(--ink);background:var(--fill-2)"></span>Production date</span><span><span class="sw" style="border:1.5px dashed var(--ink)"></span>Install date</span></div>
+      ${views("Schedule")}<button class="btn">All technicians ▾</button><div class="seg"><button>Week</button><button class="on">2 weeks</button><button>Month</button></div><button class="btn">‹ ›</button></div></div>
+    <div class="cal" style="grid-template-rows:auto 1fr 1fr">${grid}</div>`;
+  return shell("Schedule", body, "schedule");
+}
+
+/* ---------- 2.5 job details ---------- */
+function jobDetails() {
+  const body = `<div class="head"><div><div class="crumb">${T.works} › G-1048</div><h2>Ridgeline Plumbing &amp; Heating · Unit 14 full wrap</h2>
+      <div class="meta">${T.asset}: 2024 Ford Transit 250 · Customer PO 7781 · From estimate E-2207</div></div>
+    <div class="btns">${priPill("High")}<button class="btn">Stage: ${T.stages[1]} ▾</button><button class="btn">Edit</button></div></div>
+    <div class="cols" style="margin-top:0;grid-template-columns:1fr 360px">
+      <div class="stack">
+        <div class="box"><h3>Scope and instructions</h3><div><strong>Unit 14 · full wrap.</strong> Design, print, laminate and install.</div>
+          <div style="margin-top:6px">Wrap both sides and the rear. Keep the logo clear of the fuel door. Customer drops the van at 7:30 AM on install day.</div></div>
+        <div class="box" data-k="files"><h3>Files</h3><div style="display:flex;gap:22px;flex-wrap:wrap">
+          <div class="file"><div class="ph"></div>Artwork v3.pdf</div><div class="file"><div class="ph"></div>Measurements.jpg</div><div class="file"><div class="ph"></div>Panel layout.pdf</div><div class="file"><div class="ph" style="border-style:dashed;background:none"></div><span class="muted">+ Upload</span></div></div></div>
+        <div class="box"><h3>Photos</h3><div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px">${[0, 1].map(() => `<div class="ph" style="aspect-ratio:4/3"></div>`).join("")}<div class="add" style="aspect-ratio:4/3;border:1.5px dashed var(--ink-2);border-radius:2px;display:grid;place-items:center;color:var(--ink-2)">+</div></div>
+          <div class="small muted" style="margin-top:8px">2 “before” photos, Oct 26. Completion photos from the technician land here.</div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start">
+        <div class="box" data-k="checklist"><h3>Checklist</h3><div class="stack" style="gap:6px">
+          <div><span class="chk"></span>Before install: vehicle condition checked</div>
+          <div><span class="chk"></span>Final quality check</div></div>
+          <div class="small muted" style="margin-top:6px">The technician ticks these off on their job details.</div></div>
+        <div class="box"><h3>Job notes</h3><div class="stack" style="gap:8px">
+          <div class="nt"><b>Oct 30 · Technician 1</b>Printing done, laminating overnight.</div>
+          <div class="nt"><b>Oct 28 · Owner</b>Artwork v3 is final. Start printing.</div>
+          <div class="input small muted">Add a note…</div></div></div></div>
+      </div>
+      <div class="stack">
+        <div class="box"><h3>Who and where</h3><div class="kv"><dt>Assigned</dt><dd><span class="av sm">T1</span> Technician 1</dd><dt>Stage</dt><dd>${T.stages[1]}</dd><dt>Priority</dt><dd>High</dd></div></div>
+        <div class="box"><h3>Schedule</h3><div class="kv"><dt>Production</dt><dd>Oct 28 – 31</dd><dt>Install date</dt><dd>Mon Nov 2</dd></div></div>
+        <div class="box" data-k="hours"><h3>Estimated vs. actual hours</h3><table style="font-size:13px"><thead><tr><th style="padding:5px 6px">Task</th><th class="num" style="padding:5px 6px">Est.</th><th class="num" style="padding:5px 6px">Actual</th></tr></thead><tbody>
+          <tr><td style="padding:5px 6px">Design</td><td class="num">4.0</td><td class="num">3.5</td></tr>
+          <tr><td style="padding:5px 6px">Print and laminate</td><td class="num">—</td><td class="num">1.7</td></tr>
+          <tr><td style="padding:5px 6px">Installation</td><td class="num">9.0</td><td class="num">0.0</td></tr>
+          <tr><td style="padding:5px 6px"><strong>Total</strong></td><td class="num"><strong>13.0</strong></td><td class="num"><strong>5.2</strong></td></tr></tbody></table></div>
+        <div class="box"><h3>Money · owner only</h3><div class="kv"><dt>Approved total</dt><dd>${money(PRICE)}</dd><dt>Deposit recorded</dt><dd>${money(DEPOSIT)}</dd><div class="rule"></div><dt>Materials, estimated</dt><dd>${money(379.3)}</dd><dt>Materials, actual</dt><dd>${money(389.6)}</dd></div><div class="small muted" style="margin-top:6px">Actual materials as entered on the job. Hours from the job timers.</div></div>
+      </div></div>`;
+  return shell(T.works, body, "jobs/G-1048");
+}
+
+function render() {
+  const v = { title: () => cardScreen(SECTION, S.title), newJob, board, jobList, schedule, jobDetails }[S.screen];
+  $("#root").innerHTML = v() + (S.extra || "");
+  setWho(S.who);
+}
+
+const SCENES = {
+  async "2.2-title"() { parkCursor(); S.title = "Job board"; S.extra = ""; go("title", null); },
+  async "2.2-board"() {
+    S.jobs = JOBS.map((j) => ({ ...j })); S.hl = null; S.qv = null; S.g1044note = false;
+    go("board", "owner");
+    await wait(900);
+    for (let i = 0; i < 6; i++) await moveTo("colh-" + i, 0, 0, 450);
+    await wait(500);
+    S.hl = "G-1048"; render();
+    await moveTo("card-G-1048", 40, -20, 700);
+    await wait(1500);
+    await moveTo("card-G-1048", 60, 34, 500);
+    await wait(1500);
+  },
+  async "2.2-forward"() {
+    S.hl = null; render();
+    await wait(600);
+    await drag("G-1048", 2);
+    await wait(1400);
+  },
+  async "2.2-back"() {
+    S.hl = null; render();
+    await wait(1200);
+    await drag("G-1044", 1);
+    await wait(1600);
+  },
+  async "2.2-quick"() {
+    await wait(300);
+    await click("card-G-1044", () => { S.qv = "G-1044"; S.hl = "G-1044"; }, 1500);
+    await moveTo("qv-notes", 0, 0, 700);
+    await wait(900);
+    S.g1044note = true; S.jobs.find((x) => x.no === "G-1044").date = "Nov 2"; render();
+    await wait(2200);
+    await moveTo("qv-open", 0, 0, 800);
+    ripple();
+    await wait(1200);
+  },
+};
+
+const PICTURES = {
+  async "2.1"() {
+    go("newJob", "owner");
+    S.extra = hn("left:250px;top:665px;max-width:380px", "Nothing typed twice. Approved lines, customer, vehicle and deposit all carried over.", 1)
+      + hn("left:680px;top:665px;max-width:360px", "Unit 17 was declined, so it stays behind on the estimate.", 2);
+    render();
+  },
+  async "2.3"() { S.extra = hn("left:236px;top:545px;max-width:520px", "Same jobs as the job board. Move a card there and its stage changes here too.", 1); go("jobList", "owner"); },
+  async "2.4"() { S.extra = ""; go("schedule", "owner"); },
+  async "2.5"() {
+    S.extra = ""; go("jobDetails", "owner");
+    const r = document.querySelector('[data-k="checklist"]').getBoundingClientRect();
+    S.extra = hn("left:850px;top:300px;max-width:150px;font-size:24px", "? proofs") + hn(`left:${r.left + 10}px;top:${r.bottom + 14}px;max-width:260px`, "? which checklist items");
+    render();
+  },
+};
+boot();
+</script>
+</body>
+</html>

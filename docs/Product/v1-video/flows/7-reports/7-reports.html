@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Reports</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Kalam:wght@400;700&display=swap">
+<link rel="stylesheet" href="../../lib/wire.css">
+<style>
+  .note { font-family: var(--hand); color: var(--pencil); font-size: 17px; line-height: 1.3; display: flex; gap: 8px; align-items: flex-start; }
+  .note .badge { flex: none; min-width: 24px; height: 24px; border: 1.5px solid var(--pencil); border-radius: 12px; display: grid; place-items: center; font-size: 13px; font-weight: 700; padding: 0 5px; }
+  .filters { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
+  .chip { border: 1.5px solid var(--ink-3); border-radius: 3px; padding: 5px 10px; font-size: 13px; }
+  tr.total td { font-weight: 600; border-top: 1.5px solid var(--ink); background: var(--fill); border-bottom: 0; }
+  .bars { display: flex; flex-direction: column; gap: 9px; }
+  .bar { display: grid; grid-template-columns: 50px 1fr 84px; gap: 10px; align-items: center; font-size: 13px; }
+  .bar .track { height: 20px; border-left: 1.5px solid var(--ink); position: relative; }
+  .bar .fillb { height: 100%; background: var(--ink-2); border: 1.5px solid var(--ink); border-left: 0; }
+  .scale { display: grid; grid-template-columns: 50px 1fr 84px; gap: 10px; font: 10.5px var(--mono); color: var(--ink-3); }
+  .scale .ticks { display: flex; justify-content: space-between; border-top: 1px solid var(--ink-3); padding-top: 3px; }
+</style>
+</head>
+<body>
+<script src="../../lib/wire.js"></script>
+<script>
+/* 7 · Reports: 7.1 Money reports, 7.2 Work in progress, 7.3 Time reports (all pictures, owner only). */
+const S = { screen: "aging", who: "owner" };
+const go = (screen, who) => { S.screen = screen; S.who = who; render(); };
+
+function reportHead(title, meta, group, picks, on) {
+  return `<div class="head"><div><div class="crumb">Reports › ${group}</div><h2>${title}</h2><div class="meta">${meta}</div></div>
+    <div class="btns"><button class="btn">Export to spreadsheet</button><button class="btn">Print</button></div></div>
+    <div class="filters"><div class="seg">${picks.map((p) => `<button class="${p === on ? "on" : ""}">${p}</button>`).join("")}</div>`;
+}
+
+/* ---------- 7.1 money reports: receivables aging ---------- */
+// [customer, 0–30, 31–60, 61–90, 90+]
+const AGING = [
+  ["Ridgeline Plumbing & Heating", 420.00, 0, 0, 0],
+  ["Keystone Dairy Co-op", 1850.00, 640.00, 0, 0],
+  ["Millport School District", 2400.00, 0, 0, 0],
+  ["Lancaster Kitchen Supply", 1275.00, 0, 0, 0],
+  ["Brightway Movers", 0, 385.00, 0, 0],
+  ["Conestoga Tree Care", 0, 0, 960.00, 0],
+  ["Juniata Valley Landscaping", 0, 0, 0, 310.00],
+];
+const BUCKETS = ["0–30 days", "31–60 days", "61–90 days", "90+ days"];
+function aging() {
+  const tot = [1, 2, 3, 4].map((c) => AGING.reduce((a, r) => a + r[c], 0));
+  const all = tot.reduce((a, b) => a + b, 0);
+  const cell = (n) => `<td class="num">${n ? money(n) : `<span class="muted">—</span>`}</td>`;
+  const rows = AGING.map((r) => `<tr><td>${r[0]}</td>${[1, 2, 3, 4].map((c) => cell(r[c])).join("")}<td class="num">${money(r[1] + r[2] + r[3] + r[4])}</td></tr>`).join("");
+  const max = 6000; // scale end, so bars are drawn to scale
+  const bars = tot.map((t, i) => `<div class="bar"><span class="small">${BUCKETS[i].replace(" days", "")}</span><div class="track"><div class="fillb" style="width:${(t / max) * 100}%"></div></div><span class="num small">${money(t)}</span></div>`).join("");
+  const body = `${reportHead("Receivables aging", "Unpaid invoices by how long they have been due · as of Oct 29", "Money",
+      ["Receivables aging", "Revenue", "Ready to invoice", "Payments"], "Receivables aging")}
+      <span class="chip">As of: Oct 29</span><span class="chip">All customers</span></div>
+    <div style="display:grid;grid-template-columns:1fr 440px;gap:16px;align-items:start">
+      <div class="tbl"><table><thead><tr><th>Customer</th>${BUCKETS.map((b) => `<th class="num">${b}</th>`).join("")}<th class="num">Total owed</th></tr></thead>
+        <tbody>${rows}<tr class="total"><td>Total</td>${tot.map((t) => `<td class="num">${money(t)}</td>`).join("")}<td class="num">${money(all)}</td></tr></tbody></table></div>
+      <div class="box"><h3>Summary · total owed ${money(all)}</h3><div class="bars">${bars}</div>
+        <div class="scale" style="margin-top:6px"><span></span><div class="ticks"><span>$0</span><span>$2k</span><span>$4k</span><span>$6k</span></div><span></span></div></div>
+    </div>`;
+  return shell("Reports", body, "reports/receivables-aging");
+}
+
+/* ---------- 7.2 work in progress ---------- */
+// [job, customer, what, stage index, estimated value, hours so far, estimated hours]
+const WIP = [
+  ["G-1048", "Ridgeline Plumbing & Heating", "Unit 14 · full wrap", 1, PRICE, 5.5, 13],
+  ["G-1046", "Brightway Movers", "Rear door graphics", 2, 640.00, 3.0, 4],
+  ["G-1044", "Keystone Dairy Co-op", "Tanker DOT lettering", 3, 560.00, 2.5, 4],
+  ["G-1043", "Millport School District", "Shop wall mural", 4, 3250.00, 14.5, 22],
+];
+function wip() {
+  const val = WIP.reduce((a, r) => a + r[4], 0), hrs = WIP.reduce((a, r) => a + r[5], 0);
+  const rows = WIP.map((r) => `<tr><td class="num" style="text-align:left">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td><span class="pill">${T.stages[r[3]]}</span></td><td class="num">${money(r[4])}</td><td class="num">${r[5].toFixed(1)} h <span class="muted">of ${r[6]} h</span></td></tr>`).join("");
+  const body = `${reportHead("Work in progress · detail", "Sketch: every job started and not billed · as of Oct 29", "Work in progress",
+      ["Work in progress · detail", "Work in progress · summary"], "Work in progress · detail")}
+      <span class="chip">As of: Oct 29</span><span class="chip">All stages</span></div>
+    <div class="tbl"><table><thead><tr><th>${T.work}</th><th>Customer</th><th>What</th><th>Stage</th><th class="num">Estimated value</th><th class="num">Hours so far</th></tr></thead>
+      <tbody>${rows}<tr class="total"><td colspan="4">${WIP.length} ${T.works.toLowerCase()} started, not billed</td><td class="num">${money(val)}</td><td class="num">${hrs.toFixed(1)} h</td></tr></tbody></table></div>
+    <div class="small muted" style="margin-top:10px">Estimated value is the approved estimate. Hours so far come from job timers.</div>
+    <div class="note" style="position:absolute;left:560px;top:22px;transform:rotate(-2deg)"><span class="badge">?</span><span style="font-size:22px">what counts</span></div>
+    <div class="note" style="margin-top:28px;max-width:560px"><span class="badge">?</span><span>Not decided yet. This sketch simply lists every job that is started and not billed.</span></div>`;
+  return shell("Reports", body, "reports/work-in-progress");
+}
+
+/* ---------- 7.3 time reports ---------- */
+// [employee, day, clocked, on jobs, status]
+const TIME = [
+  // Same numbers as 6-payroll WEEK (Thursday after the owner's fix). Pay period approved.
+  ["Technician 1", "Mon Oct 26", 8.0, 7.1, "ok"], ["Technician 1", "Tue Oct 27", 8.5, 7.6, "ok"], ["Technician 1", "Wed Oct 28", 8.0, 6.8, "ok"],
+  ["Technician 1", "Thu Oct 29", 8.3, 7.5, "ok"], ["Technician 1", "Fri Oct 30", 8.0, 7.2, "ok"],
+  ["Owner", "Mon Oct 26", 9.0, 3.5, "ok"], ["Owner", "Tue Oct 27", 8.5, 2.0, "ok"], ["Owner", "Wed Oct 28", 9.0, 4.0, "ok"],
+  ["Owner", "Thu Oct 29", 8.0, 3.0, "ok"], ["Owner", "Fri Oct 30", 7.5, 2.5, "ok"],
+];
+function timeRep() {
+  const pill = (s) => (s === "ok" ? `<span class="pill solid">Approved</span>` : `<span class="pill dash">Needs review</span>`);
+  let rows = "";
+  ["Technician 1", "Owner"].forEach((emp) => {
+    const rs = TIME.filter((r) => r[0] === emp);
+    const c = rs.reduce((a, r) => a + r[2], 0), j = rs.reduce((a, r) => a + r[3], 0);
+    rows += `<tr class="group"><td>${emp}</td><td></td><td class="num">${c.toFixed(1)} h</td><td class="num">${j.toFixed(1)} h</td><td class="num">${(c - j).toFixed(1)} h</td><td>${rs.some((r) => r[4] === "review") ? `<span class="pill dash">1 day needs review</span>` : pill("ok")}</td></tr>`;
+    rows += rs.map((r) => `<tr class="sub"><td></td><td>${r[1]}</td><td class="num">${r[2].toFixed(1)} h</td><td class="num">${r[3].toFixed(1)} h</td><td class="num">${(r[2] - r[3]).toFixed(1)} h</td><td>${pill(r[4])}</td></tr>`).join("");
+  });
+  const body = `${reportHead("Clocked hours and job hours", "Pay period Oct 26 – Oct 30 · Job hours sit inside clocked hours. They are never added on top.", "Time",
+      ["Clocked hours", "Job hours", "Timesheets"], "Clocked hours")}
+      <span class="chip">Pay period: Oct 26 – Oct 30</span><span class="chip">All employees</span></div>
+    <div class="tbl"><table><thead><tr><th>Employee</th><th>Day</th><th class="num">Clocked</th><th class="num">On ${T.works.toLowerCase()}</th><th class="num">Shop time</th><th>Timesheet</th></tr></thead>
+      <tbody>${rows}</tbody></table></div>`;
+  return shell("Reports", body, "reports/time");
+}
+
+function render() {
+  $("#root").innerHTML = { aging, wip, timeRep }[S.screen]();
+  setWho(S.who);
+}
+const SCENES = {};
+const PICTURES = {
+  async "7.1"() { go("aging", "owner"); },
+  async "7.2"() { go("wip", "owner"); },
+  async "7.3"() { go("timeRep", "owner"); },
+};
+boot();
+</script>
+</body>
+</html>
