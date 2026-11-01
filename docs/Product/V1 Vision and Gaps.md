@@ -663,8 +663,8 @@ So these don't get relitigated every meeting:
 
 Cameron doesn't need to weigh in on these, but they block starting.
 
-1. **API framework.** Still open: NestJS vs. Fastify vs. AdonisJS, decided by spike. See
-   [[Framework Evaluation]]. Spikes already exist in `projects/fleetco/spikes/`.
+1. **API framework.** ~~Still open~~ **Decided 2026-10-13: NestJS**, chosen by spike (ADR-027).
+   See [[Framework Evaluation]]. The spikes are in `projects/fleetco/spikes/`.
 2. **Estimate and job: one table or two?** The punch list insists on *"the same underlying job
    record"* and *"the same underlying estimate structure."* Leaning one record with a lifecycle
    status, because partial approval and mid-job scope changes both need the estimate to stay alive
@@ -717,6 +717,7 @@ whole picture is in one place.
 | 2026-10-28 | Created from [[V1 Scope from Punch List]] and [[2026-10-23 Cameron Walkthrough Debrief]]. 15 gaps registered. |
 | 2026-10-28 | Added provenance to every gap — a traces-to block with punch list rows, transcript timestamps, and why each one slipped. Added the four-type taxonomy (A flagged by Cameron, B meeting vs. punch list, C internal contradiction, D nobody raised it). Two root causes identified: the portal deferral, and the punch list being shaped by FullBay's surface. |
 | 2026-11-01 | Added §8 "Proposed V1 adds" table (A1–A6): email, deposit link, approve link, proof approval, resilient photo upload, duplicate-customer warning. Unpruned. |
+| 2026-11-01 | §7 item 1: framework marked decided (NestJS, 2026-10-13, ADR-027) instead of open. |
 | 2026-11-01 | G3: recorded Dave's position — V1 emails invoices and estimates only, from one editable template each; per-business-unit template variants, multiple send methods, reminders, PO email, and inbound out. Added effort, risks both ways, and the in/out fence. Added to §6 and §8. |
 
 ## Related

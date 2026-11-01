@@ -19,9 +19,9 @@ in this whole architecture.
 **How to use these:** paste the relevant playbook into the task prompt. Every one ends with a
 verification block that must actually be run, not asserted.
 
-> **Pending the framework decision.** File names and mechanisms here assume Fastify plus our own
-> structure. See [[Framework Evaluation]] — these recipes get rewritten against whichever framework
-> wins the spike. The *steps* are framework-independent; only the file names move.
+> **Framework decided: NestJS (2026-10-13, ADR-027).** File names and mechanisms here still assume
+> Fastify plus our own structure, and get rewritten against NestJS. See [[Framework Evaluation]].
+> The *steps* are framework-independent; only the file names move.
 
 ## Playbook: Add a Field to an Existing Entity
 

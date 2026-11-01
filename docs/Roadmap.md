@@ -112,10 +112,9 @@ ADR-015).
 **Why it is its own milestone:** it proves the architecture in anger and gives Fleetco something
 real to react to, well before the feature build is committed.
 
-> **Run the framework spike as M6's first step.** [[Framework Evaluation]] is open — NestJS vs.
-> Fastify vs. AdonisJS — and must be settled before the golden module is built, since the golden
-> module has to exist in the chosen framework. Building the same `customers` module in all three
-> and reading the output *is* the spike, so the winner becomes the reference implementation.
+> **Framework spike: done.** [[Framework Evaluation]] was settled by spike on 2026-10-13 —
+> **NestJS** (ADR-027), over Fastify and AdonisJS. The golden module gets built in NestJS, and the
+> spike's NestJS output is the starting point for the reference implementation.
 >
 > **Design it as the golden module.** M6 is not just a proof of life — it is the reference
 > implementation every later module is told to copy. Pick one boring entity (`customers` or

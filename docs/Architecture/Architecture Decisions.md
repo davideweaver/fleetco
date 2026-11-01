@@ -489,7 +489,7 @@ no performance surprises**, against a bus factor of one.
 
 **Decision.** **AWS ECS Fargate.** Two services from one image: `api` (HTTP + SSE, two tasks
 minimum, behind an ALB) and `worker` (outbox dispatcher and scheduled jobs, one task). The Node
-framework inside the container is open — see ADR-027.
+framework inside the container is NestJS — see ADR-027.
 Frontend stays on Vercel. Google Cloud Run is the equal-footing alternative on the merits; AWS
 wins on Dave's existing experience, which is a legitimate tiebreaker for a system one person will
 operate. Pending confirmation that Fleetco has no conflicting cloud preference (Q17).

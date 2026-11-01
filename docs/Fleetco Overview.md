@@ -1,6 +1,6 @@
 ---
 created: 2026-10-08
-updated: 2026-10-28
+updated: 2026-11-01
 tags: [project, business, fleetco, fullbay, architecture]
 status: evaluating
 source: Claude Code (Xerro)
@@ -55,7 +55,7 @@ that question honestly and (b) if the answer is yes, become the vision he presen
 | Why OTC is doing this | **Growth, not cost savings.** FullBay covers ~30% of what they want | Confirmed 2026-10-23 |
 | Who maintains it | **Cameron** — tier-1 support, then high-level ownership (Q13) | Confirmed 2026-10-23 |
 | Compensation | Structure floated (upfront fee + tapering retainer). **No numbers. Needs Dan** | — |
-| API framework | **Open** — NestJS / Fastify / AdonisJS, decided by spike | **Low — under evaluation** |
+| API framework | **NestJS** — chosen by spike 2026-10-13 (ADR-027) | High |
 | Delivery model | **Agent fleet, Dave reviews.** No hand-written code | Confirmed |
 | Real bottleneck | **Review/verification capacity**, not code volume | High |
 | Timeline pressure | None — client has no alternative | Confirmed |
@@ -109,7 +109,7 @@ Working queue: `xerro todo list -p Fleetco`
 - [[Operations]] — backup, migrations, observability, support, and the bus-factor problem
 
 ### Build Discipline (agent-driven delivery)
-- [[Framework Evaluation]] — **open:** NestJS vs. Fastify vs. AdonisJS. Decided by spike before M6
+- [[Framework Evaluation]] — **decided 2026-10-13: NestJS** (ADR-027), chosen by spike over Fastify and AdonisJS
 - [[Testing Strategy]] — the verification layer; spec-not-implementation rule
 - [[Code Standards and Guardrails]] — branded types, lint rules, the enforcement hierarchy
 - [[Agent Playbooks]] — step-by-step recipes for recurring tasks

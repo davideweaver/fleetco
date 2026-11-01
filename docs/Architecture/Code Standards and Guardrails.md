@@ -16,7 +16,8 @@ the whole approach:
 > does not get dropped.
 
 > **Framework-dependent sections.** The enforcement *mechanisms* below assume Fastify plus our own
-> structure. The framework choice is open — see [[Framework Evaluation]] — and under NestJS several
+> structure. The framework was decided on 2026-10-13 as **NestJS** (ADR-027, [[Framework Evaluation]]),
+> so these mechanisms are due to be rewritten for it. Under NestJS several
 > rules move from tier 2 to tier 1 (module boundaries become framework-enforced rather than
 > lint-enforced). The *rules themselves* are framework-independent and stand either way. Branded
 > types, the layering direction, the dependency allowlist, and "boring is a requirement" do not
