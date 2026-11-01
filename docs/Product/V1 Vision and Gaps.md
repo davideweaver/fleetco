@@ -693,12 +693,30 @@ Cameron doesn't need to weigh in on these, but they block starting.
 5. **Get the accounting answers** (G10, G14, and Q25–Q27).
 6. **Then write the [[PRD]]**, which is finally possible.
 
+### Proposed V1 adds — to raise with Cameron (2026-11-01, unpruned)
+
+Small additions that make V1 noticeably less cumbersome. Captured in full; Dave will prune before
+the conversation. Estimates are rough and unmeasured.
+
+| # | Add | Why | Size | Depends on |
+|---|---|---|---|---|
+| A1 | **Email invoices and estimates** from the system, one editable template each (G3) | Payment links must reach customers; manual means pasting links forever | ~5–7 days | DNS access from Fleetco |
+| A2 | **Deposit collection by card link** (G6) | Cameron's loudest FullBay complaint — the fake "50% deposit" part (`00:26:26`, `00:31:43`). Same Stripe integration as invoices, different amount | ~1–2 days | A1, Stripe (7.6) |
+| A3 | **Approve/decline link on emailed estimates** (G2) | Creates the customer's own approval record on $5k+ jobs. Highest value-per-hour item in scope | ~1–2 days | A1 |
+| A4 | **Proof versions + customer proof approval** (G1) | Records which artwork version was approved; guards against printing the wrong one. Reuses the A3 link mechanism | ~2–3 days | **Only if** proofs go back and forth by email today, not inside GoHighLevel. Ask Cameron to walk a real proof cycle |
+| A5 | **Resilient photo upload** (G13) — client-side resize, retry, per-photo failure state | Completion photos are mandatory to close a job (1.11); a failed batch on shop wifi blocks Jason | ~2 days | Ask Jason how many photos a typical wrap produces |
+| A6 | **Duplicate-customer warning + stored GHL contact ID** (G12) | Customers are hand-copied from GoHighLevel; duplicates accumulate by month six | Hours | — |
+
+A5 and A6 are arguably not adds but things V1 needs to avoid feeling broken; listed here so the
+whole picture is in one place.
+
 ## Change Log
 
 | Date | Change |
 |---|---|
 | 2026-10-28 | Created from [[V1 Scope from Punch List]] and [[2026-10-23 Cameron Walkthrough Debrief]]. 15 gaps registered. |
 | 2026-10-28 | Added provenance to every gap — a traces-to block with punch list rows, transcript timestamps, and why each one slipped. Added the four-type taxonomy (A flagged by Cameron, B meeting vs. punch list, C internal contradiction, D nobody raised it). Two root causes identified: the portal deferral, and the punch list being shaped by FullBay's surface. |
+| 2026-11-01 | Added §8 "Proposed V1 adds" table (A1–A6): email, deposit link, approve link, proof approval, resilient photo upload, duplicate-customer warning. Unpruned. |
 | 2026-11-01 | G3: recorded Dave's position — V1 emails invoices and estimates only, from one editable template each; per-business-unit template variants, multiple send methods, reminders, PO email, and inbound out. Added effort, risks both ways, and the in/out fence. Added to §6 and §8. |
 
 ## Related
