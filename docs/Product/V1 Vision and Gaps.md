@@ -153,7 +153,7 @@ Dave's instrument as much as in Cameron's answers.
 |---|---|---|---|---|
 | G1 | Design proof approval has no home | **High** | **A** + D | Cameron |
 | G2 | Authorization leaves no artifact | **High** | **B** | Cameron + Dave |
-| G3 | Nothing in V1 sends email, but payment links need to reach customers. **Dave's position 2026-11-01: email invoices + estimates only, fixed templates; raise with Cameron** | **High** | **C** | Dave |
+| G3 | Nothing in V1 sends email, but payment links need to reach customers. **Dave's position 2026-11-01: email invoices + estimates only, one editable template per email type; raise with Cameron** | **High** | **C** | Dave |
 | G4 | Units and assets are undefined | Medium-High | **B** | Dave + Cameron |
 | G5 | Customer hierarchy deferred with the portal | Low for V1, **High for the model** | **B** | Dave |
 | G6 | Deposits are recorded but not collected | Medium, cheap win | **B** + C | Cameron |
@@ -266,7 +266,7 @@ resolves the 7.6 / 7.19 contradiction above rather than adding a feature.
 out of the system into Gmail on every occurrence, or lose a record we need? If yes, the system sends
 it. If a downloaded PDF is fine, it stays manual.
 
-**In V1 — system-sent, fixed templates:**
+**In V1 — system-sent, from editable templates:**
 
 | Email | Why it passes the test |
 |---|---|
@@ -274,14 +274,22 @@ it. If a downloaded PDF is fine, it stays manual.
 | Estimate, with PDF attached and the G2 approve/decline link | The customer's click is the approval record on $5k+ jobs. Manual sending loses it |
 | Auth emails: password reset, invite, email verification | Better Auth needs them regardless of this decision |
 
+**Templates are in, kept simple:** one template per email type (invoice, estimate) that Cameron
+can edit (subject, body text, signature, logo) without a deploy, with merge fields like customer
+name, document number, amount, and link. The sender can tweak the message before it goes. Same
+engine as the PDF templates (§7 item 6).
+
 Supporting pieces that come with it: send screen with recipient/CC, a send log (who, when, to whom)
 replacing the manual "sent" flag, bounce/complaint flagging on the contact, reply-to set to
 Cameron's inbox, and the non-production recipient allowlist (ADR-025).
 
 **Out of V1, explicitly fenced:**
 
-- Custom or per-business email templates, template editor, branding controls — one fixed,
-  system-defined template per email type at launch
+- Template variants per business unit (graphics vs mechanical vs mobile), per customer, or per
+  sending method — one template set at launch. Revisit when a second department comes on
+- Multiple ways of sending the same document (e.g. link-only vs attachment vs portal variants)
+  — one send path per document type
+- Rich template designer, conditional blocks, A/B or per-recipient branding
 - Automated reminders, overdue/dunning sequences, scheduled sends
 - Emailing POs to vendors (stays download-and-send, as 3.12 marks it)
 - Inbound email, reply threading, an in-app inbox
@@ -298,7 +306,7 @@ estimate; review, testing, and deliverability checks don't compress the way code
    or M365 records. A bad SPF edit can break their normal email. Most likely schedule slip.
 3. **Wrong recipient** — contacts are hand-copied from GoHighLevel (G12) and migrated from FullBay.
    Mitigated by bounce flagging and a preview before send.
-4. **Scope creep** — reminders, templates, PO email are each small and add up. The fence above is
+4. **Scope creep** — reminders, template variants, PO email are each small and add up. The fence above is
    the defense.
 5. **Replies** — customers will reply. Reply-to goes to Cameron; no inbound handling.
 
@@ -649,7 +657,7 @@ So these don't get relitigated every meeting:
 | Historical data migration | Open work only. FullBay stays readable for history |
 | GoHighLevel integration | Later. Manual entry at launch |
 | Offline capture | Confirmed not required. Online-only accepted |
-| Custom email templates, reminders/dunning, PO emailing, inbound email | Proposed fence around G3. V1 sends invoices and estimates only, with fixed templates |
+| Per-business-unit email template variants, multiple send methods, reminders/dunning, PO emailing, inbound email | Proposed fence around G3. V1 sends invoices and estimates only, one editable template each |
 
 ## 7. Dave's Open Build Decisions
 
@@ -691,7 +699,7 @@ Cameron doesn't need to weigh in on these, but they block starting.
 |---|---|
 | 2026-10-28 | Created from [[V1 Scope from Punch List]] and [[2026-10-23 Cameron Walkthrough Debrief]]. 15 gaps registered. |
 | 2026-10-28 | Added provenance to every gap — a traces-to block with punch list rows, transcript timestamps, and why each one slipped. Added the four-type taxonomy (A flagged by Cameron, B meeting vs. punch list, C internal contradiction, D nobody raised it). Two root causes identified: the portal deferral, and the punch list being shaped by FullBay's surface. |
-| 2026-11-01 | G3: recorded Dave's position — V1 emails invoices and estimates only, with fixed templates; custom templates, reminders, PO email, and inbound out. Added effort, risks both ways, and the in/out fence. Added to §6 and §8. |
+| 2026-11-01 | G3: recorded Dave's position — V1 emails invoices and estimates only, from one editable template each; per-business-unit template variants, multiple send methods, reminders, PO email, and inbound out. Added effort, risks both ways, and the in/out fence. Added to §6 and §8. |
 
 ## Related
 
