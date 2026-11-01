@@ -1,6 +1,6 @@
 ---
 created: 2026-10-28
-updated: 2026-10-28
+updated: 2026-11-01
 tags: [fleetco, otc, v1, vision, gaps, product, working-doc]
 status: living document — iterate with Cameron, then feed the PRD
 source: Claude Code (Xerro)
@@ -153,7 +153,7 @@ Dave's instrument as much as in Cameron's answers.
 |---|---|---|---|---|
 | G1 | Design proof approval has no home | **High** | **A** + D | Cameron |
 | G2 | Authorization leaves no artifact | **High** | **B** | Cameron + Dave |
-| G3 | Nothing in V1 sends email, but payment links need to reach customers | **High** | **C** | Dave |
+| G3 | Nothing in V1 sends email, but payment links need to reach customers. **Dave's position 2026-11-01: email invoices + estimates only, fixed templates; raise with Cameron** | **High** | **C** | Dave |
 | G4 | Units and assets are undefined | Medium-High | **B** | Dave + Cameron |
 | G5 | Customer hierarchy deferred with the portal | Low for V1, **High for the model** | **B** | Dave |
 | G6 | Deposits are recorded but not collected | Medium, cheap win | **B** + C | Cameron |
@@ -255,6 +255,72 @@ priced it.
 
 **Recommendation:** V1 sends invoices and estimates (with the G2 approve link) from the system, and
 keeps POs manual as marked. One sending path, two document types.
+
+#### Dave's position (2026-11-01) — to raise with Cameron
+
+Cameron wants V1 tight. Dave's position: **support email in V1, but only where leaving it out makes
+the workflow cumbersome.** Everything else about email stays out. The pitch to Cameron is that this
+resolves the 7.6 / 7.19 contradiction above rather than adding a feature.
+
+**The test for whether something gets email in V1:** would doing it by hand mean copying something
+out of the system into Gmail on every occurrence, or lose a record we need? If yes, the system sends
+it. If a downloaded PDF is fine, it stays manual.
+
+**In V1 — system-sent, fixed templates:**
+
+| Email | Why it passes the test |
+|---|---|
+| Invoice, with PDF attached and the card payment link (7.6, 7.19) | The payment link has to reach the customer. Manual means pasting a link per invoice, forever |
+| Estimate, with PDF attached and the G2 approve/decline link | The customer's click is the approval record on $5k+ jobs. Manual sending loses it |
+| Auth emails: password reset, invite, email verification | Better Auth needs them regardless of this decision |
+
+Supporting pieces that come with it: send screen with recipient/CC, a send log (who, when, to whom)
+replacing the manual "sent" flag, bounce/complaint flagging on the contact, reply-to set to
+Cameron's inbox, and the non-production recipient allowlist (ADR-025).
+
+**Out of V1, explicitly fenced:**
+
+- Custom or per-business email templates, template editor, branding controls — one fixed,
+  system-defined template per email type at launch
+- Automated reminders, overdue/dunning sequences, scheduled sends
+- Emailing POs to vendors (stays download-and-send, as 3.12 marks it)
+- Inbound email, reply threading, an in-app inbox
+- Marketing or bulk email (stays in GoHighLevel, per 11.12)
+
+**Rough size:** ~5–7 days for the email slice, +1–2 days for the G2 approve link. Unmeasured
+estimate; review, testing, and deliverability checks don't compress the way code does.
+
+**Risks of including it:**
+
+1. **Deliverability** — invoices in spam fail silently; they just don't get paid. Needs DMARC
+   reporting and test sends to Gmail and Outlook before go-live.
+2. **DNS is an external dependency** — Fleetco controls the domain, likely with existing Workspace
+   or M365 records. A bad SPF edit can break their normal email. Most likely schedule slip.
+3. **Wrong recipient** — contacts are hand-copied from GoHighLevel (G12) and migrated from FullBay.
+   Mitigated by bounce flagging and a preview before send.
+4. **Scope creep** — reminders, templates, PO email are each small and add up. The fence above is
+   the defense.
+5. **Replies** — customers will reply. Reply-to goes to Cameron; no inbound handling.
+
+**Risks of leaving it out:**
+
+1. Cameron pastes payment links by hand on every invoice, indefinitely.
+2. A step backward from FullBay, which emails everything today (`00:32:32`), on top of graphics
+   customers losing the portal at cutover.
+3. No customer-side approval record on large jobs (G2).
+4. "Sent" depends on Cameron remembering a checkbox, so A/R follow-up has nothing reliable.
+5. Only ~3–4 days are actually saved: the provider, sending domain, and allowlist are needed for
+   auth emails anyway.
+
+**What does argue for deferring:** the outbox already exists and lists email as a consumer, so
+adding it after launch is additive, not a rework. If the V1 date is fixed, deferral is defensible on
+cost; the price is the manual link-pasting and the missing approval record.
+
+**Do now regardless of the decision:** ask Fleetco who controls DNS for the sending domain.
+
+**Still to check:** whether Stripe can email the payment link itself. That might cover the "pay"
+half without our mailer, but not estimates or approvals, and Stripe-side invoices may conflict with
+two-way QBO sync (G14).
 
 ### G4. Units and assets are undefined
 
@@ -583,6 +649,7 @@ So these don't get relitigated every meeting:
 | Historical data migration | Open work only. FullBay stays readable for history |
 | GoHighLevel integration | Later. Manual entry at launch |
 | Offline capture | Confirmed not required. Online-only accepted |
+| Custom email templates, reminders/dunning, PO emailing, inbound email | Proposed fence around G3. V1 sends invoices and estimates only, with fixed templates |
 
 ## 7. Dave's Open Build Decisions
 
@@ -613,8 +680,10 @@ Cameron doesn't need to weigh in on these, but they block starting.
    the one that could change the shape of the job record.
 3. **Offer the G2 approve link and G6 deposit link.** Both are small, both fix things he complained
    about, and both make V1 visibly better than FullBay rather than merely equivalent.
-4. **Get the accounting answers** (G10, G14, and Q25–Q27).
-5. **Then write the [[PRD]]**, which is finally possible.
+4. **Raise the G3 email position** — email for invoices and estimates only, everything else fenced
+   out. Ask who controls Fleetco's DNS at the same time.
+5. **Get the accounting answers** (G10, G14, and Q25–Q27).
+6. **Then write the [[PRD]]**, which is finally possible.
 
 ## Change Log
 
@@ -622,6 +691,7 @@ Cameron doesn't need to weigh in on these, but they block starting.
 |---|---|
 | 2026-10-28 | Created from [[V1 Scope from Punch List]] and [[2026-10-23 Cameron Walkthrough Debrief]]. 15 gaps registered. |
 | 2026-10-28 | Added provenance to every gap — a traces-to block with punch list rows, transcript timestamps, and why each one slipped. Added the four-type taxonomy (A flagged by Cameron, B meeting vs. punch list, C internal contradiction, D nobody raised it). Two root causes identified: the portal deferral, and the punch list being shaped by FullBay's surface. |
+| 2026-11-01 | G3: recorded Dave's position — V1 emails invoices and estimates only, with fixed templates; custom templates, reminders, PO email, and inbound out. Added effort, risks both ways, and the in/out fence. Added to §6 and §8. |
 
 ## Related
 
