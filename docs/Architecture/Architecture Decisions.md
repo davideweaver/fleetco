@@ -1,6 +1,6 @@
 ---
 created: 2026-10-08
-updated: 2026-10-12
+updated: 2026-11-01
 tags: [fleetco, architecture, adr, decisions]
 source: Claude Code (Xerro)
 ---
@@ -45,6 +45,7 @@ Status key: `PROPOSED` · `ACCEPTED` · `SUPERSEDED` · `REOPENED`
 | 026 | Infrastructure as code once a second environment exists | `PROPOSED` |
 | 027 | NestJS, decided by spike | `PROPOSED` (resolved) |
 | 028 | Observability: Sentry + Pino behind a Telemetry port; metrics backend deferred | `PROPOSED` |
+| 029 | One product monorepo; planning stays in its own repository | `PROPOSED` |
 
 ## ADR-001 — Modular monolith, not microservices, for phase one `PROPOSED`
 
@@ -884,6 +885,92 @@ dependency can be removed without touching application code.
 > alive"; readiness asks "should traffic come here", which is false during the drain while the
 > process is still perfectly healthy. The leak suite asserts `/health`, `/ready` and `/metrics`
 > stay outside the OpenAPI document and expose no tenant identifiers.
+
+## ADR-029 — One product monorepo; planning stays in its own repository `PROPOSED`
+
+**Context.** Everything so far lives in this `fleetco` repository: discovery and commercial docs,
+architecture docs, and four framework spikes plus the `fleetco-nestjs-vehicles` harness. That is
+right for discovery. It is the wrong shape for a product, for two reasons. The product code needs
+a home it can be built, deployed and handed over from. And this repository contains material that
+should never travel with the code: [[Engagement Terms]], pricing briefs, meeting transcripts and
+the apprenticeship plan. The question is whether the product is one repository or several, and
+what moves out of this one.
+
+**Decision.**
+
+1. **One product monorepo** (working name `fleetco-app`), using pnpm workspaces and Turborepo:
+
+   ```
+   fleetco-app/
+   ├── apps/
+   │   ├── api/          NestJS modular monolith (ADR-001, ADR-027). One image, several
+   │   │                 entrypoints: api (HTTP + SSE), worker (outbox + jobs), later mcp
+   │   └── web/          React + TypeScript + Vite, deployed to Vercel
+   ├── packages/
+   │   ├── contracts/    Zod schemas, the single source of the OpenAPI document (ADR-014)
+   │   ├── api-client/   typed client generated from that document
+   │   └── config/       shared tsconfig, eslint and vitest presets
+   ├── infra/            empty until a second environment exists (ADR-026)
+   └── docs/             ADRs and technical docs, moved from here
+   ```
+
+2. **Business modules stay inside `apps/api`, not as workspace packages.** Module boundaries are
+   enforced by `@Module({ exports })` and lint rules (ADR-027, [[Code Standards and Guardrails]]),
+   not by package boundaries.
+3. **This `fleetco` repository stays as the planning repository.** Commercial, meeting, discovery
+   and apprenticeship material stays here. Technical docs move to the product repository the day
+   it is created: this ADR log, [[Code Standards and Guardrails]], [[Tenancy Model]],
+   [[Testing Strategy]], [[Agent Playbooks]], [[Domain Model]] and [[Rules Catalog]].
+4. **The spikes are archived here, not migrated.** The product repository starts from a copy of
+   `fleetco-nestjs-vehicles` as its template, without the spike's history.
+5. **New surfaces join the monorepo as apps.** The customer portal, if [[Evolution Path]]'s
+   security-posture trigger ever fires, becomes `apps/portal`. The MCP server is an entrypoint of
+   `apps/api` (see [[AI Readiness]]). Technicians use the responsive web app (punch-list row
+   10.1), so there is no native mobile repository.
+
+**Rationale.**
+
+- **Features cross the API–web boundary as a unit.** [[AI Readiness]] requires every UI action to
+  be a public OpenAPI operation called through the generated client. Most features therefore touch
+  contracts, API and web at once. One repository makes that one pull request. Separate
+  repositories make it a published client package, a version bump and a coordinated release,
+  between repositories owned by the same person.
+- **One CI run enforces every guardrail.** "The frontend may only call the generated client," the
+  tenancy and layering lint rules, and the leak suite all run over one tree at one commit. Split
+  repositories need cross-repository checks to say the same thing, and those are the checks that
+  get skipped.
+- **Agents write the code and need the whole flow in one checkout.** Every line is
+  agent-written (ADR-027). An agent that can see route, service, repository and UI together
+  produces consistent changes. An agent that sees half of them guesses at the other half.
+- **Deployment does not argue for splitting.** ADR-021 already runs several services from one
+  image. Vercel builds a subdirectory with ignored-build rules, and ECS builds one Dockerfile.
+  The monorepo changes nothing about either target.
+- **Turborepo, not Nx.** The need is task caching and "only build what changed." Nx's generators,
+  project graph plugins and module-boundary system duplicate what Nest and our lint rules already
+  do, and add a tool one person must keep current.
+- **The planning split is about who sees what, not tidiness.** The product repository will be
+  shared with contractors, possibly with Charlie after the apprenticeship ([[After the 12 Weeks]]),
+  and possibly owned by OTC. Pricing, engagement terms and meeting transcripts should not be
+  readable by anyone who can read the code, and removing them from git history later is much
+  harder than never adding them.
+
+**Consequences.**
+
+- **Repository ownership must be settled before the first commit.** Whether `fleetco-app` lives
+  under Dave's account or an OTC/Fleetco GitHub organisation follows from the IP ownership item in
+  [[Engagement Terms]], which is still open. Transferring a repository later is possible but moves
+  CI secrets, Vercel and AWS integrations, and deploy keys with it.
+- **Release attribution is set from CI.** As ADR-028 notes, an SDK inferring its release from git
+  gets it wrong when the service is not the whole repository. In a monorepo it never is, so the
+  release version is always passed explicitly by the pipeline.
+- **Vercel and CI need path filters.** A docs-only or API-only change should not trigger a
+  frontend preview build, and the reverse. Turborepo's affected-task detection covers CI. Vercel
+  needs an ignored-build step.
+- **Two places to look, for a while.** Links between this repository and the product repository
+  become plain URLs rather than wiki links. Accepted cost of the split.
+- **Reversible.** If the portal or MCP server ever needs separate access control, `apps/portal`
+  can be split out with its history using `git filter-repo`. Merging separate repositories later
+  is the harder direction, which is a reason to start together.
 
 ## Open Architectural Questions
 
