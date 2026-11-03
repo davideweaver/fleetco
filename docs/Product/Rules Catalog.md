@@ -96,7 +96,8 @@ records.
 
 ### PLAT-006 Every business record belongs to a department
 **Rule:** jobs, estimates, invoices, POs, catalog materials and time entries each carry a
-department. V1 has one department, Graphics, and the UI never shows it.
+department. V1 has one department, Graphics. The department is **shown** in the context menu at the
+bottom of the rail, with Graphics selected; *switching* between departments is FUT-002.
 
 **Design choice, not a FullBay fact:** in the new system, one company is one customer record shared
 by every department. A customer has no department.
@@ -109,8 +110,9 @@ complaint was one company split into many customer records (G5).
 
 **Consequence:** if FullBay holds one record per shop, the shop cutover must merge duplicates across
 shop exports and match them to QuickBooks (QBO-005). See D-C18.
-**Source:** PL 1.23 (switcher Later), V1 Alignment §1 (QuickBooks class), G5 · **Status:** Proposed
-(FullBay's actual behavior is D-C18) · **Phase:** V1 (data), Later (UI)
+**Source:** PL 1.23 (switcher Later), V1 Alignment §1 (QuickBooks class), G5, DAVE (visibility) ·
+**Status:** Proposed (FullBay's actual behavior is D-C18) · **Phase:** V1 (data and visibility),
+Later (switching)
 
 ### PLAT-007 External IDs are stored, not synced
 **Rule:** customers and jobs can store a GoHighLevel contact ID and opportunity ID. Migrated
@@ -988,6 +990,7 @@ and permissions are mostly Confirmed, because Cam's notes were precise about the
 |---|---|
 | 2026-10-31 | First draft. Mined from Cam's punch-list notes, the 10/23 debrief, V1 Vision and Gaps, V1 Alignment, Domain Model and Code Standards. No new FullBay access. |
 | 2026-10-31 | PLAT-006 reworded: shared customers is our design choice, and evidence suggests FullBay keeps customers per shop. Added D-C18. |
+| 2026-11-03 | PLAT-006 UI clause reversed by Dave. The department is visible from V1 even with one department; only switching stays Later. The clause was Proposed, so this is a spec change rather than a correction. |
 
 ## Related
 

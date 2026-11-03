@@ -127,6 +127,13 @@ real to react to, well before the feature build is committed.
 
 The actual build, against M4's locked scope. Sequenced in the PRD.
 
+> **How it gets built: [[Software Factory]].** An agent factory, with Dave deciding and reviewing
+> rather than writing. **It does not start before M2** — weeks of agent output on an unsigned
+> project is a business risk, not a technical one. The factory shape, the budget and the cadence
+> are decided at M2; the design system is built and approved before any screen is built on it.
+> Stage 0 foundation work (the rule-coverage gate, the card deck, the module scaffold, real auth,
+> CI) is supervised and is not factory output.
+
 ### M8 — Pilot customer cutover
 
 > ### ⚠️ Premise broken — 2026-10-11

@@ -58,6 +58,8 @@ that question honestly and (b) if the answer is yes, become the vision he presen
 | API framework | **NestJS** — chosen by spike 2026-10-13 (ADR-027) | High |
 | Delivery model | **Agent fleet, Dave reviews.** No hand-written code | Confirmed |
 | Real bottleneck | **Review/verification capacity**, not code volume | High |
+| How the build runs | **Software factory** of Claude Code agents, gated on M2. See [[Software Factory]] | High |
+| UI approach | **Design system first**, approved by Dave then OTC, before any screen is built on it | Confirmed 2026-11-03 |
 | Timeline pressure | None — client has no alternative | Confirmed |
 | Is the project worth doing? | **Undecided** — gated on [[Open Questions]] | — |
 
@@ -109,6 +111,11 @@ Working queue: `xerro todo list -p Fleetco`
 - [[Operations]] — backup, migrations, observability, support, and the bus-factor problem
 
 ### Build Discipline (agent-driven delivery)
+- [[Software Factory]] — **how V1 actually gets built.** The agent factory, its gates, the four
+  candidate shapes, and the design-system track. Starts at M2
+- [[Work Cards]] — the unit of agent work: format, lifecycle, and the eight rules for writing one
+- [[Rule Coverage Gate]] — making [[Rules Catalog]] machine-checkable, so the spec reviews the agents
+- [[UI Vocabulary]] — the shared names for the parts of a screen, mapped to the components
 - [[Framework Evaluation]] — **decided 2026-10-13: NestJS** (ADR-027), chosen by spike over Fastify and AdonisJS
 - [[Testing Strategy]] — the verification layer; spec-not-implementation rule
 - [[Code Standards and Guardrails]] — branded types, lint rules, the enforcement hierarchy
