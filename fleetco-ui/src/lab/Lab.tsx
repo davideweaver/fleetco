@@ -20,6 +20,8 @@ const SCREENS = [
   { key: "jobs", label: "Job detail (G-1048)", path: "/app/jobs/G-1048" },
   { key: "board", label: "Job board (wide, no list)", path: "/app/board" },
   { key: "reports", label: "Reports (sections list)", path: "/app/reports/ar-aging" },
+  { key: "panel", label: "Detail panel (from the board)", path: "/app/board?overlay=panel" },
+  { key: "dialog", label: "Dialog (close job)", path: "/app/jobs/G-1048?overlay=dialog" },
   { key: "schedule", label: "Schedule (wide)", path: "/app/schedule" },
   { key: "time", label: "Time & payroll (wide)", path: "/app/time" },
 ];
@@ -35,7 +37,7 @@ export function Lab() {
   const [palette, setPalette] = useState<"neutral" | "warm">("warm");
 
   const src = (extra = "") =>
-    `${screen.path}?v=${variant}&role=${role}&rail=${rail}&badges=${badges}&palette=${palette}${dark ? "&theme=dark" : ""}${extra}`;
+    `${screen.path}${screen.path.includes("?") ? "&" : "?"}v=${variant}&role=${role}&rail=${rail}&badges=${badges}&palette=${palette}${dark ? "&theme=dark" : ""}${extra}`;
 
   return (
     <div className="flex h-full flex-col bg-neutral-100 text-neutral-900">

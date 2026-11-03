@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { ChevronDown, ChevronRight, Camera, Play } from "lucide-react";
 import { jobs, STAGES, wrapComponents, wrapPriceCents } from "@/data/sample";
 import { useShell } from "@/shell/shell-context";
 import { Btn, DetailHeader, ListDetailLayout, ListHeader, ListRow, Pill } from "@/shell/ListDetailLayout";
+import { Overlay } from "@/components/ui/overlay";
 import { Section, Stat, Td, Th } from "./Customers";
 import { money } from "@/lib/utils";
 
@@ -48,8 +49,11 @@ export function JobsPage() {
 
 function JobDetail({ no }: { no: string }) {
   const { role } = useShell();
+  const [params] = useSearchParams();
   const j = jobs.find((x) => x.no === no)!;
   const [open, setOpen] = useState(false);
+  // A decision that blocks you: a dialog, not a panel.
+  const [closing, setClosing] = useState(params.get("overlay") === "dialog");
   const owner = role === "owner";
 
   return (
@@ -70,7 +74,9 @@ function JobDetail({ no }: { no: string }) {
           owner ? (
             <>
               <Btn>Move stage</Btn>
-              <Btn primary>Close job</Btn>
+              <span onClick={() => setClosing(true)}>
+                <Btn primary>Close job</Btn>
+              </span>
             </>
           ) : (
             <>
@@ -160,6 +166,38 @@ function JobDetail({ no }: { no: string }) {
           ))}
         </div>
       </Section>
+
+      <Overlay
+        kind="dialog"
+        open={closing}
+        onOpenChange={setClosing}
+        eyebrow={`Job · ${j.no}`}
+        title="Close this job?"
+        footer={
+          <>
+            <Btn>Cancel</Btn>
+            <Btn primary>Close job</Btn>
+          </>
+        }
+      >
+        <div className="space-y-3 p-4 text-sm">
+          <p>
+            Closing creates one draft invoice from the authorized lines. Nothing is sent
+            to the customer until you review it.
+          </p>
+          <div className="rounded-lg border bg-muted/40 p-3">
+            <div className="flex items-baseline justify-between">
+              <span className="text-muted-foreground">Authorized total</span>
+              <span className="tnum font-semibold">{money(j.valueCents)}</span>
+            </div>
+            <div className="mt-1 flex items-baseline justify-between">
+              <span className="text-muted-foreground">Deposit applied</span>
+              <span className="tnum">{money(Math.round(j.valueCents / 2))}</span>
+            </div>
+          </div>
+          <p className="text-muted-foreground">JOB-009 · one draft invoice per billable job.</p>
+        </div>
+      </Overlay>
     </div>
   );
 }

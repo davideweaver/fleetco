@@ -97,6 +97,25 @@ the front (the detail pane).
 their right edge; the step in tone does that work. Borders stay for **discrete objects** — cards,
 inputs, tables, and the rows inside a list.
 
+## Overlays
+
+One primitive, `Overlay`, with two presentations. Both are a Radix Dialog underneath, so focus
+trapping, escape, scroll lock and the aria wiring are identical and are not each lane's problem.
+
+| Name | What it is for | Desktop | Phone |
+|---|---|---|---|
+| **Dialog** | A decision or a short form that **blocks** you. You answer, then carry on | Centred card | Full screen |
+| **Panel** | Inspecting or editing a record while its **context stays on screen** behind it | From the right, full height | A sheet up from the bottom, capped so the context still shows |
+| **Search palette** | Global search only. Not a general overlay | Centred, near the top | Full screen |
+
+**The rule that stops agents guessing: a list section never uses a panel.** Those screens already
+have a detail pane, and a panel over it is a second detail view of the same record. Panels exist
+for `pane: "wide"` screens — the board, the schedule, timesheets — which have no detail pane. A
+board card opens a panel; a customer row does not.
+
+Dialogs go full screen on a phone rather than shrinking, because a centred card on a 390px screen
+is a postage stamp with a keyboard over it.
+
 ## Naming rules
 
 1. **Pane, column, bar, sheet — pick by behaviour, not by looks.**
@@ -123,6 +142,8 @@ built, and that is the moment to add it here rather than later:
 - The estimate line editor — customer lines and their components (`EST-002`)
 - The photo gallery and its capture control
 - Toasts, loading and error states
+- Confirm-destructive dialogs, which probably want their own variant (`INV-012` voiding,
+  `JOB-011` cancelling)
 - Anything on a customer-facing surface (estimate PDF, invoice PDF, payment page) — that is a
   **second design surface** with its own vocabulary, and `ROLE-009` means it cannot borrow internal
   components wholesale
