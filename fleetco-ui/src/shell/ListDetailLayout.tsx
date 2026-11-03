@@ -55,7 +55,7 @@ export function ListDetailLayout({
       >
         {hasSelection ? (
           <>
-            <div className={cn("shrink-0 border-b px-3 py-2", twoPane && "lg:hidden")}>
+            <div className={cn("flex h-10 shrink-0 items-center border-b px-3", twoPane && "lg:hidden")}>
               <Link
                 to={href(backTo)}
                 className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
@@ -118,7 +118,7 @@ function SectionHeader({
 }) {
   const { openSearch } = useShell();
   return (
-    <div className="flex h-12 shrink-0 items-center gap-2 border-b px-3">
+    <div className="flex h-band shrink-0 items-center gap-2 border-b px-3">
       <span className="text-sm font-semibold">{title}</span>
       {count !== undefined && (
         <span className="tnum rounded-full bg-muted px-1.5 py-0.5 text-[11px] text-muted-foreground">
@@ -208,6 +208,13 @@ export function Pill({
   );
 }
 
+/**
+ * Two parts: a band row carrying the eyebrow and the actions, then the title block.
+ *
+ * The actions live in the band rather than beside the title so that they line up with
+ * the section header's button and the rail's logo — one horizontal line across all
+ * three columns — and so they stay put however long the title runs.
+ */
 export function DetailHeader({
   eyebrow,
   title,
@@ -220,17 +227,17 @@ export function DetailHeader({
   actions?: ReactNode;
 }) {
   return (
-    <div className="flex flex-wrap items-start gap-3 border-b px-4 py-3 lg:px-5 lg:py-4">
-      <div className="min-w-0 flex-1">
-        {eyebrow && (
-          <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-            {eyebrow}
-          </div>
-        )}
+    <div className="border-b">
+      <div className="flex h-band items-center gap-3 px-4 lg:px-5">
+        <div className="min-w-0 flex-1 truncate text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+          {eyebrow}
+        </div>
+        {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
+      </div>
+      <div className="px-4 pb-4 lg:px-5">
         <h2 className="truncate text-lg font-semibold lg:text-xl">{title}</h2>
         {sub && <div className="mt-0.5 text-sm text-muted-foreground">{sub}</div>}
       </div>
-      {actions && <div className="flex shrink-0 flex-wrap gap-2">{actions}</div>}
     </div>
   );
 }

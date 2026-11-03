@@ -7,6 +7,12 @@
    default (lg 1024 = two panes, xl 1280 = roomy two panes). */
 @theme {
   --breakpoint-pad: 744px;
+
+  /* The header band. Every header that sits at the top of a column uses it — the rail's
+     logo row, the section header, and the first row of a detail header — so one
+     horizontal line runs across all three. Retune this single value in the visual pass;
+     do not hand-pick heights per header. */
+  --spacing-band: 3.5rem;
 }
 
 :root {

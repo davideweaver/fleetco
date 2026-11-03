@@ -87,7 +87,7 @@ export function AppShell() {
           >
             <div
               className={cn(
-                "flex h-14 shrink-0 items-center",
+                "flex h-band shrink-0 items-center border-b",
                 railOpen ? "gap-2 px-1" : "w-full justify-center"
               )}
             >

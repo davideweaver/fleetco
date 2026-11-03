@@ -42,10 +42,10 @@ grep for the thing they mean. It is the same failure the single route table prev
 | # | Name | Component | What it is |
 |---|---|---|---|
 | ① | **Rail** | `AppShell` | The left navigation. **Expanded** (208px, labels) or **collapsed** (56px, icons). Not "sidebar" — that was the discarded variant |
-| ② | **Section header** | `SectionHeader` | The 48px bar with the section name, count and actions. `ListHeader` on list sections, `PageHeader` on wide ones. **There is no top banner** — it duplicated this |
+| ② | **Section header** | `SectionHeader` | The **band** at the top of the list column: section name, count and actions. `ListHeader` on list sections, `PageHeader` on wide ones. **There is no top banner** — it duplicated this |
 | ③ | **List row** | `ListRow` | One record in the list column. A **row**, never a card |
 | ④ | **Bottom bar** | `AppShell` | The phone's navigation. Four items plus **More**, which opens the **More sheet** |
-| ⑤ | **Detail header** | `DetailHeader` | Eyebrow, title, subtitle, actions, at the top of the detail pane |
+| ⑤ | **Detail header** | `DetailHeader` | A **band** carrying the eyebrow and the actions, then the title and subtitle below it |
 | ⑥ | **Detail pane** | `ListDetailLayout` | The right pane. Holds a **stat strip** (the row of labelled numbers) and **detail sections** |
 | ⑦ | **Search palette** | `SearchPalette` | Global search. Opened from the rail, `⌘K`, or the phone magnifier. Not a search *field*; there is nowhere to put one |
 | ⑧ | **Nav item** | `AppShell` | One entry in the rail. Grouped into **nav groups** (work / sales / shop / admin) separated by a hairline |
@@ -63,6 +63,24 @@ grep for the thing they mean. It is the same failure the single route table prev
 | **Detail section** | `Section` | A titled block inside the detail pane, usually wrapping a table |
 | **More sheet** | `AppShell` | The full-screen list the phone's More button opens |
 | **Empty state** | `ListDetailLayout` | What the detail pane shows with nothing selected |
+
+## The band
+
+**Every header at the top of a column is one height**, set by `--spacing-band` and used as
+`h-band`. Three places share it: the rail's logo row, the section header, and the first row of a
+detail header. The result is a single horizontal line running across the rail, the list column and
+the detail pane.
+
+Two consequences worth knowing before changing anything:
+
+- **The detail header's actions sit in the band, not beside the title.** That is what makes them
+  line up with the section header's button, and it keeps them in one place however long the title
+  runs.
+- **The back row is not a band.** It is `h-10`, and deliberately so: it only appears on a narrow
+  screen, where the list column is hidden and there is nothing for it to line up with.
+
+Before this rule the three headers centred at 28px, 24px and 33px. Retune the single token in the
+visual pass; never hand-pick a height for one header.
 
 ## Naming rules
 
