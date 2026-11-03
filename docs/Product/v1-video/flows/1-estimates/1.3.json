@@ -1,6 +1,7 @@
 [
-  {"id": "1.3-title", "text": "Here is how the owner records the customer's approval."},
-  {"id": "1.3-sent", "text": "The owner downloaded the estimate as a PDF, emailed it from their own email, and marked it as sent. The customer calls back. They want Unit 14 wrapped now, but not Unit 17. The owner opens Record approval."},
+  {"id": "1.3-title", "text": "Here is how the owner emails an estimate and records the customer's approval."},
+  {"id": "1.3-email", "text": "The owner emails the estimate straight from the system. The message comes from a template, with the PDF attached. They check it and click Send. The estimate now shows who it went to and when."},
+  {"id": "1.3-sent", "text": "The customer calls back. They want Unit 14 wrapped now, but not Unit 17. The owner opens Record approval."},
   {"id": "1.3-record", "text": "The owner approves Unit 14 and declines Unit 17. They record who approved, when, and how. Here it was a phone call. Then they save."},
   {"id": "1.3-record-shown", "text": "The approval record now shows on the estimate. Unit 17 is crossed out, and the total covers only Unit 14. When the deposit check arrives, the owner records it."}
 ]

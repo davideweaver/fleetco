@@ -48,7 +48,7 @@ const pct = (c, p) => (p ? Math.round(((p - c) / p) * 100) + "%" : "");
 
 function freshE() {
   return { cust: null, custMenu: false, vehMenu: false, pkgMenu: null, units: [], edit: null, changed: null,
-    view: "int", modal: false, dec17: false, method: "Phone call", approved: false, deposit: "none", sent: false };
+    view: "int", modal: false, dec17: false, method: "Phone call", approved: false, deposit: "none", sent: false, sendWin: false };
   // deposit: "none" (not recorded yet) · "recorded" (owner recorded a check) · "link" (picture 1.4 only, open question)
 }
 const S = { screen: "title", who: null, title: ["", ""], E: freshE(), compact: false };
@@ -97,7 +97,7 @@ function sidePanel() {
   const c = live.reduce((a, x) => a + lineSum(x.lines, 3), 0), p = live.reduce((a, x) => a + lineSum(x.lines, 4), 0);
   const dep = { none: `<button class="btn" data-k="rec-deposit" ${E.approved ? "" : "disabled"}>Record deposit</button>`,
     recorded: `<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><span class="pill solid" data-k="dep-rec">Deposit recorded · ${money(p / 2)}</span><span class="small muted">Check · Oct 26 · comes off the final invoice</span></div>`,
-    link: `<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><span class="small muted">Card link in the owner's email, Oct 26</span><span class="pill solid" data-k="dep-paid">Paid by card · Oct 26, 2:41 PM</span><span class="small muted">Comes off the final invoice</span></div>` }[E.deposit];
+    link: `<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><span class="small muted">Card link emailed by OTC Fleet Graphix, Oct 26</span><span class="pill solid" data-k="dep-paid">Paid by card · Oct 26, 2:41 PM</span><span class="small muted">Comes off the final invoice</span></div>` }[E.deposit];
   const totals = `<div class="box" data-k="totals"><h3>Totals</h3><div class="kv">
     ${E.view === "int" ? `<dt>Your cost</dt><dd>${money(c)}</dd>` : ""}<dt>${E.approved ? "Approved price" : "Price"}</dt><dd>${money(p)}</dd>
     ${E.view === "int" ? `<dt>Margin</dt><dd>${p ? money(p - c) + " · " + pct(c, p) : "—"}</dd>` : ""}<dt>Sales tax</dt><dd>per settings</dd>
@@ -105,7 +105,7 @@ function sidePanel() {
     ${E.approved ? `<div style="margin-top:12px;display:flex;justify-content:flex-end">${dep}</div>` : ""}</div>`;
   const appr = `<div class="box" data-k="approval-box"><h3>Approval record</h3>${E.approved
     ? `<div class="kv"><dt>Unit 14</dt><dd>Approved</dd><dt>Unit 17</dt><dd>${E.dec17 ? "Declined" : "Approved"}</dd><dt>Approved by</dt><dd>${CONTACT}</dd><dt>How</dt><dd>${E.method}</dd><dt>When</dt><dd>Oct 26, 10:14 AM</dd><dt>Recorded by</dt><dd>Owner</dd></div>`
-    : `<div class="muted small">${E.sent ? "Marked as sent Oct 23. Not approved yet." : "Not sent yet."}</div>`}</div>`;
+    : (E.sent ? `<div class="small" data-k="send-log">${SENDLOG}</div><div class="muted small" style="margin-top:4px">Not approved yet.</div>` : `<div class="muted small">Not sent yet.</div>`)}</div>`;
   return S.compact ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start">${totals}${appr}</div>` : `<div style="display:flex;flex-direction:column;gap:14px">${totals}${appr}</div>`;
 }
 function estimate() {
@@ -115,7 +115,7 @@ function estimate() {
   <div class="head"><div><div class="crumb">Estimates › E-2207</div><h2 style="white-space:nowrap">${E.cust ? "Ridgeline Plumbing &amp; Heating" : "New estimate"}</h2><div class="meta">${E.cust ? `Contact: ${CONTACT}${S.compact ? " · PO 7781" : ""}` : "Nothing sent to the customer yet"}</div></div>
     <div class="btns">${E.cust && E.units.some((x) => x.lines.length) ? `<div class="seg"><button class="${E.view === "int" ? "on" : ""}" data-k="v-int">Your view</button><button class="${E.view === "cust" ? "on" : ""}" data-k="v-cust">Customer view</button></div>` : ""}
     <button class="btn" data-k="pdf" ${E.units.some((x) => x.lines.length) ? "" : "disabled"}>Download PDF</button>
-    ${E.approved ? `<button class="btn primary" data-k="create-job">Create job</button>` : E.sent ? `<button class="btn primary" data-k="record-approval">Record approval</button>` : `<button class="btn primary" data-k="mark-sent" ${E.units.some((x) => x.lines.length) ? "" : "disabled"}>Mark as sent</button>`}</div></div>
+    ${E.approved ? `<button class="btn primary" data-k="create-job">Create job</button>` : E.sent ? `<button class="btn primary" data-k="record-approval">Record approval</button>` : `<button class="btn primary" data-k="email-est" ${E.units.some((x) => x.lines.length) ? "" : "disabled"}>Email estimate</button>`}</div></div>
   <div class="fields" ${S.compact ? "hidden" : ""}>
     <div class="f"><label>Customer</label><div class="input pick ${E.custMenu ? "on" : ""}" data-k="cust-field"><span class="${custName ? "" : "hint"}">${custName || "Choose a customer…"}</span><span class="muted">▾</span></div></div>
     <div class="f"><label>Contact</label><div class="input"><span class="${E.cust ? "" : "hint"}">${E.cust ? CONTACT + " · office manager" : "—"}</span></div></div>
@@ -125,7 +125,8 @@ function estimate() {
   ${E.custMenu ? `<div class="menu" style="left:24px;top:132px;width:330px">${CUSTOMERS.map((c, i) => `<div data-k="cust-${i}"><span>${c}</span></div>`).join("")}</div>` : ""}
   ${E.vehMenu ? `<div class="menu" style="left:24px;top:${vehMenuTop()}px;width:360px"><div class="muted small" style="font-family:var(--mono)">Ridgeline's vehicles</div>${[9, 14, 17, 21].map((u) => `<div data-k="veh-${u}"><span>Unit ${u}</span><span class="muted small">${VEH[u].ymm}</span></div>`).join("")}<div><span>Trailer T-3</span><span class="muted small">2019 Wells Cargo 7×14</span></div></div>` : ""}
   ${E.pkgMenu ? `<div class="menu" style="right:345px;top:${pkgMenuTop()}px;width:290px"><div class="muted small" style="font-family:var(--mono)">Saved packages</div><div data-k="pk-wrap"><span>Full wrap</span><span class="muted small">6 lines</span></div><div><span>Partial wrap</span><span class="muted small">5 lines</span></div><div><span>Door logos (pair)</span><span class="muted small">4 lines</span></div><div><span>DOT lettering</span><span class="muted small">3 lines</span></div></div>` : ""}
-  ${E.modal ? approvalModal() : ""}`;
+  ${E.modal ? approvalModal() : ""}
+  ${E.sendWin ? sendWindow() : ""}`;
   return shell("Estimates", body, "estimates/E-2207");
 }
 // menus are placed under the element that opened them
@@ -137,6 +138,19 @@ function below(k, dy = 6) {
 let _vehTop = 200, _pkgTop = 200;
 const vehMenuTop = () => _vehTop, pkgMenuTop = () => _pkgTop;
 
+const SENDLOG = `Emailed to ${CONTACT} · Oct 23, 3:40 PM · by Owner`;
+function sendWindow() {
+  const total = S.E.units.reduce((a, x) => a + lineSum(x.lines, 4), 0);
+  return `<div class="scrim"><div class="modal" style="width:640px"><h4>Email estimate</h4>
+    <div class="muted small">Estimate E-2207 · filled in from your estimate email template</div>
+    <div class="field"><label>To</label><div class="input">${CONTACT} · office@ridgelineph.com</div></div>
+    <div class="field"><label>CC</label><div class="input"><span class="hint">Optional</span></div></div>
+    <div class="field"><label>Subject</label><div class="input">Estimate E-2207 from OTC Fleet Graphix</div></div>
+    <div class="field" style="align-items:start"><label style="padding-top:6px">Message</label><div class="input" style="line-height:1.5">Hi ${CONTACT},<br><br>Thank you for the chance to quote for Ridgeline Plumbing &amp; Heating. Your estimate E-2207 is attached. The total is ${money(total)}.<br><br>To approve, reply to this email or give us a call.<br><br>OTC Fleet Graphix</div></div>
+    <div class="field"><label>Attachment</label><div><span class="pill">PDF attached · Estimate E-2207.pdf</span></div></div>
+    <div class="field"><label>Replies go to</label><div>Owner's inbox</div></div>
+    <div class="btns"><button class="btn">Cancel</button><button class="btn primary" data-k="send-email">Send</button></div></div></div>`;
+}
 function approvalModal() {
   const E = S.E;
   const seg = (u, dec) => `<div class="seg"><button class="${dec ? "" : "on"}">Approve</button><button class="${dec ? "on" : ""}" data-k="decline-${u}">Decline</button></div>`;
@@ -163,8 +177,8 @@ function custDoc() {
     <div class="small muted">Approve each vehicle separately. Reply or call us to approve.</div></div>`;
 }
 function mailDoc() {
-  return `<div class="doc"><div class="lab">The owner's own email · not sent by the app</div>
-    <div class="mail-head"><span>From</span><span>OTC Fleet Graphix · the owner's mailbox</span><span>To</span><span>${CONTACT} · Ridgeline Plumbing</span><span>Subject</span><span><b>Deposit for estimate E-2207</b></span></div>
+  return `<div class="doc"><div class="lab">Email from OTC Fleet Graphix · only if deposits by card link are added</div>
+    <div class="mail-head"><span>From</span><span>OTC Fleet Graphix</span><span>To</span><span>${CONTACT} · Ridgeline Plumbing</span><span>Subject</span><span><b>Deposit for estimate E-2207</b></span></div>
     <div style="font-size:14.5px;line-height:1.5">Hi Mike,<br>Thanks for approving Unit 14. To get it on the schedule, please pay the deposit below.</div>
     <div class="box"><div class="kv"><dt>Unit 14 · Full wrap</dt><dd>${money(PRICE)}</dd><div class="rule"></div><dt><b>Deposit due</b></dt><dd><b>${money(PRICE / 2)}</b></dd></div></div>
     <div class="paybtn">Pay deposit</div>
@@ -263,11 +277,18 @@ const SCENES = {
   },
 
   async "1.3-title"() { title("Customer approval"); },
-  async "1.3-sent"() {
-    S.E = freshE(); S.E.cust = CUSTOMERS[0]; S.E.units = storyUnits(); S.E.view = "cust"; S.E.sent = true;
+  async "1.3-email"() {
+    S.E = freshE(); S.E.cust = CUSTOMERS[0]; S.E.units = storyUnits(); S.E.view = "cust";
     go("estimate", "owner");
-    await wait(1200);
-    await moveTo("approval-box", 0, -10, 900);
+    await wait(700);
+    await click("email-est", () => (S.E.sendWin = true), 600);
+    await wait(3600);
+    await click("send-email", () => { S.E.sendWin = false; S.E.sent = true; }, 300);
+    toast("Estimate emailed");
+    await moveTo("send-log", 0, -10, 900);
+    await wait(1400);
+  },
+  async "1.3-sent"() {
     await wait(1500);
     await click("record-approval", () => (S.E.modal = true), 600);
   },
@@ -307,7 +328,7 @@ const PICTURES = {
     NOTES = [];
     go("deposit", "owner");
     const r = document.querySelector('[data-k="dep-paid"]').getBoundingClientRect();
-    NOTES = [{ badge: 1, text: "The owner puts the card link in an email from their own mailbox. The deposit comes off the final invoice.", pos: `left:${r.left - 120}px;top:${r.bottom + 60}px;max-width:420px` },
+    NOTES = [{ badge: 1, text: "The card link would go out in an email from OTC Fleet Graphix. The deposit comes off the final invoice.", pos: `left:${r.left - 120}px;top:${r.bottom + 60}px;max-width:420px` },
       { badge: "?", text: "deposits by card link", pos: `left:${r.left - 120}px;top:${r.bottom + 170}px;max-width:420px;font-size:24px` }];
     render();
   },
