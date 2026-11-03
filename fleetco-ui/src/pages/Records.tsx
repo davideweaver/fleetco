@@ -3,6 +3,7 @@ import { invoices, jobs } from "@/data/sample";
 import { useShell } from "@/shell/shell-context";
 import { Btn, DetailHeader, ListDetailLayout, ListHeader, ListRow, Pill } from "@/shell/ListDetailLayout";
 import { Stat } from "./Customers";
+import { EstimateEditor } from "./EstimateEditor";
 import { money } from "@/lib/utils";
 
 export function InvoicesPage() {
@@ -98,26 +99,7 @@ export function EstimatesPage() {
           </div>
         </>
       }
-      detail={
-        selected && (
-          <div>
-            <DetailHeader
-              eyebrow={`Estimate · ${selected.customer}`}
-              title={`${selected.est} · ${selected.what}`}
-              sub="Itemized while you work on it. One line per vehicle on the customer's copy."
-              actions={
-                <>
-                  <Btn>Preview</Btn>
-                  <Btn primary>Record approval</Btn>
-                </>
-              }
-            />
-            <div className="grid place-items-center p-10 text-sm text-muted-foreground">
-              Line editor with saved packages.
-            </div>
-          </div>
-        )
-      }
+      detail={selected && <EstimateEditor estimateId={selected.est} />}
     />
   );
 }

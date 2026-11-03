@@ -155,6 +155,23 @@ access**. "You do not have access to this job" confirms the job exists and leaks
 such job" tells the only person who should care — the one who mistyped — exactly as much as they
 need.
 
+## Dense tables
+
+| Name | Component | Notes |
+|---|---|---|
+| **Cell input** | `CellInput` | Editing inside a table. Transparent until hovered or focused, so the table reads as a table and edits as a form |
+| **Money cell** | `MoneyCell` | Formatted while you read it (`$2,019.00`), raw while you type it (`2019.00`) |
+| **Kind tag** | — | The small outlined label on a component: material, labor, allowance, custom item |
+
+**Dense tables do not use the 40px form control.** A grid of forty bordered boxes is unreadable;
+the border arrives on hover and focus instead. Money columns are always `tnum` and right-aligned —
+an editable cell showing `2019.00` beside a computed one showing `$2,019.00` makes a column stop
+lining up, which is the only thing a money column is for.
+
+**Column priority, not horizontal scroll.** The estimate editor drops Margin below 1280 and Cost
+below 1024, and the approval pill moves under the line name below `@md`. The line name and the
+price never drop — they are what the screen is for.
+
 ## Naming rules
 
 1. **Pane, column, bar, sheet — pick by behaviour, not by looks.**
@@ -178,7 +195,6 @@ built, and that is the moment to add it here rather than later:
 
 - The board's columns and cards (`pane: "wide"`, nothing extracted yet)
 - The calendar's entries and lanes
-- The estimate line editor — customer lines and their components (`EST-002`)
 - The photo gallery and its capture control
 - Toasts and other after-action feedback
 - Confirm-destructive dialogs, which probably want their own variant (`INV-012` voiding,

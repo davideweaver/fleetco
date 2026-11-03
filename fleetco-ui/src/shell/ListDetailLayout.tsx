@@ -52,7 +52,7 @@ export function ListDetailLayout({
 
       <section
         className={cn(
-          "flex min-h-0 flex-1 flex-col",
+          "@container flex min-h-0 flex-1 flex-col",
           !hasSelection && (twoPane ? "hidden lg:flex" : "hidden")
         )}
       >

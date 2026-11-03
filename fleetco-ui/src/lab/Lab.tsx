@@ -20,6 +20,7 @@ const SCREENS = [
   { key: "jobs", label: "Job detail (G-1048)", path: "/app/jobs/G-1048" },
   { key: "board", label: "Job board (wide, no list)", path: "/app/board" },
   { key: "reports", label: "Reports (sections list)", path: "/app/reports/ar-aging" },
+  { key: "estimate", label: "Estimate line editor", path: "/app/estimates/E-1048" },
   { key: "form", label: "Form in a panel (new job)", path: "/app/jobs?overlay=form" },
   { key: "form-errors", label: "Form with errors", path: "/app/jobs?overlay=form-errors" },
   { key: "states", label: "Loading / empty / error / not found", path: "/app/_states" },

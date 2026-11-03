@@ -173,3 +173,85 @@ export function FieldRow({ children }: { children: ReactNode }) {
 export function FormBody({ children }: { children: ReactNode }) {
   return <div className="@container flex flex-col gap-4 p-4 lg:p-5">{children}</div>;
 }
+
+/**
+ * A cell input, for editing inside a dense table. Deliberately not the 40px form control:
+ * a grid of forty bordered boxes is unreadable. It shows as plain text until hovered or
+ * focused, so the table reads as a table and edits as a form.
+ */
+export function CellInput({
+  value,
+  onChange,
+  align = "right",
+  width = "w-20",
+  suffix,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  align?: "left" | "right";
+  width?: string;
+  suffix?: string;
+}) {
+  return (
+    <span className="inline-flex items-center gap-1">
+      <input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className={cn(
+          "tnum h-7 rounded-md border border-transparent bg-transparent px-1.5 text-sm outline-none",
+          "hover:border-border focus-visible:border-ring focus-visible:bg-surface-3 focus-visible:ring-2 focus-visible:ring-ring/30",
+          align === "right" ? "text-right" : "text-left",
+          width
+        )}
+      />
+      {suffix && <span className="text-xs text-muted-foreground">{suffix}</span>}
+    </span>
+  );
+}
+
+/**
+ * Money inside a dense table. Formatted while you read it, raw while you type it: an
+ * editable cell reading `2019.00` beside a computed one reading `$2,019.00` makes a
+ * column of figures stop lining up, which is the only thing a money column is for.
+ */
+export function MoneyCell({
+  valueCents,
+  onChangeCents,
+  width = "w-28",
+}: {
+  valueCents: number;
+  onChangeCents: (cents: number) => void;
+  width?: string;
+}) {
+  const format = (cents: number) =>
+    "$" + (cents / 100).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  const [text, setText] = useState(format(valueCents));
+  const [editing, setEditing] = useState(false);
+
+  return (
+    <input
+      value={text}
+      inputMode="decimal"
+      onFocus={(e) => {
+        setEditing(true);
+        setText((valueCents / 100).toFixed(2));
+        requestAnimationFrame(() => e.target.select());
+      }}
+      onChange={(e) => setText(e.target.value)}
+      onBlur={() => {
+        setEditing(false);
+        const cents = Math.round(Number(text.replace(/[^0-9.]/g, "")) * 100);
+        const next = Number.isFinite(cents) ? cents : valueCents;
+        onChangeCents(next);
+        setText(format(next));
+      }}
+      className={cn(
+        "tnum h-7 rounded-md border border-transparent bg-transparent px-1.5 text-right text-sm outline-none",
+        "hover:border-border focus-visible:border-ring focus-visible:bg-surface-3 focus-visible:ring-2 focus-visible:ring-ring/30",
+        editing && "bg-surface-3",
+        width
+      )}
+    />
+  );
+}

@@ -127,3 +127,81 @@ export const departments = [
   { id: "lancaster", name: "Lancaster shop" },
   { id: "mobile", name: "Mobile" },
 ];
+
+/* --- Estimate lines (EST-002): customer lines, each with internal components. ---------
+   Three lines in three approval states, because AUTH-005 — only authorized lines reach an
+   invoice — is the thing the screen has to make obvious. */
+
+export type ComponentKind = "material" | "custom" | "labor" | "allowance";
+export type Approval = "pending" | "approved" | "declined" | "overridden";
+
+export type LineComponent = {
+  id: string;
+  kind: ComponentKind;
+  item: string;
+  /** Allowances have no quantity at all (EST-006). */
+  qty: number | null;
+  unit: string | null;
+  costCents: number;
+  sellCents: number;
+};
+
+export type EstimateLine = {
+  id: string;
+  name: string;
+  approval: Approval;
+  /** EST-003: when the owner sets a price, it wins and the component sum is kept. */
+  setPriceCents: number | null;
+  how?: string;
+  components: LineComponent[];
+};
+
+export const estimateLines: EstimateLine[] = [
+  {
+    id: "L1",
+    name: "Full wrap · Unit 14",
+    approval: "approved",
+    setPriceCents: null,
+    how: "Approved by Dana Hoff by phone, Oct 28",
+    components: [
+      { id: "c1", kind: "material", item: "Avery MPI 1105 wrap film", qty: 62, unit: "ft", costCents: 310, sellCents: 750 },
+      { id: "c2", kind: "material", item: "Avery DOL 1460Z overlaminate", qty: 62, unit: "ft", costCents: 205, sellCents: 450 },
+      { id: "c3", kind: "allowance", item: "Latex ink", qty: null, unit: null, costCents: 3800, sellCents: 8500 },
+      { id: "c4", kind: "allowance", item: "Install supplies", qty: null, unit: null, costCents: 2200, sellCents: 4500 },
+      { id: "c5", kind: "labor", item: "Design", qty: 4, unit: "hr", costCents: 3500, sellCents: 9500 },
+      { id: "c6", kind: "labor", item: "Installation", qty: 9, unit: "hr", costCents: 2800, sellCents: 8500 },
+    ],
+  },
+  {
+    id: "L2",
+    name: "Hood decal kit",
+    approval: "declined",
+    setPriceCents: null,
+    how: "Declined by Dana Hoff by phone, Oct 28",
+    components: [
+      { id: "c7", kind: "custom", item: "Cut vinyl hood decal (custom item)", qty: 1, unit: "ea", costCents: 4200, sellCents: 11000 },
+      { id: "c8", kind: "labor", item: "Installation", qty: 1.5, unit: "hr", costCents: 2800, sellCents: 8500 },
+    ],
+  },
+  {
+    id: "L3",
+    name: "Rear window perforated",
+    approval: "pending",
+    // EST-003: priced as a package, not by summing. The component total is kept.
+    setPriceCents: 48000,
+    components: [
+      { id: "c9", kind: "material", item: "Perforated window film", qty: 18, unit: "ft", costCents: 420, sellCents: 980 },
+      { id: "c10", kind: "labor", item: "Installation", qty: 2, unit: "hr", costCents: 2800, sellCents: 8500 },
+    ],
+  },
+];
+
+export const componentSum = (l: EstimateLine) =>
+  l.components.reduce((a, c) => a + Math.round((c.qty ?? 1) * c.sellCents), 0);
+export const lineCost = (l: EstimateLine) =>
+  l.components.reduce((a, c) => a + Math.round((c.qty ?? 1) * c.costCents), 0);
+/** EST-003: the set price wins where there is one. */
+export const linePrice = (l: EstimateLine) => l.setPriceCents ?? componentSum(l);
+/** AUTH-005: authorized means approved or overridden. Nothing else bills. */
+export const isAuthorized = (l: EstimateLine) =>
+  l.approval === "approved" || l.approval === "overridden";
