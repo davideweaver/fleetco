@@ -78,6 +78,8 @@ Two consequences worth knowing before changing anything:
   runs.
 - **The back row is not a band.** It is `h-10`, and deliberately so: it only appears on a narrow
   screen, where the list column is hidden and there is nothing for it to line up with.
+- **The rail's logo row has no bottom border.** The band sets the height, which is what does the
+  aligning. A rule under the logo only chops the rail in two.
 
 Before this rule the three headers centred at 28px, 24px and 33px. Retune the single token in the
 visual pass; never hand-pick a height for one header.

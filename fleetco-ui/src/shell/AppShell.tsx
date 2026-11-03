@@ -87,7 +87,9 @@ export function AppShell() {
           >
             <div
               className={cn(
-                "flex h-band shrink-0 items-center border-b",
+                // No border under the logo. The band sets the height, which is what does the
+                // aligning; the rule under it just chopped the rail in two.
+                "flex h-band shrink-0 items-center",
                 railOpen ? "gap-2 px-1" : "w-full justify-center"
               )}
             >
