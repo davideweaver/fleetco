@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Link, Outlet, useLocation, useSearchParams } from "react-router-dom";
 import { Menu, PanelLeftClose, PanelLeftOpen, Search, X } from "lucide-react";
 import { SearchPalette, useSearchHotkey } from "./SearchPalette";
+import { Toaster } from "sonner";
 import { ShellContext, type Variant } from "./shell-context";
 import { ContextCluster } from "./ContextCluster";
 import { GROUP_ORDER, itemForPath, labelFor, navFor, phoneNavFor, type Role } from "@/nav/routes";
@@ -383,6 +384,17 @@ export function AppShell() {
           </div>
         )}
         <SearchPalette open={searchOpen} onClose={() => setSearchOpen(false)} role={role} />
+        {/* Bottom-right on a desktop, top on a phone — the bottom bar owns the bottom. */}
+        <Toaster
+          position="bottom-right"
+          mobileOffset={{ top: 12 }}
+          toastOptions={{
+            classNames: {
+              toast: "!bg-popover !text-popover-foreground !border-border !rounded-xl",
+              description: "!text-muted-foreground",
+            },
+          }}
+        />
       </div>
       </TooltipProvider>
     </ShellContext>

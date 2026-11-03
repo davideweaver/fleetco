@@ -187,6 +187,33 @@ lining up, which is the only thing a money column is for.
 below 1024, and the approval pill moves under the line name below `@md`. The line name and the
 price never drop — they are what the screen is for.
 
+## Board, drag and refusal
+
+| Name | Component | Notes |
+|---|---|---|
+| **Board column** | `Column` in `Board.tsx` | One stage. Columns come from `STAGES` (`JOB-004`), never hardcoded |
+| **Board card** | `Card` | A job. Tapping opens a **panel**; dragging moves the stage |
+| **Drag overlay** | dnd-kit `DragOverlay` | The card follows the pointer; the original dims in place |
+| **Toast** | sonner | After-action feedback. Bottom-right on a desktop, **top** on a phone — the bottom bar owns the bottom |
+
+**Refusing an action is a design problem, and it has a shape.** `JOB-006` says a billable job with
+no authorized line cannot enter Ready for production. Three things happen, in this order:
+
+1. **Before the drop** — a column that will refuse this card goes dashed and dim as soon as the
+   drag starts. The refusal is visible while there is still time to change course.
+2. **On the drop** — the card snaps back. Nothing moves.
+3. **After** — a toast names the job, the stage, and **why**. "Needs an approved line before it can
+   go into production", not "invalid move".
+
+Refusing silently is how a user decides the software is broken. Refusing without a reason is how
+they decide it is stupid.
+
+**No reordering inside a column.** Nothing in the Rules Catalog gives a card a position within a
+stage, and adding one would be inventing a rule rather than implementing one.
+
+**Technicians cannot drag at all** until `ROLE-008` (D-C2) is answered. Read-only is the reversible
+default; granting the permission later breaks nothing, while taking it away would.
+
 ## Naming rules
 
 1. **Pane, column, bar, sheet — pick by behaviour, not by looks.**
@@ -208,10 +235,8 @@ price never drop — they are what the screen is for.
 Parts the design system does not have yet, so they have no agreed name. Each gets one when it is
 built, and that is the moment to add it here rather than later:
 
-- The board's columns and cards (`pane: "wide"`, nothing extracted yet)
 - The calendar's entries and lanes
 - The photo gallery and its capture control
-- Toasts and other after-action feedback
 - Confirm-destructive dialogs, which probably want their own variant (`INV-012` voiding,
   `JOB-011` cancelling)
 - Anything on a customer-facing surface (estimate PDF, invoice PDF, payment page) — that is a

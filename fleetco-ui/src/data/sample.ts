@@ -15,6 +15,10 @@ export type Priority = "Normal" | "High" | "Rush";
 
 export type Job = {
   no: string;
+  /** JOB-002. Internal and warranty jobs are exempt from the JOB-006 scope gate. */
+  billing: "billable" | "internal" | "warranty";
+  /** AUTH-005: has at least one approved or overridden line. Drives JOB-006. */
+  hasAuthorizedScope: boolean;
   customerId: string;
   customer: string;
   what: string;
@@ -58,13 +62,13 @@ export const customers: Customer[] = [
 ];
 
 export const jobs: Job[] = [
-  { no: "G-1052", customerId: "lancaster-kitchen", customer: "Lancaster Kitchen Supply", what: "Box truck logo kit", asset: "Box truck 7", who: "T1", date: "Nov 3", priority: "Normal", stage: 0, valueCents: 118500 },
-  { no: "G-1053", customerId: "conestoga", customer: "Conestoga Tree Care", what: "Bucket truck doors ×3", asset: "Bucket 2", who: "OW", date: "Nov 4", priority: "Normal", stage: 0, valueCents: 64000 },
-  { no: "G-1048", customerId: "ridgeline", customer: "Ridgeline Plumbing & Heating", what: "Unit 14 · full wrap", asset: "Unit 14", who: "T1", date: "Nov 2", priority: "High", stage: 1, valueCents: 201900 },
-  { no: "G-1046", customerId: "brightway", customer: "Brightway Movers", what: "Rear door graphics", asset: "Truck 3", who: "T1", date: "Oct 31", priority: "Normal", stage: 2, valueCents: 48000 },
-  { no: "G-1044", customerId: "keystone", customer: "Keystone Dairy Co-op", what: "Tanker DOT lettering", asset: "Tanker 11", who: "T1", date: "Oct 30", priority: "High", stage: 3, valueCents: 86500 },
-  { no: "G-1043", customerId: "millport", customer: "Millport School District", what: "Shop wall mural", asset: "Bay 2 wall", who: "T1", date: "Oct 29", priority: "Normal", stage: 4, valueCents: 158000 },
-  { no: "G-1041", customerId: "ridgeline", customer: "Ridgeline Plumbing & Heating", what: "Unit 9 · decal refresh", asset: "Unit 9", who: "T1", date: "Oct 27", priority: "Normal", stage: 5, valueCents: 42000 },
+  { no: "G-1052", billing: "billable", hasAuthorizedScope: true, customerId: "lancaster-kitchen", customer: "Lancaster Kitchen Supply", what: "Box truck logo kit", asset: "Box truck 7", who: "T1", date: "Nov 3", priority: "Normal", stage: 0, valueCents: 118500 },
+  { no: "G-1053", billing: "billable", hasAuthorizedScope: false, customerId: "conestoga", customer: "Conestoga Tree Care", what: "Bucket truck doors ×3", asset: "Bucket 2", who: "OW", date: "Nov 4", priority: "Normal", stage: 0, valueCents: 64000 },
+  { no: "G-1048", billing: "billable", hasAuthorizedScope: true, customerId: "ridgeline", customer: "Ridgeline Plumbing & Heating", what: "Unit 14 · full wrap", asset: "Unit 14", who: "T1", date: "Nov 2", priority: "High", stage: 1, valueCents: 201900 },
+  { no: "G-1046", billing: "billable", hasAuthorizedScope: true, customerId: "brightway", customer: "Brightway Movers", what: "Rear door graphics", asset: "Truck 3", who: "T1", date: "Oct 31", priority: "Normal", stage: 2, valueCents: 48000 },
+  { no: "G-1044", billing: "billable", hasAuthorizedScope: true, customerId: "keystone", customer: "Keystone Dairy Co-op", what: "Tanker DOT lettering", asset: "Tanker 11", who: "T1", date: "Oct 30", priority: "High", stage: 3, valueCents: 86500 },
+  { no: "G-1043", billing: "internal", hasAuthorizedScope: false, customerId: "millport", customer: "Millport School District", what: "Shop wall mural", asset: "Bay 2 wall", who: "T1", date: "Oct 29", priority: "Normal", stage: 4, valueCents: 158000 },
+  { no: "G-1041", billing: "billable", hasAuthorizedScope: true, customerId: "ridgeline", customer: "Ridgeline Plumbing & Heating", what: "Unit 9 · decal refresh", asset: "Unit 9", who: "T1", date: "Oct 27", priority: "Normal", stage: 5, valueCents: 42000 },
 ];
 
 export const invoices: Invoice[] = [

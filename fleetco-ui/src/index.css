@@ -227,7 +227,7 @@ body {
 }
 
 /* ---------------------------------------------------------------------------
-   DARK NAV on a light app.
+   DARK NAV on a light app. DECIDED (Dave, 2026-11-03): this is the default, not a mode.
 
    The rail is chrome, not content: a dark rail reads as a frame around the work
    rather than as part of it, and it keeps the brightest surface where the money is.

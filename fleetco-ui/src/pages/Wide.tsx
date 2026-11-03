@@ -2,69 +2,24 @@ import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { jobs, STAGES, type Job } from "@/data/sample";
 import { useShell } from "@/shell/shell-context";
-import { Btn, PageHeader, Pill } from "@/shell/ListDetailLayout";
+import { Btn, PageHeader } from "@/shell/ListDetailLayout";
 import { Overlay } from "@/components/ui/overlay";
+import { BoardPage as Board } from "./Board";
 import { Section, Stat } from "./Customers";
 import { money } from "@/lib/utils";
 
-/**
- * `pane: "wide"` — no second column. Six stages minus a 300px list leaves about
- * 140px per column on an iPad, which is why the board does not get one.
- */
+/** The board plus the panel a card opens. `pane: "wide"` has no detail pane to use. */
 export function BoardPage() {
   const { role } = useShell();
   const [params] = useSearchParams();
   const owner = role === "owner";
-  // The board is `pane: "wide"` — no detail pane to put a job in, which is exactly when
-  // a panel is the right answer. `?overlay=` lets the device lab shoot it open.
   const [picked, setPicked] = useState<Job | null>(
     params.get("overlay") === "panel" ? (jobs.find((j) => j.no === "G-1048") ?? null) : null
   );
-  return (
-    <div className="flex h-full min-h-0 flex-col">
-      <PageHeader title="Job board" count={jobs.length} />
-      <div className="min-h-0 flex-1 overflow-x-auto p-3">
-      <div className="flex h-full min-w-max gap-3">
-        {STAGES.map((stage, i) => {
-          const inStage = jobs.filter((j) => j.stage === i);
-          return (
-            <div key={stage} className="flex w-[240px] shrink-0 flex-col rounded-lg border bg-muted/30">
-              <div className="flex items-center gap-2 border-b px-3 py-2">
-                <span className="truncate text-xs font-semibold uppercase tracking-wide">{stage}</span>
-                <span className="tnum ml-auto rounded-full bg-background px-1.5 text-[11px] text-muted-foreground">
-                  {inStage.length}
-                </span>
-              </div>
-              <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-2">
-                {inStage.map((j) => (
-                  <button
-                    key={j.no}
-                    type="button"
-                    onClick={() => setPicked(j)}
-                    className="rounded-md border bg-surface-3 p-2.5 text-left text-sm hover:border-primary/40"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">{j.no}</span>
-                      {j.priority !== "Normal" && <Pill tone="warn">{j.priority}</Pill>}
-                    </div>
-                    <div className="mt-0.5 truncate text-xs text-muted-foreground">{j.customer}</div>
-                    <div className="mt-1 truncate text-xs">{j.what}</div>
-                    <div className="mt-2 flex items-center gap-2 text-[11px] text-muted-foreground">
-                      <span className="grid size-5 place-items-center rounded-full bg-muted text-[9px] font-semibold">
-                        {j.who}
-                      </span>
-                      <span>{j.date}</span>
-                      {owner && <span className="tnum ml-auto">{money(j.valueCents)}</span>}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-      </div>
 
+  return (
+    <>
+      <Board onPick={setPicked} />
       <Overlay
         kind="panel"
         open={Boolean(picked)}
@@ -106,10 +61,14 @@ export function BoardPage() {
           </div>
         )}
       </Overlay>
-    </div>
+    </>
   );
 }
 
+/**
+ * `pane: "wide"` — no second column. Six stages minus a 300px list leaves about
+ * 140px per column on an iPad, which is why the board does not get one.
+ */
 export function SchedulePage() {
   const days = ["Mon 2", "Tue 3", "Wed 4", "Thu 5", "Fri 6"];
   return (

@@ -19,7 +19,7 @@ function Theme() {
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
     document.documentElement.dataset.palette = palette;
-    document.documentElement.dataset.nav = params.get("nav") ?? "light";
+    document.documentElement.dataset.nav = params.get("nav") ?? "dark";
   }, [dark, palette, params]);
   return null;
 }
