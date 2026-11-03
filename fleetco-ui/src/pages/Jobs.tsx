@@ -5,12 +5,16 @@ import { jobs, STAGES, wrapComponents, wrapPriceCents } from "@/data/sample";
 import { useShell } from "@/shell/shell-context";
 import { Btn, DetailHeader, ListDetailLayout, ListHeader, ListRow, Pill } from "@/shell/ListDetailLayout";
 import { Overlay } from "@/components/ui/overlay";
+import { NewJobPanel } from "./NewJob";
 import { Section, Stat, Td, Th } from "./Customers";
 import { money } from "@/lib/utils";
 
 export function JobsPage() {
   const { id } = useParams();
   const { href, role } = useShell();
+  const [params] = useSearchParams();
+  const overlay = params.get("overlay");
+  const [creating, setCreating] = useState(overlay === "form" || overlay === "form-errors");
   // ROLE-003: a technician sees only their assigned jobs, in the list and by URL.
   const visible = role === "tech" ? jobs.filter((j) => j.who === "T1") : jobs;
   const selected = visible.find((j) => j.no === id);
@@ -25,7 +29,13 @@ export function JobsPage() {
           <ListHeader
             title={role === "tech" ? "My jobs" : "Jobs"}
             count={visible.length}
-            action={role === "owner" ? <Btn primary>New</Btn> : undefined}
+            action={
+              role === "owner" ? (
+                <span onClick={() => setCreating(true)}>
+                  <Btn primary>New</Btn>
+                </span>
+              ) : undefined
+            }
           />
           <div className="min-h-0 flex-1 overflow-y-auto">
             {visible.map((j) => (
@@ -43,6 +53,13 @@ export function JobsPage() {
         </>
       }
       detail={selected && <JobDetail no={selected.no} />}
+      after={
+        <NewJobPanel
+          open={creating}
+          onOpenChange={setCreating}
+          showErrors={overlay === "form-errors"}
+        />
+      }
     />
   );
 }

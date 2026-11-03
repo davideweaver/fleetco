@@ -116,6 +116,45 @@ board card opens a panel; a customer row does not.
 Dialogs go full screen on a phone rather than shrinking, because a centred card on a 390px screen
 is a postage stamp with a keyboard over it.
 
+## Forms
+
+| Name | Component | Notes |
+|---|---|---|
+| **Field** | `Field` | Label, control, and one line of hint **or** error. Never both |
+| **Field row** | `FieldRow` | Two fields on a line where the container is wide enough |
+| **Form body** | `FormBody` | The `@container` wrapper. Forms adapt to the width they are given, so the same form works in a panel and on a page |
+| **Money input** | `MoneyInput` | Parses to integer cents (`PLAT-001`), `$` as an adornment, tabular and right-aligned |
+| **Date input** | `DateInput` | Shop time, `America/New_York`, and the hint says so (`PLAT-003`) |
+
+Three decisions, so no lane re-makes them:
+
+1. **Labels sit above the field.** A label beside the field needs a second layout the moment
+   the form is in a 390px phone or a 26rem panel, and this app puts forms in both.
+2. **Optional is marked, not required.** Nearly every field in a shop system is required, so an
+   asterisk on nine fields in ten is noise that stops being read.
+3. **Controls are 40px tall** — taller than the shadcn default, because the primary device is an
+   iPad on a shop floor and the primary hand may be gloved.
+
+**A form lives in a panel or a page, never a dialog.** Dialogs are for a decision and at most two
+or three fields; anything longer needs somewhere to scroll without fighting a keyboard.
+
+## States
+
+Four of them, and every UI card ships a screenshot of each — factory gate 8.
+
+| Name | Component | The decision inside it |
+|---|---|---|
+| **Loading** | `LoadingRows` | **Skeletons, not a spinner.** A spinner says something is happening; a skeleton says what is about to appear and holds the layout, so nothing jumps when it lands |
+| **Empty** | `EmptyState` | Says what is missing and offers the one action that fixes it |
+| **Error** | `ErrorState` | What failed, plus a retry. **Never the raw error** — a stack trace tells Cam nothing and tells an attacker something |
+| **Not found** | `NotFoundState` | Doubles as "not yours". See below |
+
+**A technician who opens someone else's job gets "no such job", not "you do not have access".**
+`ROLE-003` enforces assignment across lists, the board, the calendar, job records **and direct URL
+access**. "You do not have access to this job" confirms the job exists and leaks its number; "no
+such job" tells the only person who should care — the one who mistyped — exactly as much as they
+need.
+
 ## Naming rules
 
 1. **Pane, column, bar, sheet — pick by behaviour, not by looks.**
@@ -141,7 +180,7 @@ built, and that is the moment to add it here rather than later:
 - The calendar's entries and lanes
 - The estimate line editor — customer lines and their components (`EST-002`)
 - The photo gallery and its capture control
-- Toasts, loading and error states
+- Toasts and other after-action feedback
 - Confirm-destructive dialogs, which probably want their own variant (`INV-012` voiding,
   `JOB-011` cancelling)
 - Anything on a customer-facing surface (estimate PDF, invoice PDF, payment page) — that is a

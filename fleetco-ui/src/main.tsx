@@ -8,6 +8,7 @@ import { JobsPage } from "@/pages/Jobs";
 import { EstimatesPage, InvoicesPage, MaterialsPage } from "@/pages/Records";
 import { SectionsPage } from "@/pages/Sections";
 import { BoardPage, SchedulePage, TimePage } from "@/pages/Wide";
+import { StatesPage } from "@/pages/States";
 import "./index.css";
 
 /** `?theme=` and `?palette=` so the lab can show every combination without a store. */
@@ -42,6 +43,7 @@ createRoot(document.getElementById("root")!).render(
           <Route path="board" element={<BoardPage />} />
           <Route path="schedule" element={<SchedulePage />} />
           <Route path="time" element={<TimePage />} />
+          <Route path="_states" element={<StatesPage />} />
           {sectionRoutes("jobs", <JobsPage />)}
           {sectionRoutes("customers", <CustomersPage />)}
           {sectionRoutes("estimates", <EstimatesPage />)}

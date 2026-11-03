@@ -25,12 +25,15 @@ export function ListDetailLayout({
   hasSelection,
   backTo,
   empty = "Pick one from the list.",
+  after,
 }: {
   list: ReactNode;
   detail?: ReactNode;
   hasSelection: boolean;
   backTo: string;
   empty?: string;
+  /** Overlays owned by this section — a create form, say. */
+  after?: ReactNode;
 }) {
   const { variant, href } = useShell();
   const twoPane = variant === "rail";
@@ -72,6 +75,7 @@ export function ListDetailLayout({
           </div>
         )}
       </section>
+      {after}
     </div>
   );
 }
