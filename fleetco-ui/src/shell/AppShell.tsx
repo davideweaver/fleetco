@@ -81,7 +81,7 @@ export function AppShell() {
         {variant === "rail" ? (
           <nav
             className={cn(
-              "hidden shrink-0 flex-col bg-surface-1 pad:flex",
+              "nav-surface hidden shrink-0 flex-col bg-surface-1 pad:flex",
               railOpen ? "w-52 items-stretch px-2" : "w-14 items-center"
             )}
           >
@@ -235,7 +235,7 @@ export function AppShell() {
             </div>
           </nav>
         ) : (
-          <nav className="hidden w-[232px] shrink-0 flex-col bg-surface-1 pad:flex">
+          <nav className="nav-surface hidden w-[232px] shrink-0 flex-col bg-surface-1 pad:flex">
             <div className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
               <span className="grid size-8 place-items-center rounded-md bg-primary text-[10px] font-bold text-primary-foreground">
                 OTC
@@ -277,7 +277,7 @@ export function AppShell() {
 
         {/* Phone bottom bar. Four items plus More, which opens the full list —
             the VarsityBio pattern, driven off the same route table. */}
-        <nav className="fixed inset-x-0 bottom-0 z-40 bg-surface-1 pb-[env(safe-area-inset-bottom)] pad:hidden">
+        <nav className="nav-surface fixed inset-x-0 bottom-0 z-40 bg-surface-1 pb-[env(safe-area-inset-bottom)] pad:hidden">
           <div className="flex h-16 items-stretch">
             {phoneItems.map((item) => {
               const on = !moreOpen && active?.key === item.key;

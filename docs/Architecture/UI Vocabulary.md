@@ -97,6 +97,21 @@ the front (the detail pane).
 their right edge; the step in tone does that work. Borders stay for **discrete objects** — cards,
 inputs, tables, and the rows inside a list.
 
+### Dark nav
+
+`[data-nav="dark"]` puts a dark rail and bottom bar on an otherwise light app. The rail is chrome,
+not content — a dark frame around the work keeps the brightest surface where the money is.
+
+It is a **scoped token override**, not a pile of `dark:` classes: the rule redefines `--foreground`,
+`--accent`, `--border`, `--brand` and friends on `.nav-surface`, and every utility inside already
+reads those variables, so the nav items, separators, context cluster and its popover all re-skin
+with **no component changes**. That is the token layer earning its keep.
+
+> **The gotcha, and it cost a bug:** custom properties inherit, but a plain `<span>` with no colour
+> class inherits the *computed* colour from `<body>`, resolved against the light `--foreground`
+> before the scope existed. The scope must therefore also set `color: var(--foreground)` on itself.
+> Any future scoped override needs the same line.
+
 ## Overlays
 
 One primitive, `Overlay`, with two presentations. Both are a Radix Dialog underneath, so focus

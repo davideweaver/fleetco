@@ -225,3 +225,61 @@ body {
 .tnum {
   font-variant-numeric: tabular-nums;
 }
+
+/* ---------------------------------------------------------------------------
+   DARK NAV on a light app.
+
+   The rail is chrome, not content: a dark rail reads as a frame around the work
+   rather than as part of it, and it keeps the brightest surface where the money is.
+
+   Implemented as a SCOPED TOKEN OVERRIDE rather than a pile of `dark:` classes. Every
+   utility in the rail already reads these variables, so redefining them on one element
+   re-skins everything inside — the nav items, the separators, the context cluster and
+   its popover — with no component changes at all. That property is the reason the token
+   layer exists.
+   --------------------------------------------------------------------------- */
+[data-nav="dark"] .nav-surface {
+  --surface-1: oklch(0.2 0 0);
+  --foreground: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.68 0 0);
+  --accent: oklch(0.27 0 0);
+  --accent-foreground: oklch(0.97 0 0);
+  --border: oklch(1 0 0 / 14%);
+  --primary: oklch(0.97 0 0);
+  --primary-foreground: oklch(0.2 0 0);
+  --popover: oklch(0.24 0 0);
+  --popover-foreground: oklch(0.97 0 0);
+  --brand: oklch(0.74 0.15 272);
+  --brand-foreground: oklch(0.18 0.02 272);
+  --surface-3: oklch(0.27 0 0);
+
+  /* Re-resolve the inherited colour at the scope boundary. Custom properties inherit,
+     but a plain <span> with no colour class inherits the *computed* colour from <body>,
+     which was resolved against the light --foreground before this scope existed. Without
+     this line any unclassed text in the rail stays dark-on-dark. */
+  color: var(--foreground);
+}
+
+[data-palette="warm"][data-nav="dark"] .nav-surface {
+  --surface-1: oklch(0.21 0.012 65);
+  --foreground: oklch(0.97 0.008 85);
+  --muted-foreground: oklch(0.7 0.016 75);
+  --accent: oklch(0.28 0.014 65);
+  --accent-foreground: oklch(0.97 0.008 85);
+  --border: oklch(1 0 0 / 13%);
+  --primary: oklch(0.97 0.008 85);
+  --primary-foreground: oklch(0.21 0.012 65);
+  --popover: oklch(0.25 0.013 65);
+  --popover-foreground: oklch(0.97 0.008 85);
+  /* The reference's bright yellow finally has somewhere to live in a light app. */
+  --brand: oklch(0.83 0.15 85);
+  --brand-foreground: oklch(0.22 0.02 75);
+  --surface-3: oklch(0.28 0.014 65);
+  color: var(--foreground);
+}
+
+/* In dark theme the whole app is already dark, so the override is a no-op. */
+.dark [data-nav="dark"] .nav-surface,
+[data-nav="dark"].dark .nav-surface {
+  --surface-1: initial;
+}
