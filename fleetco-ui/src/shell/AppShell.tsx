@@ -81,7 +81,7 @@ export function AppShell() {
         {variant === "rail" ? (
           <nav
             className={cn(
-              "hidden shrink-0 flex-col border-r bg-sidebar pad:flex",
+              "hidden shrink-0 flex-col bg-surface-1 pad:flex",
               railOpen ? "w-52 items-stretch px-2" : "w-14 items-center"
             )}
           >
@@ -175,7 +175,7 @@ export function AppShell() {
                             (railOpen ? (
                               <NavBadge badge={badge} placement="inline" />
                             ) : (
-                              <NavBadge badge={badge} placement="overlay" ring="ring-sidebar" />
+                              <NavBadge badge={badge} placement="overlay" ring="ring-surface-1" />
                             ))}
                         </Link>
                       );
@@ -235,7 +235,7 @@ export function AppShell() {
             </div>
           </nav>
         ) : (
-          <nav className="hidden w-[232px] shrink-0 flex-col border-r bg-sidebar pad:flex">
+          <nav className="hidden w-[232px] shrink-0 flex-col bg-surface-1 pad:flex">
             <div className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
               <span className="grid size-8 place-items-center rounded-md bg-primary text-[10px] font-bold text-primary-foreground">
                 OTC
@@ -271,13 +271,13 @@ export function AppShell() {
 
         {/* No top banner. It repeated the section title the list header already shows,
             and cost 56px on every screen. Search moved to the rail and the palette. */}
-        <main className="flex min-w-0 flex-1 flex-col pb-16 pad:pb-0">
+        <main className="flex min-w-0 flex-1 flex-col bg-surface-3 pb-16 pad:pb-0">
           <Outlet />
         </main>
 
         {/* Phone bottom bar. Four items plus More, which opens the full list —
             the VarsityBio pattern, driven off the same route table. */}
-        <nav className="fixed inset-x-0 bottom-0 z-40 border-t bg-background pb-[env(safe-area-inset-bottom)] pad:hidden">
+        <nav className="fixed inset-x-0 bottom-0 z-40 bg-surface-1 pb-[env(safe-area-inset-bottom)] pad:hidden">
           <div className="flex h-16 items-stretch">
             {phoneItems.map((item) => {
               const on = !moreOpen && active?.key === item.key;
@@ -306,7 +306,7 @@ export function AppShell() {
                       <NavBadge
                         badge={badges[item.key]}
                         placement="overlay"
-                        ring="ring-background"
+                        ring="ring-surface-1"
                       />
                     )}
                   </span>
@@ -336,7 +336,7 @@ export function AppShell() {
                 )}
                 {/* A badge behind More would otherwise be invisible until you opened it. */}
                 {!moreOpen && moreBadge && (
-                  <NavBadge badge={moreBadge} placement="overlay" ring="ring-background" />
+                  <NavBadge badge={moreBadge} placement="overlay" ring="ring-surface-1" />
                 )}
               </span>
               <span>More</span>

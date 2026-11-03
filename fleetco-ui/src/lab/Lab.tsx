@@ -32,9 +32,10 @@ export function Lab() {
   const [screen, setScreen] = useState(SCREENS[0]);
   const [scale, setScale] = useState(0.45);
   const [dark, setDark] = useState(false);
+  const [palette, setPalette] = useState<"neutral" | "warm">("warm");
 
   const src = (extra = "") =>
-    `${screen.path}?v=${variant}&role=${role}&rail=${rail}&badges=${badges}${dark ? "&theme=dark" : ""}${extra}`;
+    `${screen.path}?v=${variant}&role=${role}&rail=${rail}&badges=${badges}&palette=${palette}${dark ? "&theme=dark" : ""}${extra}`;
 
   return (
     <div className="flex h-full flex-col bg-neutral-100 text-neutral-900">
@@ -70,6 +71,11 @@ export function Lab() {
             <Seg on={badges === "off"} onClick={() => setBadges("off")}>Off</Seg>
             <Seg on={badges === "quiet"} onClick={() => setBadges("quiet")}>Quiet</Seg>
             <Seg on={badges === "busy"} onClick={() => setBadges("busy")}>Busy</Seg>
+          </Group>
+
+          <Group label="Palette">
+            <Seg on={palette === "neutral"} onClick={() => setPalette("neutral")}>Neutral</Seg>
+            <Seg on={palette === "warm"} onClick={() => setPalette("warm")}>Warm</Seg>
           </Group>
 
           <Group label="Theme">
@@ -121,7 +127,7 @@ export function Lab() {
                 style={{ width: d.w * scale, height: d.h * scale }}
               >
                 <iframe
-                  key={`${d.key}-${variant}-${rail}-${role}-${badges}-${screen.key}-${dark}`}
+                  key={`${d.key}-${variant}-${rail}-${role}-${badges}-${palette}-${screen.key}-${dark}`}
                   title={d.label}
                   src={src()}
                   style={{

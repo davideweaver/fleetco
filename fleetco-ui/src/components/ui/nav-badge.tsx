@@ -13,7 +13,7 @@ const label = (n: number) => (n > 99 ? "99+" : String(n));
 export function NavBadge({
   badge,
   placement,
-  ring = "bg-sidebar",
+  ring = "ring-surface-1",
 }: {
   badge: Badge;
   placement: "overlay" | "inline";
@@ -39,8 +39,8 @@ export function NavBadge({
   return (
     <span
       className={cn(
-        "tnum grid h-4 min-w-4 place-items-center rounded-full px-1 text-[10px] font-semibold leading-none text-white",
-        alert ? "bg-destructive" : "bg-brand",
+        "tnum grid h-4 min-w-4 place-items-center rounded-full px-1 text-[10px] font-semibold leading-none text-brand-foreground",
+        alert ? "bg-destructive text-white" : "bg-brand",
         placement === "overlay" && cn("absolute right-0 top-0 ring-2", ring)
       )}
     >

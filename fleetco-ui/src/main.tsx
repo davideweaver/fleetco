@@ -10,13 +10,15 @@ import { SectionsPage } from "@/pages/Sections";
 import { BoardPage, SchedulePage, TimePage } from "@/pages/Wide";
 import "./index.css";
 
-/** `?theme=dark` so the lab can show both modes without a store. */
+/** `?theme=` and `?palette=` so the lab can show every combination without a store. */
 function Theme() {
   const [params] = useSearchParams();
   const dark = params.get("theme") === "dark";
+  const palette = params.get("palette") ?? "neutral";
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
-  }, [dark]);
+    document.documentElement.dataset.palette = palette;
+  }, [dark, palette]);
   return null;
 }
 

@@ -87,6 +87,16 @@ Two consequences worth knowing before changing anything:
 Before this rule the three headers centred at 28px, 24px and 33px. Retune the single token in the
 visual pass; never hand-pick a height for one header.
 
+## Surfaces
+
+Three tones, `--surface-1/2/3`, named by depth rather than by component so the shell can be
+re-layered without renaming tokens. 1 is furthest back (the rail and the phone's bottom bar), 3 is
+the front (the detail pane).
+
+**Panes are separated by tone, not by a rule.** The rail and the list column have no border on
+their right edge; the step in tone does that work. Borders stay for **discrete objects** — cards,
+inputs, tables, and the rows inside a list.
+
 ## Naming rules
 
 1. **Pane, column, bar, sheet — pick by behaviour, not by looks.**

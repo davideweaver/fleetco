@@ -39,7 +39,7 @@ export function ListDetailLayout({
     <div className="flex h-full min-h-0">
       <aside
         className={cn(
-          "flex min-h-0 w-full flex-col border-r",
+          "flex min-h-0 w-full flex-col bg-surface-2",
           twoPane && "lg:w-[272px] lg:shrink-0 xl:w-[312px]",
           hasSelection && (twoPane ? "hidden lg:flex" : "hidden")
         )}
@@ -165,7 +165,7 @@ export function ListRow({
       to={to}
       aria-current={selected ? "true" : undefined}
       className={cn(
-        "flex items-center gap-3 border-b px-3 py-2.5 text-sm",
+        "flex items-center gap-3 border-b border-border/60 px-3 py-2.5 text-sm",
         selected ? "bg-accent" : "hover:bg-accent/50"
       )}
     >
