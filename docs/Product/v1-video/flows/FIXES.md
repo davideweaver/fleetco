@@ -15,10 +15,16 @@ When a rule and existing text disagree, the rule wins.
 5. **Business name** on anything the customer sees (estimate, invoice, PDF, payment page, email):
    "OTC Fleet Graphix". The owner's top bar shows "OTC Fleet Graphix" (shell() in wire.js does this), not
    "Division: Graphics".
-6. **No built-in email.** The app never sends email. Estimates and invoices: "Download PDF" and
-   "Mark as sent". The invoice PDF includes a pay-by-card link. The owner emails the PDF from their own
-   email. A customer-side email wireframe is fine if it is clearly the owner's own email. Remove any
-   in-app "Send" / "Email estimate" window. Toasts: "PDF downloaded", "Marked as sent".
+6. **Email (updated 2026-11-03, Dave's position A1/G3).** The system emails **invoices and estimates**
+   from one editable template each. Owner clicks "Email invoice" / "Email estimate", which opens a send
+   window: To (customer billing contact), CC (optional), Subject and Message pre-filled from the template
+   with the customer name, document number and amount filled in (editable before sending), "PDF attached"
+   chip, for invoices a "Pay by card link included" line, "Replies go to: owner's inbox", then Cancel and
+   "Send". After sending, a send log line: "Emailed to billing@… · Nov 3, 9:12 AM · by Owner". Toast
+   "Invoice emailed" / "Estimate emailed". The customer's email shows From "OTC Fleet Graphix".
+   **Stays manual:** purchase orders (Download PDF, send from your own email). **Not in V1:** reminders,
+   overdue emails, scheduled sends, per-division templates. The estimate email has **no** approve/decline
+   button (that is open question A3); deposits by card link stay open (A2).
 7. **Deposits are recorded, not collected by link** (collecting by link is open question 4.3).
    "Record deposit" → "Deposit recorded · $1,009.50" (method e.g. "Check"). Never gate Create job on a
    paid deposit. Don't hard-code "50%"; say "Deposit". Only picture 1.4 may show a card deposit link, and
