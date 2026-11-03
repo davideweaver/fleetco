@@ -169,6 +169,10 @@ tr.declined td .strike { text-decoration: line-through; }
 #who { position: fixed; left: 56px; bottom: 44px; z-index: 30; font: 22px var(--hand); background: var(--paper); border: 2px solid var(--ink); border-radius: 4px; padding: 6px 14px; display: flex; gap: 10px; align-items: center; box-shadow: 4px 4px 0 var(--fill-2); }
 #who b { font: 600 12px var(--mono); letter-spacing: .1em; text-transform: uppercase; }
 .toast { position: fixed; left: 50%; bottom: 60px; transform: translateX(-50%); z-index: 45; background: var(--ink); color: var(--paper); padding: 10px 18px; border-radius: 4px; font-size: 15px; animation: rowin .25s ease-out both; }
+/* email send window */
+.chip { display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid var(--ink); border-radius: 3px; padding: 3px 9px; font: 12px var(--mono); }
+.msg { border: 1.5px solid var(--ink-3); border-radius: 3px; padding: 8px 10px; font-size: 13px; line-height: 1.45; }
+.msg .lnk { text-decoration: underline; font-family: var(--mono); font-size: 12px; }
 </style>
 </head>
 <body>
@@ -226,7 +230,7 @@ const S = {
   est: { units: [], film17: 0, custView: false, menu: false, modal: false, declined17: false, approved: false, deposit: false },
   job: { stage: null, review: false, hl: false, lifted: false },
   phone: { view: "list", clocked: false, timer: false, secs: 0, photos: 0, finished: false },
-  inv: "draft",
+  inv: "draft", email: false,
   time: { approved: false },
   div: "graphics",
   out: 0,
@@ -355,11 +359,27 @@ function jobRecord() {
   return shell(T.works, body, "jobs/G-1048");
 }
 
+const BILL_TO = "billing@ridgelineph.com";
+function emailModal() {
+  const bal = money(PRICE / 2);
+  return `<div class="scrim"><div class="modal pop" style="width:640px" data-k="email-modal">
+    <h4>Email invoice OTC-G-0412</h4>
+    <div class="field"><label>To</label><div class="input">${BILL_TO} <span class="small muted">· billing contact</span></div></div>
+    <div class="field"><label>CC</label><div class="input" style="color:var(--ink-3)">Optional</div></div>
+    <div class="field"><label>Subject</label><div class="input">Invoice OTC-G-0412 from OTC Fleet Graphix</div></div>
+    <div class="field" style="align-items:start"><label style="padding-top:8px">Message</label><div class="msg" data-k="email-msg">Hello Ridgeline Plumbing &amp; Heating,<br><br>Your invoice OTC-G-0412 for <strong>${bal}</strong> is attached. You can pay by card here: <span class="lnk">Pay invoice OTC-G-0412</span><br><br>Thank you for your business.<br>OTC Fleet Graphix</div></div>
+    <div class="field"><label></label><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center" data-k="email-chips"><span class="chip">▤ OTC-G-0412.pdf · PDF attached</span><span class="small">Pay by card link included</span></div></div>
+    <div class="field"><label></label><div class="small muted">Replies go to: owner's inbox · Text from the Invoice email template, edit it before sending if needed</div></div>
+    <div class="btns"><button class="btn">Cancel</button><button class="btn primary" data-k="email-send">Send</button></div>
+  </div></div>`;
+}
+
 function invoice() {
   const dep = PRICE / 2, st = S.inv;
   const pill = { draft: `<span class="pill dash">Draft</span>`, sent: `<span class="pill">Sent</span>`, paid: `<span class="pill solid">Paid</span>` }[st];
+  const sendLog = st === "draft" ? `<span class="muted">Not emailed yet</span>` : `<div class="rowin" data-k="sendlog">Emailed to ${BILL_TO} · Nov 3, 9:12 AM · by Owner</div>`;
   const body = `<div class="head"><div><div class="crumb">Invoices › ${st === "draft" ? "Draft" : "OTC-G-0412"}</div><h2>Invoice ${pill}</h2><div class="meta">Created when G-1048 was closed</div></div>
-    <div class="btns"><button class="btn">Edit</button><button class="btn" data-k="dl-pdf">Download PDF</button>${st === "draft" ? `<button class="btn primary" data-k="mark-sent">Mark as sent</button>` : ""}</div></div>
+    <div class="btns"><button class="btn">Edit</button><button class="btn">Download PDF</button>${st === "draft" ? `<button class="btn primary" data-k="email-inv">Email invoice</button>` : ""}</div></div>
     <div class="cols" style="margin-top:0">
       <div class="box" style="padding:18px">
         <div style="display:flex;justify-content:space-between"><div><div class="logo">LOGO</div><div style="font-weight:600;margin-top:6px">OTC Fleet Graphix</div></div><div class="small" style="text-align:right">Bill to<br><strong>Ridgeline Plumbing &amp; Heating</strong><br>Customer PO: 7781</div></div>
@@ -370,9 +390,10 @@ function invoice() {
         <div class="box" style="margin-top:16px;border-style:dashed" data-k="inv-other"><h3>Other unpaid invoices</h3><div class="kv"><dt>OTC-G-0398 · Unit 9 decal refresh · due Nov 26</dt><dd>$420.00</dd><div class="rule"></div><dt><strong>Total of other unpaid invoices</strong></dt><dd><strong>$420.00</strong></dd></div></div>
       </div>
       <div style="display:flex;flex-direction:column;gap:16px">
-        <div class="box"><h3>Payment</h3><div class="small">${st === "draft" ? "Not sent yet. The PDF includes a pay-by-card link." : st === "sent" ? "Marked as sent · the owner emailed the PDF with its pay-by-card link" : `<span class="pill solid">Paid by card</span> Nov 5 · ${money(PRICE - dep)}`}</div></div>
+        <div class="box"><h3>Email</h3><div class="small">${sendLog}</div></div>
+        <div class="box"><h3>Payment</h3><div class="small">${st === "paid" ? `<span class="pill solid">Paid by card</span> Nov 5 · ${money(PRICE - dep)}` : st === "sent" ? "Waiting for payment · the email has a pay-by-card link" : "Not sent yet"}</div></div>
         <div class="box" data-k="qb"><h3>QuickBooks Online</h3><div class="small">${st === "draft" ? "Not sent to QuickBooks yet" : st === "sent" ? "Sent to QuickBooks" : "Invoice and payment sent to QuickBooks"}</div></div>
-      </div></div>`;
+      </div></div>${S.email ? emailModal() : ""}`;
   return shell("Invoices", body, "invoices/" + (st === "draft" ? "draft" : "OTC-G-0412"));
 }
 
@@ -663,21 +684,21 @@ const SCENES = {
   },
 
   async invoice() {
-    S.inv = "draft"; go("invoice", "owner");
-    await wait(800);
-    await moveTo("inv-line", -200, 0, 800); await wait(1300);
-    await moveTo("inv-totals", 0, 30, 800); await wait(1300);
-    await moveTo("inv-other", 0, 0, 800); await wait(1600);
-    await click("dl-pdf", null, 200);
-    toast("PDF downloaded");
-    await wait(1600);
-    await click("mark-sent", () => (S.inv = "sent"), 200);
-    toast("Marked as sent");
-    await wait(2000);
+    S.inv = "draft"; S.email = false; go("invoice", "owner");
+    await wait(700);
+    await moveTo("inv-line", -200, 0, 700); await wait(1000);
+    await moveTo("inv-totals", 0, 30, 700); await wait(1000);
+    await moveTo("inv-other", 0, 0, 700); await wait(1300);
+    await click("email-inv", () => (S.email = true), 900);
+    await moveTo("email-msg", 0, 0, 700); await wait(1100);
+    await moveTo("email-chips", -80, 0, 600); await wait(700);
+    await click("email-send", () => { S.email = false; S.inv = "sent"; }, 200);
+    toast("Invoice emailed");
+    await moveTo("sendlog", 0, 0, 700); await wait(1500);
     S.inv = "paid"; render();
     toast("Payment received · balance $0.00");
-    await moveTo("qb", 0, 0, 900);
-    await wait(1500);
+    await moveTo("qb", 150, 14, 800);
+    await wait(1600);
   },
 
   async time() {

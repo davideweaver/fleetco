@@ -69,6 +69,8 @@ it, gets paid, and closes the books with accounting, without going back to FullB
 **Invoicing and payments**
 - A draft invoice created automatically when a job closes, for Cam to review before it goes out
 - Card payment by link, with invoice balances updating on their own
+- Invoices and estimates emailed from the system, from one editable template each, with the PDF
+  attached and replies going to your inbox. Purchase orders stay download-and-send
 - Each invoice lists that customer's other unpaid invoices
 - Deposits applied against the final invoice
 - A QuickBooks Online connection

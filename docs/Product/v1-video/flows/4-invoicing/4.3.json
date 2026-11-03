@@ -1,7 +1,7 @@
 [
-  {"id": "4.3-title", "text": "This clip shows a customer paying an invoice by card."},
-  {"id": "4.3-send", "text": "The owner downloads the invoice as a PDF. It includes a pay-by-card link. They email it to the customer the way they do today, and mark it sent."},
-  {"id": "4.3-open", "text": "The customer opens the PDF, sees the balance due, and clicks pay by card."},
+  {"id": "4.3-title", "text": "This clip shows the owner emailing an invoice, and the customer paying it by card."},
+  {"id": "4.3-send", "text": "The owner emails the invoice from the system. The message comes from a template they can edit, with the PDF attached and a pay-by-card link. Replies go to the owner's inbox."},
+  {"id": "4.3-open", "text": "The customer gets the email from OTC Fleet Graphix, with the PDF attached. They click pay by card."},
   {"id": "4.3-pay", "text": "A simple payment page takes their card. There is nothing to sign in to."},
   {"id": "4.3-paid", "text": "Back in the app, the invoice is marked paid and the balance is zero. The payment shows on the invoices list too."}
 ]
