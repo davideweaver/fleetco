@@ -14,7 +14,7 @@ thumbs.mkdir(parents=True, exist_ok=True)
 
 # Videos that live in v1-video/ rather than being written straight to media/.
 shutil.copyfile(video_dir / "v1-walkthrough.mp4", media / "overview.mp4")
-shutil.copyfile(video_dir / "doing-the-job.mp4", media / "doing-the-job.mp4")
+shutil.copyfile(video_dir / "doing-the-job.mp4", media / "3.3.mp4")  # card 3.3
 
 
 def duration(path):
