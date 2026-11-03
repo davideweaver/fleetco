@@ -55,7 +55,7 @@ export function ListDetailLayout({
       >
         {hasSelection ? (
           <>
-            <div className={cn("flex h-10 shrink-0 items-center border-b px-3", twoPane && "lg:hidden")}>
+            <div className={cn("flex h-band shrink-0 items-center border-b px-3", twoPane && "lg:hidden")}>
               <Link
                 to={href(backTo)}
                 className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"

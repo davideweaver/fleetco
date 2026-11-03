@@ -67,17 +67,20 @@ grep for the thing they mean. It is the same failure the single route table prev
 ## The band
 
 **Every header at the top of a column is one height**, set by `--spacing-band` and used as
-`h-band`. Three places share it: the rail's logo row, the section header, and the first row of a
-detail header. The result is a single horizontal line running across the rail, the list column and
-the detail pane.
+`h-band`. **No exceptions** — the rail's logo row, the section header, the first row of a detail
+header, and the back row all share it. The result is a single horizontal line running across the
+rail, the list column and the detail pane.
+
+The no-exceptions part is deliberate. A rule with one carve-out is a rule eight parallel lanes will
+get wrong; the back row could have been shorter, since it only appears on a narrow screen where
+there is nothing beside it to line up with, and it is `h-band` anyway because the simpler rule is
+worth more than sixteen pixels of phone height.
 
 Two consequences worth knowing before changing anything:
 
 - **The detail header's actions sit in the band, not beside the title.** That is what makes them
   line up with the section header's button, and it keeps them in one place however long the title
   runs.
-- **The back row is not a band.** It is `h-10`, and deliberately so: it only appears on a narrow
-  screen, where the list column is hidden and there is nothing for it to line up with.
 - **The rail's logo row has no bottom border.** The band sets the height, which is what does the
   aligning. A rule under the logo only chops the rail in two.
 
