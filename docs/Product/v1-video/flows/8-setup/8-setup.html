@@ -30,6 +30,13 @@
 .check.on { background: var(--ink); color: var(--paper); }
 .blank { display: inline-block; min-width: 150px; border: 1.5px dashed var(--ink-3); border-radius: 3px; padding: 3px 9px; color: var(--ink-3); font-family: var(--mono); font-size: 12.5px; }
 .sw td { padding: 11px 10px; vertical-align: middle; }
+/* 8.4 email templates */
+.merge { display: inline-block; border: 1.5px solid var(--ink-2); border-radius: 10px; background: var(--fill); font: 11.5px var(--mono); padding: 0 8px; line-height: 19px; white-space: nowrap; }
+.tpl-item { border: 1.5px solid var(--ink-3); border-radius: 3px; padding: 10px 12px; display: flex; flex-direction: column; gap: 3px; font-size: 14px; }
+.tpl-item.on { border: 2px solid var(--ink); background: var(--fill); }
+.tarea { border: 1.5px solid var(--ink-3); border-radius: 3px; padding: 8px 10px; font-size: 13.5px; line-height: 1.75; }
+.chip { display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid var(--ink); border-radius: 3px; padding: 2px 8px; font: 11.5px var(--mono); }
+.lnk { text-decoration: underline; font-family: var(--mono); font-size: 12px; }
 </style>
 </head>
 <body>
@@ -141,10 +148,46 @@ function switchover() {
   return shell("Settings", body, "plan/moving-off-fullbay");
 }
 
+/* ---------- 8.4 Settings › Email templates ---------- */
+function emailTemplates() {
+  const m = (t) => `<span class="merge">${t}</span>`;
+  const body = `<div class="head"><div><div class="crumb">Settings › Email templates</div><h2>Email templates</h2><div class="meta">The text the system uses when the owner clicks Email invoice or Email estimate</div></div>
+    <div class="btns"><button class="btn">Cancel</button><button class="btn primary">Save template</button></div></div>
+    <div class="cols" style="grid-template-columns:230px 1fr 400px;margin-top:0;align-items:start">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="tpl-item on"><strong>Invoice email</strong><span class="small muted">Edited Oct 28</span></div>
+        <div class="tpl-item"><strong>Estimate email</strong><span class="small muted">Edited Oct 28</span></div>
+        <div class="note" style="margin-top:22px"><span class="badge">1</span><span>One template per email type. Edit any time, no developer needed.</span></div>
+        <div class="note" style="margin-top:14px"><span class="badge">2</span><span>Purchase orders aren't emailed from the system. Download and send as today.</span></div>
+      </div>
+      <div class="box" style="display:flex;flex-direction:column;gap:12px"><h3 style="margin:0">Invoice email</h3>
+        <div class="field"><label>Subject</label><div class="input">Invoice ${m("Invoice number")} from OTC Fleet Graphix</div></div>
+        <div class="field" style="align-items:start"><label style="padding-top:8px">Message</label><div class="tarea">Hello ${m("Customer name")},<br><br>Your invoice ${m("Invoice number")} for ${m("Amount due")} is attached. You can pay by card here: ${m("Pay link")}<br><br>Thank you for your business.</div></div>
+        <div class="field"><label>Insert</label><div style="display:flex;gap:6px;flex-wrap:wrap">${["Customer name", "Invoice number", "Amount due", "Pay link"].map((t) => `<span class="merge">+ ${t}</span>`).join("")}</div></div>
+        <div class="field" style="align-items:start"><label style="padding-top:6px">Signature</label><div class="input" style="line-height:1.5">OTC Fleet Graphix<br><span class="small muted">Lancaster, PA · (717) 555-0142</span></div></div>
+        <div class="field"><label>Logo</label><div style="display:flex;align-items:center;gap:10px"><div class="logo" style="width:120px;height:28px">LOGO</div><span class="small muted">Business logo, shown at the top</span></div></div>
+        <div class="field"><label>Reply-to</label><div class="input">Owner's inbox</div></div>
+        <div class="field"><label>Attached</label><div class="small">PDF of the invoice, every time</div></div>
+      </div>
+      <div class="box" style="background:var(--fill)"><h3>Preview · as the customer sees it</h3>
+        <div style="background:var(--paper);border:1.5px solid var(--ink);border-radius:3px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;font-size:13px;line-height:1.5">
+          <div class="small"><span class="muted">From</span> <strong>OTC Fleet Graphix</strong><br><span class="muted">Subject</span> Invoice OTC-G-0412 from OTC Fleet Graphix</div>
+          <div style="border-top:1px solid var(--fill-2)"></div>
+          <div class="logo" style="width:120px;height:28px">LOGO</div>
+          <div>Hello Ridgeline Plumbing &amp; Heating,<br><br>Your invoice OTC-G-0412 for <strong>${money(PRICE / 2)}</strong> is attached. You can pay by card here: <span class="lnk">pay.otcfleet.com/OTC-G-0412</span><br><br>Thank you for your business.</div>
+          <div>OTC Fleet Graphix<br><span class="small muted">Lancaster, PA · (717) 555-0142</span></div>
+          <div><button class="btn primary">Pay by card</button></div>
+          <div style="border-top:1px solid var(--fill-2);padding-top:8px"><span class="chip">▤ OTC-G-0412.pdf</span></div>
+        </div>
+        <div class="small muted" style="margin-top:8px">Sample: Ridgeline Plumbing &amp; Heating, invoice OTC-G-0412</div></div>
+    </div>`;
+  return shell("Settings", body, "settings/email-templates");
+}
+
 function render() {
   const views = {
     title: () => cardScreen(S.title[0], S.title[1]),
-    settings, devices, switchover,
+    settings, devices, switchover, emailTemplates,
   };
   $("#root").innerHTML = views[S.screen]();
   setWho(S.who);
@@ -172,6 +215,7 @@ const SCENES = {
 const PICTURES = {
   async "8.2"() { go("devices", "owner"); $("#who").innerHTML = `<span class="av">T1</span><span><b>Owner or Technician</b> · any screen</span>`; },
   async "8.3"() { go("switchover", "owner"); },
+  async "8.4"() { go("emailTemplates", "owner"); },
 };
 boot();
 </script>
