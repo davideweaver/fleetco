@@ -100,13 +100,25 @@ function JobDetail({ no }: { no: string }) {
       {
         id: `n${n}`,
         // Tag the first one Completion so the JOB-008 gate can be seen unlocking.
-        tag: all.some((p) => p.tag === "completion" && p.state === "done")
-          ? "progress"
-          : "completion",
+        // Checked against ANY state, not just done: photos are added faster than they
+        // upload, so waiting for one to land tagged the whole batch Completion.
+        tag: all.some((p) => p.tag === "completion") ? "progress" : "completion",
         state: "queued",
       },
     ]);
   };
+
+  /**
+   * Lab: the lifecycle demo adds photos on its own, staggered, so a viewer sees the
+   * queue build up and drain rather than arriving after it already happened.
+   */
+  const demoStarted = useRef(false);
+  useEffect(() => {
+    if (params.get("photos") !== "demo" || demoStarted.current) return;
+    demoStarted.current = true;
+    const timers = [0, 500, 1000, 1500, 2000, 2500].map((ms) => setTimeout(add, ms));
+    return () => timers.forEach(clearTimeout);
+  }, [params]);
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -132,7 +144,7 @@ function JobDetail({ no }: { no: string }) {
             if (left > 0) return { ...p, confirmTicks: left };
             // Lab: a retry always lands, so the recovery path can be walked without
             // fighting the simulator.
-            const failed = !p.retried && Number(p.id.replace(/\D/g, "")) % 3 === 2;
+            const failed = !p.retried && Number(p.id.replace(/\D/g, "")) % 5 === 2;
             return failed
               ? { ...p, state: "failed" as const, sizeKb: 2100 + ((Number(p.id.replace(/\D/g, "")) * 137) % 900) }
               : { ...p, state: "done" as const };
@@ -322,6 +334,8 @@ function JobDetail({ no }: { no: string }) {
 
 /** `?photos=` lets the lab shoot the states that are hard to reach on purpose. */
 function seedPhotos(mode: string | null): Photo[] {
+  // The lifecycle demo starts with nothing, so the whole arc can be watched.
+  if (mode === "demo") return [];
   if (mode === "uploading")
     return [
       { id: "p1", tag: "before", state: "done" },
