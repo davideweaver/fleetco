@@ -171,7 +171,7 @@ function SectionHeader({
   const { openSearch } = useShell();
   return (
     <div className="flex h-band shrink-0 items-center gap-2 border-b px-3">
-      <span className="text-sm font-semibold">{title}</span>
+      <span className="text-base font-bold tracking-tight">{title}</span>
       {count !== undefined && (
         <span className="tnum rounded-full bg-muted px-1.5 py-0.5 text-[11px] text-muted-foreground">
           {count}
