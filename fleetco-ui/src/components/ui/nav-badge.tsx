@@ -26,10 +26,10 @@ export function NavBadge({
       <span
         aria-hidden
         className={cn(
-          "size-2.5 rounded-full",
+          "size-2 rounded-full",
           alert ? "bg-destructive" : "bg-brand",
           // No ring. A count needs one to separate it from the glyph it overlaps; a dot
-          // sits in the corner clear of the icon, and the ring just reads as a border.
+          // sits in the corner clear of the icon, so the ring only read as a border.
           placement === "overlay" && "absolute right-1 top-1"
         )}
       />
