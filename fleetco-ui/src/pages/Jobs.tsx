@@ -80,9 +80,13 @@ function JobDetail({ no }: { no: string }) {
   const added = useRef(0);
 
   const retry = (id: string) =>
-    setPhotos((all) => all.map((p) => (p.id === id ? { ...p, state: "queued" } : p)));
+    setPhotos((all) =>
+      all.map((p) => (p.id === id ? { ...p, state: "queued", retried: true } : p))
+    );
   const retryAll = () =>
-    setPhotos((all) => all.map((p) => (p.state === "failed" ? { ...p, state: "queued" } : p)));
+    setPhotos((all) =>
+      all.map((p) => (p.state === "failed" ? { ...p, state: "queued", retried: true } : p))
+    );
 
   /**
    * Lab-only upload simulator, so the lifecycle can be watched rather than described.
@@ -126,7 +130,9 @@ function JobDetail({ no }: { no: string }) {
           if (p.state === "confirming") {
             const left = (p.confirmTicks ?? 0) - 1;
             if (left > 0) return { ...p, confirmTicks: left };
-            const failed = Number(p.id.replace(/\D/g, "")) % 3 === 2;
+            // Lab: a retry always lands, so the recovery path can be walked without
+            // fighting the simulator.
+            const failed = !p.retried && Number(p.id.replace(/\D/g, "")) % 3 === 2;
             return failed
               ? { ...p, state: "failed" as const, sizeKb: 2100 + ((Number(p.id.replace(/\D/g, "")) * 137) % 900) }
               : { ...p, state: "done" as const };

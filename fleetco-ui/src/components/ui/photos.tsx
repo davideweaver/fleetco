@@ -1,4 +1,4 @@
-import { AlertTriangle, Camera, Check, RotateCw, X } from "lucide-react";
+import { AlertTriangle, Camera, RotateCw, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
@@ -36,6 +36,8 @@ export type Photo = {
   progress?: number;
   /** Lab-only: ticks remaining before `confirming` resolves. Not a real field. */
   confirmTicks?: number;
+  /** Lab-only: a retried photo always succeeds, so the retry path can be walked. */
+  retried?: boolean;
   /** Shown on the tile so a stalled upload is explicable, not mysterious. */
   sizeKb?: number;
 };
@@ -224,11 +226,6 @@ function Tile({
         </button>
       )}
 
-      {photo.state === "done" && photo.tag === "completion" && (
-        <span className="absolute bottom-1 right-1 grid size-4 place-items-center rounded-full bg-brand text-brand-foreground">
-          <Check className="size-2.5" strokeWidth={3} />
-        </span>
-      )}
     </div>
   );
 }
