@@ -645,6 +645,15 @@ effect on everyone, which is why it stays on Summary.
 is running on (weekly, Monday to Sunday) rather than letting a week look like a settled answer,
 the same way a report states an unsettled definition.
 
+**One person's pane is one list — Time records.** Punches and entries together, in day order,
+with the running punch wearing its chip in place. Two lists each ending in a `Correct…` button
+was the same affordance twice, and it separated what needed attention from the record it is part
+of.
+
+> **Merging the lists must not merge the meanings.** A punch is attendance and an entry is job
+> time, and `TIME-001` keeps those apart. So every row states its kind — `Punch · attendance`
+> against a job or activity name — which the two separate lists used to say by position alone.
+
 **On Summary the mark sits on the figure, not in a list.** A punch still running inflates that
 person's payable hours, so an amber dot goes beside *that number* in the roll-up and the row
 clicks through to their entries. A separate "needs you" block on Summary was the same fact told

@@ -233,6 +233,42 @@ function Review() {
   const selectionPayable = shownPunches.reduce((a, p) => a + minutesOf(p), 0);
   const selectionJob = shownEntries.reduce((a, e) => a + minutesOf(e), 0);
 
+  /**
+   * Punches and entries as one chronological list.
+   *
+   * `TIME-001` keeps attendance and job time apart, so the KIND is on every row rather
+   * than implied by which list it sits in. Order is day then clock, because a timesheet
+   * is read against a day.
+   */
+  const records = [
+    ...shownPunches.map((p) => ({
+      key: `p-${p.id}`,
+      label: "Punch · attendance",
+      day: p.day,
+      start: p.in,
+      end: p.out,
+      minutes: minutesOf(p),
+      attention: isLeftRunning(p),
+      corrected: false,
+      onCorrect: () => correctPunch(p),
+    })),
+    ...shownEntries.map((e) => ({
+      key: `e-${e.id}`,
+      label: (e.jobNo ? jobLabel(e.jobNo) : e.activity) ?? "",
+      day: e.day,
+      start: e.start,
+      end: e.end,
+      minutes: minutesOf(e),
+      attention: false,
+      corrected: Boolean(e.correctedFrom),
+      onCorrect: () => correctEntry(e),
+    })),
+  ].sort((a, b) =>
+    a.day === b.day
+      ? a.start - b.start
+      : (DAY_ISO[a.day] ?? "").localeCompare(DAY_ISO[b.day] ?? "")
+  );
+
   const correctPunch = (p: (typeof punches)[number]) =>
     setCorrecting({
       kind: "punch",
@@ -376,34 +412,19 @@ function Review() {
 
           <div className="min-h-0 flex-1 overflow-auto p-3">
             <div className="space-y-3">
-              {who !== "all" && shownPunches.some(isLeftRunning) && (
-                <Section title="Needs you">
-                  <ul className="divide-y">
-                    {shownPunches.filter(isLeftRunning).map((p) => (
-                      <li key={p.id} className="flex flex-wrap items-center gap-3 p-3 text-sm">
-                        <span className="min-w-0 flex-1">
-                          <span className="block">
-                            {nameOf(p.who)} · punch still
-                            running
-                          </span>
-                          <span className="tnum text-xs text-muted-foreground">
-                            {p.day} from {at(p.in)} · {hours(minutesOf(p))} h
-                          </span>
-                        </span>
-                        <LeftRunningChip />
-                        <span onClick={() => correctPunch(p)}>
-                          <Btn>Correct…</Btn>
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </Section>
-              )}
+              {/* Two different answers to "what am I looking at".
 
-              {/* Everyone is a ROLL-UP, not a merged list. Seven people's entries
-                  interleaved by day is a report nobody reads, and the per-person view
-                  already does the detail — so this answers the question Everyone is
-                  actually asked: who worked how much, and does it look right. */}
+                  SUMMARY is a roll-up. Seven people's records interleaved by day is a
+                  report nobody reads, and the per-person view already does detail, so
+                  this answers the question Summary is actually asked: who worked how
+                  much, and does it look right.
+
+                  ONE PERSON gets their punches and entries in a single list. Two lists
+                  each ending in a Correct… button was the same affordance twice, and it
+                  separated what needed attention from the record it belongs to. Every
+                  row states its KIND, though — a punch is attendance and an entry is
+                  job time, and TIME-001 keeps those apart. Merging the lists must not
+                  merge the meanings. */}
               {who === "all" ? (
                 <Section title="Hours by employee">
                   <table className="w-full text-sm">
@@ -476,29 +497,29 @@ function Review() {
                   </table>
                 </Section>
               ) : (
-              <Section title="Entries">
-                {shownEntries.length === 0 ? (
+              <Section title="Time records">
+                {records.length === 0 ? (
                   <p className="p-3 text-sm text-muted-foreground">
-                    No entries in this period.
+                    Nothing in this period.
                   </p>
                 ) : (
                   <ul className="divide-y">
-                    {shownEntries.map((e) => (
-                      <li key={e.id} className="flex flex-wrap items-center gap-3 p-3 text-sm">
+                    {records.map((r) => (
+                      <li
+                        key={r.key}
+                        className="flex flex-wrap items-center gap-3 p-3 text-sm"
+                      >
                         <span className="min-w-0 flex-1">
-                          <span className="block truncate">
-                            {/* The name is redundant once one person is selected. */}
-                            {who === "all" && (
-                              <>{nameOf(e.who)} · </>
-                            )}
-                            {e.jobNo ? jobLabel(e.jobNo) : e.activity}
-                          </span>
+                          <span className="block truncate">{r.label}</span>
                           <span className="tnum text-xs text-muted-foreground">
-                            {e.day} {at(e.start)}–{at(e.end!)} · {hours(minutesOf(e))} h
+                            {r.day} {at(r.start)}
+                            {r.end === null ? " → still running" : `–${at(r.end)}`} ·{" "}
+                            {hours(r.minutes)} h
                           </span>
                         </span>
-                        {e.correctedFrom && <Pill tone="muted">Corrected</Pill>}
-                        <span onClick={() => correctEntry(e)}>
+                        {r.attention && <LeftRunningChip />}
+                        {r.corrected && <Pill tone="muted">Corrected</Pill>}
+                        <span onClick={r.onCorrect}>
                           <Btn>Correct…</Btn>
                         </span>
                       </li>
