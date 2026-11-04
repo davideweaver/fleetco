@@ -53,7 +53,20 @@ export function AppShell() {
   useSearchHotkey(() => setSearchOpen(true));
   const badges = badgesFor(role, (params.get("badges") as BadgeLevel) ?? "quiet");
 
-  const query = `?role=${role}`;
+  // Carry the environment across in-app navigation. Without this, clicking a rail item
+  // dropped every lab setting but `role` and the preview snapped back to defaults.
+  // Screen-scoped params (overlay, photos) are deliberately NOT carried: they belong to
+  // the screen that was opened with them, not to the session.
+  const query = (() => {
+    const keep = ["role", "badges", "palette", "nav", "theme", "entry"];
+    const q = new URLSearchParams();
+    for (const k of keep) {
+      const v = params.get(k);
+      if (v) q.set(k, v);
+    }
+    const s = q.toString();
+    return s ? `?${s}` : "";
+  })();
   const shell = useMemo(
     () => ({
       role,
