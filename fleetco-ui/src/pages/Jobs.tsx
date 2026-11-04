@@ -109,15 +109,16 @@ function JobDetail({ no }: { no: string }) {
   };
 
   /**
-   * Lab: the lifecycle demo adds photos on its own, staggered, so a viewer sees the
-   * queue build up and drain rather than arriving after it already happened.
+   * Lab: the lifecycle demo opens on an empty job and adds ONE photo, so the band can be
+   * watched go queued -> uploading -> confirming -> done without five others competing
+   * for attention. Press Add for more; the third one fails, which is the other path.
    */
   const demoStarted = useRef(false);
   useEffect(() => {
     if (params.get("photos") !== "demo" || demoStarted.current) return;
     demoStarted.current = true;
-    const timers = [0, 500, 1000, 1500, 2000, 2500].map((ms) => setTimeout(add, ms));
-    return () => timers.forEach(clearTimeout);
+    const timer = setTimeout(add, 400);
+    return () => clearTimeout(timer);
   }, [params]);
 
   useEffect(() => {
