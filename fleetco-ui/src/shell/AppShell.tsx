@@ -19,12 +19,9 @@ const RAIL_KEY = "fleetco.railOpen";
  * desktop at 1280px and up: it needs room for a list and a detail beside it, and it needs
  * hover tooltips to replace the labels it drops. Once the user touches the toggle, their
  * choice wins everywhere.
- *
- * `?rail=expanded|collapsed` lets the device lab force a state without touching storage.
  */
-function useRailOpen(override: string | null): [boolean, (v: boolean) => void] {
+function useRailOpen(): [boolean, (v: boolean) => void] {
   const [open, setOpen] = useState(() => {
-    if (override) return override === "expanded";
     const saved = localStorage.getItem(RAIL_KEY);
     if (saved !== null) return saved === "true";
     // Collapsed is only a good default where a tooltip can stand in for the label.
@@ -36,7 +33,7 @@ function useRailOpen(override: string | null): [boolean, (v: boolean) => void] {
 
   const set = (v: boolean) => {
     setOpen(v);
-    if (!override) localStorage.setItem(RAIL_KEY, String(v));
+    localStorage.setItem(RAIL_KEY, String(v));
   };
 
   return [open, set];
@@ -48,7 +45,7 @@ export function AppShell() {
   const role = (params.get("role") as Role) ?? "owner";
   const [moreOpen, setMoreOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [railOpen, setRailOpen] = useRailOpen(params.get("rail"));
+  const [railOpen, setRailOpen] = useRailOpen();
   const hasHover = useHasHover();
   // Tooltips stand in for the labels the collapsed rail drops, so they are only
   // wanted when the rail is collapsed and the device can actually hover.

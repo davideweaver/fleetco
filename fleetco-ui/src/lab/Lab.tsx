@@ -33,7 +33,6 @@ const SCREENS = [
 ];
 
 export function Lab() {
-  const [rail, setRail] = useState<"expanded" | "collapsed">("collapsed");
   const [badges, setBadges] = useState<"off" | "quiet" | "busy">("quiet");
   const [role, setRole] = useState<"owner" | "tech">("owner");
   const [screen, setScreen] = useState(SCREENS[0]);
@@ -47,7 +46,7 @@ export function Lab() {
   const [entry, setEntry] = useState<"fill" | "stripe" | "both">("both");
 
   const src = (extra = "") =>
-    `${screen.path}${screen.path.includes("?") ? "&" : "?"}role=${role}&rail=${rail}&badges=${badges}&palette=${palette}&nav=${nav}&entry=${entry}${dark ? "&theme=dark" : ""}${extra}`;
+    `${screen.path}${screen.path.includes("?") ? "&" : "?"}role=${role}&badges=${badges}&palette=${palette}&nav=${nav}&entry=${entry}${dark ? "&theme=dark" : ""}${extra}`;
 
   return (
     <div className="flex h-full flex-col bg-neutral-100 text-neutral-900">
@@ -61,10 +60,6 @@ export function Lab() {
           </div>
 
 
-          <Group label="Rail">
-            <Seg on={rail === "collapsed"} onClick={() => setRail("collapsed")}>Collapsed</Seg>
-            <Seg on={rail === "expanded"} onClick={() => setRail("expanded")}>Expanded</Seg>
-          </Group>
 
           <Group label="Role">
             <Seg on={role === "owner"} onClick={() => setRole("owner")}>Owner</Seg>
@@ -176,7 +171,7 @@ export function Lab() {
                 style={{ width: d.w * scale, height: d.h * scale }}
               >
                 <iframe
-                  key={`${d.key}-${rail}-${role}-${badges}-${palette}-${nav}-${entry}-${screen.key}-${dark}`}
+                  key={`${d.key}-${role}-${badges}-${palette}-${nav}-${entry}-${screen.key}-${dark}`}
                   title={d.label}
                   src={src()}
                   style={{
