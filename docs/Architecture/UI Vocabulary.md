@@ -263,6 +263,15 @@ is refused, and the toast repeats why.
 **The tag is always legible, never on hover.** It is the thing `JOB-008` reads, and the primary
 device is a phone with no hover at all.
 
+**Two axes on one tile, and they are not the same thing.** The **tag** says what a photo *is* —
+before, progress, completion, condition — and never changes. The **bottom banner** says where it is
+in the upload, and disappears once it lands. A tile reading "Completion / Waiting to upload" is the
+exact case `JOB-008` turns on.
+
+> The completion tag only goes brand-filled once the photo has **arrived**. Amber means "this one
+> counts" everywhere else in the app, and a completion photo still in the queue does not count —
+> colouring it early promises what the gate refuses.
+
 ## Naming rules
 
 1. **Pane, column, bar, sheet — pick by behaviour, not by looks.**

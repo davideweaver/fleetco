@@ -1,4 +1,4 @@
-import { AlertTriangle, Camera, Check, RotateCw, X } from "lucide-react";
+import { AlertTriangle, Camera, Check, Clock, RotateCw, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
@@ -139,11 +139,14 @@ function Tile({
         </div>
       )}
 
-      {/* The tag is the thing JOB-008 reads, so it is always legible, never on hover. */}
+      {/* The tag is the thing JOB-008 reads, so it is always legible, never on hover.
+          It only goes brand-filled once the photo has ARRIVED. Amber means "this one
+          counts" everywhere else in the app, and a completion photo still sitting in the
+          queue does not count — colouring it early promises what the gate refuses. */}
       <span
         className={cn(
           "absolute left-1 top-1 rounded px-1 py-px text-[9px] font-medium uppercase tracking-wide",
-          photo.tag === "completion"
+          photo.tag === "completion" && photo.state === "done"
             ? "bg-brand text-brand-foreground"
             : "bg-surface-3/90 text-muted-foreground"
         )}
@@ -174,8 +177,9 @@ function Tile({
       )}
 
       {photo.state === "queued" && (
-        <span className="absolute inset-x-0 bottom-0 bg-foreground/60 px-1.5 py-0.5 text-center text-[10px] text-background">
-          Waiting
+        <span className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-1 bg-foreground/70 px-1.5 py-1 text-[10px] text-background">
+          <Clock className="size-3" />
+          Waiting to upload
         </span>
       )}
 
