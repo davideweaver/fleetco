@@ -162,7 +162,6 @@ export function Lab() {
               <div className="mb-1.5 flex items-baseline gap-2">
                 <span className="text-xs font-semibold">{d.label}</span>
                 <span className="tnum text-[11px] text-neutral-500">{d.sub}</span>
-                <span className="text-[11px] text-neutral-400">· {screen.note}</span>
                 <a
                   href={src()}
                   target="_blank"
