@@ -57,7 +57,7 @@ grep for the thing they mean. It is the same failure the single route table prev
 
 | Name | Component | Notes |
 |---|---|---|
-| **Chip** | — | The rounded tinted box behind an active icon. The one "you are here" cue, used identically in the rail and the bottom bar |
+| **Chip** | — | The rounded **solid** box behind an active icon, `--nav-active` with a white icon. The one "you are here" cue, used identically in the rail, the bottom bar and the More sheet |
 | **Pill** | `Pill` | A small outlined status label — stage, invoice status, priority |
 | **Stat strip** | `Stat` in a grid | The row of labelled numbers under a detail header |
 | **Detail section** | `Section` | A titled block inside the detail pane, usually wrapping a table |
@@ -307,6 +307,11 @@ exact case `JOB-008` turns on.
 > The completion tag only goes brand-filled once the photo has **arrived**. Amber means "this one
 > counts" everywhere else in the app, and a completion photo still in the queue does not count —
 > colouring it early promises what the gate refuses.
+
+> **`--nav-active` is a separate token from `--brand`, on purpose.** Brand is tuned to be *read* —
+> badge fills, small coloured text — and in the warm palette that is a bright amber. A white icon
+> on bright amber is about 2:1 and illegible. The chip is tuned to be *sat on*, so it is a deeper
+> bronze that carries white at roughly 5:1. One token cannot do both jobs.
 
 ## Naming rules
 

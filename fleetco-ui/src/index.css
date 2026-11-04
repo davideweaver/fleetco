@@ -57,6 +57,12 @@
      this is the one value to swap when the palette is chosen. */
   --brand: oklch(0.52 0.19 272);
   --brand-foreground: oklch(1 0 0);
+
+  /* The active nav chip is solid, so it needs its own pair rather than borrowing
+     --brand. Brand is tuned to be READ (badge fills, small text); this is tuned to be
+     SAT ON by a white icon, which wants more depth than a bright accent has. */
+  --nav-active: oklch(0.5 0.19 272);
+  --nav-active-fg: oklch(1 0 0);
 }
 
 /* ---------------------------------------------------------------------------
@@ -99,6 +105,9 @@
 
   --brand: oklch(0.58 0.13 72);
   --brand-foreground: oklch(0.99 0.005 85);
+  /* Bronze, not the bright amber: white on bright amber is about 2:1 and unreadable. */
+  --nav-active: oklch(0.52 0.12 62);
+  --nav-active-fg: oklch(0.99 0.01 85);
   --font-app: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
 }
 
@@ -132,6 +141,8 @@
   /* Dark is where the reference's bright yellow actually works. */
   --brand: oklch(0.82 0.15 85);
   --brand-foreground: oklch(0.21 0.02 75);
+  --nav-active: oklch(0.54 0.13 62);
+  --nav-active-fg: oklch(0.99 0.01 85);
 }
 
 .dark {
@@ -160,6 +171,8 @@
   --sidebar-border: oklch(1 0 0 / 12%);
   --brand: oklch(0.72 0.15 272);
   --brand-foreground: oklch(0.16 0 0);
+  --nav-active: oklch(0.5 0.19 272);
+  --nav-active-fg: oklch(1 0 0);
   --surface-1: oklch(0.175 0 0);
   --surface-2: oklch(0.205 0 0);
   --surface-3: oklch(0.235 0 0);
@@ -191,6 +204,8 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-brand: var(--brand);
   --color-brand-foreground: var(--brand-foreground);
+  --color-nav-active: var(--nav-active);
+  --color-nav-active-fg: var(--nav-active-fg);
   --color-surface-1: var(--surface-1);
   --color-surface-2: var(--surface-2);
   --color-surface-3: var(--surface-3);
@@ -251,6 +266,8 @@ body {
   --popover-foreground: oklch(0.97 0 0);
   --brand: oklch(0.74 0.15 272);
   --brand-foreground: oklch(0.18 0.02 272);
+  --nav-active: oklch(0.52 0.2 272);
+  --nav-active-fg: oklch(1 0 0);
   --surface-3: oklch(0.27 0 0);
 
   /* Re-resolve the inherited colour at the scope boundary. Custom properties inherit,
@@ -274,6 +291,8 @@ body {
   /* The reference's bright yellow finally has somewhere to live in a light app. */
   --brand: oklch(0.83 0.15 85);
   --brand-foreground: oklch(0.22 0.02 75);
+  --nav-active: oklch(0.56 0.14 62);
+  --nav-active-fg: oklch(0.99 0.01 85);
   --surface-3: oklch(0.28 0.014 65);
   color: var(--foreground);
 }

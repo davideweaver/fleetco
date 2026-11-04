@@ -169,7 +169,7 @@ export function AppShell() {
                             "relative flex items-center rounded-xl transition-colors",
                             railOpen ? "gap-2.5 px-2.5 py-2" : "size-10 justify-center",
                             on
-                              ? "bg-brand/12 text-brand"
+                              ? "bg-nav-active text-nav-active-fg"
                               : "text-muted-foreground hover:bg-accent hover:text-foreground"
                           )}
                         >
@@ -264,7 +264,7 @@ export function AppShell() {
                   style={{ width: `${100 / (phoneItems.length + 1)}%` }}
                   className={cn(
                     "flex flex-col items-center justify-center gap-1 text-[11px]",
-                    on ? "text-brand" : "text-muted-foreground"
+                    on ? "font-medium text-foreground" : "text-muted-foreground"
                   )}
                 >
                   {/* Same tinted chip as the rail, so "where am I" looks identical on
@@ -272,7 +272,7 @@ export function AppShell() {
                   <span
                     className={cn(
                       "relative grid h-8 w-14 place-items-center rounded-xl transition-colors",
-                      on && "bg-brand/12"
+                      on && "bg-nav-active text-nav-active-fg"
                     )}
                   >
                     <item.icon className="size-5" strokeWidth={1.75} />
@@ -294,13 +294,13 @@ export function AppShell() {
               style={{ width: `${100 / (phoneItems.length + 1)}%` }}
               className={cn(
                 "flex flex-col items-center justify-center gap-1 text-[11px]",
-                moreOpen ? "text-brand" : "text-muted-foreground"
+                moreOpen ? "font-medium text-foreground" : "text-muted-foreground"
               )}
             >
               <span
                 className={cn(
                   "relative grid h-8 w-14 place-items-center rounded-xl transition-colors",
-                  moreOpen && "bg-brand/12"
+                  moreOpen && "bg-nav-active text-nav-active-fg"
                 )}
               >
                 {moreOpen ? (
@@ -334,7 +334,7 @@ export function AppShell() {
                     aria-current={on ? "page" : undefined}
                     className={cn(
                       "flex items-center gap-3 rounded-xl px-3 py-3 text-sm",
-                      on ? "bg-brand/12 text-brand" : "hover:bg-accent"
+                      on ? "bg-nav-active text-nav-active-fg" : "hover:bg-accent"
                     )}
                   >
                     <item.icon
