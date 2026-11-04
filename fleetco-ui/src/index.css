@@ -292,8 +292,11 @@ body {
    A one-way loop reads as "starting over", which is the opposite of reassuring when
    someone is watching an upload they already half suspect has failed. */
 @keyframes band-sweep {
-  from { transform: translateX(0%); }
-  to   { transform: translateX(257%); }
+  /* Starts on the RIGHT. The determinate fill before it ran left to right and ended at
+     100%, so the sweep picks up where that motion stopped instead of snapping back to
+     the start — which would read as the upload restarting. */
+  from { transform: translateX(257%); }
+  to   { transform: translateX(0%); }
 }
 
 .band-sweep {

@@ -16,10 +16,14 @@ import { cn } from "@/lib/utils";
  * own failure and everything else stays usable.
  */
 /**
- * Four live states and one terminal one. `queued` is BEFORE the bytes move — forty photos
- * and a handful of parallel uploads means most of them sit here. `confirming` is after
- * the bytes have landed and before the server says it kept them; the client knows no
- * percentage for either, which is why both get a sweep rather than a bar.
+ * Four live states and one terminal one.
+ *
+ *   queued      Before the bytes move. Forty photos and a few parallel uploads means
+ *               most of them sit here. Shown as an EMPTY track — nothing is happening to
+ *               this photo yet, and a moving bar would claim otherwise.
+ *   uploading   Determinate. The only phase that knows how far along it is.
+ *   confirming  Bytes have landed; the server has not said it kept them. No percentage
+ *               exists, so this one sweeps.
  */
 export type PhotoState = "done" | "queued" | "uploading" | "confirming" | "failed";
 export type PhotoTag = "before" | "progress" | "completion" | "condition";
@@ -30,6 +34,8 @@ export type Photo = {
   state: PhotoState;
   /** 0–100, only meaningful while uploading. */
   progress?: number;
+  /** Lab-only: ticks remaining before `confirming` resolves. Not a real field. */
+  confirmTicks?: number;
   /** Shown on the tile so a stalled upload is explicable, not mysterious. */
   sizeKb?: number;
 };
@@ -160,16 +166,7 @@ function Tile({
         {TAG_LABEL[photo.tag]}
       </span>
 
-      {photo.state === "done" && onRemove && (
-        <button
-          type="button"
-          onClick={() => onRemove(photo.id)}
-          aria-label="Remove photo"
-          className="absolute right-1 top-1 grid size-5 place-items-center rounded-full bg-foreground/60 text-background"
-        >
-          <X className="size-3" />
-        </button>
-      )}
+
 
       {/* One band, one height, and always a bar — never a bar that turns into words.
           The tile goes queued -> uploading -> confirming without the status changing
@@ -179,12 +176,15 @@ function Tile({
         photo.state === "confirming") && (
         <div className="absolute inset-x-0 bottom-0 flex h-5 items-center bg-foreground/70 px-1.5">
           <div className="h-1 w-full overflow-hidden rounded-full bg-background/30">
-            {photo.state === "uploading" ? (
+            {/* queued: an EMPTY track. Nothing is happening to this photo yet, and a
+                moving bar would say otherwise. The track alone says "in the queue". */}
+            {photo.state === "uploading" && (
               <div
                 className="h-full rounded-full bg-background transition-all"
                 style={{ width: `${photo.progress ?? 0}%` }}
               />
-            ) : (
+            )}
+            {photo.state === "confirming" && (
               <div className="band-sweep h-full w-[28%] rounded-full bg-background/80" />
             )}
           </div>
@@ -204,6 +204,23 @@ function Tile({
               <span className="block text-[9px] opacity-70">{photo.sizeKb} KB</span>
             )}
           </span>
+        </button>
+      )}
+
+      {/* Discard. Rendered last so it sits above the full-tile retry target, and present
+          on a failed tile as well as a landed one: retrying nine failures on bad wifi is
+          only sensible if the three you no longer want can leave the queue. */}
+      {(photo.state === "done" || failed) && onRemove && (
+        <button
+          type="button"
+          onClick={() => onRemove(photo.id)}
+          aria-label={failed ? "Discard this photo" : "Remove photo"}
+          className={cn(
+            "absolute right-1 top-1 z-10 grid size-5 place-items-center rounded-full text-background",
+            failed ? "bg-destructive" : "bg-foreground/60"
+          )}
+        >
+          <X className="size-3" />
         </button>
       )}
 

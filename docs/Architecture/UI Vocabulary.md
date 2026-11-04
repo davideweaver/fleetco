@@ -260,14 +260,33 @@ exactly the moment the user already suspects the upload failed.
 
 | State | Band | Why |
 |---|---|---|
-| `queued` | Indeterminate sweep | Before the bytes move. With forty photos and a few parallel uploads, most sit here |
+| `queued` | **Empty track** | Before the bytes move. Nothing is happening to this photo yet, and a moving bar would claim otherwise |
 | `uploading` | Determinate fill | The one phase that knows how far along it is |
 | `confirming` | Indeterminate sweep | Bytes have landed; the server has not said it kept them yet. No percentage exists |
 | `done` / `failed` | No band | The tag and the retry overlay carry it |
 
-The sweep runs **back and forth** (`alternate`), not left-to-right on a loop. A one-way loop reads
-as "starting over", which is the wrong message for someone watching an upload they half believe has
-already failed. It collapses to a static dimmed bar under `prefers-reduced-motion`.
+The sweep runs **back and forth** (`alternate`), not left-to-right on a loop, and **starts on the
+right** — the determinate fill before it ended at 100%, so the sweep carries that motion on instead
+of snapping back to the start, which would read as the upload restarting. It collapses to a static
+dimmed bar under `prefers-reduced-motion`.
+
+**A failed tile can be discarded, not only retried.** Retrying nine failures on bad wifi is only
+sensible if the three you no longer want can leave the queue.
+
+### Open: who sets the tag
+
+`JOB-008` requires "at least one photo tagged as a completion photo" but **nothing says how a photo
+gets its tag.** The lab assigns it in the simulator, which is scaffolding, not a design. Three
+candidates, in order of how well they survive a technician with forty photos:
+
+1. **Context sets the default, and the finish flow confirms** *(recommended)*. Photos added from
+   the job record default to Progress; "Mark work finished" asks which are completion photos. One
+   decision over a batch, taken at the moment the tag actually matters.
+2. **Bulk re-tag** — select tiles, apply a tag. Needed anyway as a correction path.
+3. **Ask at capture** — a tag picker on every photo. Nobody will do this forty times.
+
+Needs confirming with Cam, and it is adjacent to **D-C9** (`JOB-017`, checklist items undefined),
+since condition photos belong to the checklists.
 
 **A failed upload is not an error state for the screen.** `ErrorState` would blank the gallery and
 hide the photos that did land. The tile carries the failure; everything else stays usable.

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { ChevronDown, ChevronRight, Camera, Play } from "lucide-react";
 import { jobs, STAGES, wrapComponents, wrapPriceCents } from "@/data/sample";
@@ -77,14 +77,66 @@ function JobDetail({ no }: { no: string }) {
   const [photos, setPhotos] = useState<Photo[]>(() => seedPhotos(params.get("photos")));
   const canFinish = hasUploadedCompletionPhoto(photos);
 
+  const added = useRef(0);
+
   const retry = (id: string) =>
-    setPhotos((all) =>
-      all.map((p) => (p.id === id ? { ...p, state: "uploading", progress: 40 } : p))
-    );
+    setPhotos((all) => all.map((p) => (p.id === id ? { ...p, state: "queued" } : p)));
   const retryAll = () =>
-    setPhotos((all) =>
-      all.map((p) => (p.state === "failed" ? { ...p, state: "uploading", progress: 15 } : p))
-    );
+    setPhotos((all) => all.map((p) => (p.state === "failed" ? { ...p, state: "queued" } : p)));
+
+  /**
+   * Lab-only upload simulator, so the lifecycle can be watched rather than described.
+   * Two at a time, so the queue visibly drains; every third photo fails, so the failure
+   * path shows up without waiting on luck.
+   */
+  const add = () => {
+    const n = added.current++;
+    setPhotos((all) => [
+      ...all,
+      {
+        id: `n${n}`,
+        // Tag the first one Completion so the JOB-008 gate can be seen unlocking.
+        tag: all.some((p) => p.tag === "completion" && p.state === "done")
+          ? "progress"
+          : "completion",
+        state: "queued",
+      },
+    ]);
+  };
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setPhotos((all) => {
+        const active = all.filter(
+          (p) => p.state === "uploading" || p.state === "confirming"
+        ).length;
+        let slots = Math.max(0, 2 - active);
+
+        return all.map((p) => {
+          if (p.state === "queued" && slots > 0) {
+            slots -= 1;
+            return { ...p, state: "uploading" as const, progress: 0 };
+          }
+          if (p.state === "uploading") {
+            const next = (p.progress ?? 0) + 9 + Math.random() * 9;
+            return next >= 100
+              ? { ...p, state: "confirming" as const, progress: 100, confirmTicks: 5 }
+              : { ...p, progress: next };
+          }
+          if (p.state === "confirming") {
+            const left = (p.confirmTicks ?? 0) - 1;
+            if (left > 0) return { ...p, confirmTicks: left };
+            const failed = Number(p.id.replace(/\D/g, "")) % 3 === 2;
+            return failed
+              ? { ...p, state: "failed" as const, sizeKb: 2100 + ((Number(p.id.replace(/\D/g, "")) * 137) % 900) }
+              : { ...p, state: "done" as const };
+          }
+          return p;
+        });
+      });
+    }, 180);
+    return () => clearInterval(id);
+  }, []);
 
   return (
     <div>
@@ -190,7 +242,7 @@ function JobDetail({ no }: { no: string }) {
           onRetry={retry}
           onRetryAll={retryAll}
           onRemove={(id) => setPhotos((all) => all.filter((p) => p.id !== id))}
-          onAdd={() => {}}
+          onAdd={add}
         />
       </Section>
 
