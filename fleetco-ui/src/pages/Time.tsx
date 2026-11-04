@@ -5,6 +5,7 @@ import { useShell } from "@/shell/shell-context";
 import { Btn, FilterChip, PageHeader, Pill } from "@/shell/ListDetailLayout";
 import { PunchClock, useTimeClock, LeftRunningChip, FlaggedPill } from "@/components/ui/timer";
 import { ConfirmWithReason } from "@/components/ui/confirm";
+import { CorrectTimeDialog } from "@/components/ui/correct-time";
 import { Section } from "./Customers";
 import { DateRangePicker, type DateRange } from "@/components/ui/date-picker";
 import { attentionMap } from "@/nav/attention";
@@ -160,7 +161,17 @@ function MyDay() {
  */
 function Review() {
   const [approved, setApproved] = useState(false);
-  const [correcting, setCorrecting] = useState<string | null>(null);
+  const [correcting, setCorrecting] = useState<
+    | { kind: "punch" | "entry"; id: string; what: string; when: string; start: number; end: number | null }
+    | null
+  >(null);
+  /**
+   * Bumped after a correction so the derivation re-runs. The sample arrays stand in for
+   * the server here and are edited in place, which keeps `attentionMap` the single
+   * source: the flag clears, the row leaves "needs you", and the rail badge drops by
+   * one — all from the same call, with nothing held in a second place to go stale.
+   */
+  const [, bump] = useState(0);
   const [who, setWho] = useState<string | "all">("all");
   const [onlyAttention, setOnlyAttention] = useState(false);
   const [period, setPeriod] = useState<DateRange>({
@@ -362,7 +373,18 @@ function Review() {
                     </span>
                   </span>
                   <LeftRunningChip />
-                  <span onClick={() => setCorrecting(p.id)}>
+                  <span
+                    onClick={() =>
+                      setCorrecting({
+                        kind: "punch",
+                        id: p.id,
+                        what: `${employees.find((e) => e.id === p.who)?.name} · punch`,
+                        when: p.day,
+                        start: p.in,
+                        end: p.out,
+                      })
+                    }
+                  >
                     <Btn>Correct…</Btn>
                   </span>
                 </li>
@@ -384,7 +406,20 @@ function Review() {
                       </span>
                     </span>
                     <FlaggedPill />
-                    <span onClick={() => setCorrecting(e.id)}>
+                    <span
+                      onClick={() =>
+                        setCorrecting({
+                          kind: "entry",
+                          id: e.id,
+                          what: `${employees.find((x) => x.id === e.who)?.name} · ${
+                            e.jobNo ? jobLabel(e.jobNo) : e.activity
+                          }`,
+                          when: e.day,
+                          start: e.start,
+                          end: e.end,
+                        })
+                      }
+                    >
                       <Btn>Correct…</Btn>
                     </span>
                   </li>
@@ -440,21 +475,50 @@ function Review() {
         </div>
       </div>
 
-      <ConfirmWithReason
-        open={correcting !== null}
-        onOpenChange={(v) => !v && setCorrecting(null)}
-        title="Correct this entry"
-        consequence="The original is kept beside your change. Both stay on the record."
-        reasonLabel="Why are you changing it?"
-        tone="warning"
-        confirmLabel="Save correction"
-        onConfirm={(reason) => {
-          toast.success("Correction saved", { description: reason });
-          setCorrecting(null);
-        }}
-      />
+      {correcting && (
+        <CorrectTimeDialog
+          open
+          onOpenChange={(v) => !v && setCorrecting(null)}
+          what={correcting.what}
+          when={correcting.when}
+          start={correcting.start}
+          end={correcting.end}
+          endRequired={correcting.end === null}
+          onSave={({ start, end, reason }) => {
+            // TIME-008: the original is kept, never overwritten — the same
+            // supersede shape as an approval correction (AUTH-003).
+            if (correcting.kind === "punch") {
+              const p = punches.find((x) => x.id === correcting.id)!;
+              const before = { start: p.in, end: p.out ?? end, reason, by: "Cam" };
+              p.in = start;
+              p.out = end;
+              seedEntries.push({
+                id: `${p.id}-c`,
+                who: p.who,
+                day: p.day,
+                jobNo: null,
+                activity: "Punch correction",
+                start,
+                end,
+                correctedFrom: before,
+              });
+            } else {
+              const e = seedEntries.find((x) => x.id === correcting.id)!;
+              e.correctedFrom = { start: e.start, end: e.end ?? end, reason, by: "Cam" };
+              e.start = start;
+              e.end = end;
+              // Resolving it is the point: the flag is the ASK, and the correction is
+              // the answer. Leaving it flagged would badge the rail forever.
+              e.flagged = undefined;
+            }
+            bump((n) => n + 1);
+            toast.success("Correction saved", {
+              description: `${at(start)}–${at(end)} · ${hours(end - start)} h. The original is kept.`,
+            });
+            setCorrecting(null);
+          }}
+        />
+      )}
     </div>
   );
 }
-
-export { DAYS };

@@ -584,9 +584,31 @@ from the time screen must obey the same rules — and cannot, if each screen imp
 
 ### Corrections and the lock
 
-`TIME-008`: a technician **cannot edit their own time**, even their own. They *ask for a
-correction*; the Owner makes it with a required reason, and **both values are kept** — struck
-original, new value, reason, who. The same supersede-don't-overwrite shape as `AUTH-003`.
+`TIME-008` has three parts and all three are load-bearing:
+
+1. A technician **cannot edit their own time**. They *ask for a correction* — a reason, nothing
+   else, because they are raising a question, not answering one.
+2. A user with `time.correct` (Owner in V1) **changes the entry** — the actual numbers — with a
+   **required reason**.
+3. **Both values are kept**: struck original, new value, reason, who. The same
+   supersede-don't-overwrite shape as `AUTH-003`.
+
+So there are **two dialogs, and the difference is the point**. The technician's is a reason box.
+The Owner's has the clock fields, because a reason without an edit resolves nothing.
+
+> **Attention is only legitimate if the screen can clear it.** An earlier version of the Owner's
+> dialog captured a reason but never let anyone touch the times, so a flagged entry stayed
+> flagged and the rail badge could never go down. That is the dead end the whole mechanism
+> exists to prevent, arrived at from the other direction: not a badge with no rows, but rows
+> with no resolution. **Before badging anything, check that some screen can act on it.**
+
+Saving a correction clears the flag, drops the row out of "needs you" and takes the rail badge
+down by one — all from the same `attentionMap` call, with nothing cached in a second place to
+go stale.
+
+Clocks are **typed, not picked**. A correction is "he actually left at 16:00", which is four
+keystrokes; a picker would be slower than the thing it replaces. An end before the start is
+refused with the reason — overnight work is two days, not one negative entry.
 
 `TIME-013` is **attention**: a punch running past twelve hours is derivable, needs a person, and
 is never stopped automatically — so it bubbles to the rail badge like any other. Elapsed time
