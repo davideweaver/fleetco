@@ -56,16 +56,32 @@ export function RecordAnswerDialog({
   const [contact, setContact] = useState("");
   const [method, setMethod] = useState<ApprovalMethod | "">("");
   const [reason, setReason] = useState("");
-  const [kind, setKind] = useState<"approved" | "declined" | "override">("approved");
+  /**
+   * NO default outcome. The lines are all ticked, which AUTH-001 blesses as "approve
+   * all" — but a pre-selected Approved on top of that makes "approve everything the
+   * customer was offered" the one-click path through the dialog. On a three-line estimate
+   * where they agreed to two and refused one, that is the error this record exists to
+   * prevent. Same reasoning as the method field: it is evidence, so it is chosen.
+   */
+  const [kind, setKind] = useState<"approved" | "declined" | "override" | null>(null);
 
   const override = kind === "override";
-  const ready = override
-    ? picked.size > 0 && reason.trim().length > 0
-    : picked.size > 0 && contact.trim().length > 0 && Boolean(method);
+  const ready =
+    kind === null
+      ? false
+      : override
+        ? picked.size > 0 && reason.trim().length > 0
+        : picked.size > 0 && contact.trim().length > 0 && Boolean(method);
   const total = lines.filter((l) => picked.has(l.id)).reduce((a, l) => a + l.priceCents, 0);
 
   const label =
-    kind === "approved" ? "Record approval" : kind === "declined" ? "Record decline" : "Override";
+    kind === "approved"
+      ? "Record approval"
+      : kind === "declined"
+        ? "Record decline"
+        : kind === "override"
+          ? "Override"
+          : "Record";
 
   return (
     <Overlay
@@ -74,7 +90,7 @@ export function RecordAnswerDialog({
       onOpenChange={(v) => {
         if (!v) {
           setReason("");
-          setKind("approved");
+          setKind(null);
         }
         onOpenChange(v);
       }}
@@ -87,6 +103,7 @@ export function RecordAnswerDialog({
             type="button"
             disabled={!ready}
             onClick={() => {
+              if (kind === null) return;
               onRecord([...picked], {
                 kind,
                 contact: override ? undefined : contact.trim(),
@@ -164,9 +181,10 @@ export function RecordAnswerDialog({
           )}
         </div>
 
-        {/* Three peers. The outcome is picked once, up front, and the form below follows
-            it — so the override is as findable as the other two. The restraint on it is
-            the required reason and the consequence panel, not a harder path to reach it. */}
+        {/* Three peers, none pre-selected. The form below follows the choice, so until
+            one is made there is nothing to fill in — which is the point: picking the
+            outcome is the first deliberate act, not a correction of a guess. */}
+        <div className="text-sm font-medium">What did the customer say?</div>
         <div className="flex gap-2">
           <Choice on={kind === "approved"} onClick={() => setKind("approved")} tone="good">
             <Check className="size-4" /> They approved
@@ -179,7 +197,7 @@ export function RecordAnswerDialog({
           </Choice>
         </div>
 
-        {override ? (
+        {kind === null ? null : override ? (
           <div className="space-y-3 rounded-lg border border-warning/40 bg-warning/5 p-3">
             <div className="flex items-start gap-2 text-sm">
               <ShieldAlert className="mt-0.5 size-4 shrink-0 text-warning" />

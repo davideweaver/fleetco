@@ -361,9 +361,17 @@ when they did not.
 it into two dialogs made one task look like two, and left the override harder to find than
 it should be.
 
-**Three peer buttons — Approved, Declined, Override — and the form follows the choice.**
-Picking Override swaps it: the consequence panel appears, contact and method go away, a
-reason becomes required, and the confirm button turns to the warning treatment.
+**Three peer buttons — Approved, Declined, Override — none pre-selected, and the form
+follows the choice.** Until one is picked there is nothing to fill in. Picking Override
+swaps it again: the consequence panel appears, contact and method go away, a reason
+becomes required, and the confirm button turns to the warning treatment.
+
+> **No default outcome, for the same reason the method field has none.** The lines arrive
+> all ticked — `AUTH-001` blesses "approve all" — so a pre-selected *Approved* on top of
+> that would make **"approve everything the customer was offered"** the one-click path.
+> On a three-line estimate where they agreed to two and refused one, that is the exact
+> error the record exists to prevent. Picking the outcome is the first deliberate act,
+> not a correction of a guess.
 
 > The restraint on an override is the **required reason and the stated consequence**, not a
 > harder path to reach it. Hiding it only teaches people to hunt for it, and the third
