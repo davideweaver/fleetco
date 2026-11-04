@@ -617,6 +617,14 @@ their entries on the right.
 > Marco — the same misreading the period-wide blocking count already exists to prevent. The left
 > pane is the only place that means "everyone", so that is where it goes.
 
+**Everyone is a roll-up, not a merged list.** Selecting Everyone shows hours by employee with
+the period's totals — not every person's entries interleaved by day, which is a report nobody
+reads. The per-person view already does detail; Everyone answers the question it is actually
+asked, which is *who worked how much, and does that look right*. Each name links through.
+
+Everyone carries a **lead icon** like the people below it. Without one its title hangs 44px
+left of the names and the column reads as two lists rather than one.
+
 The employee rows **absorb the summary table** that used to sit above the entries. A row already
 has to show a name, payable hours and whether anything needs doing — that *is* the summary, and
 keeping a separate table meant two places to read the same three numbers.

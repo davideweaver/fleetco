@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
-import { Check, Lock } from "lucide-react";
+import { Link, useParams } from "react-router-dom";
+import { Check, Lock, Users } from "lucide-react";
 import { toast } from "sonner";
 import { useShell } from "@/shell/shell-context";
 import {
@@ -243,6 +243,14 @@ function Review() {
             <ListRow
               to={href("/app/time")}
               selected={who === "all"}
+              /* A lead of its own, so every title in the column starts at the same x.
+                 Without it "Everyone" hangs 44px left of the names under it and the
+                 column reads as two lists. */
+              lead={
+                <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-muted text-muted-foreground">
+                  <Users className="size-4" />
+                </span>
+              }
               title="Everyone"
               subtitle={`${employees.length} people`}
               meta={`${hours(totals.payable)} h`}
@@ -349,7 +357,66 @@ function Review() {
                 </Section>
               )}
 
-              <Section title={who === "all" ? "All entries" : "Entries"}>
+              {/* Everyone is a ROLL-UP, not a merged list. Seven people's entries
+                  interleaved by day is a report nobody reads, and the per-person view
+                  already does the detail — so this answers the question Everyone is
+                  actually asked: who worked how much, and does it look right. */}
+              {who === "all" ? (
+                <Section title="Hours by employee">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b text-left text-xs text-muted-foreground">
+                        <th className="px-3 py-2 font-medium">Employee</th>
+                        <th className="px-3 py-2 text-right font-medium">Payable</th>
+                        <th className="px-3 py-2 text-right font-medium">On jobs</th>
+                        <th className="px-3 py-2 text-right font-medium">Entries</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {employees.map((emp) => {
+                        const s = forEmployee(emp.id);
+                        const n = periodEntries.filter((e) => e.who === emp.id).length;
+                        return (
+                          <tr key={emp.id} className="border-b last:border-0">
+                            <td className="px-3 py-2">
+                              <Link
+                                to={href(`/app/time/${emp.id}`)}
+                                className="underline-offset-2 hover:underline"
+                              >
+                                {emp.name}
+                              </Link>
+                            </td>
+                            <td className="tnum px-3 py-2 text-right font-medium">
+                              {hours(s.payable)} h
+                            </td>
+                            <td className="tnum px-3 py-2 text-right text-muted-foreground">
+                              {hours(s.job)} h
+                            </td>
+                            <td className="tnum px-3 py-2 text-right text-muted-foreground">
+                              {n}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                    {/* TIME-006 again, at the only place a grand total would be
+                        tempting. Two columns, two totals, no sum across them. */}
+                    <tfoot>
+                      <tr className="border-t-2 font-semibold">
+                        <td className="px-3 py-2">Payroll takes this column →</td>
+                        <td className="tnum px-3 py-2 text-right">
+                          {hours(totals.payable)} h
+                        </td>
+                        <td className="tnum px-3 py-2 text-right text-muted-foreground">
+                          {hours(totals.job)} h
+                        </td>
+                        <td />
+                      </tr>
+                    </tfoot>
+                  </table>
+                </Section>
+              ) : (
+              <Section title="Entries">
                 {shownEntries.length === 0 ? (
                   <p className="p-3 text-sm text-muted-foreground">
                     No entries in this period.
@@ -379,6 +446,7 @@ function Review() {
                   </ul>
                 )}
               </Section>
+              )}
 
               {shownEntries.some((e) => e.correctedFrom) && (
                 <Section title="Corrections">
