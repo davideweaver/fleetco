@@ -45,10 +45,8 @@ export function EstimateEditor({ estimateId }: { estimateId: string }) {
   const owner = role === "owner";
   const [openLines, setOpenLines] = useState<Set<string>>(new Set(["L1"]));
   const overlay = params.get("overlay");
-  // One dialog, three outcomes. `answering` only decides which one it opens on.
-  const [answering, setAnswering] = useState<null | "approved" | "override">(
-    overlay === "approve" ? "approved" : overlay === "override" ? "override" : null
-  );
+  // One dialog, three outcomes, picked inside it.
+  const [answering, setAnswering] = useState(overlay === "approve");
   const [history, setHistory] = useState<Record<string, ApprovalRecord[]>>({
     L1: [
       {
@@ -98,7 +96,7 @@ export function EstimateEditor({ estimateId }: { estimateId: string }) {
           owner ? (
             <>
               <Btn>Preview</Btn>
-              <span onClick={() => setAnswering("approved")}>
+              <span onClick={() => setAnswering(true)}>
                 <Btn primary>Record answer</Btn>
               </span>
             </>
@@ -128,7 +126,7 @@ export function EstimateEditor({ estimateId }: { estimateId: string }) {
                 open={openLines.has(line.id)}
                 onToggle={() => toggle(line.id)}
                 settled={(history[line.id] ?? []).length > 0}
-                onAnswer={() => setAnswering("approved")}
+                onAnswer={() => setAnswering(true)}
               />
             ))}
 
@@ -197,9 +195,8 @@ export function EstimateEditor({ estimateId }: { estimateId: string }) {
       </div>
 
       <RecordAnswerDialog
-        open={answering !== null}
-        onOpenChange={(v) => !v && setAnswering(null)}
-        initialKind={answering ?? "approved"}
+        open={answering}
+        onOpenChange={setAnswering}
         lines={estimateLines.map((l) => ({
           id: l.id,
           name: l.name,

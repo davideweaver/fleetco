@@ -45,20 +45,18 @@ export function RecordAnswerDialog({
   onOpenChange,
   lines,
   onRecord,
-  initialKind = "approved",
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   lines: { id: string; name: string; priceCents: number; pending: boolean }[];
   onRecord: (ids: string[], r: Omit<ApprovalRecord, "id">) => void;
-  initialKind?: "approved" | "declined" | "override";
 }) {
   const pending = lines.filter((l) => l.pending);
   const [picked, setPicked] = useState<Set<string>>(new Set(pending.map((l) => l.id)));
   const [contact, setContact] = useState("");
   const [method, setMethod] = useState<ApprovalMethod | "">("");
   const [reason, setReason] = useState("");
-  const [kind, setKind] = useState<"approved" | "declined" | "override">(initialKind);
+  const [kind, setKind] = useState<"approved" | "declined" | "override">("approved");
 
   const override = kind === "override";
   const ready = override
@@ -76,7 +74,7 @@ export function RecordAnswerDialog({
       onOpenChange={(v) => {
         if (!v) {
           setReason("");
-          setKind(initialKind);
+          setKind("approved");
         }
         onOpenChange(v);
       }}
