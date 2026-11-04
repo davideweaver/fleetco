@@ -661,6 +661,16 @@ total.**
 Each day carries its **own subtotals in the same two columns**, so a day can be checked without
 adding anything up, and the period row at the foot matches the header exactly.
 
+**On a phone it is a list, and the hours are labelled instead.** Five columns do not fit 390px —
+the same call the schedule makes when it becomes a day list. The labels are what carry the
+meaning when the columns cannot: "8.50 h payable", "2.50 h on jobs". The rule generalises: when
+a table collapses to a list, **the column headings have to move into the rows**, or the only
+thing distinguishing two numbers is a position that no longer exists.
+
+The same applies to the Summary roll-up, which drops its entry count on a phone — the least
+useful column when space is the constraint — and to the row action, which becomes an icon
+because "Correct…" costs a third of a 390px row.
+
 The kind is also an **icon**, so it is seen rather than read: a clock for attendance, a case for
 job time, a wrench for shop activity. Two cues for the distinction `TIME-001` turns on — the icon
 and the column — where a text prefix was one cue nobody scans.

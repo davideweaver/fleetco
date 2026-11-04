@@ -114,6 +114,10 @@ left is coverage and the parts no screen has needed yet.
 - [ ] **Accessibility audit** — contrast across both palettes, both themes, and the
       nav-active chip. The light-warm `--brand` was found at 4.06:1 and fixed; assume
       others are lurking, and check with a measurement rather than by eye.
+- [ ] **Check every table at 390px before it lands.** Two tables shipped this session
+      that only worked on a desktop. A dense table is the component most likely to be
+      built at one width and never looked at again — the lab's Phone toggle exists for
+      exactly this and was not used.
 - [ ] **Visual regression gate.** Factory gate 8 expects a screenshot contact sheet per
       card, and the lab is the obvious source. **Run it against `dev`, not a production
       build** — a StrictMode-only bug got through precisely because preview was checked.

@@ -7,6 +7,7 @@ import {
   ChevronDown,
   Clock,
   Lock,
+  Pencil,
   Users,
   Wrench,
 } from "lucide-react";
@@ -475,7 +476,51 @@ function Review() {
                   merge the meanings. */}
               {who === "all" ? (
                 <Section title="Hours by employee">
-                  <table className="w-full text-sm">
+                  {/* Four columns of numbers do not fit 390px — the same call as the
+                      records table. The phone gets the two figures stacked and
+                      labelled, and drops the entry count, which is the least useful
+                      column when space is the constraint. */}
+                  <ul className="divide-y pad:hidden">
+                    {employees.map((emp) => {
+                      const s = forEmployee(emp.id);
+                      return (
+                        <li key={emp.id}>
+                          <Link
+                            to={href(`/app/time/${emp.id}`)}
+                            className="flex items-center gap-3 px-3 py-2.5 hover:bg-accent/50"
+                          >
+                            <span className="min-w-0 flex-1 truncate text-sm">
+                              {emp.name}
+                            </span>
+                            <span className="shrink-0 text-right">
+                              <span className="tnum flex items-center justify-end gap-1.5 text-sm font-medium">
+                                {s.running > 0 && (
+                                  <span className="size-2 shrink-0 rounded-full bg-attention" />
+                                )}
+                                {hours(s.payable)} h payable
+                              </span>
+                              <span className="tnum block text-xs text-muted-foreground">
+                                {hours(s.job)} h on jobs
+                              </span>
+                            </span>
+                          </Link>
+                        </li>
+                      );
+                    })}
+                    <li className="border-t-2 px-3 py-2.5 text-sm font-semibold">
+                      <span className="flex items-baseline justify-between gap-3">
+                        <span>Period</span>
+                        <span className="tnum text-right">
+                          {hours(totals.payable)} h payable
+                          <span className="block text-xs font-normal text-muted-foreground">
+                            {hours(totals.job)} h on jobs
+                          </span>
+                        </span>
+                      </span>
+                    </li>
+                  </ul>
+
+                  <table className="hidden w-full text-sm pad:table">
                     <thead>
                       <tr className="border-b text-left text-xs text-muted-foreground">
                         <th className="px-3 py-2 font-medium">Employee</th>
@@ -551,7 +596,81 @@ function Review() {
                     Nothing in this period.
                   </p>
                 ) : (
-                  <table className="w-full text-sm">
+                  <>
+                  {/* A five-column table at 390px cannot work — the same reason the
+                      schedule becomes a day list on a phone. The phone gets the hours
+                      LABELLED instead ("8.50 h payable"), because the thing the columns
+                      were carrying — which total each record feeds — has to survive
+                      without columns to carry it. */}
+                  <ul className="divide-y pad:hidden">
+                    {days.map((d) => (
+                      <li key={d.day}>
+                        <div className="flex flex-wrap items-baseline justify-between gap-x-3 bg-muted/50 px-3 py-1.5">
+                          <span className="text-xs font-semibold uppercase tracking-wide">
+                            {d.day}
+                          </span>
+                          <span className="tnum text-xs">
+                            <span className="font-semibold">
+                              {d.payable > 0 ? `${hours(d.payable)} h` : "—"}
+                            </span>{" "}
+                            <span className="text-muted-foreground">payable</span>
+                            {d.job > 0 && (
+                              <span className="text-muted-foreground">
+                                {" · "}
+                                {hours(d.job)} h on jobs
+                              </span>
+                            )}
+                          </span>
+                        </div>
+                        <ul className="divide-y">
+                          {d.recs.map((r) => (
+                            <li key={r.key} className="flex items-center gap-2.5 px-3 py-2.5">
+                              <KindIcon kind={r.kind} />
+                              <span className="min-w-0 flex-1">
+                                <span className="block truncate text-sm">{r.label}</span>
+                                <span className="tnum block text-xs text-muted-foreground">
+                                  {at(r.start)}
+                                  {r.end === null ? " → running" : `–${at(r.end)}`} ·{" "}
+                                  {r.payable !== null
+                                    ? `${hours(r.payable)} h payable`
+                                    : `${hours(r.job ?? 0)} h on jobs`}
+                                </span>
+                                {(r.attention || r.corrected) && (
+                                  <span className="mt-1 flex flex-wrap gap-1.5">
+                                    {r.attention && <LeftRunningChip />}
+                                    {r.corrected && <Pill tone="muted">Corrected</Pill>}
+                                  </span>
+                                )}
+                              </span>
+                              {/* An icon here, not "Correct…". The word costs a third
+                                  of a 390px row, and it is the only action on the row
+                                  anyway. */}
+                              <button
+                                type="button"
+                                aria-label="Correct this record"
+                                onClick={r.onCorrect}
+                                className="grid size-9 shrink-0 place-items-center rounded-md border text-muted-foreground hover:bg-accent hover:text-foreground"
+                              >
+                                <Pencil className="size-4" />
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      </li>
+                    ))}
+                    <li className="flex items-baseline justify-between gap-3 border-t-2 px-3 py-2.5 text-sm font-semibold">
+                      <span>Period</span>
+                      <span className="tnum">
+                        {hours(selectionPayable)} h payable
+                        <span className="font-normal text-muted-foreground">
+                          {" · "}
+                          {hours(selectionJob)} h on jobs
+                        </span>
+                      </span>
+                    </li>
+                  </ul>
+
+                  <table className="hidden w-full text-sm pad:table">
                     <thead>
                       <tr className="border-b text-left text-xs text-muted-foreground">
                         <th className="px-3 py-2 font-medium">Record</th>
@@ -640,6 +759,7 @@ function Review() {
                       </tr>
                     </tfoot>
                   </table>
+                  </>
                 )}
               </Section>
               )}
