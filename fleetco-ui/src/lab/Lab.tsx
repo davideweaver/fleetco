@@ -155,7 +155,7 @@ export function Lab() {
         </div>
       </header>
 
-      <div className="flex min-h-0 flex-1">
+      <div className="relative flex min-h-0 flex-1">
       <div className="min-h-0 flex-1 overflow-auto p-4">
         <div className="flex items-start gap-5">
           {DEVICES.filter((d) => shown.has(d.key)).map((d) => (
@@ -202,8 +202,10 @@ export function Lab() {
         </p>
       </div>
 
+      {/* Floats over the stage rather than taking a column, so it stays put while the
+          previews scroll and costs no width when there is nothing to put in it. */}
       {SCREEN_CONTROLS[screen.key] && (
-        <aside className="w-48 shrink-0 overflow-y-auto border-l border-neutral-300 bg-white p-3">
+        <aside className="absolute right-5 top-5 z-20 w-56 rounded-xl border border-neutral-300 bg-white/95 p-3 shadow-lg backdrop-blur-sm">
           <div className="text-[11px] font-medium uppercase tracking-wide text-neutral-500">
             This screen
           </div>
@@ -229,7 +231,7 @@ export function Lab() {
 
 function SideGroup({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="mt-3">
+    <div className="mt-2.5">
       <div className="mb-1.5 text-xs font-medium text-neutral-700">{label}</div>
       <div className="flex flex-wrap gap-1.5">{children}</div>
     </div>
