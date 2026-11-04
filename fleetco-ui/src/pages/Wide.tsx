@@ -6,6 +6,7 @@ import { Btn } from "@/shell/ListDetailLayout";
 import { Overlay } from "@/components/ui/overlay";
 import { BoardPage as Board } from "./Board";
 import { Section, Stat } from "./Customers";
+import { nameOf } from "@/data/time";
 import { money } from "@/lib/utils";
 
 /** The board plus the panel a card opens. `pane: "wide"` has no detail pane to use. */
@@ -37,7 +38,7 @@ export function BoardPage() {
           <div>
             <div className="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-px border-b bg-border">
               <Stat label="Stage" value={STAGES[picked.stage]} />
-              <Stat label="Assigned" value={picked.who === "T1" ? "Technician 1" : "Owner"} />
+              <Stat label="Assigned" value={nameOf(picked.who)} />
               <Stat label="Due" value={picked.date} />
               {owner && <Stat label="Value" value={money(picked.valueCents)} />}
             </div>

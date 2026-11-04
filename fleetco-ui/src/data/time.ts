@@ -25,11 +25,18 @@ export const DAY_ISO: Record<string, string> = {
 
 export type Employee = { id: string; name: string; initials: string };
 
+/**
+ * The shop's people, named once. Screens used to spell out `who === "T1" ? "Technician
+ * 1" : "Owner"` inline, which is both a second place to change a name and a reason the
+ * monograms collided — "Technician 1" and "Technician 2" both initial to T.
+ */
 export const employees: Employee[] = [
-  { id: "T1", name: "Technician 1", initials: "T1" },
-  { id: "T2", name: "Technician 2", initials: "T2" },
-  { id: "OW", name: "Cam (Owner)", initials: "CW" },
+  { id: "T1", name: "Jason Mull", initials: "JM" },
+  { id: "T2", name: "Marco Diaz", initials: "MD" },
+  { id: "OW", name: "Cam Walsh", initials: "CW" },
 ];
+
+export const nameOf = (id: string) => employees.find((e) => e.id === id)?.name ?? id;
 
 /** Minutes since midnight, shop-local. `PLAT-003`. */
 export type Punch = {

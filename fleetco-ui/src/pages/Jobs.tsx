@@ -9,7 +9,7 @@ import { StatusPill } from "@/components/ui/status-pill";
 import { Overlay } from "@/components/ui/overlay";
 import { PhotoGrid, hasUploadedCompletionPhoto, type Photo } from "@/components/ui/photos";
 import { useTimeClock } from "@/components/ui/timer";
-import { punches } from "@/data/time";
+import { nameOf, punches } from "@/data/time";
 import { toast } from "sonner";
 import { NewJobPanel } from "./NewJob";
 import { Section, Stat, Td, Th } from "./Customers";
@@ -221,7 +221,7 @@ function JobDetail({ no }: { no: string }) {
       />
 
       <div className="grid grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-px border-b bg-border">
-        <Stat label="Assigned" value={j.who === "T1" ? "Technician 1" : "Owner"} />
+        <Stat label="Assigned" value={nameOf(j.who)} />
         <Stat label="Production" value="Nov 1" />
         <Stat label="Installation" value={j.date} />
         {owner && <Stat label="Job value" value={money(j.valueCents)} />}

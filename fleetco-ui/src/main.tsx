@@ -43,7 +43,7 @@ createRoot(document.getElementById("root")!).render(
           <Route index element={<Navigate to="/app/board" replace />} />
           <Route path="board" element={<BoardPage />} />
           <Route path="schedule" element={<CalendarPage />} />
-          <Route path="time" element={<TimePage />} />
+          {sectionRoutes("time", <TimePage />)}
           {sectionRoutes("jobs", <JobsPage />)}
           {sectionRoutes("customers", <CustomersPage />)}
           {sectionRoutes("estimates", <EstimatesPage />)}

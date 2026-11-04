@@ -1,20 +1,30 @@
 import { useState } from "react";
+import { useParams } from "react-router-dom";
 import { Check, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { useShell } from "@/shell/shell-context";
-import { Btn, FilterChip, PageHeader, Pill } from "@/shell/ListDetailLayout";
+import {
+  Btn,
+  DetailHeader,
+  ListDetailLayout,
+  ListHeader,
+  ListRow,
+  Monogram,
+  PageHeader,
+  Pill,
+} from "@/shell/ListDetailLayout";
 import { PunchClock, useTimeClock, LeftRunningChip } from "@/components/ui/timer";
 import { CorrectTimeDialog } from "@/components/ui/correct-time";
 import { Section } from "./Customers";
 import { DateRangePicker, type DateRange } from "@/components/ui/date-picker";
-import { attentionMap } from "@/nav/attention";
-import { fromISODate, isWithin, startOfDay } from "@/lib/date";
+import { fmtRange, fromISODate, isWithin, startOfDay } from "@/lib/date";
 import {
   DAYS,
   DAY_ISO,
   TODAY_LABEL,
   at,
   employees,
+  nameOf,
   entries as seedEntries,
   hours,
   isLeftRunning,
@@ -22,7 +32,6 @@ import {
   minutesOf,
   punches,
 } from "@/data/time";
-import { cn } from "@/lib/utils";
 
 export function TimePage() {
   const { role } = useShell();
@@ -136,363 +145,330 @@ function MyDay() {
  * (`TIME-013`), entries flagged for correction (`TIME-008`), and the approval that
  * locks the period (`TIME-009`).
  */
+/**
+ * Timesheet review, as a list-detail screen rather than one long page.
+ *
+ * **Left is the PERIOD. Right is the SELECTION.** That split is the whole layout, and it
+ * settles the question that a single scrolling page kept getting wrong: approving locks
+ * the period for everyone, so the Approve button lives on the left, in the pane that
+ * represents everyone. Put it in a detail header titled "Technician 2" and it reads as
+ * approving Technician 2 — which is exactly the misreading the period-wide blocking
+ * count exists to prevent.
+ *
+ * The employee list also absorbs the summary table that used to sit above the entries.
+ * Each row already has to show a name, payable hours and whether something needs doing;
+ * that IS the summary, and keeping a separate table meant two places to read the same
+ * three numbers.
+ */
 function Review() {
   const [approved, setApproved] = useState(false);
   const [correcting, setCorrecting] = useState<
     | { kind: "punch" | "entry"; id: string; what: string; when: string; start: number; end: number | null }
     | null
   >(null);
-  /**
-   * Bumped after a correction so the derivation re-runs. The sample arrays stand in for
-   * the server here and are edited in place, which keeps `attentionMap` the single
-   * source: the flag clears, the row leaves "needs you", and the rail badge drops by
-   * one — all from the same call, with nothing held in a second place to go stale.
-   */
   const [, bump] = useState(0);
-  const [who, setWho] = useState<string | "all">("all");
-  const [onlyAttention, setOnlyAttention] = useState(false);
   const [period, setPeriod] = useState<DateRange>({
     from: fromISODate(DAY_ISO[DAYS[0]])!,
     to: fromISODate(DAY_ISO[TODAY_LABEL])!,
   });
 
-  /* The three filters answer three different questions, so none of them substitutes
-     for another: WHEN (which pay period), WHO (one employee), and WHAT NEEDS ME. */
+  const { id } = useParams();
+  const { href } = useShell();
+  // No id means Everyone — the period as a whole, which is also what a fresh visit wants.
+  const who = id ?? "all";
+  const selectedEmployee = employees.find((e) => e.id === who);
+
   const inPeriod = (day: string) => {
     const d = fromISODate(DAY_ISO[day] ?? "");
     return d ? isWithin(d, startOfDay(period.from), startOfDay(period.to)) : true;
   };
 
-  // The same derivation the rail badge counts. The badge says a number; this is where
-  // those rows are, which is the whole reason the badge is allowed to exist.
-  const needs = attentionMap("time", "owner");
+  const periodPunches = punches.filter((p) => inPeriod(p.day));
+  const periodEntries = seedEntries.filter((e) => inPeriod(e.day));
+  const shownPunches = periodPunches.filter((p) => who === "all" || p.who === who);
+  const shownEntries = periodEntries.filter((e) => who === "all" || e.who === who);
 
-  const shownPunches = punches.filter(
-    (p) => inPeriod(p.day) && (who === "all" || p.who === who)
-  );
-  const shownEntries = seedEntries.filter(
-    (e) => inPeriod(e.day) && (who === "all" || e.who === who)
-  );
-
-  const rows = employees
-    .filter((emp) => who === "all" || emp.id === who)
-    .map((emp) => {
-    const theirPunches = shownPunches.filter((p) => p.who === emp.id);
-    const theirEntries = shownEntries.filter((e) => e.who === emp.id);
-    return {
-      emp,
-      payable: theirPunches.reduce((a, p) => a + minutesOf(p), 0),
-      job: theirEntries.reduce((a, e) => a + minutesOf(e), 0),
-      running: theirPunches.filter(isLeftRunning),
-      corrected: theirEntries.filter((e) => e.correctedFrom),
-    };
+  const forEmployee = (empId: string) => ({
+    payable: periodPunches.filter((p) => p.who === empId).reduce((a, p) => a + minutesOf(p), 0),
+    job: periodEntries.filter((e) => e.who === empId).reduce((a, e) => a + minutesOf(e), 0),
+    running: periodPunches.filter((p) => p.who === empId && isLeftRunning(p)).length,
   });
 
-  /**
-   * What blocks approval is counted across the WHOLE period, never the filtered view.
-   * Approving locks the period for everyone, so letting a filter to one employee hide
-   * another's flag would be a way to approve past exactly the thing the guard exists
-   * to catch. A filter changes what you are looking at, never what is true.
-   */
-  const blocking =
-    punches.filter((p) => inPeriod(p.day) && isLeftRunning(p)).length;
-  // "Needs you" hides the employees with nothing outstanding; it never hides a column.
-  // Dropping the payable column under a filter is how a part-filtered total gets read
-  // as the whole period.
-  const tableRows = onlyAttention ? rows.filter((r) => r.running.length > 0) : rows;
+  const totals = {
+    payable: periodPunches.reduce((a, p) => a + minutesOf(p), 0),
+    job: periodEntries.reduce((a, e) => a + minutesOf(e), 0),
+  };
+
+  /** Counted across the whole period, never the selection. See the note above. */
+  const blocking = periodPunches.filter(isLeftRunning).length;
+
+  const selectionPayable = shownPunches.reduce((a, p) => a + minutesOf(p), 0);
+  const selectionJob = shownEntries.reduce((a, e) => a + minutesOf(e), 0);
+
+  const correctPunch = (p: (typeof punches)[number]) =>
+    setCorrecting({
+      kind: "punch",
+      id: p.id,
+      what: `${nameOf(p.who)} · punch`,
+      when: p.day,
+      start: p.in,
+      end: p.out,
+    });
+
+  const correctEntry = (e: (typeof seedEntries)[number]) =>
+    setCorrecting({
+      kind: "entry",
+      id: e.id,
+      what: `${nameOf(e.who)} · ${
+        e.jobNo ? jobLabel(e.jobNo) : e.activity
+      }`,
+      when: e.day,
+      start: e.start,
+      end: e.end,
+    });
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
-      <PageHeader
-        title="Timesheet review"
-        action={
-          approved ? (
-            <Pill tone="good">
-              <span className="inline-flex items-center gap-1">
-                <Lock className="size-3" /> Approved
-              </span>
-            </Pill>
-          ) : (
-            <span
-              onClick={() => {
-                // TIME-009 locks the period, and TIME-010 pays from approved periods
-                // only — so approving over an unresolved flag is how a wrong number
-                // reaches payroll. Refuse, and say exactly how many.
-                if (blocking > 0) {
-                  toast.error("Resolve the flags first", {
-                    description: `${blocking} entr${blocking === 1 ? "y" : "ies"} still need you. Approving locks the period.`,
-                  });
-                  return;
-                }
-                setApproved(true);
-                toast.success("Pay period approved", {
-                  description: "Entries are locked. Reopening is audited.",
-                });
-              }}
-            >
-              <Btn primary>Approve period</Btn>
-            </span>
-          )
-        }
-      />
-
-      <div className="flex flex-wrap items-center gap-2 border-b px-3 py-2">
-        <DateRangePicker value={period} onChange={setPeriod} />
-        <span className="h-5 w-px bg-border" />
-        <FilterChip on={who === "all"} onClick={() => setWho("all")}>
-          Everyone
-        </FilterChip>
-        {employees.map((e) => (
-          <FilterChip key={e.id} on={who === e.id} onClick={() => setWho(e.id)}>
-            {e.name}
-          </FilterChip>
-        ))}
-        {needs.size > 0 && (
-          <>
-            <span className="h-5 w-px bg-border" />
-            <FilterChip on={!onlyAttention} onClick={() => setOnlyAttention(false)}>
-              All
-            </FilterChip>
-            <FilterChip on={onlyAttention} onClick={() => setOnlyAttention(true)}>
-              Needs you
-              <span className="tnum ml-1.5 rounded-full bg-attention px-1.5 text-[10px] font-semibold text-attention-fg">
-                {needs.size}
-              </span>
-            </FilterChip>
-          </>
-        )}
-      </div>
-
-      <div className="min-h-0 flex-1 overflow-auto p-3">
-        <div className="space-y-3">
-          <div className="overflow-hidden rounded-xl border">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b bg-muted/40 text-left text-xs text-muted-foreground">
-                  <th className="px-3 py-2 font-medium">Employee</th>
-                  <th className="px-3 py-2 text-right font-medium">Payable</th>
-                  <th className="px-3 py-2 text-right font-medium">On jobs</th>
-                  <th className="px-3 py-2 font-medium">Needs you</th>
-                </tr>
-              </thead>
-              <tbody>
-                {tableRows.length === 0 && (
-                  <tr>
-                    <td colSpan={4} className="px-3 py-8 text-center text-sm text-muted-foreground">
-                      {onlyAttention
-                        ? "Nothing needs you in this period."
-                        : "No time in this period."}
-                    </td>
-                  </tr>
-                )}
-                {tableRows.map((r) => (
-                  <tr key={r.emp.id} className="border-b last:border-0">
-                    <td className="px-3 py-2">{r.emp.name}</td>
-                    <td className="tnum px-3 py-2 text-right font-medium">{hours(r.payable)} h</td>
-                    <td className="tnum px-3 py-2 text-right text-muted-foreground">
-                      {hours(r.job)} h
-                    </td>
-                    <td className="px-3 py-2">
-                      <span className="flex flex-wrap items-center gap-1.5">
-                        {r.running.map((p) => (
-                          <LeftRunningChip key={p.id} />
-                        ))}
-                        {r.running.length === 0 && (
-                          <span className="text-xs text-muted-foreground">—</span>
-                        )}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-              {/* TIME-006 made structural: the two columns have separate totals and
-                  there is deliberately no grand total, because adding payable hours to
-                  job hours is the single most expensive mistake this screen could make. */}
-              <tfoot>
-                <tr className="border-t-2 font-semibold">
-                  <td className="px-3 py-2">
-                    Payroll takes the left column only
-                    {(who !== "all" || onlyAttention) && (
-                      <span className="ml-1.5 font-normal text-muted-foreground">
-                        · filtered
-                      </span>
-                    )}
-                  </td>
-                  <td className="tnum px-3 py-2 text-right">
-                    {hours(tableRows.reduce((a, r) => a + r.payable, 0))} h
-                  </td>
-                  <td className="tnum px-3 py-2 text-right text-muted-foreground">
-                    {hours(tableRows.reduce((a, r) => a + r.job, 0))} h
-                  </td>
-                  <td />
-                </tr>
-              </tfoot>
-            </table>
+    <ListDetailLayout
+      hasSelection
+      backTo="/app/time"
+      empty="Pick someone."
+      list={
+        <>
+          <ListHeader title="Timesheet review" count={employees.length} />
+          <div className="border-b px-2 py-1.5">
+            <DateRangePicker value={period} onChange={setPeriod} />
           </div>
 
-          <Section title="Entries that need you">
-            <ul className="divide-y">
-              {shownPunches.filter(isLeftRunning).map((p) => (
-                <li key={p.id} className="flex flex-wrap items-center gap-3 p-3 text-sm">
-                  <span className="min-w-0 flex-1">
-                    <span className="block">
-                      {employees.find((e) => e.id === p.who)?.name} · punch still running
-                    </span>
-                    <span className="tnum text-xs text-muted-foreground">
-                      {p.day} from {at(p.in)} · {hours(minutesOf(p))} h
-                    </span>
-                  </span>
-                  <LeftRunningChip />
-                  <span
-                    onClick={() =>
-                      setCorrecting({
-                        kind: "punch",
-                        id: p.id,
-                        what: `${employees.find((e) => e.id === p.who)?.name} · punch`,
-                        when: p.day,
-                        start: p.in,
-                        end: p.out,
-                      })
-                    }
-                  >
-                    <Btn>Correct…</Btn>
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </Section>
+          <div className="min-h-0 flex-1 overflow-y-auto">
+            <ListRow
+              to={href("/app/time")}
+              selected={who === "all"}
+              title="Everyone"
+              subtitle={`${employees.length} people`}
+              meta={`${hours(totals.payable)} h`}
+              metaSub="payable"
+              attention={blocking > 0 ? `${blocking} needs you` : undefined}
+            />
+            {employees.map((emp) => {
+              const s = forEmployee(emp.id);
+              return (
+                <ListRow
+                  key={emp.id}
+                  to={href(`/app/time/${emp.id}`)}
+                  selected={who === emp.id}
+                  lead={<Monogram name={emp.name} />}
+                  title={emp.name}
+                  subtitle={`${hours(s.job)} h on jobs`}
+                  meta={`${hours(s.payable)} h`}
+                  metaSub="payable"
+                  attention={s.running > 0 ? "Running over 12 h" : undefined}
+                />
+              );
+            })}
+          </div>
 
-          {/* With no flag queue, THIS is the route to TIME-008's "can change any entry".
-              The Owner is told about a wrong entry in person, so the screen's job is to
-              let them find it quickly — not to wait for a ticket. */}
-          <Section title="All entries in this period">
-            {shownEntries.length === 0 ? (
-              <p className="p-3 text-sm text-muted-foreground">No entries.</p>
+          {/* Pinned to the pane that means "the whole period", so it can never be read
+              as approving only whoever is selected on the right. */}
+          <div className="shrink-0 border-t p-2">
+            {approved ? (
+              <div className="flex items-center justify-center gap-1.5 rounded-md bg-muted py-2 text-sm text-muted-foreground">
+                <Lock className="size-3.5" /> Period approved
+              </div>
             ) : (
-              <ul className="divide-y">
-                {shownEntries.map((e) => (
-                  <li key={e.id} className="flex flex-wrap items-center gap-3 p-3 text-sm">
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate">
-                        {employees.find((x) => x.id === e.who)?.name} ·{" "}
-                        {e.jobNo ? jobLabel(e.jobNo) : e.activity}
-                      </span>
-                      <span className="tnum text-xs text-muted-foreground">
-                        {e.day} {at(e.start)}–{at(e.end!)} · {hours(minutesOf(e))} h
-                      </span>
-                    </span>
-                    {e.correctedFrom && <Pill tone="muted">Corrected</Pill>}
-                    <span
-                      onClick={() =>
-                        setCorrecting({
-                          kind: "entry",
-                          id: e.id,
-                          what: `${employees.find((x) => x.id === e.who)?.name} · ${
-                            e.jobNo ? jobLabel(e.jobNo) : e.activity
-                          }`,
-                          when: e.day,
-                          start: e.start,
-                          end: e.end,
-                        })
-                      }
-                    >
-                      <Btn>Correct…</Btn>
-                    </span>
-                  </li>
-                ))}
-              </ul>
+              <button
+                type="button"
+                onClick={() => {
+                  if (blocking > 0) {
+                    toast.error("Resolve what needs you first", {
+                      description: `${blocking} entr${blocking === 1 ? "y" : "ies"} in this period still need you. Approving locks it for everyone.`,
+                    });
+                    return;
+                  }
+                  setApproved(true);
+                  toast.success("Pay period approved", {
+                    description: "Entries are locked. Reopening is audited.",
+                  });
+                }}
+                className="w-full rounded-md border border-primary bg-primary py-2 text-sm font-medium text-primary-foreground"
+              >
+                Approve period
+              </button>
             )}
-          </Section>
+            <p className="mt-1.5 text-center text-[11px] text-muted-foreground">
+              Locks every employee · payroll exports approved periods only
+            </p>
+          </div>
+        </>
+      }
+      detail={
+        <div className="flex h-full min-h-0 flex-col">
+          <DetailHeader
+            eyebrow={`Timesheet · ${fmtRange(period.from, period.to, new Date())}`}
+            title={selectedEmployee ? selectedEmployee.name : "Everyone"}
+            sub={
+              /* TIME-006 at the top of whatever you selected. Two numbers, side by
+                 side, never summed — the same refusal the old table made structural. */
+              <span className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                <span>
+                  <span className="tnum font-medium text-foreground">
+                    {hours(selectionPayable)} h
+                  </span>{" "}
+                  payable
+                </span>
+                <span>
+                  <span className="tnum">{hours(selectionJob)} h</span> on jobs · costing
+                  only
+                </span>
+              </span>
+            }
+          />
 
-          {/* TIME-008: the corrected value never replaces the original silently. Both
-              are kept, the same way an approval correction supersedes rather than
-              overwrites (AUTH-003). */}
-          <Section title="Corrections already made">
-            <ul className="divide-y">
-              {shownEntries
-                .filter((e) => e.correctedFrom)
-                .map((e) => (
-                  <li key={e.id} className="p-3 text-sm">
-                    <div className="flex flex-wrap items-baseline gap-2">
-                      <span className="font-medium">
-                        {employees.find((x) => x.id === e.who)?.name}
-                      </span>
-                      <span className="text-muted-foreground">
-                        {e.jobNo ? jobLabel(e.jobNo) : e.activity} · {e.day}
-                      </span>
-                    </div>
-                    <div className="tnum mt-1 flex flex-wrap items-center gap-2 text-xs">
-                      <span className="text-muted-foreground line-through">
-                        {at(e.correctedFrom!.start)}–{at(e.correctedFrom!.end)}
-                      </span>
-                      <span className="text-muted-foreground">→</span>
-                      <span className="font-medium">
-                        {at(e.start)}–{at(e.end!)}
-                      </span>
-                      <span className="text-muted-foreground">
-                        · by {e.correctedFrom!.by}
-                      </span>
-                    </div>
-                    <div className="mt-0.5 text-xs italic text-muted-foreground">
-                      “{e.correctedFrom!.reason}”
-                    </div>
-                  </li>
-                ))}
-            </ul>
-          </Section>
+          <div className="min-h-0 flex-1 overflow-auto p-3">
+            <div className="space-y-3">
+              {shownPunches.some(isLeftRunning) && (
+                <Section title="Needs you">
+                  <ul className="divide-y">
+                    {shownPunches.filter(isLeftRunning).map((p) => (
+                      <li key={p.id} className="flex flex-wrap items-center gap-3 p-3 text-sm">
+                        <span className="min-w-0 flex-1">
+                          <span className="block">
+                            {nameOf(p.who)} · punch still
+                            running
+                          </span>
+                          <span className="tnum text-xs text-muted-foreground">
+                            {p.day} from {at(p.in)} · {hours(minutesOf(p))} h
+                          </span>
+                        </span>
+                        <LeftRunningChip />
+                        <span onClick={() => correctPunch(p)}>
+                          <Btn>Correct…</Btn>
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </Section>
+              )}
 
-          <div className={cn("flex items-start gap-2 rounded-lg border p-3 text-xs", "text-muted-foreground")}>
-            <Check className="mt-0.5 size-3.5 shrink-0" />
-            <span>
-              Payable hours come from punches only (TIME-006). Job time is costing
-              (TIME-011) and is never added to pay. Approving locks the period
-              (TIME-009); payroll exports approved periods only (TIME-010).
-            </span>
+              <Section title={who === "all" ? "All entries" : "Entries"}>
+                {shownEntries.length === 0 ? (
+                  <p className="p-3 text-sm text-muted-foreground">
+                    No entries in this period.
+                  </p>
+                ) : (
+                  <ul className="divide-y">
+                    {shownEntries.map((e) => (
+                      <li key={e.id} className="flex flex-wrap items-center gap-3 p-3 text-sm">
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate">
+                            {/* The name is redundant once one person is selected. */}
+                            {who === "all" && (
+                              <>{nameOf(e.who)} · </>
+                            )}
+                            {e.jobNo ? jobLabel(e.jobNo) : e.activity}
+                          </span>
+                          <span className="tnum text-xs text-muted-foreground">
+                            {e.day} {at(e.start)}–{at(e.end!)} · {hours(minutesOf(e))} h
+                          </span>
+                        </span>
+                        {e.correctedFrom && <Pill tone="muted">Corrected</Pill>}
+                        <span onClick={() => correctEntry(e)}>
+                          <Btn>Correct…</Btn>
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </Section>
+
+              {shownEntries.some((e) => e.correctedFrom) && (
+                <Section title="Corrections">
+                  <ul className="divide-y">
+                    {shownEntries
+                      .filter((e) => e.correctedFrom)
+                      .map((e) => (
+                        <li key={e.id} className="p-3 text-sm">
+                          <div className="flex flex-wrap items-baseline gap-2">
+                            <span className="font-medium">
+                              {nameOf(e.who)}
+                            </span>
+                            <span className="text-muted-foreground">
+                              {e.jobNo ? jobLabel(e.jobNo) : e.activity} · {e.day}
+                            </span>
+                          </div>
+                          <div className="tnum mt-1 flex flex-wrap items-center gap-2 text-xs">
+                            <span className="text-muted-foreground line-through">
+                              {at(e.correctedFrom!.start)}–{at(e.correctedFrom!.end)}
+                            </span>
+                            <span className="text-muted-foreground">→</span>
+                            <span className="font-medium">
+                              {at(e.start)}–{at(e.end!)}
+                            </span>
+                            <span className="text-muted-foreground">
+                              · by {e.correctedFrom!.by}
+                            </span>
+                          </div>
+                          <div className="mt-0.5 text-xs italic text-muted-foreground">
+                            “{e.correctedFrom!.reason}”
+                          </div>
+                        </li>
+                      ))}
+                  </ul>
+                </Section>
+              )}
+
+              <p className="flex items-start gap-2 p-1 text-xs text-muted-foreground">
+                <Check className="mt-0.5 size-3.5 shrink-0" />
+                <span>
+                  Payable hours come from punches only (TIME-006). Job time is costing
+                  (TIME-011) and is never added to pay. A technician cannot edit their own
+                  time (TIME-008); corrections keep both values.
+                </span>
+              </p>
+            </div>
           </div>
         </div>
-      </div>
-
-      {correcting && (
-        <CorrectTimeDialog
-          open
-          onOpenChange={(v) => !v && setCorrecting(null)}
-          what={correcting.what}
-          when={correcting.when}
-          start={correcting.start}
-          end={correcting.end}
-          endRequired={correcting.end === null}
-          onSave={({ start, end, reason }) => {
-            // TIME-008: the original is kept, never overwritten — the same
-            // supersede shape as an approval correction (AUTH-003).
-            if (correcting.kind === "punch") {
-              const p = punches.find((x) => x.id === correcting.id)!;
-              const before = { start: p.in, end: p.out ?? end, reason, by: "Cam" };
-              p.in = start;
-              p.out = end;
-              seedEntries.push({
-                id: `${p.id}-c`,
-                who: p.who,
-                day: p.day,
-                jobNo: null,
-                activity: "Punch correction",
-                start,
-                end,
-                correctedFrom: before,
+      }
+      after={
+        correcting && (
+          <CorrectTimeDialog
+            open
+            onOpenChange={(v) => !v && setCorrecting(null)}
+            what={correcting.what}
+            when={correcting.when}
+            start={correcting.start}
+            end={correcting.end}
+            endRequired={correcting.end === null}
+            onSave={({ start, end, reason }) => {
+              if (correcting.kind === "punch") {
+                const p = punches.find((x) => x.id === correcting.id)!;
+                const before = { start: p.in, end: p.out ?? end, reason, by: "Cam" };
+                p.in = start;
+                p.out = end;
+                seedEntries.push({
+                  id: `${p.id}-c`,
+                  who: p.who,
+                  day: p.day,
+                  jobNo: null,
+                  activity: "Punch correction",
+                  start,
+                  end,
+                  correctedFrom: before,
+                });
+              } else {
+                const e = seedEntries.find((x) => x.id === correcting.id)!;
+                e.correctedFrom = { start: e.start, end: e.end ?? end, reason, by: "Cam" };
+                e.start = start;
+                e.end = end;
+              }
+              bump((n) => n + 1);
+              toast.success("Correction saved", {
+                description: `${at(start)}–${at(end)} · ${hours(end - start)} h. The original is kept.`,
               });
-            } else {
-              const e = seedEntries.find((x) => x.id === correcting.id)!;
-              e.correctedFrom = { start: e.start, end: e.end ?? end, reason, by: "Cam" };
-              e.start = start;
-              e.end = end;
-            }
-            bump((n) => n + 1);
-            toast.success("Correction saved", {
-              description: `${at(start)}–${at(end)} · ${hours(end - start)} h. The original is kept.`,
-            });
-            setCorrecting(null);
-          }}
-        />
-      )}
-    </div>
+              setCorrecting(null);
+            }}
+          />
+        )
+      }
+    />
   );
 }

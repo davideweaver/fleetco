@@ -601,6 +601,30 @@ That decides the shape of the Owner's screen. With no queue to work, **every ent
 is listed with a Correct… action**, because being told "Tuesday's wrong" and then having to find
 Tuesday is the actual job.
 
+### Review is list-detail: left is the period, right is the selection
+
+Timesheet review was the one screen pretending to be a wide page while behaving like a list one.
+It is now the standard `ListDetailLayout`: **Everyone** plus one row per employee on the left,
+their entries on the right.
+
+| Pane | Means | Carries |
+|---|---|---|
+| left | **the period** | the date range, each person's payable hours, **Approve** |
+| right | **the selection** | that person's hours, what needs them, their entries |
+
+> **Approve lives on the left, and that is the point of the split.** Approving locks the period
+> for *everyone*. Put the button in a detail header titled "Marco Diaz" and it reads as approving
+> Marco — the same misreading the period-wide blocking count already exists to prevent. The left
+> pane is the only place that means "everyone", so that is where it goes.
+
+The employee rows **absorb the summary table** that used to sit above the entries. A row already
+has to show a name, payable hours and whether anything needs doing — that *is* the summary, and
+keeping a separate table meant two places to read the same three numbers.
+
+**People are named once.** `nameOf()` in `data/time.ts` is the only place a person's name is
+produced. Screens used to spell out `who === "T1" ? "Technician 1" : "Owner"` inline, which is a
+second place to change a name and the reason two monograms both read "T".
+
 > **Attention is only legitimate if the screen can clear it.** An earlier version of the Owner's
 > dialog captured a reason but never let anyone touch the times, so a flagged entry stayed
 > flagged and the rail badge could never go down. That is the dead end the whole mechanism

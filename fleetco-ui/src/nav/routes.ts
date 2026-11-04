@@ -48,7 +48,9 @@ export const NAV: NavItem[] = [
   { key: "estimates", group: "sales", title: "Estimates", short: "Estimates", icon: FileText, path: "/app/estimates", pane: "list-detail", listKind: "records", roles: ["owner"] },
   { key: "customers", group: "sales", title: "Customers", short: "Customers", icon: Users, path: "/app/customers", pane: "list-detail", listKind: "records", roles: ["owner"] },
   { key: "invoices", group: "sales", title: "Invoices", short: "Invoices", icon: Receipt, path: "/app/invoices", pane: "list-detail", listKind: "records", roles: ["owner"], phone: 4 },
-  { key: "time", group: "shop", title: "Time & payroll", titleTech: "Clock", short: "Time", icon: Clock, path: "/app/time", pane: "wide", roles: ["owner", "tech"], phone: 5 },
+  // list-detail for the owner's review, which selects an employee on the left; the
+  // technician's own screen is one pane because they are the only person on it.
+  { key: "time", group: "shop", title: "Time & payroll", titleTech: "Clock", short: "Time", icon: Clock, path: "/app/time", pane: "list-detail", roles: ["owner", "tech"], phone: 5 },
   { key: "materials", group: "shop", title: "Materials & ordering", short: "Materials", icon: Package, path: "/app/materials", pane: "list-detail", listKind: "records", roles: ["owner"] },
   { key: "reports", group: "admin", title: "Reports", short: "Reports", icon: BarChart3, path: "/app/reports", pane: "list-detail", listKind: "sections", roles: ["owner"] },
   { key: "settings", group: "admin", title: "Settings", short: "Settings", icon: Settings, path: "/app/settings", pane: "list-detail", listKind: "sections", roles: ["owner"] },
