@@ -488,6 +488,20 @@ decorative counts — badges are either on and derived, or off.
 column of ten icons each carrying a count stops being glanceable, which is the only reason a
 collapsed rail exists.
 
+### Demo screens live under Settings
+
+The design-system screens — Dates, States, and whatever follows — sit in the Settings list
+**below a labelled `ListDivider`**, not on URLs you have to know. A screen reachable only by
+typing a path is a screen nobody reviews.
+
+Settings is the right home because it is already the app's "everything else" list. The divider
+is doing real work rather than decorating: these are not settings, and without a labelled break
+someone eventually hunts for a real setting among them. An unlabelled rule would say "these are
+different" without saying how.
+
+The section count stays the **real** settings only. Counting the demos would overstate how much
+of the app exists.
+
 ## Dates
 
 **One grid, two pickers.** A range is two dates chosen on the same calendar, so

@@ -119,6 +119,16 @@ export const settingsSections = [
   { id: "quickbooks", name: "QuickBooks", note: "Connection and mapping" },
 ];
 
+/**
+ * Design-system demo screens. They live under Settings because they need a nav home and
+ * Settings is where the "everything else" list already is — but they are NOT settings,
+ * so the list separates them rather than mixing them in. Expect this to grow.
+ */
+export const demoScreens = [
+  { id: "_dates", name: "Dates", note: "Date picker and date range picker" },
+  { id: "_states", name: "States", note: "Loading, empty, error, not found" },
+];
+
 export const businesses = [
   { id: "otc", name: "OTC Fleet Services", sub: "Lancaster, PA" },
   { id: "demo", name: "Keystone Wraps (demo)", sub: "Harrisburg, PA" },

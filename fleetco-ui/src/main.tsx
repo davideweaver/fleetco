@@ -9,8 +9,6 @@ import { EstimatesPage, InvoicesPage, MaterialsPage } from "@/pages/Records";
 import { SectionsPage } from "@/pages/Sections";
 import { BoardPage, TimePage } from "@/pages/Wide";
 import { CalendarPage } from "@/pages/Calendar";
-import { StatesPage } from "@/pages/States";
-import { DatesPage } from "@/pages/Dates";
 import "./index.css";
 
 /** `?theme=` and `?palette=` so the lab can show every combination without a store. */
@@ -45,8 +43,6 @@ createRoot(document.getElementById("root")!).render(
           <Route path="board" element={<BoardPage />} />
           <Route path="schedule" element={<CalendarPage />} />
           <Route path="time" element={<TimePage />} />
-          <Route path="_states" element={<StatesPage />} />
-          <Route path="_dates" element={<DatesPage />} />
           {sectionRoutes("jobs", <JobsPage />)}
           {sectionRoutes("customers", <CustomersPage />)}
           {sectionRoutes("estimates", <EstimatesPage />)}

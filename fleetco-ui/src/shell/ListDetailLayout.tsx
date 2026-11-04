@@ -197,6 +197,21 @@ function SectionHeader({
 }
 
 /**
+ * A labelled break in a list. The label is the point — an unlabelled rule says "these
+ * are different" without saying how, which leaves the reader to guess.
+ */
+export function ListDivider({ label }: { label: string }) {
+  return (
+    <div className="flex items-center gap-2 border-b bg-surface-1/50 px-3 py-1.5">
+      <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+        {label}
+      </span>
+      <span className="h-px flex-1 bg-border" />
+    </div>
+  );
+}
+
+/**
  * A list row, not a card. A card per record looks good in a marketing screenshot and
  * falls apart at 200 customers — Cam needs to scan, not admire.
  */
