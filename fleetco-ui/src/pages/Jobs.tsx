@@ -113,13 +113,16 @@ function JobDetail({ no }: { no: string }) {
    * watched go queued -> uploading -> confirming -> done without five others competing
    * for attention. Press Add for more; the third one fails, which is the other path.
    */
-  const demoStarted = useRef(false);
+  // NO ref guard here. StrictMode runs effect -> cleanup -> effect in development, and a
+  // ref latched on the first pass made the second pass bail out, so the photo was never
+  // added under `npm run dev` while working fine in a production build. The timer plus
+  // its cleanup is already idempotent: the first timer is cleared before it fires.
   useEffect(() => {
-    if (params.get("photos") !== "demo" || demoStarted.current) return;
-    demoStarted.current = true;
+    if (params.get("photos") !== "demo") return;
     const timer = setTimeout(add, 400);
     return () => clearTimeout(timer);
-  }, [params]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const id = setInterval(() => {
