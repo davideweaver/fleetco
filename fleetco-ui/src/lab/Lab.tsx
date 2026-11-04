@@ -32,6 +32,17 @@ const SCREENS = [
   { key: "time", label: "Time & payroll (wide)", path: "/app/time" },
 ];
 
+/**
+ * Controls that only mean something on one screen live beside the preview, not in the
+ * global bar. A toggle in the header implies it applies to whatever you are looking at,
+ * and "Cal entry" sitting there on the invoices screen is a small lie that costs a few
+ * seconds every time someone reads the bar.
+ */
+const SCREEN_CONTROLS: Record<string, "calEntry"[]> = {
+  schedule2: ["calEntry"],
+  schedule: ["calEntry"],
+};
+
 export function Lab() {
   const [badges, setBadges] = useState<"off" | "quiet" | "busy">("quiet");
   const [role, setRole] = useState<"owner" | "tech">("owner");
@@ -82,11 +93,6 @@ export function Lab() {
             <Seg on={nav === "dark"} onClick={() => setNav("dark")}>Dark</Seg>
           </Group>
 
-          <Group label="Cal entry">
-            <Seg on={entry === "fill"} onClick={() => setEntry("fill")}>Fill</Seg>
-            <Seg on={entry === "stripe"} onClick={() => setEntry("stripe")}>Stripe</Seg>
-            <Seg on={entry === "both"} onClick={() => setEntry("both")}>Both</Seg>
-          </Group>
 
           <Group label="Theme">
             <Seg on={!dark} onClick={() => setDark(false)}>Light</Seg>
@@ -149,6 +155,7 @@ export function Lab() {
         </div>
       </header>
 
+      <div className="flex min-h-0 flex-1">
       <div className="min-h-0 flex-1 overflow-auto p-4">
         <div className="flex items-start gap-5">
           {DEVICES.filter((d) => shown.has(d.key)).map((d) => (
@@ -194,6 +201,37 @@ export function Lab() {
           details, so it stays one pane — the same behaviour the phone needs.
         </p>
       </div>
+
+      {SCREEN_CONTROLS[screen.key] && (
+        <aside className="w-48 shrink-0 overflow-y-auto border-l border-neutral-300 bg-white p-3">
+          <div className="text-[11px] font-medium uppercase tracking-wide text-neutral-500">
+            This screen
+          </div>
+          {SCREEN_CONTROLS[screen.key].includes("calEntry") && (
+            <SideGroup label="Entry style">
+              <Seg on={entry === "fill"} onClick={() => setEntry("fill")}>
+                Fill
+              </Seg>
+              <Seg on={entry === "stripe"} onClick={() => setEntry("stripe")}>
+                Stripe
+              </Seg>
+              <Seg on={entry === "both"} onClick={() => setEntry("both")}>
+                Both
+              </Seg>
+            </SideGroup>
+          )}
+        </aside>
+      )}
+      </div>
+    </div>
+  );
+}
+
+function SideGroup({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="mt-3">
+      <div className="mb-1.5 text-xs font-medium text-neutral-700">{label}</div>
+      <div className="flex flex-wrap gap-1.5">{children}</div>
     </div>
   );
 }
