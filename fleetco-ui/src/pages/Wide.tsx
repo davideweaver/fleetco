@@ -69,37 +69,6 @@ export function BoardPage() {
  * `pane: "wide"` — no second column. Six stages minus a 300px list leaves about
  * 140px per column on an iPad, which is why the board does not get one.
  */
-export function SchedulePage() {
-  const days = ["Mon 2", "Tue 3", "Wed 4", "Thu 5", "Fri 6"];
-  return (
-    <div className="flex h-full min-h-0 flex-col">
-      <PageHeader title="Schedule" />
-      <div className="min-h-0 flex-1 overflow-auto p-3">
-      <div className="grid min-w-[640px] grid-cols-5 gap-2">
-        {days.map((d, col) => (
-          <div key={d} className="rounded-lg border">
-            <div className="border-b px-2 py-1.5 text-xs font-semibold">{d}</div>
-            <div className="flex flex-col gap-1.5 p-2">
-              {jobs
-                .filter((_, i) => i % 5 === col)
-                .map((j) => (
-                  <div key={j.no} className="rounded border-l-2 border-primary bg-muted/50 p-2 text-xs">
-                    <div className="font-medium">{j.no}</div>
-                    <div className="truncate text-muted-foreground">{j.what}</div>
-                    <div className="mt-1 text-[11px] text-muted-foreground">
-                      {col % 2 ? "Installation" : "Production"} · {j.who}
-                    </div>
-                  </div>
-                ))}
-            </div>
-          </div>
-        ))}
-      </div>
-      </div>
-    </div>
-  );
-}
-
 export function TimePage() {
   const rows = [
     { who: "Technician 1", day: "Mon", clocked: "8:02", job: "6:45", shop: "1:17" },

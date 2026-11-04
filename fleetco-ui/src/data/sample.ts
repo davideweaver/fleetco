@@ -209,3 +209,89 @@ export const linePrice = (l: EstimateLine) => l.setPriceCents ?? componentSum(l)
 /** AUTH-005: authorized means approved or overridden. Nothing else bills. */
 export const isAuthorized = (l: EstimateLine) =>
   l.approval === "approved" || l.approval === "overridden";
+
+/* --- Calendar entries (JOB-014) -------------------------------------------------------
+   Either production or installation, one job, own start and end, one or more employees.
+   A job can have several of each. Week of Mon 2 Nov 2026; today is Wed 4 Nov. */
+
+export type EntryKind = "production" | "installation";
+
+export type CalendarEntry = {
+  id: string;
+  jobNo: string;
+  customer: string;
+  what: string;
+  kind: EntryKind;
+  /** Day index within the shown week, 0 = Monday. */
+  day: number;
+  /** Minutes from midnight, shop time (PLAT-003). */
+  start: number;
+  end: number;
+  who: string[];
+};
+
+const hm = (h: number, m = 0) => h * 60 + m;
+
+export const WEEK = [
+  { label: "Mon", date: "Nov 2" },
+  { label: "Tue", date: "Nov 3" },
+  { label: "Wed", date: "Nov 4" },
+  { label: "Thu", date: "Nov 5" },
+  { label: "Fri", date: "Nov 6" },
+];
+export const TODAY = 2;
+
+export const DAY_START = hm(7);
+export const DAY_END = hm(18);
+
+export const calendarEntries: CalendarEntry[] = [
+  { id: "e1", jobNo: "G-1048", customer: "Ridgeline Plumbing & Heating", what: "Unit 14 · full wrap", kind: "production", day: 0, start: hm(8), end: hm(12), who: ["T1"] },
+  // JOB-016: this overlaps e1 and shares T1. V1 allows it and says nothing.
+  { id: "e2", jobNo: "G-1044", customer: "Keystone Dairy Co-op", what: "Tanker DOT lettering", kind: "installation", day: 0, start: hm(10), end: hm(14), who: ["T1", "OW"] },
+  { id: "e3", jobNo: "G-1052", customer: "Lancaster Kitchen Supply", what: "Box truck logo kit", kind: "production", day: 0, start: hm(13), end: hm(16, 30), who: ["T1"] },
+  { id: "e4", jobNo: "G-1048", customer: "Ridgeline Plumbing & Heating", what: "Unit 14 · full wrap", kind: "installation", day: 1, start: hm(9), end: hm(15), who: ["T1", "OW"] },
+  { id: "e5", jobNo: "G-1046", customer: "Brightway Movers", what: "Rear door graphics", kind: "production", day: 2, start: hm(8), end: hm(11), who: ["T1"] },
+  { id: "e6", jobNo: "G-1053", customer: "Conestoga Tree Care", what: "Bucket truck doors ×3", kind: "production", day: 2, start: hm(13), end: hm(17), who: ["OW"] },
+  { id: "e7", jobNo: "G-1043", customer: "Millport School District", what: "Shop wall mural", kind: "installation", day: 3, start: hm(7, 30), end: hm(16), who: ["T1"] },
+  { id: "e8", jobNo: "G-1041", customer: "Ridgeline Plumbing & Heating", what: "Unit 9 · decal refresh", kind: "production", day: 4, start: hm(9), end: hm(11, 30), who: ["T1"] },
+];
+
+export const clock = (mins: number) => {
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  const ampm = h >= 12 ? "pm" : "am";
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  return m === 0 ? `${h12}${ampm}` : `${h12}:${String(m).padStart(2, "0")}${ampm}`;
+};
+
+/**
+ * JOB-016 allows overlaps, so the grid has to lay them out rather than prevent them.
+ * Entries that overlap share the column width; everything else gets the full width.
+ */
+export function layoutDay(entries: CalendarEntry[]) {
+  const sorted = [...entries].sort((a, b) => a.start - b.start || a.end - b.end);
+  const out: { entry: CalendarEntry; lane: number; lanes: number }[] = [];
+  let cluster: CalendarEntry[] = [];
+  let clusterEnd = -1;
+
+  const flush = () => {
+    const lanes: CalendarEntry[][] = [];
+    for (const e of cluster) {
+      let lane = lanes.findIndex((l) => l[l.length - 1].end <= e.start);
+      if (lane === -1) { lanes.push([e]); lane = lanes.length - 1; }
+      else lanes[lane].push(e);
+      out.push({ entry: e, lane, lanes: 0 });
+    }
+    for (const o of out.slice(-cluster.length)) o.lanes = lanes.length;
+    cluster = [];
+    clusterEnd = -1;
+  };
+
+  for (const e of sorted) {
+    if (cluster.length && e.start >= clusterEnd) flush();
+    cluster.push(e);
+    clusterEnd = Math.max(clusterEnd, e.end);
+  }
+  if (cluster.length) flush();
+  return out;
+}

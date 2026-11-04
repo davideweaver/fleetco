@@ -214,6 +214,31 @@ stage, and adding one would be inventing a rule rather than implementing one.
 **Technicians cannot drag at all** until `ROLE-008` (D-C2) is answered. Read-only is the reversible
 default; granting the permission later breaks nothing, while taking it away would.
 
+## Calendar
+
+| Name | Component | Notes |
+|---|---|---|
+| **Week grid** | `CalendarPage` | Five day columns plus a time gutter, 7am–6pm. Desktop and tablet only |
+| **Day list** | `DayList` | The phone's schedule. A time grid at 390px is a wall of empty boxes |
+| **Entry** | `Entry` | Production or installation (`JOB-014`). Positioned absolutely by minutes from `DAY_START` |
+| **Time gutter** | `TimeGutter` | The hour axis. Sticky on horizontal scroll |
+
+**Built, not bought.** What makes calendar libraries expensive is recurrence, timezones and overlap
+resolution. V1 has no recurring entries, one shop timezone (`PLAT-003`), and `JOB-016` says
+overlaps are **allowed and unmanaged**. Strip those three and what is left is a positioned grid,
+which is cheaper to own than to configure.
+
+**What that gives up, to revisit rather than forget:** keyboard navigation, a month view, print, and
+real timezone handling if OTC ever runs a shop in another one. Any of those arriving is a reason to
+reopen the decision.
+
+**`JOB-016` makes overlap a layout problem, not a validation problem.** Entries that overlap share
+the column width. There is no warning, because the rule says V1 stays quiet.
+
+**`JOB-015` is said out loud.** Dragging an entry toasts *"Dates only. The job board is
+unchanged."* Two systems being deliberately separate is the kind of thing a user only half believes
+until the software tells them.
+
 ## Naming rules
 
 1. **Pane, column, bar, sheet — pick by behaviour, not by looks.**
@@ -235,7 +260,6 @@ default; granting the permission later breaks nothing, while taking it away woul
 Parts the design system does not have yet, so they have no agreed name. Each gets one when it is
 built, and that is the moment to add it here rather than later:
 
-- The calendar's entries and lanes
 - The photo gallery and its capture control
 - Confirm-destructive dialogs, which probably want their own variant (`INV-012` voiding,
   `JOB-011` cancelling)

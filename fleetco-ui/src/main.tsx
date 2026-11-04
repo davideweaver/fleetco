@@ -7,7 +7,8 @@ import { CustomersPage } from "@/pages/Customers";
 import { JobsPage } from "@/pages/Jobs";
 import { EstimatesPage, InvoicesPage, MaterialsPage } from "@/pages/Records";
 import { SectionsPage } from "@/pages/Sections";
-import { BoardPage, SchedulePage, TimePage } from "@/pages/Wide";
+import { BoardPage, TimePage } from "@/pages/Wide";
+import { CalendarPage } from "@/pages/Calendar";
 import { StatesPage } from "@/pages/States";
 import "./index.css";
 
@@ -42,7 +43,7 @@ createRoot(document.getElementById("root")!).render(
         <Route path="/app" element={<AppShell />}>
           <Route index element={<Navigate to="/app/board" replace />} />
           <Route path="board" element={<BoardPage />} />
-          <Route path="schedule" element={<SchedulePage />} />
+          <Route path="schedule" element={<CalendarPage />} />
           <Route path="time" element={<TimePage />} />
           <Route path="_states" element={<StatesPage />} />
           {sectionRoutes("jobs", <JobsPage />)}
