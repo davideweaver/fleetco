@@ -361,15 +361,13 @@ when they did not.
 it into two dialogs made one task look like two, and left the override harder to find than
 it should be.
 
-**But the three outcomes are not peers.** Approved and Declined are a pair of buttons —
-they both record what the customer said. Override is a quieter link beneath them that
-swaps the form: the consequence panel appears, the contact and method fields go away, a
-reason becomes required, and the confirm button turns to the warning treatment. There is a
-way back ("The customer did answer after all").
+**Three peer buttons — Approved, Declined, Override — and the form follows the choice.**
+Picking Override swaps it: the consequence panel appears, contact and method go away, a
+reason becomes required, and the confirm button turns to the warning treatment.
 
-> Equal weight would make authorizing *without* the customer exactly as easy as recording
-> that they agreed. Those two mistakes do not cost the same, so the paths should not cost
-> the same either. The friction belongs **inside** the flow, not in front of it.
+> The restraint on an override is the **required reason and the stated consequence**, not a
+> harder path to reach it. Hiding it only teaches people to hunt for it, and the third
+> button is where someone looks when the customer has not answered.
 
 **Still unknown, and it could invert this:** how often Cam actually overrides. Recording
 "Dana said yes on the phone" is an *approval* with method `phone` (`AUTH-011`), not an

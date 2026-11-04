@@ -166,16 +166,18 @@ export function RecordAnswerDialog({
           )}
         </div>
 
-        {/* One flow, three outcomes — but the two that record what the CUSTOMER said are
-            the pair, and the override is set apart below them. Equal weight would make
-            authorising without the customer exactly as easy as recording that they
-            agreed, and those two mistakes do not cost the same. */}
+        {/* Three peers. The outcome is picked once, up front, and the form below follows
+            it — so the override is as findable as the other two. The restraint on it is
+            the required reason and the consequence panel, not a harder path to reach it. */}
         <div className="flex gap-2">
           <Choice on={kind === "approved"} onClick={() => setKind("approved")} tone="good">
             <Check className="size-4" /> They approved
           </Choice>
           <Choice on={kind === "declined"} onClick={() => setKind("declined")} tone="bad">
             <X className="size-4" /> They declined
+          </Choice>
+          <Choice on={kind === "override"} onClick={() => setKind("override")} tone="warn">
+            <ShieldAlert className="size-4" /> Override
           </Choice>
         </div>
 
@@ -202,13 +204,6 @@ export function RecordAnswerDialog({
                 />
               )}
             </Field>
-            <button
-              type="button"
-              onClick={() => setKind("approved")}
-              className="text-xs text-muted-foreground underline-offset-2 hover:underline"
-            >
-              The customer did answer after all
-            </button>
           </div>
         ) : (
           <>
@@ -241,14 +236,6 @@ export function RecordAnswerDialog({
                 </Select>
               )}
             </Field>
-
-            <button
-              type="button"
-              onClick={() => setKind("override")}
-              className="text-xs text-warning underline-offset-2 hover:underline"
-            >
-              The customer has not answered — authorize anyway
-            </button>
           </>
         )}
 
@@ -270,18 +257,20 @@ function Choice({
   on: boolean;
   onClick: () => void;
   children: React.ReactNode;
-  tone: "good" | "bad";
+  tone: "good" | "bad" | "warn";
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
       className={cn(
-        "flex flex-1 items-center justify-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium",
+        "flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border px-2 py-2 text-[13px] font-medium",
         on
           ? tone === "good"
             ? "border-success bg-success/10 text-success"
-            : "border-destructive bg-destructive/10 text-destructive"
+            : tone === "bad"
+              ? "border-destructive bg-destructive/10 text-destructive"
+              : "border-warning bg-warning/10 text-warning"
           : "text-muted-foreground hover:bg-accent"
       )}
     >
