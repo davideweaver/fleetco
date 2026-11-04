@@ -1,5 +1,5 @@
 import { customers, invoices, jobs } from "@/data/sample";
-import { employees, entries, isLeftRunning, punches } from "@/data/time";
+import { employees, isLeftRunning, punches } from "@/data/time";
 import type { Role } from "./routes";
 
 /**
@@ -15,9 +15,9 @@ import type { Role } from "./routes";
  *   jobs       owner: work marked finished, waiting to be closed (JOB-007)
  *              tech:  assigned and not started yet
  *   invoices   overdue, or a draft that has never been sent (JOB-009 creates it unsent)
- *   time       owner: a punch left running past 12 hours (TIME-013), or an entry a
- *              technician flagged for correction (TIME-008). Both block approving the
- *              period, so both have to be visible without opening the screen.
+ *   time       owner: a punch left running past 12 hours (TIME-013). Derived, never
+ *              stopped automatically, and it blocks approving the period — so it has
+ *              to be visible without opening the screen.
  */
 export type Attention = { id: string; reason: string };
 
@@ -45,17 +45,10 @@ export function attentionFor(section: string, role: Role): Attention[] {
   if (section === "time" && role === "owner") {
     // TIME-013 says flag, never stop automatically — so the flag has to land somewhere
     // a person looks. The rail badge IS that somewhere.
-    const stale = punches.filter(isLeftRunning).map((p) => ({
+    return punches.filter(isLeftRunning).map((p) => ({
       id: p.id,
       reason: `${employees.find((e) => e.id === p.who)?.name} · running over 12 h`,
     }));
-    const flagged = entries
-      .filter((e) => e.flagged)
-      .map((e) => ({
-        id: e.id,
-        reason: `${employees.find((x) => x.id === e.who)?.name} · asked for a correction`,
-      }));
-    return [...stale, ...flagged];
   }
 
   if (section === "invoices" && role === "owner") {

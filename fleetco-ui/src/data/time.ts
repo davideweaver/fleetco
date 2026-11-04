@@ -51,8 +51,6 @@ export type Entry = {
   start: number;
   /** null while running. */
   end: number | null;
-  /** `TIME-008`: a technician cannot edit, only ask for a correction. */
-  flagged?: string;
   /** `TIME-008`: the correction kept beside what it replaced. */
   correctedFrom?: { start: number; end: number; reason: string; by: string };
 };
@@ -73,17 +71,7 @@ export const entries: Entry[] = [
   { id: "e1", who: "T1", day: "Mon Nov 2", jobNo: "G-1048", activity: null, start: hm(8), end: hm(10, 30) },
   { id: "e2", who: "T1", day: "Mon Nov 2", jobNo: "G-1044", activity: null, start: hm(10, 30), end: hm(14) },
   { id: "e3", who: "T1", day: "Mon Nov 2", jobNo: null, activity: "Cleanup", start: hm(14), end: hm(15, 15) },
-  {
-    id: "e4",
-    who: "T1",
-    day: "Tue Nov 3",
-    jobNo: "G-1048",
-    activity: null,
-    start: hm(7, 15),
-    end: hm(12),
-    // TIME-008: the technician flags; only the Owner can change it.
-    flagged: "Forgot to stop when I went to lunch.",
-  },
+  { id: "e4", who: "T1", day: "Tue Nov 3", jobNo: "G-1048", activity: null, start: hm(7, 15), end: hm(12) },
   { id: "e5", who: "T1", day: "Tue Nov 3", jobNo: "G-1052", activity: null, start: hm(12, 30), end: hm(15, 10) },
   {
     id: "e6",

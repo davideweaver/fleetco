@@ -3,8 +3,7 @@ import { Check, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { useShell } from "@/shell/shell-context";
 import { Btn, FilterChip, PageHeader, Pill } from "@/shell/ListDetailLayout";
-import { PunchClock, useTimeClock, LeftRunningChip, FlaggedPill } from "@/components/ui/timer";
-import { ConfirmWithReason } from "@/components/ui/confirm";
+import { PunchClock, useTimeClock, LeftRunningChip } from "@/components/ui/timer";
 import { CorrectTimeDialog } from "@/components/ui/correct-time";
 import { Section } from "./Customers";
 import { DateRangePicker, type DateRange } from "@/components/ui/date-picker";
@@ -43,7 +42,6 @@ function MyDay() {
     activity: null,
     start: 13 * 60 + 10,
   });
-  const [flagging, setFlagging] = useState<string | null>(null);
 
   const mine = seedEntries.filter((e) => e.who === "T1" && e.day === TODAY_LABEL);
   const jobMinutes = mine.reduce((a, e) => a + minutesOf(e), 0);
@@ -109,44 +107,23 @@ function MyDay() {
                     <span className="tnum text-muted-foreground">
                       {at(e.start)}–{at(e.end!)} · {hours(minutesOf(e))} h
                     </span>
-                    {e.flagged ? (
-                      <FlaggedPill />
-                    ) : (
-                      // TIME-008: this is the technician's ONLY route to a change.
-                      <button
-                        type="button"
-                        onClick={() => setFlagging(e.id)}
-                        className="rounded-md px-2 py-1 text-xs text-muted-foreground underline-offset-2 hover:bg-accent hover:text-foreground"
-                      >
-                        Ask for a correction
-                      </button>
-                    )}
+
                   </li>
                 ))}
               </ul>
             )}
           </Section>
 
+          {/* TIME-008, and no queue behind it. In a three-person shop the technician
+              tells Cam, who corrects it — a flag workflow would be a ticketing system
+              for a ten-second conversation. */}
           <p className="text-xs text-muted-foreground">
-            You cannot edit your own time (TIME-008). Flagging sends it to Cam, who makes
-            the change with a reason and keeps both versions.
+            You cannot edit your own time (TIME-008). If something here is wrong, tell
+            Cam — he can correct it, with a reason, and both versions are kept.
           </p>
         </div>
       </div>
 
-      <ConfirmWithReason
-        open={flagging !== null}
-        onOpenChange={(v) => !v && setFlagging(null)}
-        title="Ask for a correction"
-        consequence="Cam will see this entry in timesheet review. Say what is wrong with it."
-        reasonLabel="What needs changing?"
-        tone="warning"
-        confirmLabel="Send"
-        onConfirm={(reason) => {
-          toast.success("Sent to Cam", { description: reason });
-          setFlagging(null);
-        }}
-      />
     </div>
   );
 }
@@ -207,7 +184,6 @@ function Review() {
       payable: theirPunches.reduce((a, p) => a + minutesOf(p), 0),
       job: theirEntries.reduce((a, e) => a + minutesOf(e), 0),
       running: theirPunches.filter(isLeftRunning),
-      flagged: theirEntries.filter((e) => e.flagged),
       corrected: theirEntries.filter((e) => e.correctedFrom),
     };
   });
@@ -219,14 +195,11 @@ function Review() {
    * to catch. A filter changes what you are looking at, never what is true.
    */
   const blocking =
-    punches.filter((p) => inPeriod(p.day) && isLeftRunning(p)).length +
-    seedEntries.filter((e) => inPeriod(e.day) && e.flagged).length;
+    punches.filter((p) => inPeriod(p.day) && isLeftRunning(p)).length;
   // "Needs you" hides the employees with nothing outstanding; it never hides a column.
   // Dropping the payable column under a filter is how a part-filtered total gets read
   // as the whole period.
-  const tableRows = onlyAttention
-    ? rows.filter((r) => r.running.length + r.flagged.length > 0)
-    : rows;
+  const tableRows = onlyAttention ? rows.filter((r) => r.running.length > 0) : rows;
 
   return (
     <div className="flex h-full min-h-0 flex-col">
@@ -324,10 +297,7 @@ function Review() {
                         {r.running.map((p) => (
                           <LeftRunningChip key={p.id} />
                         ))}
-                        {r.flagged.map((e) => (
-                          <FlaggedPill key={e.id} />
-                        ))}
-                        {r.running.length + r.flagged.length === 0 && (
+                        {r.running.length === 0 && (
                           <span className="text-xs text-muted-foreground">—</span>
                         )}
                       </span>
@@ -389,23 +359,29 @@ function Review() {
                   </span>
                 </li>
               ))}
-              {shownEntries
-                .filter((e) => e.flagged)
-                .map((e) => (
+            </ul>
+          </Section>
+
+          {/* With no flag queue, THIS is the route to TIME-008's "can change any entry".
+              The Owner is told about a wrong entry in person, so the screen's job is to
+              let them find it quickly — not to wait for a ticket. */}
+          <Section title="All entries in this period">
+            {shownEntries.length === 0 ? (
+              <p className="p-3 text-sm text-muted-foreground">No entries.</p>
+            ) : (
+              <ul className="divide-y">
+                {shownEntries.map((e) => (
                   <li key={e.id} className="flex flex-wrap items-center gap-3 p-3 text-sm">
                     <span className="min-w-0 flex-1">
-                      <span className="block">
+                      <span className="block truncate">
                         {employees.find((x) => x.id === e.who)?.name} ·{" "}
                         {e.jobNo ? jobLabel(e.jobNo) : e.activity}
                       </span>
                       <span className="tnum text-xs text-muted-foreground">
                         {e.day} {at(e.start)}–{at(e.end!)} · {hours(minutesOf(e))} h
                       </span>
-                      <span className="mt-0.5 block text-xs italic text-muted-foreground">
-                        “{e.flagged}”
-                      </span>
                     </span>
-                    <FlaggedPill />
+                    {e.correctedFrom && <Pill tone="muted">Corrected</Pill>}
                     <span
                       onClick={() =>
                         setCorrecting({
@@ -424,7 +400,8 @@ function Review() {
                     </span>
                   </li>
                 ))}
-            </ul>
+              </ul>
+            )}
           </Section>
 
           {/* TIME-008: the corrected value never replaces the original silently. Both
@@ -507,9 +484,6 @@ function Review() {
               e.correctedFrom = { start: e.start, end: e.end ?? end, reason, by: "Cam" };
               e.start = start;
               e.end = end;
-              // Resolving it is the point: the flag is the ASK, and the correction is
-              // the answer. Leaving it flagged would badge the rail forever.
-              e.flagged = undefined;
             }
             bump((n) => n + 1);
             toast.success("Correction saved", {

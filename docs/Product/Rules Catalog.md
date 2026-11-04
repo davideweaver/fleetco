@@ -543,10 +543,15 @@ entries.
 **Source:** PL 4.5 · **Status:** Confirmed · **Phase:** V1
 
 ### TIME-008 Corrections are done by the Owner, with a reason
-**Rule:** Technicians can't edit time entries, even their own; they flag an entry for correction.
-A user with `time.correct` can change any entry, with a required reason. The before and after values
-are kept.
-**Source:** PL 4.6 · **Status:** Confirmed · **Phase:** V1
+**Rule:** Technicians can't edit time entries, even their own. A user with `time.correct` can
+change any entry, with a required reason. The before and after values are kept.
+**Source:** PL 4.6 ("Manual timesheet corrections") · **Status:** Confirmed · **Phase:** V1
+
+> **A technician flagging an entry for correction was removed on 2026-11-04.** It was never in
+> PL 4.6 and Cam never asked for it — it was invented in the first draft and inherited the
+> source's Confirmed status. In a three-person shop the technician tells Cam, who corrects it.
+> Adding a queue for a conversation that takes ten seconds is how software gets heavier than
+> the business it serves. If Cam asks for it later, it is a new rule with its own source.
 
 ### TIME-009 Approving a pay period locks it
 **Rule:** the Owner approves a pay period. Entries in an approved period can't be changed unless the
@@ -990,6 +995,7 @@ and permissions are mostly Confirmed, because Cam's notes were precise about the
 |---|---|
 | 2026-10-31 | First draft. Mined from Cam's punch-list notes, the 10/23 debrief, V1 Vision and Gaps, V1 Alignment, Domain Model and Code Standards. No new FullBay access. |
 | 2026-10-31 | PLAT-006 reworded: shared customers is our design choice, and evidence suggests FullBay keeps customers per shop. Added D-C18. |
+| 2026-11-04 | TIME-008: the technician "flags an entry for correction" clause removed. PL 4.6 says only "Manual timesheet corrections" and Cam never raised a flag workflow — the clause was invented in the first draft and took the source's Confirmed status with it. The rest of TIME-008 stands. |
 | 2026-11-03 | PLAT-006 UI clause reversed by Dave. The department is visible from V1 even with one department; only switching stays Later. The clause was Proposed, so this is a spec change rather than a correction. |
 
 ## Related

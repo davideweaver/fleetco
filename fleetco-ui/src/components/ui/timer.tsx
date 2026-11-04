@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { AlertTriangle, LogIn, LogOut, Play, Square } from "lucide-react";
+import { LogIn, LogOut, Play, Square } from "lucide-react";
 import { toast } from "sonner";
-import { Btn, Pill } from "@/shell/ListDetailLayout";
+import { Btn } from "@/shell/ListDetailLayout";
 import { AttentionChip } from "./attention";
 import { ACTIVITIES, at, hours, jobLabel, minutesOf, NOW } from "@/data/time";
 import { cn } from "@/lib/utils";
@@ -245,14 +245,4 @@ export function useTimeClock(initialPunch: number | null, initialTimer: RunningT
 /** `TIME-013`. Shown wherever a punch or entry is listed, not only in review. */
 export function LeftRunningChip() {
   return <AttentionChip reason="Running over 12 h" />;
-}
-
-export function FlaggedPill() {
-  return (
-    <Pill tone="warn">
-      <span className="inline-flex items-center gap-1">
-        <AlertTriangle className="size-3" /> Flagged
-      </span>
-    </Pill>
-  );
 }

@@ -584,17 +584,22 @@ from the time screen must obey the same rules — and cannot, if each screen imp
 
 ### Corrections and the lock
 
-`TIME-008` has three parts and all three are load-bearing:
+`TIME-008` has three parts:
 
-1. A technician **cannot edit their own time**. They *ask for a correction* — a reason, nothing
-   else, because they are raising a question, not answering one.
-2. A user with `time.correct` (Owner in V1) **changes the entry** — the actual numbers — with a
+1. A technician **cannot edit their own time** — they see it, read-only.
+2. A user with `time.correct` (Owner in V1) **changes any entry** — the actual numbers — with a
    **required reason**.
 3. **Both values are kept**: struck original, new value, reason, who. The same
    supersede-don't-overwrite shape as `AUTH-003`.
 
-So there are **two dialogs, and the difference is the point**. The technician's is a reason box.
-The Owner's has the clock fields, because a reason without an edit resolves nothing.
+**There is no flag-for-correction queue.** An earlier draft had the technician flag an entry and
+the Owner work a queue of flags. Nobody asked for it: punch list 4.6 says only "Manual timesheet
+corrections", and Cam never raised it. In a three-person shop the technician tells Cam and Cam
+fixes it — a queue would be a ticketing system for a ten-second conversation.
+
+That decides the shape of the Owner's screen. With no queue to work, **every entry in the period
+is listed with a Correct… action**, because being told "Tuesday's wrong" and then having to find
+Tuesday is the actual job.
 
 > **Attention is only legitimate if the screen can clear it.** An earlier version of the Owner's
 > dialog captured a reason but never let anyone touch the times, so a flagged entry stayed
@@ -602,9 +607,9 @@ The Owner's has the clock fields, because a reason without an edit resolves noth
 > exists to prevent, arrived at from the other direction: not a badge with no rows, but rows
 > with no resolution. **Before badging anything, check that some screen can act on it.**
 
-Saving a correction clears the flag, drops the row out of "needs you" and takes the rail badge
-down by one — all from the same `attentionMap` call, with nothing cached in a second place to
-go stale.
+Attention here is **`TIME-013` only** — a punch past twelve hours, which is derived from the
+data rather than asked for by a person. Correcting it closes the punch, drops the row out of
+"needs you" and takes the rail badge down by one, all from the same `attentionMap` call.
 
 Clocks are **typed, not picked**. A correction is "he actually left at 16:00", which is four
 keystrokes; a picker would be slower than the thing it replaces. An end before the start is
