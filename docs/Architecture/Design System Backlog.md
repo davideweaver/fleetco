@@ -31,6 +31,7 @@ queue.
 - [x] Badges and attention — one derivation for the rail and the list
 - [x] List rows — monogram, attention reason, filter chips
 - [x] **Approval capture** (`AUTH-002`/`003`/`004`) and the reason-required confirm
+- [x] Row action menu — the action sits in the cell that shows the state
 
 ## Next
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { ChevronDown, ChevronRight, Plus } from "lucide-react";
 import {
@@ -128,6 +128,9 @@ export function EstimateEditor({ estimateId }: { estimateId: string }) {
                 owner={owner}
                 open={openLines.has(line.id)}
                 onToggle={() => toggle(line.id)}
+                settled={(history[line.id] ?? []).length > 0}
+                onRecord={() => setRecording(true)}
+                onOverride={() => setOverriding(line.id)}
               />
             ))}
 
@@ -182,15 +185,10 @@ export function EstimateEditor({ estimateId }: { estimateId: string }) {
             <div className="space-y-3">
               {estimateLines.map((l) => (
                 <div key={l.id} className="overflow-hidden rounded-lg border">
-                  <div className="flex items-center gap-2 border-b bg-muted/40 px-3 py-2 text-xs">
-                    <span className="font-medium">{l.name}</span>
-                    <button
-                      type="button"
-                      onClick={() => setOverriding(l.id)}
-                      className="ml-auto text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
-                    >
-                      Override
-                    </button>
+                  {/* Read-only. The history records what happened; acting happens in the
+                      table above, next to the line. */}
+                  <div className="border-b bg-muted/40 px-3 py-2 text-xs font-medium">
+                    {l.name}
                   </div>
                   <ApprovalHistory records={history[l.id] ?? []} />
                 </div>
@@ -267,11 +265,18 @@ function LineRows({
   owner,
   open,
   onToggle,
+  settled,
+  onRecord,
+  onOverride,
 }: {
   line: EstimateLine;
   owner: boolean;
   open: boolean;
   onToggle: () => void;
+  /** Already has an answer on the record, so there is nothing to act on. */
+  settled: boolean;
+  onRecord: () => void;
+  onOverride: () => void;
 }) {
   const [price, setPrice] = useState(linePrice(line));
   const sum = componentSum(line);
@@ -310,8 +315,15 @@ function LineRows({
           )}
         </Td>
 
+        {/* The action lives where the state is. A line waiting on an answer is the only
+            line you can do anything to, so only that one is actionable — an Override on
+            an approved line is meaningless, and offering it invites the mistake. */}
         <Td className="hidden @md:table-cell">
-          <ApprovalPill approval={line.approval} />
+          {owner && !settled ? (
+            <ApprovalMenu onRecord={onRecord} onOverride={onOverride} />
+          ) : (
+            <ApprovalPill approval={line.approval} />
+          )}
         </Td>
 
         {owner && (
@@ -397,6 +409,86 @@ function ComponentRow({
       {/* ROLE-005: a technician sees the scope, never a price. */}
       <Td right>{owner ? money(Math.round((c.qty ?? 1) * c.sellCents)) : ""}</Td>
     </tr>
+  );
+}
+
+/** A pending line's approval cell is a menu, not a label. */
+function ApprovalMenu({
+  onRecord,
+  onOverride,
+}: {
+  onRecord: () => void;
+  onOverride: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative inline-block">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        className="inline-flex items-center gap-1 rounded-full border border-dashed px-2 py-0.5 text-[10.5px] font-medium uppercase tracking-wide text-muted-foreground hover:border-solid hover:bg-accent hover:text-foreground"
+      >
+        Pending
+        <ChevronDown className="size-3" />
+      </button>
+      {open && (
+        <div className="absolute left-0 top-full z-30 mt-1 w-48 overflow-hidden rounded-lg border bg-popover shadow-lg">
+          <MenuItem
+            onClick={() => {
+              setOpen(false);
+              onRecord();
+            }}
+          >
+            Record the answer…
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              setOpen(false);
+              onOverride();
+            }}
+            tone="warn"
+          >
+            Override…
+          </MenuItem>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MenuItem({
+  onClick,
+  children,
+  tone,
+}: {
+  onClick: () => void;
+  children: React.ReactNode;
+  tone?: "warn";
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "block w-full px-3 py-2 text-left text-sm hover:bg-accent",
+        tone === "warn" && "text-warning"
+      )}
+    >
+      {children}
+    </button>
   );
 }
 

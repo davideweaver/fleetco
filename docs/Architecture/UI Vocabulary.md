@@ -336,6 +336,19 @@ mark says *something*; the reason says *what*, and it is the same number of pixe
 **Sections without a list never get a badge they cannot explain.** Where the lab shows one
 (estimates, time, materials under Busy), it is explicitly marked as a visual stress test.
 
+## Row actions
+
+**The action lives where the state is.** A pending line's approval cell *is* the menu —
+"Record the answer…" and "Override…" — rather than a label with the controls elsewhere on
+the page.
+
+**Only an actionable row is actionable.** An override on an already-approved line is
+meaningless, so a settled line shows a plain pill and no menu. Offering an action that
+makes no sense invites the mistake it describes.
+
+A history block records what happened and is **read-only**; acting happens next to the
+record, not under it.
+
 ## Naming rules
 
 1. **Pane, column, bar, sheet — pick by behaviour, not by looks.**
