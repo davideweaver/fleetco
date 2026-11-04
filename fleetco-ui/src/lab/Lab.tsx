@@ -22,6 +22,8 @@ const SCREENS = [
   { key: "reports", label: "Reports (sections list)", path: "/app/reports/ar-aging" },
   { key: "schedule2", label: "Schedule (week grid)", path: "/app/schedule" },
   { key: "estimate", label: "Estimate line editor", path: "/app/estimates/E-1048" },
+  { key: "photos-up", label: "Photos uploading", path: "/app/jobs/G-1048?photos=uploading" },
+  { key: "photos-fail", label: "Photos · upload died at 31 of 40", path: "/app/jobs/G-1048?photos=failed" },
   { key: "form", label: "Form in a panel (new job)", path: "/app/jobs?overlay=form" },
   { key: "form-errors", label: "Form with errors", path: "/app/jobs?overlay=form-errors" },
   { key: "states", label: "Loading / empty / error / not found", path: "/app/_states" },

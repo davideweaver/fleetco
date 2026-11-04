@@ -5,9 +5,11 @@ import { jobs, STAGES, wrapComponents, wrapPriceCents } from "@/data/sample";
 import { useShell } from "@/shell/shell-context";
 import { Btn, DetailHeader, ListDetailLayout, ListHeader, ListRow, Pill } from "@/shell/ListDetailLayout";
 import { Overlay } from "@/components/ui/overlay";
+import { PhotoGrid, hasUploadedCompletionPhoto, type Photo } from "@/components/ui/photos";
+import { toast } from "sonner";
 import { NewJobPanel } from "./NewJob";
 import { Section, Stat, Td, Th } from "./Customers";
-import { money } from "@/lib/utils";
+import { cn, money } from "@/lib/utils";
 
 export function JobsPage() {
   const { id } = useParams();
@@ -72,6 +74,17 @@ function JobDetail({ no }: { no: string }) {
   // A decision that blocks you: a dialog, not a panel.
   const [closing, setClosing] = useState(params.get("overlay") === "dialog");
   const owner = role === "owner";
+  const [photos, setPhotos] = useState<Photo[]>(() => seedPhotos(params.get("photos")));
+  const canFinish = hasUploadedCompletionPhoto(photos);
+
+  const retry = (id: string) =>
+    setPhotos((all) =>
+      all.map((p) => (p.id === id ? { ...p, state: "uploading", progress: 40 } : p))
+    );
+  const retryAll = () =>
+    setPhotos((all) =>
+      all.map((p) => (p.state === "failed" ? { ...p, state: "uploading", progress: 15 } : p))
+    );
 
   return (
     <div>
@@ -172,17 +185,47 @@ function JobDetail({ no }: { no: string }) {
       </Section>
 
       <Section title="Photos">
-        <div className="flex gap-2 overflow-x-auto p-3">
-          {["Before", "Before", "Progress", "Completion"].map((label, i) => (
-            <div key={i} className="shrink-0">
-              <div className="grid h-20 w-28 place-items-center rounded-md border border-dashed bg-muted/50 text-[11px] text-muted-foreground">
-                photo
-              </div>
-              <div className="mt-1 text-[11px] text-muted-foreground">{label}</div>
-            </div>
-          ))}
-        </div>
+        <PhotoGrid
+          photos={photos}
+          onRetry={retry}
+          onRetryAll={retryAll}
+          onRemove={(id) => setPhotos((all) => all.filter((p) => p.id !== id))}
+          onAdd={() => {}}
+        />
       </Section>
+
+      {/* JOB-008 as the three-beat refusal: the reason is visible BEFORE the attempt,
+          the attempt is refused, and the toast repeats why. A technician on a shop floor
+          should not have to guess which of forty photos is holding up his afternoon. */}
+      {!owner && (
+        <div className="flex flex-wrap items-center gap-3 border-t px-4 py-3 lg:px-5">
+          <button
+            type="button"
+            onClick={() =>
+              canFinish
+                ? toast.success("Work marked finished", {
+                    description: "Sent to the owner to check.",
+                  })
+                : toast.error("Cannot finish yet", {
+                    description: "A completion photo has to finish uploading first.",
+                  })
+            }
+            className={cn(
+              "rounded-md border px-3 py-1.5 text-sm font-medium",
+              canFinish
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-border text-muted-foreground"
+            )}
+          >
+            Mark work finished
+          </button>
+          {!canFinish && (
+            <span className="text-xs text-muted-foreground">
+              Needs a completion photo that has finished uploading.
+            </span>
+          )}
+        </div>
+      )}
 
       <Overlay
         kind="dialog"
@@ -217,4 +260,31 @@ function JobDetail({ no }: { no: string }) {
       </Overlay>
     </div>
   );
+}
+
+/** `?photos=` lets the lab shoot the states that are hard to reach on purpose. */
+function seedPhotos(mode: string | null): Photo[] {
+  if (mode === "uploading")
+    return [
+      { id: "p1", tag: "before", state: "done" },
+      { id: "p2", tag: "before", state: "done" },
+      { id: "p3", tag: "progress", state: "uploading", progress: 62 },
+      { id: "p4", tag: "progress", state: "queued" },
+      { id: "p5", tag: "completion", state: "queued" },
+    ];
+  if (mode === "failed")
+    return [
+      { id: "p1", tag: "before", state: "done" },
+      { id: "p2", tag: "before", state: "done" },
+      { id: "p3", tag: "progress", state: "done" },
+      { id: "p4", tag: "progress", state: "failed", sizeKb: 2180 },
+      { id: "p5", tag: "completion", state: "failed", sizeKb: 2640 },
+      { id: "p6", tag: "completion", state: "queued" },
+    ];
+  return [
+    { id: "p1", tag: "before", state: "done" },
+    { id: "p2", tag: "before", state: "done" },
+    { id: "p3", tag: "progress", state: "done" },
+    { id: "p4", tag: "completion", state: "done" },
+  ];
 }

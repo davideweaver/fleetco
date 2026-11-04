@@ -239,6 +239,30 @@ the column width. There is no warning, because the rule says V1 stays quiet.
 unchanged."* Two systems being deliberately separate is the kind of thing a user only half believes
 until the software tells them.
 
+## Photos
+
+| Name | Component | Notes |
+|---|---|---|
+| **Photo grid** | `PhotoGrid` | Square tiles, add tile first. Used on the job record and in the job panel |
+| **Photo tile** | `Tile` | Carries **its own** upload state — done, uploading, queued, failed |
+| **Batch line** | in `PhotoGrid` | One line above the grid: counts, never a progress bar |
+
+**Per-photo state, not a batch progress bar.** G13 asks the question this answers — *"what
+happens when a 40-photo upload dies at photo 31 on shop wifi"*. A batch bar cannot say **which**
+one failed, and `JOB-008` means a missing completion photo is what stops a technician finishing
+the job. So each tile owns its state and retries alone, or all failures retry together.
+
+**A failed upload is not an error state for the screen.** `ErrorState` would blank the gallery and
+hide the photos that did land. The tile carries the failure; everything else stays usable.
+
+**`JOB-008` checks for an *arrived* completion photo.** One sitting in a failed queue is not
+evidence of anything, so `hasUploadedCompletionPhoto` requires `state === "done"`. The refusal
+follows the board's three beats: the reason sits next to the button before you press it, the press
+is refused, and the toast repeats why.
+
+**The tag is always legible, never on hover.** It is the thing `JOB-008` reads, and the primary
+device is a phone with no hover at all.
+
 ## Naming rules
 
 1. **Pane, column, bar, sheet — pick by behaviour, not by looks.**
@@ -260,7 +284,6 @@ until the software tells them.
 Parts the design system does not have yet, so they have no agreed name. Each gets one when it is
 built, and that is the moment to add it here rather than later:
 
-- The photo gallery and its capture control
 - Confirm-destructive dialogs, which probably want their own variant (`INV-012` voiding,
   `JOB-011` cancelling)
 - Anything on a customer-facing surface (estimate PDF, invoice PDF, payment page) — that is a
