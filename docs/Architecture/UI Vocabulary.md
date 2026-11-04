@@ -246,11 +246,28 @@ until the software tells them.
 | **Photo grid** | `PhotoGrid` | Square tiles, add tile first. Used on the job record and in the job panel |
 | **Photo tile** | `Tile` | Carries **its own** upload state — done, uploading, queued, failed |
 | **Batch line** | in `PhotoGrid` | One line above the grid: counts, never a progress bar |
+| **Status band** | in `Tile` | Fixed 20px strip. Always a bar, never words |
 
 **Per-photo state, not a batch progress bar.** G13 asks the question this answers — *"what
 happens when a 40-photo upload dies at photo 31 on shop wifi"*. A batch bar cannot say **which**
 one failed, and `JOB-008` means a missing completion photo is what stops a technician finishing
 the job. So each tile owns its state and retries alone, or all failures retry together.
+
+**The band is always a bar, and it is one height.** A photo goes `queued` → `uploading` →
+`confirming` → `done` without the status changing shape. A strip that swaps a bar for a word, or
+changes height, makes a grid of tiles twitch as uploads land — which reads as instability in
+exactly the moment the user already suspects the upload failed.
+
+| State | Band | Why |
+|---|---|---|
+| `queued` | Indeterminate sweep | Before the bytes move. With forty photos and a few parallel uploads, most sit here |
+| `uploading` | Determinate fill | The one phase that knows how far along it is |
+| `confirming` | Indeterminate sweep | Bytes have landed; the server has not said it kept them yet. No percentage exists |
+| `done` / `failed` | No band | The tag and the retry overlay carry it |
+
+The sweep runs **back and forth** (`alternate`), not left-to-right on a loop. A one-way loop reads
+as "starting over", which is the wrong message for someone watching an upload they half believe has
+already failed. It collapses to a static dimmed bar under `prefers-reduced-motion`.
 
 **A failed upload is not an error state for the screen.** `ErrorState` would blank the gallery and
 hide the photos that did land. The tile carries the failure; everything else stays usable.

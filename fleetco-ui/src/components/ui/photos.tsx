@@ -1,4 +1,4 @@
-import { AlertTriangle, Camera, Check, Clock, RotateCw, X } from "lucide-react";
+import { AlertTriangle, Camera, Check, RotateCw, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
@@ -15,7 +15,13 @@ import { cn } from "@/lib/utils";
  * would blank the gallery and hide the eleven photos that did land. The tile carries its
  * own failure and everything else stays usable.
  */
-export type PhotoState = "done" | "uploading" | "queued" | "failed";
+/**
+ * Four live states and one terminal one. `queued` is BEFORE the bytes move — forty photos
+ * and a handful of parallel uploads means most of them sit here. `confirming` is after
+ * the bytes have landed and before the server says it kept them; the client knows no
+ * percentage for either, which is why both get a sweep rather than a bar.
+ */
+export type PhotoState = "done" | "queued" | "uploading" | "confirming" | "failed";
 export type PhotoTag = "before" | "progress" | "completion" | "condition";
 
 export type Photo = {
@@ -49,7 +55,7 @@ export function PhotoGrid({
   onAdd?: () => void;
 }) {
   const failed = photos.filter((p) => p.state === "failed");
-  const pending = photos.filter((p) => p.state === "uploading" || p.state === "queued");
+  const pending = photos.filter((p) => p.state !== "done" && p.state !== "failed");
 
   return (
     <div className="p-3">
@@ -165,24 +171,23 @@ function Tile({
         </button>
       )}
 
-      {/* One band, one height, whatever it is saying. A status strip that changes size
-          makes a grid of tiles twitch as uploads land, which reads as instability in
-          exactly the moment the user is already unsure the upload worked. */}
-      {(photo.state === "uploading" || photo.state === "queued") && (
-        <div className="absolute inset-x-0 bottom-0 flex h-5 items-center justify-center gap-1 bg-foreground/70 px-1.5 text-[10px] leading-none text-background">
-          {photo.state === "uploading" ? (
-            <div className="h-1 w-full overflow-hidden rounded-full bg-background/30">
+      {/* One band, one height, and always a bar — never a bar that turns into words.
+          The tile goes queued -> uploading -> confirming without the status changing
+          shape, so a grid of them does not twitch as uploads land. */}
+      {(photo.state === "queued" ||
+        photo.state === "uploading" ||
+        photo.state === "confirming") && (
+        <div className="absolute inset-x-0 bottom-0 flex h-5 items-center bg-foreground/70 px-1.5">
+          <div className="h-1 w-full overflow-hidden rounded-full bg-background/30">
+            {photo.state === "uploading" ? (
               <div
-                className="h-full bg-background transition-all"
+                className="h-full rounded-full bg-background transition-all"
                 style={{ width: `${photo.progress ?? 0}%` }}
               />
-            </div>
-          ) : (
-            <>
-              <Clock className="size-3 shrink-0" />
-              <span>Pending…</span>
-            </>
-          )}
+            ) : (
+              <div className="band-sweep h-full w-[28%] rounded-full bg-background/80" />
+            )}
+          </div>
         </div>
       )}
 

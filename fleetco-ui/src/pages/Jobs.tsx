@@ -269,7 +269,7 @@ function seedPhotos(mode: string | null): Photo[] {
       { id: "p1", tag: "before", state: "done" },
       { id: "p2", tag: "before", state: "done" },
       { id: "p3", tag: "progress", state: "uploading", progress: 62 },
-      { id: "p4", tag: "progress", state: "queued" },
+      { id: "p4", tag: "progress", state: "confirming" },
       { id: "p5", tag: "completion", state: "queued" },
     ];
   if (mode === "failed")

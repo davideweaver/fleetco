@@ -283,3 +283,27 @@ body {
 [data-nav="dark"].dark .nav-surface {
   --surface-1: initial;
 }
+
+/* An indeterminate sweep for the two phases that have no percentage: waiting in the
+   queue, and waiting for the server to confirm a finished upload. Determinate progress
+   is reserved for the one phase that actually knows how far along it is.
+
+   `alternate` is what makes it run back and forth rather than restarting from the left.
+   A one-way loop reads as "starting over", which is the opposite of reassuring when
+   someone is watching an upload they already half suspect has failed. */
+@keyframes band-sweep {
+  from { transform: translateX(0%); }
+  to   { transform: translateX(257%); }
+}
+
+.band-sweep {
+  animation: band-sweep 1.15s ease-in-out infinite alternate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .band-sweep {
+    animation: none;
+    width: 100%;
+    opacity: 0.55;
+  }
+}
