@@ -165,22 +165,25 @@ function Tile({
         </button>
       )}
 
-      {photo.state === "uploading" && (
-        <div className="absolute inset-x-0 bottom-0 bg-foreground/70 px-1.5 py-1">
-          <div className="h-1 overflow-hidden rounded-full bg-background/30">
-            <div
-              className="h-full bg-background transition-all"
-              style={{ width: `${photo.progress ?? 0}%` }}
-            />
-          </div>
+      {/* One band, one height, whatever it is saying. A status strip that changes size
+          makes a grid of tiles twitch as uploads land, which reads as instability in
+          exactly the moment the user is already unsure the upload worked. */}
+      {(photo.state === "uploading" || photo.state === "queued") && (
+        <div className="absolute inset-x-0 bottom-0 flex h-5 items-center justify-center gap-1 bg-foreground/70 px-1.5 text-[10px] leading-none text-background">
+          {photo.state === "uploading" ? (
+            <div className="h-1 w-full overflow-hidden rounded-full bg-background/30">
+              <div
+                className="h-full bg-background transition-all"
+                style={{ width: `${photo.progress ?? 0}%` }}
+              />
+            </div>
+          ) : (
+            <>
+              <Clock className="size-3 shrink-0" />
+              <span>Pending…</span>
+            </>
+          )}
         </div>
-      )}
-
-      {photo.state === "queued" && (
-        <span className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-1 bg-foreground/70 px-1.5 py-1 text-[10px] text-background">
-          <Clock className="size-3" />
-          Waiting to upload
-        </span>
       )}
 
       {failed && (
