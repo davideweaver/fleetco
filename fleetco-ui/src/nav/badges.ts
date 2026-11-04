@@ -32,7 +32,7 @@ export function badgesFor(role: Role): Record<string, Badge> {
   // Every badge is derived from the SAME function the list filters on, so the two can
   // never disagree, and no section carries a badge it cannot explain. See attention.ts.
   const out: Record<string, Badge> = {};
-  for (const section of ["jobs", "customers", "invoices"]) {
+  for (const section of ["jobs", "customers", "invoices", "time"]) {
     const n = attentionFor(section, role).length;
     if (n) out[section] = { count: n };
   }

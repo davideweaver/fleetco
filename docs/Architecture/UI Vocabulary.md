@@ -549,6 +549,57 @@ hanging it from the right edge of a control that sits at the *left* of a toolbar
 the pane, where the list column clips it. It defaults to `start` and only takes `end` where the
 trigger is genuinely right-aligned.
 
+## Time: two clocks, never one
+
+The technician's main control, and the screen where the wrong model costs real money.
+
+| | What it is | Drawn as |
+|---|---|---|
+| **Punch** | attendance — the day. The **only** payable thing (`TIME-006`) | the frame |
+| **Timer** | the job or activity you are on now. Costing only (`TIME-011`) | **inside** the frame |
+
+The nesting is the argument. Job time happens *within* an attendance day, so the layout says
+so before anyone reads a label. A technician who believes the timer is what pays them will stop
+it at lunch and lose half a day's wages, and nobody will notice until payday.
+
+**The two numbers never add up.** "Payable today" and "On jobs today" sit side by side with no
+total, on the technician's screen and in the owner's review. Jason punching 07:00–15:30 and
+logging 6.0 h on jobs plus 1.5 h on cleanup is paid **8.50, not 16.00** — a grand total would
+be the single most expensive thing this screen could get wrong, so the structure refuses it.
+
+### One state machine, wherever Start is pressed
+
+`useTimeClock` owns every transition, because a timer started from a job detail and one started
+from the time screen must obey the same rules — and cannot, if each screen implements start.
+
+- **`TIME-002`** Starting a timer stops the running one *at the same instant* — no gap, no
+  overlap — and the handoff is **announced**: "G-1048 stopped at 10:30 — 2.50 h." A silent swap
+  leaves someone wondering where the morning went.
+- **`TIME-004`** (open, `D-C11`) A timer needs an active punch. The proposed default **refuses
+  and offers the fix** — the same shape as the board's refused drop: the toast carries a
+  "Punch in" action that does both.
+- **`TIME-005`** Punching out stops the timer, and the toast names what it stopped.
+- **`TIME-014`** No timer on a closed job, checked before the punch rule — a refusal about the
+  job beats one about the punch.
+
+### Corrections and the lock
+
+`TIME-008`: a technician **cannot edit their own time**, even their own. They *ask for a
+correction*; the Owner makes it with a required reason, and **both values are kept** — struck
+original, new value, reason, who. The same supersede-don't-overwrite shape as `AUTH-003`.
+
+`TIME-013` is **attention**: a punch running past twelve hours is derivable, needs a person, and
+is never stopped automatically — so it bubbles to the rail badge like any other. Elapsed time
+for an open span counts **across days**; subtracting two times-of-day makes a 19-hour punch look
+like 7, which is a flag that never fires.
+
+Approving a period locks it (`TIME-009`) and payroll exports approved periods only (`TIME-010`),
+so **approving over an unresolved flag is refused** with a count of what is left. That is the
+path by which a wrong number reaches payroll.
+
+`TIME-012`: two decimals, no rounding to quarter hours. A shop that rounds to quarters is a shop
+arguing about six minutes every Friday.
+
 ## Reports and print
 
 **One shell, not nine.** Every V1 report is the same object: a period, some filters, a table

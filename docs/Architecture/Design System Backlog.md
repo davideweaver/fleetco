@@ -35,12 +35,21 @@ queue.
 - [x] Destructive confirm with a required reason (`INV-012` void, and the override branch)
 - [x] **Dates** — one grid, `DatePicker` and `DateRangePicker`, presets, shop-local
 - [x] **Report shell + print + CSV** (`RPT-001`/`004`/`006`) — one shell, nine reports
+- [x] **Time** — punch clock, timer, timesheet review, corrections, the period lock
 
 ## Next
 
 ### Tier 1 — build before the swarm
 
 
+- [ ] **Wire the time reports to the time data.** `src/data/time.ts` now exists, so
+      Clocked hours, Job hours and Timesheets can be real. `RPT-007` expected-vs-actual
+      still needs `EST-011` expected hours, which the estimate does not carry yet.
+- [ ] **Payroll export** (`TIME-010`) — approved periods only, CSV and printout, hours by
+      employee and date, no wages. The report shell already does both halves.
+- [ ] **Pay period length is `D-C12`.** The review screen shows one undated period; it
+      cannot show real boundaries until someone answers weekly or fortnightly.
+- [ ] **Reopening an approved period is audited** (`TIME-009`) and has no UI yet.
 - [ ] **The four time reports have no data.** Payments, Clocked hours, Job hours and
       Timesheets render the shell and their definitions but no rows — they wait on the
       timer below. `RPT-007` expected-vs-actual needs the variance conventions from the
@@ -51,9 +60,7 @@ queue.
 - [ ] **A technician can reach Reports by URL** and sees the nine names. The financial
       ones refuse, but the non-financial ones render. Correct per `RPT-001`, possibly
       not per intent — ask.
-- [ ] **Timer, punch clock, timesheet.** The technician's main control. `TIME-002` one
-      running timer, `TIME-004` needs an active punch, `TIME-013` left-running flag,
-      `TIME-009` approval locks a period.
+
 
 
 ### Tier 1 — Attention, the rest of it

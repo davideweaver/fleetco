@@ -7,7 +7,8 @@ import { CustomersPage } from "@/pages/Customers";
 import { JobsPage } from "@/pages/Jobs";
 import { EstimatesPage, InvoicesPage, MaterialsPage } from "@/pages/Records";
 import { SectionsPage } from "@/pages/Sections";
-import { BoardPage, TimePage } from "@/pages/Wide";
+import { BoardPage } from "@/pages/Wide";
+import { TimePage } from "@/pages/Time";
 import { CalendarPage } from "@/pages/Calendar";
 import "./index.css";
 

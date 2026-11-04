@@ -8,6 +8,8 @@ import { attentionMap } from "@/nav/attention";
 import { StatusPill } from "@/components/ui/status-pill";
 import { Overlay } from "@/components/ui/overlay";
 import { PhotoGrid, hasUploadedCompletionPhoto, type Photo } from "@/components/ui/photos";
+import { useTimeClock } from "@/components/ui/timer";
+import { punches } from "@/data/time";
 import { toast } from "sonner";
 import { NewJobPanel } from "./NewJob";
 import { Section, Stat, Td, Th } from "./Customers";
@@ -82,6 +84,7 @@ function JobDetail({ no }: { no: string }) {
   const [open, setOpen] = useState(false);
   // A decision that blocks you: a dialog, not a panel.
   const [closing, setClosing] = useState(params.get("overlay") === "dialog");
+  const clock = useTimeClock(punches.find((p) => p.id === "p3")!.in, null);
   const owner = role === "owner";
   const [photos, setPhotos] = useState<Photo[]>(() => seedPhotos(params.get("photos")));
   const canFinish = hasUploadedCompletionPhoto(photos);
@@ -198,11 +201,20 @@ function JobDetail({ no }: { no: string }) {
                   <Camera className="size-4" /> Add photo
                 </span>
               </Btn>
-              <Btn primary>
-                <span className="flex items-center gap-1.5">
-                  <Play className="size-4" /> Start timer
-                </span>
-              </Btn>
+              {/* Same state machine as My time. A timer started from a job and one
+                  started from the time screen have to obey TIME-002/004/014
+                  identically, which they cannot if each screen implements start. */}
+              <span
+                onClick={() =>
+                  clock.start({ jobNo: j.no, activity: null, closed: j.stage >= 5 })
+                }
+              >
+                <Btn primary>
+                  <span className="flex items-center gap-1.5">
+                    <Play className="size-4" /> Start timer
+                  </span>
+                </Btn>
+              </span>
             </>
           )
         }

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { jobs, STAGES, type Job } from "@/data/sample";
 import { useShell } from "@/shell/shell-context";
-import { Btn, PageHeader } from "@/shell/ListDetailLayout";
+import { Btn } from "@/shell/ListDetailLayout";
 import { Overlay } from "@/components/ui/overlay";
 import { BoardPage as Board } from "./Board";
 import { Section, Stat } from "./Customers";
@@ -69,45 +69,3 @@ export function BoardPage() {
  * `pane: "wide"` — no second column. Six stages minus a 300px list leaves about
  * 140px per column on an iPad, which is why the board does not get one.
  */
-export function TimePage() {
-  const rows = [
-    { who: "Technician 1", day: "Mon", clocked: "8:02", job: "6:45", shop: "1:17" },
-    { who: "Technician 1", day: "Tue", clocked: "7:48", job: "7:10", shop: "0:38" },
-    { who: "Technician 1", day: "Wed", clocked: "8:15", job: "5:55", shop: "2:20" },
-    { who: "Owner", day: "Mon", clocked: "9:10", job: "2:30", shop: "6:40" },
-  ];
-  return (
-    <div className="flex h-full min-h-0 flex-col">
-      <PageHeader title="Time & payroll" />
-      <div className="min-h-0 flex-1 overflow-auto p-3">
-      <div className="overflow-hidden rounded-lg border">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b bg-muted/40 text-left text-xs text-muted-foreground">
-              <th className="px-3 py-2 font-medium">Employee</th>
-              <th className="px-3 py-2 font-medium">Day</th>
-              <th className="px-3 py-2 text-right font-medium">Clocked</th>
-              <th className="px-3 py-2 text-right font-medium">Job time</th>
-              <th className="hidden px-3 py-2 text-right font-medium sm:table-cell">Shop</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((r, i) => (
-              <tr key={i} className="border-b last:border-0">
-                <td className="px-3 py-2">{r.who}</td>
-                <td className="px-3 py-2 text-muted-foreground">{r.day}</td>
-                <td className="tnum px-3 py-2 text-right">{r.clocked}</td>
-                <td className="tnum px-3 py-2 text-right">{r.job}</td>
-                <td className="tnum hidden px-3 py-2 text-right sm:table-cell">{r.shop}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <p className="mt-2 text-xs text-muted-foreground">
-        TIME-006: only clocked attendance is payable. Job time is for costing.
-      </p>
-      </div>
-    </div>
-  );
-}
