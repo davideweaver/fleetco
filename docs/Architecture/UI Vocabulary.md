@@ -645,14 +645,25 @@ effect on everyone, which is why it stays on Summary.
 is running on (weekly, Monday to Sunday) rather than letting a week look like a settled answer,
 the same way a report states an unsettled definition.
 
-**One person's pane is one list — Time records.** Punches and entries together, in day order,
-with the running punch wearing its chip in place. Two lists each ending in a `Correct…` button
-was the same affordance twice, and it separated what needed attention from the record it is part
-of.
+**One person's pane is one table — Time records — grouped by day, with one hours column per
+total.**
 
-> **Merging the lists must not merge the meanings.** A punch is attendance and an entry is job
-> time, and `TIME-001` keeps those apart. So every row states its kind — `Punch · attendance`
-> against a job or activity name — which the two separate lists used to say by position alone.
+| Record | Time | Payable | On jobs |
+|---|---|---|---|
+| ⏱ Attendance | 07:00–15:30 | **8.50 h** | · |
+| 🧰 G-1048 · Unit 14 · full wrap | 08:00–10:30 | · | 2.50 h |
+
+> **This is `TIME-006` made visible rather than merely obeyed.** Attendance can only ever fill
+> the left column and job time the right; nothing can appear in both, and reading straight down
+> a column reaches the number in the header. A flat list with one hours figure per row cannot
+> show which rows add up to which total — which is exactly what review is for.
+
+Each day carries its **own subtotals in the same two columns**, so a day can be checked without
+adding anything up, and the period row at the foot matches the header exactly.
+
+The kind is also an **icon**, so it is seen rather than read: a clock for attendance, a case for
+job time, a wrench for shop activity. Two cues for the distinction `TIME-001` turns on — the icon
+and the column — where a text prefix was one cue nobody scans.
 
 **On Summary the mark sits on the figure, not in a list.** A punch still running inflates that
 person's payable hours, so an amber dot goes beside *that number* in the roll-up and the row

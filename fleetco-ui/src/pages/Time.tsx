@@ -1,6 +1,15 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { CalendarDays, Check, ChevronDown, Lock, Users } from "lucide-react";
+import {
+  Briefcase,
+  CalendarDays,
+  Check,
+  ChevronDown,
+  Clock,
+  Lock,
+  Users,
+  Wrench,
+} from "lucide-react";
 import { toast } from "sonner";
 import { useShell } from "@/shell/shell-context";
 import {
@@ -32,6 +41,7 @@ import {
 import {
   DAY_ISO,
   TODAY_LABEL,
+  DAYS,
   approvedPeriodStarts,
   at,
   employees,
@@ -240,34 +250,72 @@ function Review() {
    * than implied by which list it sits in. Order is day then clock, because a timesheet
    * is read against a day.
    */
-  const records = [
-    ...shownPunches.map((p) => ({
-      key: `p-${p.id}`,
-      label: "Punch · attendance",
-      day: p.day,
-      start: p.in,
-      end: p.out,
-      minutes: minutesOf(p),
-      attention: isLeftRunning(p),
-      corrected: false,
-      onCorrect: () => correctPunch(p),
-    })),
-    ...shownEntries.map((e) => ({
-      key: `e-${e.id}`,
-      label: (e.jobNo ? jobLabel(e.jobNo) : e.activity) ?? "",
-      day: e.day,
-      start: e.start,
-      end: e.end,
-      minutes: minutesOf(e),
-      attention: false,
-      corrected: Boolean(e.correctedFrom),
-      onCorrect: () => correctEntry(e),
-    })),
-  ].sort((a, b) =>
-    a.day === b.day
-      ? a.start - b.start
-      : (DAY_ISO[a.day] ?? "").localeCompare(DAY_ISO[b.day] ?? "")
-  );
+  type Rec = {
+    key: string;
+    kind: "attendance" | "job" | "activity";
+    label: string;
+    start: number;
+    end: number | null;
+    /** Minutes, in the column this record FEEDS — never both. */
+    payable: number | null;
+    job: number | null;
+    attention: boolean;
+    corrected: boolean;
+    onCorrect: () => void;
+  };
+
+  /**
+   * Grouped by day, and every record's hours land in the column that total is made of.
+   *
+   * The flat list this replaces failed at the thing the screen is for: with one hours
+   * figure per row you could not see which rows added up to "payable" and which to "on
+   * jobs", and the kind was carried by a text prefix nobody scans.
+   *
+   * Two columns is `TIME-006` made visible rather than merely obeyed — attendance can
+   * only ever fill the left column, job time the right, and nothing can appear in both.
+   * Reading straight down a column reaches the number in the header.
+   */
+  const days = DAYS.filter((day) =>
+    [...shownPunches, ...shownEntries].some((r) => r.day === day)
+  ).map((day) => {
+    const recs: Rec[] = [
+      ...shownPunches
+        .filter((p) => p.day === day)
+        .map((p) => ({
+          key: `p-${p.id}`,
+          kind: "attendance" as const,
+          label: "Attendance",
+          start: p.in,
+          end: p.out,
+          payable: minutesOf(p),
+          job: null,
+          attention: isLeftRunning(p),
+          corrected: false,
+          onCorrect: () => correctPunch(p),
+        })),
+      ...shownEntries
+        .filter((e) => e.day === day)
+        .map((e) => ({
+          key: `e-${e.id}`,
+          kind: (e.jobNo ? "job" : "activity") as "job" | "activity",
+          label: (e.jobNo ? jobLabel(e.jobNo) : e.activity) ?? "",
+          start: e.start,
+          end: e.end,
+          payable: null,
+          job: minutesOf(e),
+          attention: false,
+          corrected: Boolean(e.correctedFrom),
+          onCorrect: () => correctEntry(e),
+        })),
+    ].sort((a, b) => a.start - b.start);
+
+    return {
+      day,
+      recs,
+      payable: recs.reduce((a, r) => a + (r.payable ?? 0), 0),
+      job: recs.reduce((a, r) => a + (r.job ?? 0), 0),
+    };
+  });
 
   const correctPunch = (p: (typeof punches)[number]) =>
     setCorrecting({
@@ -498,33 +546,100 @@ function Review() {
                 </Section>
               ) : (
               <Section title="Time records">
-                {records.length === 0 ? (
+                {days.length === 0 ? (
                   <p className="p-3 text-sm text-muted-foreground">
                     Nothing in this period.
                   </p>
                 ) : (
-                  <ul className="divide-y">
-                    {records.map((r) => (
-                      <li
-                        key={r.key}
-                        className="flex flex-wrap items-center gap-3 p-3 text-sm"
-                      >
-                        <span className="min-w-0 flex-1">
-                          <span className="block truncate">{r.label}</span>
-                          <span className="tnum text-xs text-muted-foreground">
-                            {r.day} {at(r.start)}
-                            {r.end === null ? " → still running" : `–${at(r.end)}`} ·{" "}
-                            {hours(r.minutes)} h
-                          </span>
-                        </span>
-                        {r.attention && <LeftRunningChip />}
-                        {r.corrected && <Pill tone="muted">Corrected</Pill>}
-                        <span onClick={r.onCorrect}>
-                          <Btn>Correct…</Btn>
-                        </span>
-                      </li>
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b text-left text-xs text-muted-foreground">
+                        <th className="px-3 py-2 font-medium">Record</th>
+                        <th className="hidden px-3 py-2 font-medium sm:table-cell">
+                          Time
+                        </th>
+                        <th className="px-3 py-2 text-right font-medium">Payable</th>
+                        <th className="px-3 py-2 text-right font-medium">On jobs</th>
+                        <th className="w-px px-3 py-2" />
+                      </tr>
+                    </thead>
+
+                    {days.map((d) => (
+                      <tbody key={d.day} className="border-b last:border-0">
+                        {/* The day's own subtotals, in the same two columns, so a day
+                            can be checked without adding anything up. */}
+                        <tr className="bg-muted/50">
+                          <td className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wide">
+                            {d.day}
+                          </td>
+                          <td className="hidden sm:table-cell" />
+                          <td className="tnum px-3 py-1.5 text-right text-xs font-semibold">
+                            {d.payable > 0 ? `${hours(d.payable)} h` : "—"}
+                          </td>
+                          <td className="tnum px-3 py-1.5 text-right text-xs text-muted-foreground">
+                            {d.job > 0 ? `${hours(d.job)} h` : "—"}
+                          </td>
+                          <td />
+                        </tr>
+
+                        {d.recs.map((r) => (
+                          <tr key={r.key} className="border-t">
+                            <td className="px-3 py-2">
+                              <span className="flex items-center gap-2">
+                                {/* An icon per kind, so the type is seen rather than
+                                    read. The column the hours land in says it a second
+                                    time — two cues for the distinction TIME-001 turns
+                                    on. */}
+                                <KindIcon kind={r.kind} />
+                                <span className="min-w-0 truncate">{r.label}</span>
+                                {r.attention && <LeftRunningChip />}
+                                {r.corrected && <Pill tone="muted">Corrected</Pill>}
+                              </span>
+                            </td>
+                            <td className="tnum hidden px-3 py-2 text-muted-foreground sm:table-cell">
+                              {at(r.start)}
+                              {r.end === null ? " → running" : `–${at(r.end)}`}
+                            </td>
+                            <td className="tnum px-3 py-2 text-right">
+                              {r.payable === null ? (
+                                <span className="text-muted-foreground/30">·</span>
+                              ) : (
+                                `${hours(r.payable)} h`
+                              )}
+                            </td>
+                            <td className="tnum px-3 py-2 text-right text-muted-foreground">
+                              {r.job === null ? (
+                                <span className="text-muted-foreground/30">·</span>
+                              ) : (
+                                `${hours(r.job)} h`
+                              )}
+                            </td>
+                            <td className="px-3 py-2 text-right">
+                              <span onClick={r.onCorrect}>
+                                <Btn>Correct…</Btn>
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
                     ))}
-                  </ul>
+
+                    {/* These two match the header exactly, which is the point of the
+                        whole table. They are never added together. */}
+                    <tfoot>
+                      <tr className="border-t-2 font-semibold">
+                        <td className="px-3 py-2">Period</td>
+                        <td className="hidden sm:table-cell" />
+                        <td className="tnum px-3 py-2 text-right">
+                          {hours(selectionPayable)} h
+                        </td>
+                        <td className="tnum px-3 py-2 text-right text-muted-foreground">
+                          {hours(selectionJob)} h
+                        </td>
+                        <td />
+                      </tr>
+                    </tfoot>
+                  </table>
                 )}
               </Section>
               )}
@@ -725,5 +840,23 @@ function PeriodPicker({
         </ul>
       </div>
     </Popover>
+  );
+}
+
+/** Attendance, a job, or shop time — recognised at a glance rather than read. */
+function KindIcon({ kind }: { kind: "attendance" | "job" | "activity" }) {
+  const Icon = kind === "attendance" ? Clock : kind === "job" ? Briefcase : Wrench;
+  return (
+    <span
+      title={kind === "attendance" ? "Attendance · payable" : "Job time · costing only"}
+      className={cn(
+        "grid size-6 shrink-0 place-items-center rounded-md",
+        kind === "attendance"
+          ? "bg-foreground/10 text-foreground"
+          : "bg-muted text-muted-foreground"
+      )}
+    >
+      <Icon className="size-3.5" />
+    </span>
   );
 }
