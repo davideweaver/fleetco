@@ -352,10 +352,20 @@ filter**.
 The filter chip itself stays a plain control. Only its count wears the colour — tinting the whole
 control as well makes a filter look like a warning.
 
-A **status pill** joins that set when the status *is* the reason — an invoice's `OVERDUE` and
-`DRAFT` are the attention count, so the pill wears the fill instead of a red or grey tint. The
-status and the reason are one fact; two marks would say it twice. The test is `attentionMap`,
-never a hardcoded `=== "Overdue"`, so the colour cannot drift away from what the badge counts.
+A **status pill** joins that set only when the status and the reason are the **same fact**.
+`OVERDUE` is both the invoice's status and the whole reason it needs chasing, so one mark does
+the work of two and it takes the badge's colour.
+
+`DRAFT` is the case that draws the line. It is in the attention count, but the reason is "never
+sent" — the status is where the invoice sits in its life, and the reason says more than the
+status does. So they stay two marks: the row chip carries the reason, and the pill stays a plain
+status. Colouring `DRAFT` would say the state itself is the alarm, and every new invoice is a
+draft for a moment.
+
+The test is a comparison against `attentionMap`, never a hardcoded `=== "Overdue"`, so the colour
+cannot drift from what the badge counts. If a reason's wording changes the pill falls back to a
+plain status — the safe direction, because the failure is a missing colour rather than an
+invented one.
 
 Everything else keeps its old tone. `PAID` is green, `SENT` and `IN PRODUCTION` are grey: those
 are *states*, and a state nobody has to act on must not borrow the colour of one that does.

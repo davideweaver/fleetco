@@ -8,24 +8,24 @@ type Status = (typeof invoices)[number]["status"];
 /**
  * An invoice's status, as a pill.
  *
- * When the status is the reason the invoice is in the attention count, the pill wears
- * the attention fill — the same solid colour as the rail badge and the list chip. The
- * status and the reason are one fact here ("Overdue" is both), so showing them as two
- * separate marks would say it twice.
+ * The pill wears the attention fill only when the status and the reason are the SAME
+ * FACT. "Overdue" is both the status and the whole reason it needs chasing, so one mark
+ * does the work of two and it takes the badge's colour.
  *
- * The test is `attentionMap`, not a list of statuses spelled out again. If the rule for
- * what needs chasing ever changes, the colour follows it. A hardcoded `=== "Overdue"`
- * would let the badge count one thing and the pill colour another — the exact split
- * this one-derivation rule exists to prevent.
+ * "Draft" is not. The status is where the invoice sits in its life; the reason is "never
+ * sent", which is the part that needs someone. The reason says more than the status, so
+ * they stay two separate marks — the row chip carries the reason, and the pill stays a
+ * plain status. Colouring DRAFT would have told the user the state itself is the alarm.
  *
- * Note this asks the INVOICES question even on a customer's screen. The pill describes
- * an invoice, so "does this invoice need someone" is the right question wherever it is
- * drawn; the customer row's own chip answers the separate customer question.
+ * The test is a comparison against `attentionMap`, not a list of statuses written out
+ * again, so the colour cannot drift away from what the rail badge counts. If a reason's
+ * wording ever changes, the pill falls back to a plain status — the safe direction,
+ * since the failure is a missing colour rather than an invented one.
  */
 export function InvoiceStatus({ no, status }: { no: string; status: Status }) {
   const { role } = useShell();
-  const needs = attentionMap("invoices", role);
-  if (needs.has(no)) return <Pill tone="attention">{status}</Pill>;
+  const reason = attentionMap("invoices", role).get(no);
+  if (reason === status) return <Pill tone="attention">{status}</Pill>;
   // Paid is the only status worth a positive mark. The rest are just where it is.
   return <Pill tone={status === "Paid" ? "good" : "muted"}>{status}</Pill>;
 }
