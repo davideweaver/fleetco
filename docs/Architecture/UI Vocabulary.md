@@ -344,6 +344,26 @@ text on it. It appears in exactly three places, and they are meant to be recogni
 thing: the **rail badge**, the **row's reason chip**, and the **count inside the "Needs you"
 filter**.
 
+**There is no second badge colour.** Estimates used to carry a red badge while Customers carried
+an amber one, which implied a severity the data cannot actually tell apart — both numbers come
+out of the same function. It also broke the thing the colour is for: the badge, the chip and the
+filter count are meant to be recognised as one mark, and they cannot be if the badge has moods.
+
+The fill is `--attention`, not `--brand`. Those matched by coincidence in the warm palette and
+came apart in the neutral one, where the rail's brand is purple.
+
+**Placement decides the shape, not the device.**
+
+| Where | Shape |
+|---|---|
+| on a bare icon — collapsed rail, bottom bar, More | a **dot** |
+| beside a label — expanded rail, More sheet | a **count** |
+
+A number stacked on a 20px glyph is a rail you read instead of glance at, and the count is one
+tap away in the list header. `NavBadge` decides this from `placement` rather than each caller
+choosing, because the bottom bar and the collapsed rail are the same situation and used to
+disagree.
+
 > **Coloured text could never tie them together.** The badge sits on a dark rail and the row on
 > a light list, so the two can never share a text colour — and matching the dark theme's bright
 > amber as light-theme text measured **1.47:1**. A *fill* can be shared: dark-on-amber is legible

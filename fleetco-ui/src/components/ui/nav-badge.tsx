@@ -4,46 +4,49 @@ import { cn } from "@/lib/utils";
 const label = (n: number) => (n > 99 ? "99+" : String(n));
 
 /**
- * `overlay` sits on the corner of an icon chip (collapsed rail, bottom bar) and needs a
- * ring in the surface colour to separate it from the icon underneath. It sits INSIDE the
- * chip rather than outdented: the collapsed rail scrolls on the y axis, and a box that
- * overhangs by even 2px gets clipped, because `overflow-y: auto` clips x as well.
- * `inline` sits at the end of a labelled row (expanded rail, More sheet).
+ * A nav badge. One colour, and the PLACEMENT decides the shape.
+ *
+ *   overlay  on the corner of a bare icon — collapsed rail, bottom bar, More. Always a
+ *            DOT. A number stacked on a 20px glyph is a rail you read instead of glance
+ *            at, and the count is one tap away in the list header anyway.
+ *   inline   at the end of a labelled row — expanded rail, More sheet. A COUNT, because
+ *            there is room for it and the label already says what it counts.
+ *
+ * Deciding here rather than at each call site is deliberate: the bottom bar and the
+ * collapsed rail are the same situation, and they used to disagree because each one
+ * chose for itself.
+ *
+ * The fill is `--attention`, the same token as the row chip and the filter count — not
+ * `--brand`. They matched by coincidence in the warm palette and came apart in the
+ * neutral one, where the rail's brand is purple.
  */
 export function NavBadge({
   badge,
   placement,
-  ring = "ring-surface-1",
 }: {
   badge: Badge;
   placement: "overlay" | "inline";
-  ring?: string;
 }) {
-  const alert = badge.tone === "alert";
-
-  if (badge.dot) {
+  if (placement === "overlay") {
+    if (!badge.count && !badge.dot) return null;
     return (
       <span
         aria-hidden
-        className={cn(
-          "size-2 rounded-full",
-          alert ? "bg-destructive" : "bg-brand",
-          // No ring. A count needs one to separate it from the glyph it overlaps; a dot
-          // sits in the corner clear of the icon, so the ring only read as a border.
-          placement === "overlay" && "absolute right-1 top-1"
-        )}
+        className="absolute right-1 top-1 size-2 rounded-full bg-attention"
       />
     );
   }
 
+  if (badge.dot) {
+    return <span aria-hidden className="size-2 shrink-0 rounded-full bg-attention" />;
+  }
   if (!badge.count) return null;
 
   return (
     <span
       className={cn(
-        "tnum grid h-4 min-w-4 place-items-center rounded-full px-1 text-[10px] font-semibold leading-none text-brand-foreground",
-        alert ? "bg-destructive text-white" : "bg-brand",
-        placement === "overlay" && cn("absolute right-0 top-0 ring-2", ring)
+        "tnum grid h-4 min-w-4 place-items-center rounded-full px-1 text-[10px]",
+        "font-semibold leading-none bg-attention text-attention-fg"
       )}
     >
       {label(badge.count)}

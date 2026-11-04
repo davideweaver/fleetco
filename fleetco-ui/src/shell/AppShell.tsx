@@ -179,19 +179,12 @@ export function AppShell() {
                               {label}
                             </span>
                           )}
-                          {badge &&
-                            (railOpen ? (
-                              <NavBadge badge={badge} placement="inline" />
-                            ) : (
-                              /* Collapsed: a dot, not a number. Ten icons each carrying a
-                                 figure is a rail you read instead of glance at — and the
-                                 count is one click away in the list anyway. */
-                              <NavBadge
-                                badge={{ tone: badge.tone, dot: true }}
-                                placement="overlay"
-                                ring="ring-surface-1"
-                              />
-                            ))}
+                          {badge && (
+                            <NavBadge
+                              badge={badge}
+                              placement={railOpen ? "inline" : "overlay"}
+                            />
+                          )}
                         </Link>
                       );
                       return showTips ? (
@@ -284,11 +277,7 @@ export function AppShell() {
                   >
                     <item.icon className="size-5" strokeWidth={1.75} />
                     {badges[item.key] && (
-                      <NavBadge
-                        badge={badges[item.key]}
-                        placement="overlay"
-                        ring="ring-surface-1"
-                      />
+                      <NavBadge badge={badges[item.key]} placement="overlay" />
                     )}
                   </span>
                   <span>{item.short}</span>
@@ -317,7 +306,7 @@ export function AppShell() {
                 )}
                 {/* A badge behind More would otherwise be invisible until you opened it. */}
                 {!moreOpen && moreBadge && (
-                  <NavBadge badge={moreBadge} placement="overlay" ring="ring-surface-1" />
+                  <NavBadge badge={moreBadge} placement="overlay" />
                 )}
               </span>
               <span>More</span>

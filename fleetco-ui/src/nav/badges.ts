@@ -14,10 +14,13 @@ import type { Role } from "./routes";
  * Everything below approximates it from real state instead — a technician's "new jobs"
  * is "assigned to me and not started yet", which is true without anybody tracking reads.
  *
- * Tone is two values on purpose. `alert` is money that is late. Everything else is
- * `brand`, or the red stops meaning anything.
+ * There is no tone. Every badge is the ONE attention colour, because every badge is
+ * derived from the one attention function — a red Estimates badge beside an amber
+ * Customers one implied a severity the data cannot actually tell them apart by. Two
+ * colours would also break the thing the colour is for: the badge, the row chip and the
+ * filter count are meant to be recognised as the same mark.
  */
-export type Badge = { count?: number; dot?: boolean; tone: "brand" | "alert" };
+export type Badge = { count?: number; dot?: boolean };
 
 export type BadgeLevel = "off" | "on";
 
@@ -29,7 +32,7 @@ export function badgesFor(role: Role, level: BadgeLevel): Record<string, Badge> 
   const out: Record<string, Badge> = {};
   for (const section of ["jobs", "customers", "invoices"]) {
     const n = attentionFor(section, role).length;
-    if (n) out[section] = { count: n, tone: section === "invoices" ? "alert" : "brand" };
+    if (n) out[section] = { count: n };
   }
   return out;
 }
@@ -38,12 +41,10 @@ export function badgesFor(role: Role, level: BadgeLevel): Record<string, Badge> 
 export function rollUp(badges: Record<string, Badge>, visibleKeys: Set<string>) {
   let count = 0;
   let dot = false;
-  let tone: Badge["tone"] = "brand";
   for (const [key, b] of Object.entries(badges)) {
     if (visibleKeys.has(key)) continue;
     if (b.count) count += b.count;
     if (b.dot) dot = true;
-    if (b.tone === "alert") tone = "alert";
   }
-  return count || dot ? { count: count || undefined, dot: !count && dot, tone } : null;
+  return count || dot ? { count: count || undefined, dot: !count && dot } : null;
 }
