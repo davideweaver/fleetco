@@ -31,7 +31,8 @@ queue.
 - [x] Badges and attention — one derivation for the rail and the list
 - [x] List rows — monogram, attention reason, filter chips
 - [x] **Approval capture** (`AUTH-002`/`003`/`004`) and the reason-required confirm
-- [x] Row action menu — the action sits in the cell that shows the state
+- [x] Row actions — the action sits in the cell that shows the state
+- [x] Destructive confirm with a required reason (`INV-012` void, and the override branch)
 
 ## Next
 
@@ -75,6 +76,10 @@ These block a screen but are answered by people, not by drawing:
       Recommendation and options in [[UI Vocabulary]]. Adjacent to **D-C9**.
 - [ ] **Can a technician drag a board card** — `ROLE-008`, **D-C2**. Read-only until
       answered.
+- [ ] **How often does Cam override?** Recording what the customer said on the phone is an
+      approval (`AUTH-011`), not an override — overrides are for when nobody answered. The
+      dialog currently treats override as the quieter path. If it is his daily path, it
+      should be a peer of Approved and Declined. Ask alongside **D-C8**.
 - [ ] **Board columns scroll horizontally** even at 1440 with no list column. Accept, or
       narrow the cards?
 - [ ] **Frontend ADRs still unwritten** — 029 tokens/shadcn, 030 container queries,

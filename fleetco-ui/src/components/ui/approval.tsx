@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Check, ShieldAlert, X } from "lucide-react";
 import { Overlay } from "./overlay";
-import { Field, Select, TextInput } from "./field";
+import { Field, Select, TextArea, TextInput } from "./field";
 import { Btn, Pill } from "@/shell/ListDetailLayout";
 import { cn, money } from "@/lib/utils";
 
@@ -40,35 +40,48 @@ export type ApprovalRecord = {
   supersededBy?: string;
 };
 
-export function RecordApprovalDialog({
+export function RecordAnswerDialog({
   open,
   onOpenChange,
   lines,
   onRecord,
+  initialKind = "approved",
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   lines: { id: string; name: string; priceCents: number; pending: boolean }[];
   onRecord: (ids: string[], r: Omit<ApprovalRecord, "id">) => void;
+  initialKind?: "approved" | "declined" | "override";
 }) {
   const pending = lines.filter((l) => l.pending);
   const [picked, setPicked] = useState<Set<string>>(new Set(pending.map((l) => l.id)));
   const [contact, setContact] = useState("");
   const [method, setMethod] = useState<ApprovalMethod | "">("");
-  const [kind, setKind] = useState<"approved" | "declined">("approved");
+  const [reason, setReason] = useState("");
+  const [kind, setKind] = useState<"approved" | "declined" | "override">(initialKind);
 
-  const ready = picked.size > 0 && contact.trim() && method;
-  const total = lines
-    .filter((l) => picked.has(l.id))
-    .reduce((a, l) => a + l.priceCents, 0);
+  const override = kind === "override";
+  const ready = override
+    ? picked.size > 0 && reason.trim().length > 0
+    : picked.size > 0 && contact.trim().length > 0 && Boolean(method);
+  const total = lines.filter((l) => picked.has(l.id)).reduce((a, l) => a + l.priceCents, 0);
+
+  const label =
+    kind === "approved" ? "Record approval" : kind === "declined" ? "Record decline" : "Override";
 
   return (
     <Overlay
       kind="dialog"
       open={open}
-      onOpenChange={onOpenChange}
+      onOpenChange={(v) => {
+        if (!v) {
+          setReason("");
+          setKind(initialKind);
+        }
+        onOpenChange(v);
+      }}
       eyebrow="Estimate E-1048 · Ridgeline Plumbing & Heating"
-      title="Record the customer's answer"
+      title="Record the answer"
       footer={
         <>
           <Btn>Cancel</Btn>
@@ -78,27 +91,31 @@ export function RecordApprovalDialog({
             onClick={() => {
               onRecord([...picked], {
                 kind,
-                contact: contact.trim(),
-                method: method as ApprovalMethod,
-                givenAt: "today",
+                contact: override ? undefined : contact.trim(),
+                method: override ? undefined : (method as ApprovalMethod),
+                reason: override ? reason.trim() : undefined,
+                givenAt: override ? undefined : "today",
                 recordedBy: "Owner",
                 recordedAt: "just now",
               });
+              setReason("");
               onOpenChange(false);
             }}
             className={cn(
-              "rounded-md border border-primary bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground",
+              "rounded-md border px-3 py-1.5 text-sm font-medium whitespace-nowrap",
+              override
+                ? "border-warning bg-warning text-white"
+                : "border-primary bg-primary text-primary-foreground",
               !ready && "cursor-not-allowed opacity-40"
             )}
           >
-            Record {kind === "approved" ? "approval" : "decline"}
+            {label}
           </button>
         </>
       }
     >
       <div className="space-y-4 p-4">
-        {/* AUTH-001: approval is per line, so the form is per line. "Approve all" is a
-            convenience over the same records, not a shortcut around them. */}
+        {/* AUTH-001: approval is per line, so the form is per line. */}
         <div>
           <div className="mb-1.5 flex items-baseline justify-between">
             <span className="text-sm font-medium">Which lines</span>
@@ -149,6 +166,10 @@ export function RecordApprovalDialog({
           )}
         </div>
 
+        {/* One flow, three outcomes — but the two that record what the CUSTOMER said are
+            the pair, and the override is set apart below them. Equal weight would make
+            authorising without the customer exactly as easy as recording that they
+            agreed, and those two mistakes do not cost the same. */}
         <div className="flex gap-2">
           <Choice on={kind === "approved"} onClick={() => setKind("approved")} tone="good">
             <Check className="size-4" /> They approved
@@ -158,35 +179,78 @@ export function RecordApprovalDialog({
           </Choice>
         </div>
 
-        <Field label="Who said so" hint="The customer contact who gave the answer.">
-          {({ id }) => (
-            <TextInput
-              id={id}
-              value={contact}
-              onChange={(e) => setContact(e.target.value)}
-              placeholder="Dana Hoff"
-            />
-          )}
-        </Field>
-
-        <Field label="How" hint="No default on purpose — this is the evidence.">
-          {({ id }) => (
-            <Select
-              id={id}
-              value={method}
-              onChange={(e) => setMethod(e.target.value as ApprovalMethod)}
+        {override ? (
+          <div className="space-y-3 rounded-lg border border-warning/40 bg-warning/5 p-3">
+            <div className="flex items-start gap-2 text-sm">
+              <ShieldAlert className="mt-0.5 size-4 shrink-0 text-warning" />
+              <span>
+                No customer approval. These lines become billable anyway, recorded as an{" "}
+                <strong>override</strong> — shown that way on every report and in the line
+                history, never as customer approval.
+              </span>
+            </div>
+            <Field
+              label="Why are you overriding?"
+              hint="Permanent. It cannot be edited later."
             >
-              <option value="" disabled>
-                Choose
-              </option>
-              <option value="phone">By phone</option>
-              <option value="email">By email</option>
-              <option value="in person">In person</option>
-              <option value="text">By text</option>
-              <option value="other">Other</option>
-            </Select>
-          )}
-        </Field>
+              {({ id }) => (
+                <TextArea
+                  id={id}
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+                  placeholder="Customer unreachable, work starts today…"
+                />
+              )}
+            </Field>
+            <button
+              type="button"
+              onClick={() => setKind("approved")}
+              className="text-xs text-muted-foreground underline-offset-2 hover:underline"
+            >
+              The customer did answer after all
+            </button>
+          </div>
+        ) : (
+          <>
+            <Field label="Who said so" hint="The customer contact who gave the answer.">
+              {({ id }) => (
+                <TextInput
+                  id={id}
+                  value={contact}
+                  onChange={(e) => setContact(e.target.value)}
+                  placeholder="Dana Hoff"
+                />
+              )}
+            </Field>
+
+            <Field label="How" hint="No default on purpose — this is the evidence.">
+              {({ id }) => (
+                <Select
+                  id={id}
+                  value={method}
+                  onChange={(e) => setMethod(e.target.value as ApprovalMethod)}
+                >
+                  <option value="" disabled>
+                    Choose
+                  </option>
+                  <option value="phone">By phone</option>
+                  <option value="email">By email</option>
+                  <option value="in person">In person</option>
+                  <option value="text">By text</option>
+                  <option value="other">Other</option>
+                </Select>
+              )}
+            </Field>
+
+            <button
+              type="button"
+              onClick={() => setKind("override")}
+              className="text-xs text-warning underline-offset-2 hover:underline"
+            >
+              The customer has not answered — authorize anyway
+            </button>
+          </>
+        )}
 
         <p className="rounded-lg bg-muted/50 p-3 text-xs text-muted-foreground">
           Recorded by <span className="font-medium text-foreground">you</span>, just now.

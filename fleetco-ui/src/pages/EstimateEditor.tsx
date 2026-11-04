@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { ChevronDown, ChevronRight, Plus } from "lucide-react";
 import {
@@ -16,10 +16,9 @@ import { Btn, DetailHeader, Pill } from "@/shell/ListDetailLayout";
 import { CellInput, MoneyCell } from "@/components/ui/field";
 import {
   ApprovalHistory,
-  RecordApprovalDialog,
+  RecordAnswerDialog,
   type ApprovalRecord,
 } from "@/components/ui/approval";
-import { ConfirmWithReason } from "@/components/ui/confirm";
 import { toast } from "sonner";
 import { cn, money } from "@/lib/utils";
 
@@ -46,9 +45,9 @@ export function EstimateEditor({ estimateId }: { estimateId: string }) {
   const owner = role === "owner";
   const [openLines, setOpenLines] = useState<Set<string>>(new Set(["L1"]));
   const overlay = params.get("overlay");
-  const [recording, setRecording] = useState(overlay === "approve");
-  const [overriding, setOverriding] = useState<string | null>(
-    overlay === "override" ? "L3" : null
+  // One dialog, three outcomes. `answering` only decides which one it opens on.
+  const [answering, setAnswering] = useState<null | "approved" | "override">(
+    overlay === "approve" ? "approved" : overlay === "override" ? "override" : null
   );
   const [history, setHistory] = useState<Record<string, ApprovalRecord[]>>({
     L1: [
@@ -99,7 +98,7 @@ export function EstimateEditor({ estimateId }: { estimateId: string }) {
           owner ? (
             <>
               <Btn>Preview</Btn>
-              <span onClick={() => setRecording(true)}>
+              <span onClick={() => setAnswering("approved")}>
                 <Btn primary>Record answer</Btn>
               </span>
             </>
@@ -129,8 +128,7 @@ export function EstimateEditor({ estimateId }: { estimateId: string }) {
                 open={openLines.has(line.id)}
                 onToggle={() => toggle(line.id)}
                 settled={(history[line.id] ?? []).length > 0}
-                onRecord={() => setRecording(true)}
-                onOverride={() => setOverriding(line.id)}
+                onAnswer={() => setAnswering("approved")}
               />
             ))}
 
@@ -198,9 +196,10 @@ export function EstimateEditor({ estimateId }: { estimateId: string }) {
         )}
       </div>
 
-      <RecordApprovalDialog
-        open={recording}
-        onOpenChange={setRecording}
+      <RecordAnswerDialog
+        open={answering !== null}
+        onOpenChange={(v) => !v && setAnswering(null)}
+        initialKind={answering ?? "approved"}
         lines={estimateLines.map((l) => ({
           id: l.id,
           name: l.name,
@@ -215,45 +214,16 @@ export function EstimateEditor({ estimateId }: { estimateId: string }) {
             }
             return next;
           });
-          toast.success(`Recorded on ${ids.length} line${ids.length === 1 ? "" : "s"}`, {
-            description: "Permanent. A correction adds a record rather than editing this one.",
-          });
-        }}
-      />
-
-      <ConfirmWithReason
-        open={Boolean(overriding)}
-        onOpenChange={(v) => !v && setOverriding(null)}
-        eyebrow="AUTH-004 · override"
-        title="Authorize without customer approval?"
-        tone="warning"
-        confirmLabel="Override"
-        consequence={
-          <>
-            This line becomes billable without the customer having agreed to it. It is
-            recorded as an <strong>override</strong> and will show that way on every report
-            and in the line history — never as customer approval.
-          </>
-        }
-        reasonLabel="Why are you overriding?"
-        onConfirm={(reason) => {
-          const id = overriding!;
-          setHistory((h) => ({
-            ...h,
-            [id]: [
-              ...(h[id] ?? []),
-              {
-                id: `o${Date.now()}`,
-                kind: "override",
-                reason,
-                recordedBy: "Owner",
-                recordedAt: "just now",
-              },
-            ],
-          }));
-          toast.warning("Recorded as an override", {
-            description: "Shown as an override everywhere, never as customer approval.",
-          });
+          if (rec.kind === "override") {
+            toast.warning(`Overridden on ${ids.length} line${ids.length === 1 ? "" : "s"}`, {
+              description: "Shown as an override everywhere, never as customer approval.",
+            });
+          } else {
+            toast.success(`Recorded on ${ids.length} line${ids.length === 1 ? "" : "s"}`, {
+              description:
+                "Permanent. A correction adds a record rather than editing this one.",
+            });
+          }
         }}
       />
     </div>
@@ -266,8 +236,7 @@ function LineRows({
   open,
   onToggle,
   settled,
-  onRecord,
-  onOverride,
+  onAnswer,
 }: {
   line: EstimateLine;
   owner: boolean;
@@ -275,8 +244,7 @@ function LineRows({
   onToggle: () => void;
   /** Already has an answer on the record, so there is nothing to act on. */
   settled: boolean;
-  onRecord: () => void;
-  onOverride: () => void;
+  onAnswer: () => void;
 }) {
   const [price, setPrice] = useState(linePrice(line));
   const sum = componentSum(line);
@@ -320,7 +288,7 @@ function LineRows({
             an approved line is meaningless, and offering it invites the mistake. */}
         <Td className="hidden @md:table-cell">
           {owner && !settled ? (
-            <ApprovalMenu onRecord={onRecord} onOverride={onOverride} />
+            <PendingButton onClick={onAnswer} />
           ) : (
             <ApprovalPill approval={line.approval} />
           )}
@@ -412,82 +380,19 @@ function ComponentRow({
   );
 }
 
-/** A pending line's approval cell is a menu, not a label. */
-function ApprovalMenu({
-  onRecord,
-  onOverride,
-}: {
-  onRecord: () => void;
-  onOverride: () => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const onDown = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", onDown);
-    return () => document.removeEventListener("mousedown", onDown);
-  }, [open]);
-
-  return (
-    <div ref={ref} className="relative inline-block">
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        aria-haspopup="menu"
-        aria-expanded={open}
-        className="inline-flex items-center gap-1 rounded-full border border-dashed px-2 py-0.5 text-[10.5px] font-medium uppercase tracking-wide text-muted-foreground hover:border-solid hover:bg-accent hover:text-foreground"
-      >
-        Pending
-        <ChevronDown className="size-3" />
-      </button>
-      {open && (
-        <div className="absolute left-0 top-full z-30 mt-1 w-48 overflow-hidden rounded-lg border bg-popover shadow-lg">
-          <MenuItem
-            onClick={() => {
-              setOpen(false);
-              onRecord();
-            }}
-          >
-            Record the answer…
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              setOpen(false);
-              onOverride();
-            }}
-            tone="warn"
-          >
-            Override…
-          </MenuItem>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function MenuItem({
-  onClick,
-  children,
-  tone,
-}: {
-  onClick: () => void;
-  children: React.ReactNode;
-  tone?: "warn";
-}) {
+/**
+ * A pending line's approval cell is a button, not a label. One dialog covers all three
+ * outcomes, so there is nothing to choose between before opening it.
+ */
+function PendingButton({ onClick }: { onClick: () => void }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={cn(
-        "block w-full px-3 py-2 text-left text-sm hover:bg-accent",
-        tone === "warn" && "text-warning"
-      )}
+      className="inline-flex items-center gap-1 rounded-full border border-dashed px-2 py-0.5 text-[10.5px] font-medium uppercase tracking-wide text-muted-foreground hover:border-solid hover:bg-accent hover:text-foreground"
     >
-      {children}
+      Pending
+      <ChevronDown className="size-3" />
     </button>
   );
 }

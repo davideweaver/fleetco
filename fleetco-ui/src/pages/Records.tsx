@@ -4,6 +4,8 @@ import { invoices, jobs } from "@/data/sample";
 import { useShell } from "@/shell/shell-context";
 import { Btn, DetailHeader, ListDetailLayout, ListHeader, ListRow, Pill } from "@/shell/ListDetailLayout";
 import { attentionMap } from "@/nav/attention";
+import { ConfirmWithReason } from "@/components/ui/confirm";
+import { toast } from "sonner";
 import { Stat } from "./Customers";
 import { EstimateEditor } from "./EstimateEditor";
 import { money } from "@/lib/utils";
@@ -12,6 +14,7 @@ export function InvoicesPage() {
   const { id } = useParams();
   const { href, role } = useShell();
   const [onlyAttention, setOnlyAttention] = useState(false);
+  const [voiding, setVoiding] = useState(false);
   const needs = attentionMap("invoices", role);
   const rows = onlyAttention ? invoices.filter((v) => needs.has(v.no)) : invoices;
   const selected = invoices.find((v) => v.no === id);
@@ -62,6 +65,9 @@ export function InvoicesPage() {
               }
               actions={
                 <>
+                  <span onClick={() => setVoiding(true)}>
+                    <Btn>Void…</Btn>
+                  </span>
                   <Btn>Preview PDF</Btn>
                   <Btn primary>Send</Btn>
                 </>
@@ -75,6 +81,27 @@ export function InvoicesPage() {
             <div className="grid place-items-center p-10 text-sm text-muted-foreground">
               Invoice lines, rolled up for the customer.
             </div>
+
+            {/* INV-012. The second user of ConfirmWithReason, which is the point of it
+                being a component rather than a one-off. */}
+            <ConfirmWithReason
+              open={voiding}
+              onOpenChange={setVoiding}
+              eyebrow={`Invoice #${selected.no}`}
+              title="Void this invoice?"
+              confirmLabel="Void invoice"
+              consequence={
+                <>
+                  A finalized invoice is never edited (INV-003). Voiding keeps it on the
+                  record, marked void, and leaves the job free to be invoiced again. The
+                  number is not reused.
+                </>
+              }
+              reasonLabel="Why is it being voided?"
+              onConfirm={(reason) =>
+                toast.success(`Invoice #${selected.no} voided`, { description: reason })
+              }
+            />
           </div>
         )
       }

@@ -338,9 +338,9 @@ mark says *something*; the reason says *what*, and it is the same number of pixe
 
 ## Row actions
 
-**The action lives where the state is.** A pending line's approval cell *is* the menu —
-"Record the answer…" and "Override…" — rather than a label with the controls elsewhere on
-the page.
+**The action lives where the state is.** A pending line's approval cell is a **button**
+that opens the one dialog covering all three outcomes, rather than a label with the
+controls elsewhere on the page.
 
 **Only an actionable row is actionable.** An override on an already-approved line is
 meaningless, so a settled line shows a plain pill and no menu. Offering an action that
@@ -348,6 +348,33 @@ makes no sense invites the mistake it describes.
 
 A history block records what happened and is **read-only**; acting happens next to the
 record, not under it.
+
+## Authorization
+
+**An override is not an approval, but both are authorizations.** `AUTH-005`: a line is
+authorized if its latest state is Approved **or** Overridden — same downstream effect.
+`AUTH-004`: an override is recorded and displayed as an override, **never** as customer
+approval. An approval says what the *customer* said; an override says what *OTC decided*
+when they did not.
+
+**One dialog, three outcomes.** The user's job is "resolve this pending line", so splitting
+it into two dialogs made one task look like two, and left the override harder to find than
+it should be.
+
+**But the three outcomes are not peers.** Approved and Declined are a pair of buttons —
+they both record what the customer said. Override is a quieter link beneath them that
+swaps the form: the consequence panel appears, the contact and method fields go away, a
+reason becomes required, and the confirm button turns to the warning treatment. There is a
+way back ("The customer did answer after all").
+
+> Equal weight would make authorizing *without* the customer exactly as easy as recording
+> that they agreed. Those two mistakes do not cost the same, so the paths should not cost
+> the same either. The friction belongs **inside** the flow, not in front of it.
+
+**Still unknown, and it could invert this:** how often Cam actually overrides. Recording
+"Dana said yes on the phone" is an *approval* with method `phone` (`AUTH-011`), not an
+override — overrides are for when nobody answered at all. If that turns out to be his
+daily path rather than an exception, the override should be promoted to a peer.
 
 ## Naming rules
 
