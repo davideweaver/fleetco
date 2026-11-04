@@ -132,6 +132,10 @@ board card opens a panel; a customer row does not.
 Dialogs go full screen on a phone rather than shrinking, because a centred card on a 390px screen
 is a postage stamp with a keyboard over it.
 
+The overlay's title is `text-base` — a heading, not a caption — and the close button is **40px**,
+the same as a form control. This is the escape hatch, and on an iPad it is hit with a thumb; a
+32px target in the corner of a dialog is the one nobody can reach in a hurry.
+
 ## Forms
 
 | Name | Component | Notes |

@@ -62,13 +62,18 @@ export function Overlay({
                   {eyebrow}
                 </div>
               )}
-              <Dialog.Title className="truncate text-sm font-semibold">{title}</Dialog.Title>
+              <Dialog.Title className="truncate text-base font-semibold leading-tight">
+                {title}
+              </Dialog.Title>
             </div>
+            {/* 40px, same as a form control: this is the escape hatch, and on an iPad it
+                is hit with a thumb. A 32px target in the corner of a dialog is the one
+                nobody can reach in a hurry. */}
             <Dialog.Close
               aria-label="Close"
-              className="grid size-8 shrink-0 place-items-center rounded-md text-muted-foreground hover:bg-accent"
+              className="grid size-10 shrink-0 place-items-center rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
             >
-              <X className="size-4" />
+              <X className="size-5" />
             </Dialog.Close>
           </div>
 
