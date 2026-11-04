@@ -148,19 +148,11 @@ export function MoneyInput({
   );
 }
 
-/**
- * Dates are shop-local (PLAT-003), and the field says so rather than leaving the user to
- * wonder whose midnight it means.
- */
-export function DateInput({
-  id,
-  invalid,
-  ...props
-}: React.InputHTMLAttributes<HTMLInputElement> & { invalid?: boolean }) {
-  return (
-    <input type="date" id={id} aria-invalid={invalid} className={control(invalid)} {...props} />
-  );
-}
+/* A date field is `DatePicker` from ./date-picker — there is no separate DateInput.
+   `<input type="date">` was here first and gave a phone its OS picker for free, but it
+   cannot render a range, cannot carry presets, and styles differently in every browser.
+   Keeping it for single dates would have meant a form and a report period disagreeing
+   about what a calendar looks like and which day is today. */
 
 /** Two fields on one line where there is room, stacked where there is not. */
 export function FieldRow({ children }: { children: ReactNode }) {

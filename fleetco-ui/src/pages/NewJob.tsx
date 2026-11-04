@@ -3,7 +3,6 @@ import { customers, STAGES } from "@/data/sample";
 import { Overlay } from "@/components/ui/overlay";
 import { Btn } from "@/shell/ListDetailLayout";
 import {
-  DateInput,
   Field,
   FieldRow,
   FormBody,
@@ -12,6 +11,8 @@ import {
   TextArea,
   TextInput,
 } from "@/components/ui/field";
+import { DatePicker } from "@/components/ui/date-picker";
+import { fromISODate } from "@/lib/date";
 
 /**
  * A form lives in a PANEL or a PAGE, never a dialog — dialogs are for a decision and at
@@ -28,6 +29,10 @@ export function NewJobPanel({
   showErrors?: boolean;
 }) {
   const [deposit, setDeposit] = useState<number | null>(100950);
+  const [production, setProduction] = useState(fromISODate("2026-11-01"));
+  // Deliberately BEFORE production, so the lab's error state has a real cause rather
+  // than a message with nothing behind it.
+  const [install, setInstall] = useState(fromISODate("2026-10-28"));
 
   return (
     <Overlay
@@ -91,13 +96,17 @@ export function NewJobPanel({
 
         <FieldRow>
           <Field label="Production date" hint="Shop time, America/New_York.">
-            {({ id, invalid }) => <DateInput id={id} invalid={invalid} defaultValue="2026-11-01" />}
+            {({ id, invalid }) => (
+              <DatePicker id={id} invalid={invalid} value={production} onChange={setProduction} />
+            )}
           </Field>
           <Field
             label="Installation date"
             error={showErrors ? "Installation cannot be before production." : undefined}
           >
-            {({ id, invalid }) => <DateInput id={id} invalid={invalid} defaultValue="2026-10-28" />}
+            {({ id, invalid }) => (
+              <DatePicker id={id} invalid={invalid} value={install} onChange={setInstall} />
+            )}
           </Field>
         </FieldRow>
 

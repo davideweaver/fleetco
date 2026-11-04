@@ -33,6 +33,7 @@ queue.
 - [x] **Approval capture** (`AUTH-002`/`003`/`004`) and the reason-required confirm
 - [x] Row actions — the action sits in the cell that shows the state
 - [x] Destructive confirm with a required reason (`INV-012` void, and the override branch)
+- [x] **Dates** — one grid, `DatePicker` and `DateRangePicker`, presets, shop-local
 
 ## Next
 
@@ -43,8 +44,7 @@ queue.
 - [ ] **Timer, punch clock, timesheet.** The technician's main control. `TIME-002` one
       running timer, `TIME-004` needs an active punch, `TIME-013` left-running flag,
       `TIME-009` approval locks a period.
-- [ ] **Date range picker.** Shared by reports and the schedule's week nav. Built twice
-      is the default outcome.
+
 
 ### Tier 1 — Attention, the rest of it
 
@@ -78,6 +78,16 @@ left is coverage and the parts no screen has needed yet.
 
 ### Tier 3 — before anything ships
 
+- [ ] **The popover does not flip.** It opens below its trigger and stays there, so a
+      date field low on a long scrolling panel has its footer clipped. Fine where the
+      pickers sit today (headers, the top of forms); fix it before one lands at the foot
+      of a page.
+- [ ] **Keyboard on the calendar grid.** Arrows, PageUp/Down and Enter are not wired —
+      part of the focus pass below, but listed here because a date picker is the control
+      people most expect to drive from the keyboard.
+- [ ] **Wire the schedule's week nav to `DateRangePicker`.** Its arrows and "Nov 2 – 6"
+      are still hardcoded, because `WEEK` in the sample data is strings rather than real
+      dates. Moving it is what makes the picker and the grid agree.
 - [ ] **Focus and keyboard pass.** Nothing systematic yet. Cheap now, tedious across
       forty screens later.
 - [ ] **Negative, zero and credit amounts.** `tnum` is in place; the conventions are not.

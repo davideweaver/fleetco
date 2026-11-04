@@ -488,6 +488,48 @@ decorative counts — badges are either on and derived, or off.
 column of ten icons each carrying a count stops being glanceable, which is the only reason a
 collapsed rail exists.
 
+## Dates
+
+**One grid, two pickers.** A range is two dates chosen on the same calendar, so
+`CalendarGrid` renders the month and the pickers above it decide what a click means. That is
+the only thing that actually differs between picking one date and picking two — and building a
+second grid is how "today" ends up meaning two different days.
+
+| Control | For |
+|---|---|
+| `DatePicker` | one day — a job's production date, an invoice date |
+| `DateRangePicker` | a span — a report period, a schedule week |
+
+**Presets first.** Nearly every range anyone asks a shop system for has a name: this month, last
+month, the quarter. Making someone click two days to say "last month" is the common failure of
+range pickers, so the named spans are the primary control and the grid is there for the times
+they are not enough. The trigger shows the preset's **name** when one matches, not the dates it
+expands to.
+
+Rules the grid keeps:
+
+- **Today is an outline, never a fill.** A fill competes with the selection, and on the day you
+  happen to open it the two sit in the same cell.
+- **The grid is always six weeks.** A popover that resizes between a 4-row and a 6-row month
+  moves the day you were about to click.
+- **Clicking backwards swaps the ends.** It is a correction, not an error.
+- **Closing mid-pick discards the half-formed range** rather than leaving the field showing a
+  span nobody finished.
+- **Neighbouring months stay visible but recede.** Blanking them loses the week shape, which is
+  how people find "next Monday".
+- **Both ends are inclusive**, because that is what "Nov 2 – 6" means to a person.
+
+Everything is **shop-local** (`PLAT-003`): a day is a local midnight, never a UTC instant, so a
+date cannot shift because someone opened the app at 11pm. `lib/date.ts` is deliberately small —
+it is the file that has to change if OTC ever runs a shop in a second timezone.
+
+**There is no `<input type="date">` any more.** It gave a phone its OS picker for free, but it
+cannot render a range, cannot carry presets, and looks different in every browser — so a form
+and a report period would have disagreed about what a calendar looks like.
+
+On a phone the popover is a **bottom sheet**, the same rule overlays already follow. A 248px
+grid anchored to a field in a 390px viewport ends up half off-screen.
+
 ## Row actions
 
 **The action lives where the state is.** A pending line's approval cell is a **button**
