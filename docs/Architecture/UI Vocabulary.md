@@ -330,7 +330,7 @@ It bubbles up unchanged through four layers:
 | Layer | What it looks like |
 |---|---|
 | **Record** | a reason, derived — "Overdue", "Never sent", "Finished · waiting for you to close" |
-| **Row / detail** | the amber **attention chip**, carrying that reason |
+| **Row / detail** | the amber **attention chip**, or the record's own status pill turned amber |
 | **List** | the **"Needs you" filter**, with the count in amber |
 | **Nav** | the rail **badge** (count) or **dot** (bare icon) |
 
@@ -361,15 +361,25 @@ inlined in `ListRow` first, and that is exactly why the invoice list showed a dr
 while the invoice's own screen showed nothing — the detail had no way to draw the chip without
 copying it. **If a record warrants attention in a list, it warrants it on its own screen.**
 
-Beside a status pill the two are one decision, made in one place:
+**One record in one state gets one mark.** So where a record already shows a status pill, the
+*pill* is the attention mark — it turns amber — and no chip appears beside it. A plain pill with
+an amber chip next to it says the same thing twice and makes the status look innocent while
+something else raises the alarm.
 
-- **The status is the reason** — `OVERDUE`. The pill takes the attention fill and there is no
-  separate chip. One mark.
-- **The reason says more** — `DRAFT` + `Never sent`. The pill stays plain and the chip carries
-  the reason next to it.
+| Record shows | Attention appears as |
+|---|---|
+| a status pill — an invoice | the **pill**, in amber |
+| no status — a customer, a job row | the **chip**, carrying the reason |
 
-Reasons are worded so they never repeat the pill they sit beside: "Never sent", not
-"Draft · never sent".
+Which statuses turn amber is `attentionMap`'s to say, never a list of strings written out again
+in the component. `DRAFT` is amber because `JOB-009` creates an invoice unsent and an unsent
+invoice is money not billed — if that rule changes, the colour follows it.
+
+> This took two passes to get right. The first instinct was that `DRAFT` is a lifecycle state
+> rather than an alarm, so it should stay grey. But it *is* in the attention count, and a state
+> that counts toward a badge while looking calm on the record is the exact dead end the whole
+> mechanism exists to prevent. The question to ask is not "does this status sound urgent" but
+> "does this record need someone" — and `attentionMap` already answers it.
 
 ### One colour, three places
 
