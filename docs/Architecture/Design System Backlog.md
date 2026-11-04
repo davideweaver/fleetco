@@ -47,8 +47,11 @@ queue.
       still needs `EST-011` expected hours, which the estimate does not carry yet.
 - [ ] **Payroll export** (`TIME-010`) — approved periods only, CSV and printout, hours by
       employee and date, no wages. The report shell already does both halves.
-- [ ] **Pay period length is `D-C12`.** The review screen shows one undated period; it
-      cannot show real boundaries until someone answers weekly or fortnightly.
+- [ ] **Pay period length is `D-C12`** — ask Cam: weekly or fortnightly, and which day
+      it starts. Review now steps whole weekly periods, Mon–Sun, and says on screen that
+      this is an assumption. Only the step size changes when it is answered.
+- [ ] **Approved periods are not persisted** — approving is in-page state, so stepping
+      away and back forgets it. Needs the real thing before anyone trusts `TIME-010`.
 - [ ] **Reopening an approved period is audited** (`TIME-009`) and has no UI yet.
 - [ ] **The four time reports have no data.** Payments, Clocked hours, Job hours and
       Timesheets render the shell and their definitions but no rows — they wait on the

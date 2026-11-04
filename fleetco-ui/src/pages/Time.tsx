@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { Check, Lock, Users } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Lock, Users } from "lucide-react";
 import { toast } from "sonner";
 import { useShell } from "@/shell/shell-context";
 import {
@@ -16,10 +16,17 @@ import {
 import { PunchClock, useTimeClock, LeftRunningChip } from "@/components/ui/timer";
 import { CorrectTimeDialog } from "@/components/ui/correct-time";
 import { Section } from "./Customers";
-import { DateRangePicker, type DateRange } from "@/components/ui/date-picker";
-import { fmtRange, fromISODate, isWithin, startOfDay } from "@/lib/date";
+import type { DateRange } from "@/components/ui/date-picker";
 import {
-  DAYS,
+  addDays,
+  fmtRange,
+  fromISODate,
+  isSameDay,
+  isWithin,
+  startOfDay,
+  startOfWeek,
+} from "@/lib/date";
+import {
   DAY_ISO,
   TODAY_LABEL,
   at,
@@ -167,10 +174,23 @@ function Review() {
     | null
   >(null);
   const [, bump] = useState(0);
-  const [period, setPeriod] = useState<DateRange>({
-    from: fromISODate(DAY_ISO[DAYS[0]])!,
-    to: fromISODate(DAY_ISO[TODAY_LABEL])!,
-  });
+  /**
+   * A pay PERIOD, stepped — not a free date range.
+   *
+   * `TIME-009` approves a pay period and `TIME-010` exports approved periods, so an
+   * arbitrary range cannot be the unit of approval: approve Nov 2–4 and nobody can say
+   * what Nov 5–8 is, which periods are approved, or what reopening would reopen. The
+   * control therefore does not offer a range it would then have to refuse.
+   *
+   * Ad-hoc ranges are a reporting question and already have a home — Clocked hours and
+   * Job hours take any range, because looking is not approving.
+   */
+  const [periodStart, setPeriodStart] = useState(() =>
+    startOfWeek(fromISODate(DAY_ISO[TODAY_LABEL])!)
+  );
+  const period: DateRange = { from: periodStart, to: addDays(periodStart, 6) };
+  const thisPeriodStart = startOfWeek(fromISODate(DAY_ISO[TODAY_LABEL])!);
+  const isCurrent = isSameDay(periodStart, thisPeriodStart);
 
   const { id } = useParams();
   const { href } = useShell();
@@ -235,9 +255,33 @@ function Review() {
       list={
         <>
           <ListHeader title="Timesheet review" count={employees.length} />
-          <div className="border-b px-2 py-1.5">
-            <DateRangePicker value={period} onChange={setPeriod} />
+          {/* Steps whole periods. There is no way to land on half of one. */}
+          <div className="flex items-center gap-1 border-b px-2 py-1.5">
+            <IconStep
+              label="Previous period"
+              onClick={() => setPeriodStart((d) => addDays(d, -7))}
+            >
+              <ChevronLeft className="size-4" />
+            </IconStep>
+            <span className="tnum flex-1 text-center text-sm font-medium">
+              {fmtRange(period.from, period.to, new Date())}
+            </span>
+            <IconStep
+              label="Next period"
+              onClick={() => setPeriodStart((d) => addDays(d, 7))}
+            >
+              <ChevronRight className="size-4" />
+            </IconStep>
           </div>
+          {!isCurrent && (
+            <button
+              type="button"
+              onClick={() => setPeriodStart(thisPeriodStart)}
+              className="border-b px-3 py-1 text-left text-xs text-muted-foreground underline-offset-2 hover:underline"
+            >
+              Back to this period
+            </button>
+          )}
 
           <div className="min-h-0 flex-1 overflow-y-auto">
             <ListRow
@@ -251,8 +295,8 @@ function Review() {
                   <Users className="size-4" />
                 </span>
               }
-              title="Everyone"
-              subtitle={`${employees.length} people`}
+              title="Summary"
+              subtitle={`${employees.length} people · approve here`}
               meta={`${hours(totals.payable)} h`}
               metaSub="payable"
               attention={blocking > 0 ? `${blocking} needs you` : undefined}
@@ -275,44 +319,43 @@ function Review() {
             })}
           </div>
 
-          {/* Pinned to the pane that means "the whole period", so it can never be read
-              as approving only whoever is selected on the right. */}
-          <div className="shrink-0 border-t p-2">
-            {approved ? (
-              <div className="flex items-center justify-center gap-1.5 rounded-md bg-muted py-2 text-sm text-muted-foreground">
-                <Lock className="size-3.5" /> Period approved
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => {
-                  if (blocking > 0) {
-                    toast.error("Resolve what needs you first", {
-                      description: `${blocking} entr${blocking === 1 ? "y" : "ies"} in this period still need you. Approving locks it for everyone.`,
-                    });
-                    return;
-                  }
-                  setApproved(true);
-                  toast.success("Pay period approved", {
-                    description: "Entries are locked. Reopening is audited.",
-                  });
-                }}
-                className="w-full rounded-md border border-primary bg-primary py-2 text-sm font-medium text-primary-foreground"
-              >
-                Approve period
-              </button>
-            )}
-            <p className="mt-1.5 text-center text-[11px] text-muted-foreground">
-              Locks every employee · payroll exports approved periods only
-            </p>
-          </div>
         </>
       }
       detail={
         <div className="flex h-full min-h-0 flex-col">
           <DetailHeader
             eyebrow={`Timesheet · ${fmtRange(period.from, period.to, new Date())}`}
-            title={selectedEmployee ? selectedEmployee.name : "Everyone"}
+            title={selectedEmployee ? selectedEmployee.name : "Summary"}
+            actions={
+              /* On the SUMMARY pane only. Approving locks the period for everyone, so
+                 it belongs with the period's totals — not on a pane headed with one
+                 person's name, where it reads as approving that person. Costing a
+                 click to get here is the right price for that. */
+              who === "all" ? (
+                approved ? (
+                  <span className="inline-flex items-center gap-1.5 rounded-md bg-muted px-3 py-1.5 text-sm text-muted-foreground">
+                    <Lock className="size-3.5" /> Approved
+                  </span>
+                ) : (
+                  <span
+                    onClick={() => {
+                      if (blocking > 0) {
+                        toast.error("Resolve what needs you first", {
+                          description: `${blocking} entr${blocking === 1 ? "y" : "ies"} in this period still need you. Approving locks it for everyone.`,
+                        });
+                        return;
+                      }
+                      setApproved(true);
+                      toast.success("Pay period approved", {
+                        description: `${fmtRange(period.from, period.to, new Date())} is locked. Reopening is audited.`,
+                      });
+                    }}
+                  >
+                    <Btn primary>Approve period</Btn>
+                  </span>
+                )
+              ) : undefined
+            }
             sub={
               /* TIME-006 at the top of whatever you selected. Two numbers, side by
                  side, never summed — the same refusal the old table made structural. */
@@ -330,6 +373,15 @@ function Review() {
               </span>
             }
           />
+
+          {/* D-C12 is open, so the screen says which assumption it is running on rather
+              than letting a week look like a settled decision. */}
+          {who === "all" && (
+            <p className="border-b bg-muted/40 px-3 py-1.5 text-xs text-muted-foreground">
+              Not settled — TIME-009 / D-C12: the pay period is assumed weekly,
+              Monday to Sunday. Approval is per period, never a partial range.
+            </p>
+          )}
 
           <div className="min-h-0 flex-1 overflow-auto p-3">
             <div className="space-y-3">
@@ -538,5 +590,27 @@ function Review() {
         )
       }
     />
+  );
+}
+
+/** A square step button. The period moves a whole week at a time, never a day. */
+function IconStep({
+  label,
+  onClick,
+  children,
+}: {
+  label: string;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      onClick={onClick}
+      className="grid size-7 shrink-0 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+    >
+      {children}
+    </button>
   );
 }

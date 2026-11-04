@@ -609,13 +609,31 @@ their entries on the right.
 
 | Pane | Means | Carries |
 |---|---|---|
-| left | **the period** | the date range, each person's payable hours, **Approve** |
+| left | **the period** | the period stepper, each person's payable hours |
 | right | **the selection** | that person's hours, what needs them, their entries |
 
-> **Approve lives on the left, and that is the point of the split.** Approving locks the period
-> for *everyone*. Put the button in a detail header titled "Marco Diaz" and it reads as approving
-> Marco — the same misreading the period-wide blocking count already exists to prevent. The left
-> pane is the only place that means "everyone", so that is where it goes.
+The first row is **Summary** — the period itself, not a person. It holds the hours-by-employee
+roll-up and **Approve**.
+
+> **Approve is on Summary and nowhere else.** Approving locks the period for *everyone*, so the
+> button has to sit somewhere that means everyone. On a pane headed "Marco Diaz" it reads as
+> approving Marco — the same misreading the period-wide blocking count exists to prevent. It
+> costs a click to get back to Summary, and that is the right price.
+
+### Approve a period, never a range
+
+`TIME-009` approves a **pay period** and `TIME-010` exports approved periods. An arbitrary date
+range cannot be the unit: approve Nov 2–4 and nobody can say what Nov 5–8 is, which periods are
+approved, or what reopening would reopen.
+
+So the control **does not offer a range it would then have to refuse**. Review steps whole
+periods — `‹ Nov 2 – 8 ›` — and there is no way to land on half of one. Looking at an arbitrary
+range is a *reporting* question and already has a home: Clocked hours and Job hours take any
+range, because looking is not approving.
+
+**`D-C12` is open** — weekly or fortnightly is not decided. The screen says which assumption it
+is running on (weekly, Monday to Sunday) rather than letting a week look like a settled answer,
+the same way a report states an unsettled definition.
 
 **Everyone is a roll-up, not a merged list.** Selecting Everyone shows hours by employee with
 the period's totals — not every person's entries interleaved by day, which is a report nobody
