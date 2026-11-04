@@ -199,14 +199,17 @@ function SectionHeader({
 /**
  * A labelled break in a list. The label is the point — an unlabelled rule says "these
  * are different" without saying how, which leaves the reader to guess.
+ *
+ * The gap above it is what separates the two groups; the label just names the lower one.
+ * A trailing rule across the rest of the row was a second separator doing the same job,
+ * and next to the row borders already in the list it read as clutter.
  */
 export function ListDivider({ label }: { label: string }) {
   return (
-    <div className="flex items-center gap-2 border-b bg-surface-1/50 px-3 py-1.5">
+    <div className="border-b px-3 pb-1.5 pt-6">
       <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
         {label}
       </span>
-      <span className="h-px flex-1 bg-border" />
     </div>
   );
 }
