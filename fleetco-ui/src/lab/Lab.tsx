@@ -33,7 +33,6 @@ const SCREENS = [
 ];
 
 export function Lab() {
-  const [variant, setVariant] = useState<"rail" | "sidebar">("rail");
   const [rail, setRail] = useState<"expanded" | "collapsed">("collapsed");
   const [badges, setBadges] = useState<"off" | "quiet" | "busy">("quiet");
   const [role, setRole] = useState<"owner" | "tech">("owner");
@@ -48,7 +47,7 @@ export function Lab() {
   const [entry, setEntry] = useState<"fill" | "stripe" | "both">("both");
 
   const src = (extra = "") =>
-    `${screen.path}${screen.path.includes("?") ? "&" : "?"}v=${variant}&role=${role}&rail=${rail}&badges=${badges}&palette=${palette}&nav=${nav}&entry=${entry}${dark ? "&theme=dark" : ""}${extra}`;
+    `${screen.path}${screen.path.includes("?") ? "&" : "?"}role=${role}&rail=${rail}&badges=${badges}&palette=${palette}&nav=${nav}&entry=${entry}${dark ? "&theme=dark" : ""}${extra}`;
 
   return (
     <div className="flex h-full flex-col bg-neutral-100 text-neutral-900">
@@ -57,18 +56,10 @@ export function Lab() {
           <div>
             <div className="text-sm font-semibold">FleetCo device lab</div>
             <div className="text-xs text-neutral-500">
-              Nav shape comparison · V1 graphics
+              Design system · V1 graphics
             </div>
           </div>
 
-          <Group label="Nav shape">
-            <Seg on={variant === "rail"} onClick={() => setVariant("rail")}>
-              Rail + second column
-            </Seg>
-            <Seg on={variant === "sidebar"} onClick={() => setVariant("sidebar")}>
-              Sidebar only
-            </Seg>
-          </Group>
 
           <Group label="Rail">
             <Seg on={rail === "collapsed"} onClick={() => setRail("collapsed")}>Collapsed</Seg>
@@ -185,7 +176,7 @@ export function Lab() {
                 style={{ width: d.w * scale, height: d.h * scale }}
               >
                 <iframe
-                  key={`${d.key}-${variant}-${rail}-${role}-${badges}-${palette}-${nav}-${entry}-${screen.key}-${dark}`}
+                  key={`${d.key}-${rail}-${role}-${badges}-${palette}-${nav}-${entry}-${screen.key}-${dark}`}
                   title={d.label}
                   src={src()}
                   style={{

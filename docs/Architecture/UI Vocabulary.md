@@ -41,7 +41,7 @@ grep for the thing they mean. It is the same failure the single route table prev
 
 | # | Name | Component | What it is |
 |---|---|---|---|
-| ① | **Rail** | `AppShell` | The left navigation. **Expanded** (208px, labels) or **collapsed** (56px, icons). Not "sidebar" — that was the discarded variant |
+| ① | **Rail** | `AppShell` | The left navigation. **Expanded** (208px, labels) or **collapsed** (56px, icons). Not "sidebar" — that alternative was built, compared, and dropped |
 | ② | **Section header** | `SectionHeader` | The **band** at the top of the list column: section name, count and actions. `ListHeader` on list sections, `PageHeader` on wide ones. **There is no top banner** — it duplicated this |
 | ③ | **List row** | `ListRow` | One record in the list column. A **row**, never a card |
 | ④ | **Bottom bar** | `AppShell` | The phone's navigation. Four items plus **More**, which opens the **More sheet** |

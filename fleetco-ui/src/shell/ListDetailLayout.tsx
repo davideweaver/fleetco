@@ -15,9 +15,6 @@ import { cn } from "@/lib/utils";
  * Responsive is pure CSS, keyed off `hasSelection`:
  *   < 1024px  one pane — list, or detail with a back link
  *   >= 1024px two panes — list keeps its scroll position, selection moves
- *
- * In the `sidebar` variant there is no second column at all: the list is a page and
- * the detail is a page, which is what VarsityBio does today.
  */
 export function ListDetailLayout({
   list,
@@ -35,16 +32,14 @@ export function ListDetailLayout({
   /** Overlays owned by this section — a create form, say. */
   after?: ReactNode;
 }) {
-  const { variant, href } = useShell();
-  const twoPane = variant === "rail";
+  const { href } = useShell();
 
   return (
     <div className="flex h-full min-h-0">
       <aside
         className={cn(
-          "flex min-h-0 w-full flex-col bg-surface-2",
-          twoPane && "lg:w-[272px] lg:shrink-0 xl:w-[312px]",
-          hasSelection && (twoPane ? "hidden lg:flex" : "hidden")
+          "flex min-h-0 w-full flex-col bg-surface-2 lg:w-[272px] lg:shrink-0 xl:w-[312px]",
+          hasSelection && "hidden lg:flex"
         )}
       >
         {list}
@@ -53,12 +48,12 @@ export function ListDetailLayout({
       <section
         className={cn(
           "@container flex min-h-0 flex-1 flex-col",
-          !hasSelection && (twoPane ? "hidden lg:flex" : "hidden")
+          !hasSelection && "hidden lg:flex"
         )}
       >
         {hasSelection ? (
           <>
-            <div className={cn("flex h-band shrink-0 items-center border-b px-3", twoPane && "lg:hidden")}>
+            <div className="flex h-band shrink-0 items-center border-b px-3 lg:hidden">
               <Link
                 to={href(backTo)}
                 className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"

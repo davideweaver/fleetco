@@ -1,19 +1,15 @@
 import { createContext, useContext } from "react";
 import type { Role } from "@/nav/routes";
 
-export type Variant = "rail" | "sidebar";
-
 type Shell = {
-  variant: Variant;
   role: Role;
-  /** Appends the current variant/role to a path so links keep the lab settings. */
+  /** Appends the current role to a path so links keep the lab settings. */
   href: (path: string) => string;
   /** Opens the global search palette. There is no banner to put a field in. */
   openSearch: () => void;
 };
 
 export const ShellContext = createContext<Shell>({
-  variant: "rail",
   role: "owner",
   href: (p) => p,
   openSearch: () => {},

@@ -3,7 +3,7 @@ import { Link, Outlet, useLocation, useSearchParams } from "react-router-dom";
 import { Menu, PanelLeftClose, PanelLeftOpen, Search, X } from "lucide-react";
 import { SearchPalette, useSearchHotkey } from "./SearchPalette";
 import { Toaster } from "sonner";
-import { ShellContext, type Variant } from "./shell-context";
+import { ShellContext } from "./shell-context";
 import { ContextCluster } from "./ContextCluster";
 import { GROUP_ORDER, itemForPath, labelFor, navFor, phoneNavFor, type Role } from "@/nav/routes";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -45,7 +45,6 @@ function useRailOpen(override: string | null): [boolean, (v: boolean) => void] {
 export function AppShell() {
   const [params] = useSearchParams();
   const location = useLocation();
-  const variant = (params.get("v") as Variant) ?? "rail";
   const role = (params.get("role") as Role) ?? "owner";
   const [moreOpen, setMoreOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -57,15 +56,14 @@ export function AppShell() {
   useSearchHotkey(() => setSearchOpen(true));
   const badges = badgesFor(role, (params.get("badges") as BadgeLevel) ?? "quiet");
 
-  const query = `?v=${variant}&role=${role}`;
+  const query = `?role=${role}`;
   const shell = useMemo(
     () => ({
-      variant,
       role,
       href: (path: string) => `${path}${query}`,
       openSearch: () => setSearchOpen(true),
     }),
-    [variant, role, query]
+    [role, query]
   );
 
   const items = navFor(role);
@@ -77,10 +75,9 @@ export function AppShell() {
     <ShellContext value={shell}>
       <TooltipProvider delayDuration={400} skipDelayDuration={200}>
       <div className="flex h-full w-full overflow-hidden bg-background text-foreground">
-        {/* Rail or classic sidebar. Hidden below 744px — the phone gets the bottom bar.
-            Pure CSS, so there is no first-paint flash from a JS width check. */}
-        {variant === "rail" ? (
-          <nav
+        {/* The rail. Hidden below 744px — the phone gets the bottom bar instead. Pure
+            CSS, so there is no first-paint flash from a JS width check. */}
+        <nav
             className={cn(
               "nav-surface hidden shrink-0 flex-col bg-surface-1 pad:flex",
               railOpen ? "w-52 items-stretch px-2" : "w-14 items-center"
@@ -234,41 +231,7 @@ export function AppShell() {
               })()}
               <ContextCluster compact={!railOpen} />
             </div>
-          </nav>
-        ) : (
-          <nav className="nav-surface hidden w-[232px] shrink-0 flex-col bg-surface-1 pad:flex">
-            <div className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
-              <span className="grid size-8 place-items-center rounded-md bg-primary text-[10px] font-bold text-primary-foreground">
-                OTC
-              </span>
-              <span className="text-sm font-semibold">OTC Fleet Graphix</span>
-            </div>
-            <div className="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto p-2">
-              {items.map((item) => {
-                const on = active?.key === item.key;
-                return (
-                  <Link
-                    key={item.key}
-                    to={shell.href(item.path)}
-                    aria-current={on ? "page" : undefined}
-                    className={cn(
-                      "flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm",
-                      on
-                        ? "bg-accent font-semibold text-accent-foreground"
-                        : "text-muted-foreground hover:bg-accent/60"
-                    )}
-                  >
-                    <item.icon className="size-4 shrink-0" />
-                    <span className="truncate">{labelFor(item, role)}</span>
-                  </Link>
-                );
-              })}
-            </div>
-            <div className="shrink-0 border-t p-2">
-              <ContextCluster />
-            </div>
-          </nav>
-        )}
+        </nav>
 
         {/* No top banner. It repeated the section title the list header already shows,
             and cost 56px on every screen. Search moved to the rail and the palette. */}

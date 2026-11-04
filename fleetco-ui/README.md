@@ -11,12 +11,8 @@ npm run dev     # http://localhost:5180/lab
 
 ## What it compares
 
-Two nav shapes, four device widths, two roles, two themes, three badge levels:
-
-| | |
-|---|---|
-| **Rail + second column** | A rail that collapses — 208px with labels, 56px icons only, toggled at the bottom — then a list column that drives the main pane |
-| **Sidebar only** | 232px labelled sidebar, list and detail as separate pages (what VarsityBio does today) |
+Four device widths as independent toggles, two roles, two palettes, two themes, three badge
+levels, and a rail that collapses — 80px with labels, 56px icons only.
 
 Collapsed is only the default on a desktop at 1280px and up — it needs room beside a
 list and a detail, and it needs hover tooltips to replace the labels it drops. An iPad
