@@ -352,6 +352,14 @@ filter**.
 The filter chip itself stays a plain control. Only its count wears the colour — tinting the whole
 control as well makes a filter look like a warning.
 
+A **status pill** joins that set when the status *is* the reason — an invoice's `OVERDUE` and
+`DRAFT` are the attention count, so the pill wears the fill instead of a red or grey tint. The
+status and the reason are one fact; two marks would say it twice. The test is `attentionMap`,
+never a hardcoded `=== "Overdue"`, so the colour cannot drift away from what the badge counts.
+
+Everything else keeps its old tone. `PAID` is green, `SENT` and `IN PRODUCTION` are grey: those
+are *states*, and a state nobody has to act on must not borrow the colour of one that does.
+
 **Sections without a list never get a badge they cannot explain.** There is no mode that adds
 decorative counts — badges are either on and derived, or off.
 

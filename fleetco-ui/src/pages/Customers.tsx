@@ -4,6 +4,7 @@ import { customers, invoices, jobs, STAGES } from "@/data/sample";
 import { useShell } from "@/shell/shell-context";
 import { Btn, DetailHeader, ListDetailLayout, ListHeader, ListRow, Monogram, Pill } from "@/shell/ListDetailLayout";
 import { attentionMap } from "@/nav/attention";
+import { InvoiceStatus } from "@/components/ui/invoice-status";
 import { money } from "@/lib/utils";
 
 export function CustomersPage() {
@@ -121,9 +122,7 @@ function CustomerDetail({ id }: { id: string }) {
                 <Td className="font-medium">#{v.no}</Td>
                 <Td className="hidden text-muted-foreground sm:table-cell">{v.issued}</Td>
                 <Td>
-                  <Pill tone={v.status === "Overdue" ? "bad" : v.status === "Paid" ? "good" : "muted"}>
-                    {v.status}
-                  </Pill>
+                  <InvoiceStatus no={v.no} status={v.status} />
                 </Td>
                 <Td right className="hidden sm:table-cell">{money(v.totalCents)}</Td>
                 <Td right>{v.balanceCents ? money(v.balanceCents) : "—"}</Td>

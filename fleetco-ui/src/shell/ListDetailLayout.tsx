@@ -283,7 +283,7 @@ export function Pill({
   tone = "default",
 }: {
   children: ReactNode;
-  tone?: "default" | "muted" | "warn" | "good" | "bad";
+  tone?: "default" | "muted" | "warn" | "good" | "bad" | "attention";
 }) {
   return (
     <span
@@ -293,7 +293,10 @@ export function Pill({
         tone === "muted" && "border-border text-muted-foreground",
         tone === "warn" && "border-warning/40 bg-warning/10 text-warning",
         tone === "good" && "border-success/40 bg-success/10 text-success",
-        tone === "bad" && "border-destructive/40 bg-destructive/10 text-destructive"
+        tone === "bad" && "border-destructive/40 bg-destructive/10 text-destructive",
+        // The same solid fill as the rail badge and the row chip. A pill wears this when
+        // the status IS the reason the row is in the attention count — see InvoiceStatus.
+        tone === "attention" && "border-transparent bg-attention text-attention-fg"
       )}
     >
       {children}
