@@ -597,6 +597,29 @@ Approving a period locks it (`TIME-009`) and payroll exports approved periods on
 so **approving over an unresolved flag is refused** with a count of what is left. That is the
 path by which a wrong number reaches payroll.
 
+### Filtering review: three questions, not one control
+
+| Filter | Question |
+|---|---|
+| period | **when** — which pay period |
+| employee | **who** |
+| All / Needs you | **what needs me** |
+
+They do not substitute for each other, so none of them is folded into another. The "Needs you"
+chip is not optional decoration: the rail badges Time, and a badge the screen cannot resolve
+into rows is the dead end the whole attention mechanism exists to prevent. Its count comes from
+the same `attentionMap("time")` the badge does.
+
+> **A filter changes what you are looking at, never what is true.** What blocks approval is
+> counted across the **whole period**, never the filtered view — otherwise filtering to one
+> employee would hide another's flag and let you approve past exactly the thing the guard
+> exists to catch. By the same logic, the totals row shows the totals of what is *shown* and
+> labels itself **· filtered** when it is, because a partial total read as a period total is
+> how the wrong number reaches payroll.
+
+`FilterChip` is shared with the list screens. Wide pages — the board, the schedule, review —
+have no `ListHeader` to get one from, and were each about to grow their own.
+
 `TIME-012`: two decimals, no rounding to quarter hours. A shop that rounds to quarters is a shop
 arguing about six minutes every Friday.
 

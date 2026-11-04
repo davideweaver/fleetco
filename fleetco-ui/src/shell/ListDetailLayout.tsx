@@ -124,7 +124,13 @@ export function ListHeader({
   );
 }
 
-function FilterChip({
+/**
+ * Exported because the WIDE pages need it too. A list screen gets its filter from
+ * `ListHeader`; the board, the schedule and timesheet review have no list header and
+ * were going to grow their own chip, which is how two filters in one app end up
+ * looking like two different ideas.
+ */
+export function FilterChip({
   on,
   onClick,
   children,

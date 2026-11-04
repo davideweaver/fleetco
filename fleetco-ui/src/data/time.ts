@@ -16,6 +16,13 @@ export const ACTIVITIES = ["Cleanup", "Meetings", "Training", "General shop"];
 export const DAYS = ["Mon Nov 2", "Tue Nov 3", "Wed Nov 4"];
 export const TODAY_LABEL = "Wed Nov 4";
 
+/** The real date behind each label, so a period filter compares dates, not strings. */
+export const DAY_ISO: Record<string, string> = {
+  "Mon Nov 2": "2026-11-02",
+  "Tue Nov 3": "2026-11-03",
+  "Wed Nov 4": "2026-11-04",
+};
+
 export type Employee = { id: string; name: string; initials: string };
 
 export const employees: Employee[] = [

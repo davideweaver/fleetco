@@ -2,12 +2,16 @@ import { useState } from "react";
 import { Check, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { useShell } from "@/shell/shell-context";
-import { Btn, PageHeader, Pill } from "@/shell/ListDetailLayout";
+import { Btn, FilterChip, PageHeader, Pill } from "@/shell/ListDetailLayout";
 import { PunchClock, useTimeClock, LeftRunningChip, FlaggedPill } from "@/components/ui/timer";
 import { ConfirmWithReason } from "@/components/ui/confirm";
 import { Section } from "./Customers";
+import { DateRangePicker, type DateRange } from "@/components/ui/date-picker";
+import { attentionMap } from "@/nav/attention";
+import { fromISODate, isWithin, startOfDay } from "@/lib/date";
 import {
   DAYS,
+  DAY_ISO,
   TODAY_LABEL,
   at,
   employees,
@@ -157,10 +161,36 @@ function MyDay() {
 function Review() {
   const [approved, setApproved] = useState(false);
   const [correcting, setCorrecting] = useState<string | null>(null);
+  const [who, setWho] = useState<string | "all">("all");
+  const [onlyAttention, setOnlyAttention] = useState(false);
+  const [period, setPeriod] = useState<DateRange>({
+    from: fromISODate(DAY_ISO[DAYS[0]])!,
+    to: fromISODate(DAY_ISO[TODAY_LABEL])!,
+  });
 
-  const rows = employees.map((emp) => {
-    const theirPunches = punches.filter((p) => p.who === emp.id);
-    const theirEntries = seedEntries.filter((e) => e.who === emp.id);
+  /* The three filters answer three different questions, so none of them substitutes
+     for another: WHEN (which pay period), WHO (one employee), and WHAT NEEDS ME. */
+  const inPeriod = (day: string) => {
+    const d = fromISODate(DAY_ISO[day] ?? "");
+    return d ? isWithin(d, startOfDay(period.from), startOfDay(period.to)) : true;
+  };
+
+  // The same derivation the rail badge counts. The badge says a number; this is where
+  // those rows are, which is the whole reason the badge is allowed to exist.
+  const needs = attentionMap("time", "owner");
+
+  const shownPunches = punches.filter(
+    (p) => inPeriod(p.day) && (who === "all" || p.who === who)
+  );
+  const shownEntries = seedEntries.filter(
+    (e) => inPeriod(e.day) && (who === "all" || e.who === who)
+  );
+
+  const rows = employees
+    .filter((emp) => who === "all" || emp.id === who)
+    .map((emp) => {
+    const theirPunches = shownPunches.filter((p) => p.who === emp.id);
+    const theirEntries = shownEntries.filter((e) => e.who === emp.id);
     return {
       emp,
       payable: theirPunches.reduce((a, p) => a + minutesOf(p), 0),
@@ -171,7 +201,21 @@ function Review() {
     };
   });
 
-  const blocking = rows.reduce((a, r) => a + r.running.length + r.flagged.length, 0);
+  /**
+   * What blocks approval is counted across the WHOLE period, never the filtered view.
+   * Approving locks the period for everyone, so letting a filter to one employee hide
+   * another's flag would be a way to approve past exactly the thing the guard exists
+   * to catch. A filter changes what you are looking at, never what is true.
+   */
+  const blocking =
+    punches.filter((p) => inPeriod(p.day) && isLeftRunning(p)).length +
+    seedEntries.filter((e) => inPeriod(e.day) && e.flagged).length;
+  // "Needs you" hides the employees with nothing outstanding; it never hides a column.
+  // Dropping the payable column under a filter is how a part-filtered total gets read
+  // as the whole period.
+  const tableRows = onlyAttention
+    ? rows.filter((r) => r.running.length + r.flagged.length > 0)
+    : rows;
 
   return (
     <div className="flex h-full min-h-0 flex-col">
@@ -208,6 +252,33 @@ function Review() {
         }
       />
 
+      <div className="flex flex-wrap items-center gap-2 border-b px-3 py-2">
+        <DateRangePicker value={period} onChange={setPeriod} />
+        <span className="h-5 w-px bg-border" />
+        <FilterChip on={who === "all"} onClick={() => setWho("all")}>
+          Everyone
+        </FilterChip>
+        {employees.map((e) => (
+          <FilterChip key={e.id} on={who === e.id} onClick={() => setWho(e.id)}>
+            {e.name}
+          </FilterChip>
+        ))}
+        {needs.size > 0 && (
+          <>
+            <span className="h-5 w-px bg-border" />
+            <FilterChip on={!onlyAttention} onClick={() => setOnlyAttention(false)}>
+              All
+            </FilterChip>
+            <FilterChip on={onlyAttention} onClick={() => setOnlyAttention(true)}>
+              Needs you
+              <span className="tnum ml-1.5 rounded-full bg-attention px-1.5 text-[10px] font-semibold text-attention-fg">
+                {needs.size}
+              </span>
+            </FilterChip>
+          </>
+        )}
+      </div>
+
       <div className="min-h-0 flex-1 overflow-auto p-3">
         <div className="space-y-3">
           <div className="overflow-hidden rounded-xl border">
@@ -221,7 +292,16 @@ function Review() {
                 </tr>
               </thead>
               <tbody>
-                {rows.map((r) => (
+                {tableRows.length === 0 && (
+                  <tr>
+                    <td colSpan={4} className="px-3 py-8 text-center text-sm text-muted-foreground">
+                      {onlyAttention
+                        ? "Nothing needs you in this period."
+                        : "No time in this period."}
+                    </td>
+                  </tr>
+                )}
+                {tableRows.map((r) => (
                   <tr key={r.emp.id} className="border-b last:border-0">
                     <td className="px-3 py-2">{r.emp.name}</td>
                     <td className="tnum px-3 py-2 text-right font-medium">{hours(r.payable)} h</td>
@@ -249,12 +329,19 @@ function Review() {
                   job hours is the single most expensive mistake this screen could make. */}
               <tfoot>
                 <tr className="border-t-2 font-semibold">
-                  <td className="px-3 py-2">Payroll takes the left column only</td>
+                  <td className="px-3 py-2">
+                    Payroll takes the left column only
+                    {(who !== "all" || onlyAttention) && (
+                      <span className="ml-1.5 font-normal text-muted-foreground">
+                        · filtered
+                      </span>
+                    )}
+                  </td>
                   <td className="tnum px-3 py-2 text-right">
-                    {hours(rows.reduce((a, r) => a + r.payable, 0))} h
+                    {hours(tableRows.reduce((a, r) => a + r.payable, 0))} h
                   </td>
                   <td className="tnum px-3 py-2 text-right text-muted-foreground">
-                    {hours(rows.reduce((a, r) => a + r.job, 0))} h
+                    {hours(tableRows.reduce((a, r) => a + r.job, 0))} h
                   </td>
                   <td />
                 </tr>
@@ -264,7 +351,7 @@ function Review() {
 
           <Section title="Entries that need you">
             <ul className="divide-y">
-              {punches.filter(isLeftRunning).map((p) => (
+              {shownPunches.filter(isLeftRunning).map((p) => (
                 <li key={p.id} className="flex flex-wrap items-center gap-3 p-3 text-sm">
                   <span className="min-w-0 flex-1">
                     <span className="block">
@@ -280,7 +367,7 @@ function Review() {
                   </span>
                 </li>
               ))}
-              {seedEntries
+              {shownEntries
                 .filter((e) => e.flagged)
                 .map((e) => (
                   <li key={e.id} className="flex flex-wrap items-center gap-3 p-3 text-sm">
@@ -310,7 +397,7 @@ function Review() {
               overwrites (AUTH-003). */}
           <Section title="Corrections already made">
             <ul className="divide-y">
-              {seedEntries
+              {shownEntries
                 .filter((e) => e.correctedFrom)
                 .map((e) => (
                   <li key={e.id} className="p-3 text-sm">
