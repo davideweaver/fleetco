@@ -98,6 +98,23 @@ export const entries: Entry[] = [
   { id: "e7", who: "OW", day: "Wed Nov 4", jobNo: null, activity: "Meetings", start: hm(8, 30), end: hm(9, 45) },
 ];
 
+/**
+ * Pay periods already approved, keyed by their Monday. `TIME-009`.
+ *
+ * Seeded with every week up to a fortnight ago, which is what a shop that has been
+ * running a while actually looks like — and it leaves last week (Oct 26) open, so the
+ * picker shows all three states at once: this week needing attention, last week open,
+ * everything older locked.
+ */
+export const approvedPeriodStarts = [
+  "2026-10-19",
+  "2026-10-12",
+  "2026-10-05",
+  "2026-09-28",
+  "2026-09-21",
+  "2026-09-14",
+];
+
 /** `TIME-013`. Twelve hours, flagged in review, never stopped automatically. */
 export const LEFT_RUNNING_MINUTES = 12 * 60;
 

@@ -32,6 +32,7 @@ import {
 import {
   DAY_ISO,
   TODAY_LABEL,
+  approvedPeriodStarts,
   at,
   employees,
   nameOf,
@@ -172,7 +173,9 @@ function MyDay() {
  */
 function Review() {
   /** Keyed by the period's start, so the picker can say which are already done. */
-  const [approvedPeriods, setApprovedPeriods] = useState<Set<string>>(new Set());
+  const [approvedPeriods, setApprovedPeriods] = useState<Set<string>>(
+    () => new Set(approvedPeriodStarts)
+  );
   const [correcting, setCorrecting] = useState<
     | { kind: "punch" | "entry"; id: string; what: string; when: string; start: number; end: number | null }
     | null
