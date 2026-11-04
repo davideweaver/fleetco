@@ -544,6 +544,11 @@ and a report period would have disagreed about what a calendar looks like.
 On a phone the popover is a **bottom sheet**, the same rule overlays already follow. A 248px
 grid anchored to a field in a 390px viewport ends up half off-screen.
 
+**Alignment follows the trigger, not the component.** The range panel is around 680px wide, so
+hanging it from the right edge of a control that sits at the *left* of a toolbar throws it off
+the pane, where the list column clips it. It defaults to `start` and only takes `end` where the
+trigger is genuinely right-aligned.
+
 ## Reports and print
 
 **One shell, not nine.** Every V1 report is the same object: a period, some filters, a table

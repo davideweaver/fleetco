@@ -141,10 +141,17 @@ export function DateRangePicker({
   value,
   onChange,
   max,
+  align = "start",
 }: {
   value: DateRange;
   onChange: (r: DateRange) => void;
   max?: Date;
+  /**
+   * Which edge the panel hangs from. It must follow where the TRIGGER sits: this
+   * panel is ~680px wide, so an `end` alignment on a control at the left of a
+   * toolbar throws it off the pane, where the list column clips it.
+   */
+  align?: "start" | "end";
 }) {
   const today = now();
   const [open, setOpen] = useState(false);
@@ -192,7 +199,7 @@ export function DateRangePicker({
           setHover(null);
         }
       }}
-      align="end"
+      align={align}
       label="Choose a date range"
       trigger={
         <FieldButton open={open} empty={false} onClick={() => setOpen((v) => !v)}>
