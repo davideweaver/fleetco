@@ -410,7 +410,7 @@ const KIND_LABEL: Record<LineComponent["kind"], string> = {
 
 function KindTag({ kind }: { kind: LineComponent["kind"] }) {
   return (
-    <span className="rounded border px-1 py-px text-[10px] uppercase tracking-wide">
+    <span className="rounded bg-pill-neutral px-1 py-px text-[10px] uppercase tracking-wide text-pill-neutral-fg">
       {KIND_LABEL[kind]}
     </span>
   );

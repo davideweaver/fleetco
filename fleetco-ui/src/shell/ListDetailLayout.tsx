@@ -288,15 +288,20 @@ export function Pill({
   return (
     <span
       className={cn(
-        "inline-block rounded-full border px-2 py-0.5 text-[10.5px] font-medium uppercase tracking-wide whitespace-nowrap",
-        tone === "default" && "border-border bg-muted text-foreground",
-        tone === "muted" && "border-border text-muted-foreground",
-        tone === "warn" && "border-warning/40 bg-warning/10 text-warning",
-        tone === "good" && "border-success/40 bg-success/10 text-success",
-        tone === "bad" && "border-destructive/40 bg-destructive/10 text-destructive",
-        // The same solid fill as the rail badge and the row chip. A pill wears this when
-        // the status IS the reason the row is in the attention count — see InvoiceStatus.
-        tone === "attention" && "border-transparent bg-attention text-attention-fg"
+        // No border, solid fill, in every tone. An outline and a tint are two ways of
+        // drawing the same edge; keeping both made the pills fussy at 10.5px, and the
+        // border was doing the work the fill should do.
+        "inline-block rounded-full px-2 py-0.5 text-[10.5px] font-medium uppercase tracking-wide whitespace-nowrap",
+        // Default and muted share a fill and differ only in how loudly the text reads —
+        // the same chip, said at two volumes.
+        tone === "default" && "bg-pill-neutral text-foreground",
+        tone === "muted" && "bg-pill-neutral text-pill-neutral-fg",
+        tone === "warn" && "bg-pill-warn text-pill-warn-fg",
+        tone === "good" && "bg-pill-good text-pill-good-fg",
+        tone === "bad" && "bg-pill-bad text-pill-bad-fg",
+        // The one saturated fill. It is the rail badge's own colour, worn when the status
+        // IS the reason the row is in the attention count — see InvoiceStatus.
+        tone === "attention" && "bg-attention text-attention-fg"
       )}
     >
       {children}

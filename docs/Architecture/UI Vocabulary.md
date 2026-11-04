@@ -367,8 +367,37 @@ cannot drift from what the badge counts. If a reason's wording changes the pill 
 plain status — the safe direction, because the failure is a missing colour rather than an
 invented one.
 
-Everything else keeps its old tone. `PAID` is green, `SENT` and `IN PRODUCTION` are grey: those
+Everything else keeps its own tone. `PAID` is green, `SENT` and `IN PRODUCTION` are grey: those
 are *states*, and a state nobody has to act on must not borrow the colour of one that does.
+
+### Every pill is a solid fill, no border
+
+An outline and a tint are two ways of drawing the same edge. Keeping both made the pills fussy at
+10.5px, and the border was doing the work the fill should do. So every tone is now a solid fill
+with no border, and the tones differ only in colour.
+
+They are **opaque**, not an alpha tint. The old pills were `/10` over whatever sat behind them, so
+the same `DRAFT` changed colour between a plain row, a hovered row and a selected one — a status
+does not mean something different because the row is selected.
+
+They are defined **once per theme, not per palette**. A pill is a small chip of meaning rather
+than part of the page's character, and `PAID` should not be a different green because someone
+picked the warm palette.
+
+| Tone | Used for |
+|---|---|
+| `attention` | the one saturated fill — the badge's colour, when the status is the reason |
+| `warn` | `HIGH`, `Overridden`, `Partially approved` |
+| `good` | `PAID`, `Approved` |
+| `bad` | `Declined`, voided |
+| `default` / `muted` | everything else — the same fill at two text volumes |
+
+Warn sits at hue 50 rather than `--warning`'s 70, to pull it away from the attention amber at 85.
+"Rush" and "needs you" are different claims and must not look like the same one.
+
+**A control is not a pill.** The estimate's `Pending` keeps its dashed outline because it is a
+button — nothing has been recorded yet, and the dashes say so. Filling it would make an empty slot
+look like an answer.
 
 **Sections without a list never get a badge they cannot explain.** There is no mode that adds
 decorative counts — badges are either on and derived, or off.

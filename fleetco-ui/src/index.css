@@ -70,6 +70,29 @@
      which is the only arrangement that survives both themes unchanged. */
   --attention: oklch(0.83 0.15 85);
   --attention-fg: oklch(0.25 0.03 75);
+
+  /* Status pills: a solid fill and no border, in every tone.
+     ----------------------------------------------------------------------
+     These are OPAQUE on purpose. The old pills were a /10 alpha tint over
+     whatever happened to be behind them, so the same DRAFT changed colour
+     between a plain row, a hovered row and a selected one. A status does not
+     mean something different because the row is selected.
+
+     They are also defined once per THEME rather than per palette. A pill is a
+     small chip of meaning, not part of the page's character, and PAID should
+     not be a different green because someone picked the warm palette.
+
+     Warn sits at hue 50 rather than --warning's 70 to pull it away from the
+     attention amber at 85. "Rush" and "needs you" are different claims and
+     must not look like the same one. */
+  --pill-neutral: oklch(0.925 0.005 85);
+  --pill-neutral-fg: oklch(0.44 0.01 70);
+  --pill-good: oklch(0.915 0.055 152);
+  --pill-good-fg: oklch(0.40 0.1 155);
+  --pill-bad: oklch(0.925 0.045 25);
+  --pill-bad-fg: oklch(0.45 0.17 27);
+  --pill-warn: oklch(0.925 0.065 50);
+  --pill-warn-fg: oklch(0.44 0.13 45);
 }
 
 /* ---------------------------------------------------------------------------
@@ -178,6 +201,17 @@
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 12%);
+
+  /* Dark inverts the pair: a deep, low-chroma fill with bright text of the same
+     hue. The light values would glow. */
+  --pill-neutral: oklch(0.38 0.008 70);
+  --pill-neutral-fg: oklch(0.82 0.01 75);
+  --pill-good: oklch(0.33 0.065 155);
+  --pill-good-fg: oklch(0.84 0.14 155);
+  --pill-bad: oklch(0.345 0.095 25);
+  --pill-bad-fg: oklch(0.85 0.11 25);
+  --pill-warn: oklch(0.36 0.085 50);
+  --pill-warn-fg: oklch(0.87 0.11 55);
   --brand: oklch(0.72 0.15 272);
   --brand-foreground: oklch(0.16 0 0);
   --nav-active: oklch(0.5 0.19 272);
@@ -217,6 +251,14 @@
   --color-nav-active-fg: var(--nav-active-fg);
   --color-attention: var(--attention);
   --color-attention-fg: var(--attention-fg);
+  --color-pill-neutral: var(--pill-neutral);
+  --color-pill-neutral-fg: var(--pill-neutral-fg);
+  --color-pill-good: var(--pill-good);
+  --color-pill-good-fg: var(--pill-good-fg);
+  --color-pill-bad: var(--pill-bad);
+  --color-pill-bad-fg: var(--pill-bad-fg);
+  --color-pill-warn: var(--pill-warn);
+  --color-pill-warn-fg: var(--pill-warn-fg);
   --color-surface-1: var(--surface-1);
   --color-surface-2: var(--surface-2);
   --color-surface-3: var(--surface-3);
