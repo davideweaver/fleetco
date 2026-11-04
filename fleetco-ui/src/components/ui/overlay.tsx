@@ -73,7 +73,7 @@ export function Overlay({
               aria-label="Close"
               className="grid size-10 shrink-0 place-items-center rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
             >
-              <X className="size-5" />
+              <X className="size-6" strokeWidth={1.75} />
             </Dialog.Close>
           </div>
 
