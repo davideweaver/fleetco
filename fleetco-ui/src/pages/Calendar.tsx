@@ -53,15 +53,17 @@ const SNAP = 15;
  *
  *   fill    Shape and weight carry the meaning. Production is outlined, installation is
  *           filled. Survives print and colour blindness, and leaves the accent free.
- *   tag     Identical cards, a small PROD / INST label. Quietest; relies on reading.
  *   stripe  A hairline across the top instead of the left, square corners.
+ *   both    Stripe and fill together — colour to find it, weight to confirm it. The
+ *           redundant cue is the point: it still reads on a printed schedule, and it
+ *           still reads for someone who cannot tell the two hues apart.
  */
-export type EntryStyle = "fill" | "tag" | "stripe";
+export type EntryStyle = "fill" | "stripe" | "both";
 
 export function CalendarPage() {
   const { role } = useShell();
   const [params] = useSearchParams();
-  const style = (params.get("entry") as EntryStyle) ?? "fill";
+  const style = (params.get("entry") as EntryStyle) ?? "both";
   const [entries, setEntries] = useState(seed);
   const [filter, setFilter] = useState<"all" | EntryKind>("all");
 
@@ -243,32 +245,22 @@ function Entry({
       }}
       className={cn(
         "absolute overflow-hidden rounded border px-2 py-1 text-xs",
-        style === "fill" &&
+        (style === "fill" || style === "both") &&
           (install
             ? "border-foreground/15 bg-foreground/8"
             : "border-border bg-surface-3"),
-        style === "tag" && "border-border bg-surface-3",
-        style === "stripe" &&
-          cn(
-            "border-t-2 bg-surface-3",
-            install ? "border-t-foreground/50" : "border-t-brand"
-          ),
+        (style === "stripe" || style === "both") &&
+          cn("border-t-2", install ? "border-t-foreground/50" : "border-t-brand"),
+        style === "stripe" && "border-border bg-surface-3",
         isDragging ? "z-30 opacity-90 shadow-lg" : "z-20",
         draggable && "cursor-grab active:cursor-grabbing"
       )}
     >
-      <div className="flex items-baseline gap-1.5">
-        <span className="truncate font-medium">{entry.jobNo}</span>
-        {style === "tag" && (
-          <span className="ml-auto shrink-0 rounded-sm border px-1 text-[9px] font-medium uppercase tracking-wide text-muted-foreground">
-            {install ? "Inst" : "Prod"}
-          </span>
-        )}
-      </div>
+      <div className="truncate font-medium">{entry.jobNo}</div>
       {height > 42 && <div className="truncate text-muted-foreground">{entry.what}</div>}
       {height > 60 && (
         <div className="mt-0.5 flex items-center gap-1.5 text-[10px] text-muted-foreground">
-          {style === "fill" && (
+          {style !== "both" && (
             <span className="uppercase tracking-wide">{install ? "Inst" : "Prod"}</span>
           )}
           <span>

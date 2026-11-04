@@ -41,7 +41,7 @@ export function Lab() {
   const [dark, setDark] = useState(false);
   const [palette, setPalette] = useState<"neutral" | "warm">("warm");
   const [nav, setNav] = useState<"light" | "dark">("dark");
-  const [entry, setEntry] = useState<"fill" | "tag" | "stripe">("fill");
+  const [entry, setEntry] = useState<"fill" | "stripe" | "both">("both");
 
   const src = (extra = "") =>
     `${screen.path}${screen.path.includes("?") ? "&" : "?"}v=${variant}&role=${role}&rail=${rail}&badges=${badges}&palette=${palette}&nav=${nav}&entry=${entry}${dark ? "&theme=dark" : ""}${extra}`;
@@ -94,8 +94,8 @@ export function Lab() {
 
           <Group label="Cal entry">
             <Seg on={entry === "fill"} onClick={() => setEntry("fill")}>Fill</Seg>
-            <Seg on={entry === "tag"} onClick={() => setEntry("tag")}>Tag</Seg>
             <Seg on={entry === "stripe"} onClick={() => setEntry("stripe")}>Stripe</Seg>
+            <Seg on={entry === "both"} onClick={() => setEntry("both")}>Both</Seg>
           </Group>
 
           <Group label="Theme">
