@@ -38,7 +38,10 @@ export function Lab() {
   const [badges, setBadges] = useState<"off" | "quiet" | "busy">("quiet");
   const [role, setRole] = useState<"owner" | "tech">("owner");
   const [screen, setScreen] = useState(SCREENS[0]);
-  const [scale, setScale] = useState(0.45);
+  const [scale, setScale] = useState(0.7);
+  // Devices are independent toggles, not a picker: comparing two widths side by side is
+  // the whole reason the lab exists, and "all four or one" made that an either/or.
+  const [shown, setShown] = useState<Set<string>>(new Set(["desktop"]));
   const [dark, setDark] = useState(false);
   const [palette, setPalette] = useState<"neutral" | "warm">("warm");
   const [nav, setNav] = useState<"light" | "dark">("dark");
@@ -117,7 +120,41 @@ export function Lab() {
           </Group>
         </div>
 
-        <div className="mt-3 flex flex-wrap gap-1.5">
+        <div className="mt-3 flex flex-wrap items-center gap-1.5">
+          <span className="mr-1 text-[11px] font-medium uppercase tracking-wide text-neutral-500">
+            Devices
+          </span>
+          {DEVICES.map((d) => (
+            <Seg
+              key={d.key}
+              on={shown.has(d.key)}
+              onClick={() =>
+                setShown((s) => {
+                  const next = new Set(s);
+                  // Never leave nothing on screen — the last one on stays on.
+                  if (next.has(d.key)) {
+                    if (next.size === 1) return s;
+                    next.delete(d.key);
+                  } else {
+                    next.add(d.key);
+                  }
+                  return next;
+                })
+              }
+            >
+              {d.label}
+            </Seg>
+          ))}
+          <button
+            type="button"
+            onClick={() => setShown(new Set(DEVICES.map((d) => d.key)))}
+            className="ml-1 text-[11px] text-neutral-500 underline-offset-2 hover:underline"
+          >
+            all four
+          </button>
+        </div>
+
+        <div className="mt-2 flex flex-wrap gap-1.5">
           {SCREENS.map((s) => (
             <Seg key={s.key} on={s.key === screen.key} onClick={() => setScreen(s)}>
               {s.label}
@@ -128,7 +165,7 @@ export function Lab() {
 
       <div className="min-h-0 flex-1 overflow-auto p-4">
         <div className="flex items-start gap-5">
-          {DEVICES.map((d) => (
+          {DEVICES.filter((d) => shown.has(d.key)).map((d) => (
             <div key={d.key} className="shrink-0">
               <div className="mb-1.5 flex items-baseline gap-2">
                 <span className="text-xs font-semibold">{d.label}</span>
