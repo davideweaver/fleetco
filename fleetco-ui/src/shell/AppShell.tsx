@@ -162,7 +162,7 @@ export function AppShell() {
                       const badge = badges[item.key];
                       const link = (
                         <Link
-                          to={shell.href(item.path)}
+                          to={shell.href(item.landing ?? item.path)}
                           aria-label={label}
                           aria-current={on ? "page" : undefined}
                           className={cn(
@@ -258,7 +258,7 @@ export function AppShell() {
               return (
                 <Link
                   key={item.key}
-                  to={shell.href(item.path)}
+                  to={shell.href(item.landing ?? item.path)}
                   onClick={() => setMoreOpen(false)}
                   aria-current={on ? "page" : undefined}
                   style={{ width: `${100 / (phoneItems.length + 1)}%` }}
@@ -325,7 +325,7 @@ export function AppShell() {
                 return (
                   <Link
                     key={item.key}
-                    to={shell.href(item.path)}
+                    to={shell.href(item.landing ?? item.path)}
                     onClick={() => setMoreOpen(false)}
                     aria-current={on ? "page" : undefined}
                     className={cn(

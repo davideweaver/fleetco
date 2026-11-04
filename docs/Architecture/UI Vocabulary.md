@@ -620,6 +620,14 @@ roll-up and **Approve**.
 > never rendered and Back went to a URL that immediately re-drew the detail. **A list-detail
 > screen must have a real no-selection state, or its back link has nowhere to go.**
 
+The nav lands on Summary anyway, via `landing` on the route table entry — the link target
+differs from the path that *identifies* the section.
+
+> **A landing target, not a redirect.** Redirecting `/app/time` to Summary would break Back a
+> second time, because `/app/time` is exactly where Back goes to reach the list. And `landing`
+> is a separate field from `path` because `path` is what `itemForPath` matches on; pointing it
+> at the landing URL would cost the rail its highlight everywhere else in the section.
+
 > **Approve is on Summary and nowhere else.** Approving locks the period for *everyone*, so the
 > button has to sit somewhere that means everyone. On a pane headed "Marco Diaz" it reads as
 > approving Marco — the same misreading the period-wide blocking count exists to prevent. It
