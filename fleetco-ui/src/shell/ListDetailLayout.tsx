@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft, Search } from "lucide-react";
 import { useShell } from "./shell-context";
+import { AttentionChip } from "@/components/ui/attention";
 import { cn } from "@/lib/utils";
 
 /**
@@ -238,13 +239,7 @@ export function ListRow({
       <span className="min-w-0 flex-1">
         <span className="block truncate font-medium">{title}</span>
         {attention ? (
-          /* A solid chip in the badge's own colour. Coloured text could never tie the two
-             together — the badge sits on a dark rail and the row on a light list, so the
-             two can never share a text colour. A fill can: this chip IS the badge colour,
-             and dark-on-amber stays legible in both themes. */
-          <span className="mt-0.5 inline-block max-w-full truncate rounded bg-attention px-1.5 py-0.5 text-xs font-medium text-attention-fg">
-            {attention}
-          </span>
+          <AttentionChip reason={attention} className="mt-0.5" />
         ) : (
           subtitle && (
             <span className="block truncate text-xs text-muted-foreground">{subtitle}</span>

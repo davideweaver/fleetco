@@ -320,6 +320,23 @@ exact case `JOB-008` turns on.
 
 ## Attention
 
+**Attention** is the word for it, and it is worth having one. It means: *a record is in a state
+that needs a person, and the reason is derivable from data the system already owns.* Nothing
+about it is per-user — there is no "unread", no "new since you last looked", nothing to mark as
+seen. That is what makes it safe to bubble up.
+
+It bubbles up unchanged through four layers:
+
+| Layer | What it looks like |
+|---|---|
+| **Record** | a reason, derived — "Overdue", "Never sent", "Finished · waiting for you to close" |
+| **Row / detail** | the amber **attention chip**, carrying that reason |
+| **List** | the **"Needs you" filter**, with the count in amber |
+| **Nav** | the rail **badge** (count) or **dot** (bare icon) |
+
+Every layer reads the same function, so a badge can always be traced down to the rows that
+caused it, and a row can always be traced up to the badge it feeds.
+
 **A badge says "N things need you here". The list it points at must be able to show you
 which N.** Otherwise the badge tells someone something is wrong and gives them nowhere to go.
 
@@ -336,6 +353,23 @@ both at once, which is the only way this stays true after eight lanes have touch
 
 The row shows the **reason**, not just a mark: "Payment overdue" rather than a bare dot. A
 mark says *something*; the reason says *what*, and it is the same number of pixels.
+
+### The chip goes wherever the record goes
+
+One `AttentionChip`, used by the list row, the detail header and a table cell alike. It was
+inlined in `ListRow` first, and that is exactly why the invoice list showed a draft's reason
+while the invoice's own screen showed nothing — the detail had no way to draw the chip without
+copying it. **If a record warrants attention in a list, it warrants it on its own screen.**
+
+Beside a status pill the two are one decision, made in one place:
+
+- **The status is the reason** — `OVERDUE`. The pill takes the attention fill and there is no
+  separate chip. One mark.
+- **The reason says more** — `DRAFT` + `Never sent`. The pill stays plain and the chip carries
+  the reason next to it.
+
+Reasons are worded so they never repeat the pill they sit beside: "Never sent", not
+"Draft · never sent".
 
 ### One colour, three places
 

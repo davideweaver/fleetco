@@ -43,7 +43,10 @@ export function attentionFor(section: string, role: Role): Attention[] {
       .filter((i) => i.status === "Overdue" || i.status === "Draft")
       .map((i) => ({
         id: i.no,
-        reason: i.status === "Overdue" ? "Overdue" : "Draft · never sent",
+        // "Never sent" rather than "Draft · never sent": the DRAFT pill is already
+        // next to this everywhere it is drawn, and the chip should add the reason
+        // rather than repeat the status.
+        reason: i.status === "Overdue" ? "Overdue" : "Never sent",
       }));
   }
 

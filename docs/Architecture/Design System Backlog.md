@@ -28,7 +28,7 @@ queue.
 - [x] Job board — drag, and **how to refuse** (`JOB-006`)
 - [x] Calendar — week grid, overlap layout, `JOB-015` separation
 - [x] Photos — per-photo upload state, the `JOB-008` gate (G13)
-- [x] Badges and attention — one derivation for the rail and the list
+- [x] **Attention** — the one derivation behind badges, dots, chips and filters
 - [x] List rows — monogram, attention reason, filter chips
 - [x] **Approval capture** (`AUTH-002`/`003`/`004`) and the reason-required confirm
 - [x] Row actions — the action sits in the cell that shows the state
@@ -45,6 +45,22 @@ queue.
       `TIME-009` approval locks a period.
 - [ ] **Date range picker.** Shared by reports and the schedule's week nav. Built twice
       is the default outcome.
+
+### Tier 1 — Attention, the rest of it
+
+`Attention` is the summarised state of a record that bubbles up as a chip, a filter count
+and a rail badge. The mechanism is built and the four current rules are wired; what is
+left is coverage and the parts no screen has needed yet.
+
+- [ ] **Attention on the remaining sections.** Estimates, schedule, time and parts have no
+      rules yet. Each one needs a reason that is derivable, not a per-user "unread".
+- [ ] **Attention inside a record.** A job needing a photo (`JOB-008`) or an estimate line
+      waiting on an answer is attention at line level, and nothing bubbles it to the
+      record's own chip yet.
+- [ ] **Zero and overflow.** What the filter does when the count drops to zero while you
+      are looking at it, and what the badge shows past 99.
+- [ ] **Does it belong in a report?** The AR report and the attention count answer nearly
+      the same question. If they disagree, one of them is wrong.
 
 ### Tier 2 — real decisions
 
