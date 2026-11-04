@@ -337,6 +337,21 @@ both at once, which is the only way this stays true after eight lanes have touch
 The row shows the **reason**, not just a mark: "Payment overdue" rather than a bare dot. A
 mark says *something*; the reason says *what*, and it is the same number of pixels.
 
+### One colour, three places
+
+`--attention` is a **solid chip in one colour across both themes**, with `--attention-fg` dark
+text on it. It appears in exactly three places, and they are meant to be recognised as the same
+thing: the **rail badge**, the **row's reason chip**, and the **count inside the "Needs you"
+filter**.
+
+> **Coloured text could never tie them together.** The badge sits on a dark rail and the row on
+> a light list, so the two can never share a text colour — and matching the dark theme's bright
+> amber as light-theme text measured **1.47:1**. A *fill* can be shared: dark-on-amber is legible
+> on any surface, so the chip is literally the badge colour in both themes.
+
+The filter chip itself stays a plain control. Only its count wears the colour — tinting the whole
+control as well makes a filter look like a warning.
+
 **Sections without a list never get a badge they cannot explain.** There is no mode that adds
 decorative counts — badges are either on and derived, or off.
 

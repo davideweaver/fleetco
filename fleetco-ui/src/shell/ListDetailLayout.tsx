@@ -106,9 +106,12 @@ export function ListHeader({
           <FilterChip on={!filtered} onClick={() => onFilter(false)}>
             All
           </FilterChip>
-          <FilterChip on={filtered} onClick={() => onFilter(true)} tone="attention">
+          {/* The chip is a control; its COUNT is the attention signal, so the count wears
+              the same solid amber as the rail badge and the row chips. Tinting the whole
+              control as well would make the filter look like a warning. */}
+          <FilterChip on={filtered} onClick={() => onFilter(true)}>
             Needs you
-            <span className="tnum ml-1 rounded-full bg-brand px-1.5 text-[10px] text-brand-foreground">
+            <span className="tnum ml-1.5 rounded-full bg-attention px-1.5 text-[10px] font-semibold text-attention-fg">
               {attention}
             </span>
           </FilterChip>
@@ -122,12 +125,10 @@ function FilterChip({
   on,
   onClick,
   children,
-  tone,
 }: {
   on: boolean;
   onClick: () => void;
   children: ReactNode;
-  tone?: "attention";
 }) {
   return (
     <button
@@ -137,8 +138,7 @@ function FilterChip({
         "inline-flex items-center rounded-md px-2 py-1 text-xs font-medium",
         on
           ? "bg-accent text-accent-foreground"
-          : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
-        tone === "attention" && !on && "bg-brand/10 text-brand"
+          : "text-muted-foreground hover:bg-accent/60 hover:text-foreground"
       )}
     >
       {children}
@@ -236,8 +236,11 @@ export function ListRow({
       <span className="min-w-0 flex-1">
         <span className="block truncate font-medium">{title}</span>
         {attention ? (
-          <span className="flex items-center gap-1.5 truncate text-xs font-medium text-brand">
-            <span className="size-1.5 shrink-0 rounded-full bg-brand" />
+          /* A solid chip in the badge's own colour. Coloured text could never tie the two
+             together — the badge sits on a dark rail and the row on a light list, so the
+             two can never share a text colour. A fill can: this chip IS the badge colour,
+             and dark-on-amber stays legible in both themes. */
+          <span className="mt-0.5 inline-block max-w-full truncate rounded bg-attention px-1.5 py-0.5 text-xs font-medium text-attention-fg">
             {attention}
           </span>
         ) : (

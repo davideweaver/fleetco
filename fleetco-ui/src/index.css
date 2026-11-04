@@ -63,6 +63,13 @@
      SAT ON by a white icon, which wants more depth than a bright accent has. */
   --nav-active: oklch(0.5 0.19 272);
   --nav-active-fg: oklch(1 0 0);
+
+  /* The attention cue — "Payment overdue", "Needs you". It is a SOLID chip in the badge's
+     own colour, with dark text on it, so the row and the rail badge are visibly the same
+     thing. Bright amber with dark text is legible on a light surface AND a dark one,
+     which is the only arrangement that survives both themes unchanged. */
+  --attention: oklch(0.83 0.15 85);
+  --attention-fg: oklch(0.25 0.03 75);
 }
 
 /* ---------------------------------------------------------------------------
@@ -106,9 +113,7 @@
   /* Deeper than it looks like it should be. The dark rail's amber sits far from its
      surface and pops; the same lightness on cream was 4.06:1 — under the AA floor for
      small text. Light accents have to work harder than dark ones.
-     HUE STAYS AT 85, matching the rail badge. The two cannot share a hex — what reads as
-     a highlight on a dark rail is unreadable on cream — but they must read as the same
-     colour, or the badge and the rows it points at look unrelated. */
+     HUE STAYS AT 85, matching the rail badge. */
   --brand: oklch(0.52 0.13 85);
   --brand-foreground: oklch(0.99 0.005 85);
   /* Bronze, not the bright amber: white on bright amber is about 2:1 and unreadable. */
@@ -210,6 +215,8 @@
   --color-brand-foreground: var(--brand-foreground);
   --color-nav-active: var(--nav-active);
   --color-nav-active-fg: var(--nav-active-fg);
+  --color-attention: var(--attention);
+  --color-attention-fg: var(--attention-fg);
   --color-surface-1: var(--surface-1);
   --color-surface-2: var(--surface-2);
   --color-surface-3: var(--surface-3);
