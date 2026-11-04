@@ -47,6 +47,8 @@ export type Invoice = {
   customer: string;
   issued: string;
   due: string;
+  /** The real due date, so the aging report buckets from data (RPT-003). */
+  dueISO: string | null;
   status: "Draft" | "Sent" | "Partly paid" | "Paid" | "Overdue";
   totalCents: number;
   balanceCents: number;
@@ -72,11 +74,11 @@ export const jobs: Job[] = [
 ];
 
 export const invoices: Invoice[] = [
-  { no: "1184", customerId: "ridgeline", customer: "Ridgeline Plumbing & Heating", issued: "—", due: "—", status: "Draft", totalCents: 201900, balanceCents: 100950 },
-  { no: "1179", customerId: "ridgeline", customer: "Ridgeline Plumbing & Heating", issued: "Oct 28", due: "Nov 27", status: "Sent", totalCents: 42000, balanceCents: 42000 },
-  { no: "1176", customerId: "millport", customer: "Millport School District", issued: "Oct 21", due: "Dec 5", status: "Sent", totalCents: 158000, balanceCents: 158000 },
-  { no: "1171", customerId: "keystone", customer: "Keystone Dairy Co-op", issued: "Oct 14", due: "Oct 29", status: "Overdue", totalCents: 86500, balanceCents: 86500 },
-  { no: "1168", customerId: "brightway", customer: "Brightway Movers", issued: "Oct 9", due: "Nov 8", status: "Paid", totalCents: 48000, balanceCents: 0 },
+  { no: "1184", customerId: "ridgeline", customer: "Ridgeline Plumbing & Heating", issued: "—", due: "—", dueISO: null, status: "Draft", totalCents: 201900, balanceCents: 100950 },
+  { no: "1179", customerId: "ridgeline", customer: "Ridgeline Plumbing & Heating", issued: "Oct 28", due: "Nov 27", dueISO: "2026-11-27", status: "Sent", totalCents: 42000, balanceCents: 42000 },
+  { no: "1176", customerId: "millport", customer: "Millport School District", issued: "Oct 21", due: "Dec 5", dueISO: "2026-12-05", status: "Sent", totalCents: 158000, balanceCents: 158000 },
+  { no: "1171", customerId: "keystone", customer: "Keystone Dairy Co-op", issued: "Oct 14", due: "Oct 29", dueISO: "2026-10-29", status: "Overdue", totalCents: 86500, balanceCents: 86500 },
+  { no: "1168", customerId: "brightway", customer: "Brightway Movers", issued: "Oct 9", due: "Nov 8", dueISO: "2026-11-08", status: "Paid", totalCents: 48000, balanceCents: 0 },
 ];
 
 /* One "Full wrap" saved package. Internal components; the customer sees one rolled-up

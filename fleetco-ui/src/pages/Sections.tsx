@@ -8,6 +8,11 @@ import {
   ListHeader,
   ListRow,
 } from "@/shell/ListDetailLayout";
+import { ReportShell } from "@/components/ui/report";
+import { REPORTS } from "@/data/reports";
+import { startOfMonth, startOfDay } from "@/lib/date";
+import { useState } from "react";
+import type { DateRange } from "@/components/ui/date-picker";
 import { DatesDemo } from "./Dates";
 import { StatesDemo } from "./States";
 
@@ -30,12 +35,19 @@ const DEMOS: Record<string, () => React.ReactElement> = {
 export function SectionsPage({ kind }: { kind: "reports" | "settings" }) {
   const { id } = useParams();
   const { href } = useShell();
+  // One period for the whole section, so switching reports keeps the period you chose.
+  // Resetting it per report is the behaviour that makes people stop trusting the list.
+  const [period, setPeriod] = useState<DateRange>(() => {
+    const today = startOfDay(new Date());
+    return { from: startOfMonth(today), to: today };
+  });
   const settings = kind === "reports" ? reports : settingsSections;
   const demos = kind === "settings" ? demoScreens : [];
   const base = `/app/${kind}`;
   const selected =
     settings.find((s) => s.id === id) ?? demos.find((s) => s.id === id);
   const Demo = id ? DEMOS[id] : undefined;
+  const report = kind === "reports" && id ? REPORTS[id] : undefined;
 
   return (
     <ListDetailLayout
@@ -78,7 +90,10 @@ export function SectionsPage({ kind }: { kind: "reports" | "settings" }) {
         </>
       }
       detail={
-        selected && (
+        selected &&
+        (report ? (
+          <ReportShell def={report} period={period} onPeriod={setPeriod} />
+        ) : (
           <div className="flex h-full min-h-0 flex-col">
             <DetailHeader
               eyebrow={Demo ? "Design system · demo" : kind === "reports" ? "Report" : "Setting"}
@@ -89,13 +104,11 @@ export function SectionsPage({ kind }: { kind: "reports" | "settings" }) {
               <Demo />
             ) : (
               <div className="grid place-items-center p-10 text-sm text-muted-foreground">
-                {kind === "reports"
-                  ? "Report table, with export and print."
-                  : "Setting form."}
+                Setting form.
               </div>
             )}
           </div>
-        )
+        ))
       }
     />
   );

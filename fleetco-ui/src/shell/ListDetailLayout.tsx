@@ -37,9 +37,11 @@ export function ListDetailLayout({
 
   return (
     <div className="flex h-full min-h-0">
+      {/* The list column is navigation: it picks which record you are looking at. On
+          paper there is nothing to pick, so it goes with the rail and the bottom bar. */}
       <aside
         className={cn(
-          "flex min-h-0 w-full flex-col bg-surface-2 lg:w-[272px] lg:shrink-0 xl:w-[312px]",
+          "print-hide flex min-h-0 w-full flex-col bg-surface-2 lg:w-[272px] lg:shrink-0 xl:w-[312px]",
           hasSelection && "hidden lg:flex"
         )}
       >
@@ -54,7 +56,7 @@ export function ListDetailLayout({
       >
         {hasSelection ? (
           <>
-            <div className="flex h-band shrink-0 items-center border-b px-3 lg:hidden">
+            <div className="print-hide flex h-band shrink-0 items-center border-b px-3 lg:hidden">
               <Link
                 to={href(backTo)}
                 className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"

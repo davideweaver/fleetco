@@ -34,13 +34,23 @@ queue.
 - [x] Row actions — the action sits in the cell that shows the state
 - [x] Destructive confirm with a required reason (`INV-012` void, and the override branch)
 - [x] **Dates** — one grid, `DatePicker` and `DateRangePicker`, presets, shop-local
+- [x] **Report shell + print + CSV** (`RPT-001`/`004`/`006`) — one shell, nine reports
 
 ## Next
 
 ### Tier 1 — build before the swarm
 
-- [ ] **Report shell + print.** Nine reports (`RPT-001`), all export **and** print. One
-      shell or nine. Print is always discovered late and is a requirement here.
+
+- [ ] **The four time reports have no data.** Payments, Clocked hours, Job hours and
+      Timesheets render the shell and their definitions but no rows — they wait on the
+      timer below. `RPT-007` expected-vs-actual needs the variance conventions from the
+      negative-amounts item in Tier 3.
+- [ ] **"Page 1 of 3" on paper.** Browsers will not put a page count into the document
+      without a paged-media polyfill. Chrome's own print footer can carry it; decide
+      whether that is good enough before promising it.
+- [ ] **A technician can reach Reports by URL** and sees the nine names. The financial
+      ones refuse, but the non-financial ones render. Correct per `RPT-001`, possibly
+      not per intent — ask.
 - [ ] **Timer, punch clock, timesheet.** The technician's main control. `TIME-002` one
       running timer, `TIME-004` needs an active punch, `TIME-013` left-running flag,
       `TIME-009` approval locks a period.

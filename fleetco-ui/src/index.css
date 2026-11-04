@@ -382,3 +382,124 @@ html:not(.dark)[data-palette="warm"] .nav-surface {
     opacity: 0.55;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   PRINT. A second rendering target, not a styling afterthought.
+
+   The shop prints A/R aging and hands it to an accountant, so the page has to
+   stand on its own: it must say what report it is, what period it covers and
+   when it was run, on every sheet, because sheets get separated.
+
+   Everything here is scoped to `@media print`, so none of it can affect the
+   screen. The screen rules live above; this is the whole of the other target.
+   --------------------------------------------------------------------------- */
+@media print {
+  /* Letter, because this is a Pennsylvania shop. Margins leave room for the
+     running header and the page number without reaching the printer's own
+     unprintable edge. */
+  @page {
+    size: letter;
+    margin: 14mm 12mm 16mm;
+  }
+
+  /* Ink is expensive and toner is grey. Print black on white and let weight,
+     rules and spacing carry the structure that colour carries on screen. */
+  html,
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  /* The shell is navigation. Paper has none of it. */
+  .print-hide,
+  nav,
+  [data-print="hide"] {
+    display: none !important;
+  }
+
+  /* The app is a fixed-height flex shell with its own scrollers; on paper it has
+     to become one long document or only the first screenful prints. */
+  .print-flow,
+  .print-flow * {
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+    position: static !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  /* Repeat the column headings on every sheet. Without this, page two of an
+     aging report is a wall of unlabelled numbers. */
+  thead {
+    display: table-header-group;
+  }
+  tfoot {
+    display: table-footer-group;
+  }
+
+  /* Never split a row, a group heading or a total across a page break. */
+  tr,
+  .print-keep {
+    break-inside: avoid;
+  }
+  /* A group heading alone at the foot of a page is worse than a shorter page. */
+  .print-group {
+    break-after: avoid;
+  }
+
+  /* "Background graphics" is OFF by default in every print dialog, so nothing on
+     paper may depend on a fill. Clear them all rather than hope, and let borders
+     and weight carry the structure the fills carry on screen. */
+  * {
+    background: transparent !important;
+  }
+
+  /* A group heading was a grey band; on paper it is a rule above and bold text. */
+  .print-group td {
+    border-top: 1.5pt solid #000;
+    border-bottom: 1pt solid #000;
+    font-weight: 700;
+  }
+
+  /* The total is the line the eye goes to, so it gets the heaviest rule. */
+  tfoot td {
+    border-top: 1.5pt solid #000;
+    border-bottom: none;
+    font-weight: 700;
+  }
+
+  /* Borders have to survive that same default. Backgrounds disappear; borders
+     do not. */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 10pt;
+  }
+  th,
+  td {
+    border-bottom: 1px solid #999;
+    padding: 4pt 6pt;
+  }
+
+  /* The attention fill is a background, so it will not print. Keep the meaning
+     with a border and weight, which will. */
+  .bg-attention {
+    background: transparent !important;
+    color: #000 !important;
+    border: 1pt solid #000 !important;
+    font-weight: 600;
+  }
+
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+}
+
+/* Only ever visible on paper. */
+.print-only {
+  display: none;
+}

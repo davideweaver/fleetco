@@ -544,6 +544,65 @@ and a report period would have disagreed about what a calendar looks like.
 On a phone the popover is a **bottom sheet**, the same rule overlays already follow. A 248px
 grid anchored to a field in a 390px viewport ends up half off-screen.
 
+## Reports and print
+
+**One shell, not nine.** Every V1 report is the same object: a period, some filters, a table
+with totals, and the two actions `RPT-001` requires. A report supplies its **columns, rows and
+totals**; the shell owns the rest. Nine shells would be nine places for the period control to
+drift, nine CSV encoders, and nine chances for one report to print without a header.
+
+Two rules the shell *enforces* rather than trusts a report to remember:
+
+- **`RPT-001`** — financial figures need the financial-view permission (Owner in V1). The check
+  is in the shell, so it covers the URL and not only the nav. A technician opening a financial
+  report by link gets **not found**, the same answer `ROLE` gives everywhere else: "not yours"
+  and "not there" look identical on purpose.
+- **`RPT-006`** — clocked hours and job hours are never added together. A report declares which
+  kind it counts, so nothing can later total across both.
+
+**Every report states what it means, and the sentence prints.** A printed A/R aging with no
+definition is a column of figures with no provenance, and it is the first thing an accountant
+asks about. Where a rule is still open the report says so on the page — a report that quietly
+resolves `D-A5` is how a definition ends up decided by whoever wrote the query, and nobody finds
+out until the figure is challenged.
+
+### Print is a second rendering target
+
+Not a stylesheet afterthought. The shop prints a report and hands it to someone, so a loose
+sheet has to identify itself.
+
+| On screen | On paper |
+|---|---|
+| rail, bottom bar, list column, toolbar | all gone — that is navigation, and paper has none |
+| the title bar | a running header: shop, report, period, generated date |
+| colour and fills carry structure | borders and weight carry it |
+| one scrolling pane | one continuous document |
+
+The rules that matter, each from a way print goes wrong:
+
+- **Nothing may depend on a fill.** "Background graphics" is **off by default** in every print
+  dialog, so `@media print` clears every background and re-draws group headings and totals as
+  rules. The attention chip becomes an outline, because its amber would simply vanish.
+- **`thead` repeats on every page.** Page two of an aging report is otherwise a wall of
+  unlabelled numbers.
+- **Rows, group headings and totals never split** across a page break, and a heading never
+  lands alone at the foot of a page.
+- **The shell's fixed heights and inner scrollers are released** (`.print-flow`), or only the
+  first screenful prints.
+- **Low-priority columns, dropped on a narrow window, come back on paper.** Paper is wide and
+  it is the archival copy.
+
+### Export is a file someone opens in Excel
+
+`toCSV` handles the three things a naive join gets wrong: **quoting** (shop names are full of
+commas), a **BOM** (without it Excel on Windows turns every `·` into garbage), and **formula
+injection** — a name starting with `=` is executed by Excel, so it is escaped. That last one is
+a security fix, not a formatting one.
+
+The file carries the report name, its definition, the period and the generated date above the
+header row. A CSV that has been emailed twice has lost every bit of context the screen gave it.
+Money exports as a plain number: the string is for reading, the file is for calculating.
+
 ## Row actions
 
 **The action lives where the state is.** A pending line's approval cell is a **button**
