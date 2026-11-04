@@ -615,6 +615,11 @@ their entries on the right.
 The first row is **Summary** — the period itself, not a person. It holds the hours-by-employee
 roll-up and **Approve**.
 
+> **Summary is a row with a path (`/app/time/summary`), not the absence of one.** Treating "no
+> id" as Summary forced `hasSelection` permanently true, and on a phone that meant the list pane
+> never rendered and Back went to a URL that immediately re-drew the detail. **A list-detail
+> screen must have a real no-selection state, or its back link has nowhere to go.**
+
 > **Approve is on Summary and nowhere else.** Approving locks the period for *everyone*, so the
 > button has to sit somewhere that means everyone. On a pane headed "Marco Diaz" it reads as
 > approving Marco — the same misreading the period-wide blocking count exists to prevent. It

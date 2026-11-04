@@ -213,8 +213,15 @@ function Review() {
   const { id } = useParams();
   const { href } = useShell();
   const navigate = useNavigate();
-  // No id means Everyone — the period as a whole, which is also what a fresh visit wants.
-  const who = id ?? "all";
+  /**
+   * Summary is a ROW with a path, not the absence of one.
+   *
+   * It was "no id means Summary", which forced `hasSelection` to be permanently true —
+   * and on a phone that meant the list pane never showed and Back went to a URL that
+   * re-rendered the detail. A list-detail screen has to have a no-selection state or
+   * its back link has nowhere to go.
+   */
+  const who = !id || id === "summary" ? "all" : id;
   const selectedEmployee = employees.find((e) => e.id === who);
 
   const inPeriod = (day: string) => {
@@ -342,16 +349,16 @@ function Review() {
 
   return (
     <ListDetailLayout
-      hasSelection
+      hasSelection={Boolean(id)}
       backTo="/app/time"
-      empty="Pick someone."
+      empty="Pick Summary, or someone."
       list={
         <>
           <ListHeader title="Timesheet review" count={employees.length} />
           <div className="min-h-0 flex-1 overflow-y-auto">
             <ListRow
-              to={href("/app/time")}
-              selected={who === "all"}
+              to={href("/app/time/summary")}
+              selected={id === "summary"}
               /* A lead of its own, so every title in the column starts at the same x.
                  Without it "Everyone" hangs 44px left of the names under it and the
                  column reads as two lists. */
