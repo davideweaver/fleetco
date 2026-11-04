@@ -396,9 +396,15 @@ The warm palette's amber sits far from a dark surface and pops. The same hue on 
 measured **4.06:1** — under the AA floor for small text, and visibly soft, which is why the
 attention cues read fine in dark and faded in light.
 
-`--brand` is therefore **deeper in light than the dark value is light**: `oklch(0.5 0.145 68)`
+`--brand` is therefore **deeper in light than the dark value is light**: `oklch(0.52 0.13 85)`
 against `oklch(0.82 0.15 85)`. It is not the same colour at two brightnesses, and treating it
 as one is how a light theme ends up washed out.
+
+**The hue stays fixed at 85 across every variant.** The rail is a dark surface with its own
+brand, so a badge and the rows it points at can never share a hex — what reads as a highlight
+on a dark rail is unreadable on cream. They must still read as *the same colour*, and only a
+shared hue does that. A first pass at the light value drifted to hue 68 for contrast, and the
+badge and its rows immediately looked unrelated.
 
 Colour alone was not enough at 12px either: the attention line also carries `font-medium`, and
 an inactive attention chip gets a `bg-brand/10` fill so it reads as a chip rather than as
