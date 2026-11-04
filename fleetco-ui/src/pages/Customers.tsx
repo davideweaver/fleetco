@@ -2,9 +2,9 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { customers, invoices, jobs, STAGES } from "@/data/sample";
 import { useShell } from "@/shell/shell-context";
-import { Btn, DetailHeader, ListDetailLayout, ListHeader, ListRow, Monogram, Pill } from "@/shell/ListDetailLayout";
+import { Btn, DetailHeader, ListDetailLayout, ListHeader, ListRow, Monogram } from "@/shell/ListDetailLayout";
 import { attentionMap } from "@/nav/attention";
-import { InvoiceStatus } from "@/components/ui/invoice-status";
+import { StatusPill } from "@/components/ui/status-pill";
 import { money } from "@/lib/utils";
 
 export function CustomersPage() {
@@ -96,7 +96,7 @@ function CustomerDetail({ id }: { id: string }) {
                 <Td className="hidden text-muted-foreground sm:table-cell">{j.asset}</Td>
                 <Td>{j.what}</Td>
                 <Td className="hidden lg:table-cell">
-                  <Pill tone="muted">{STAGES[j.stage]}</Pill>
+                  <StatusPill section="jobs" id={j.no} status={STAGES[j.stage]} />
                 </Td>
                 <Td right>{money(j.valueCents)}</Td>
               </tr>
@@ -122,7 +122,12 @@ function CustomerDetail({ id }: { id: string }) {
                 <Td className="font-medium">#{v.no}</Td>
                 <Td className="hidden text-muted-foreground sm:table-cell">{v.issued}</Td>
                 <Td>
-                  <InvoiceStatus no={v.no} status={v.status} />
+                  <StatusPill
+                    section="invoices"
+                    id={v.no}
+                    status={v.status}
+                    calm={v.status === "Paid" ? "good" : "muted"}
+                  />
                 </Td>
                 <Td right className="hidden sm:table-cell">{money(v.totalCents)}</Td>
                 <Td right>{v.balanceCents ? money(v.balanceCents) : "—"}</Td>

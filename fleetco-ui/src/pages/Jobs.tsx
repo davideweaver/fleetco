@@ -5,6 +5,7 @@ import { jobs, STAGES, wrapComponents, wrapPriceCents } from "@/data/sample";
 import { useShell } from "@/shell/shell-context";
 import { Btn, DetailHeader, ListDetailLayout, ListHeader, ListRow, Pill } from "@/shell/ListDetailLayout";
 import { attentionMap } from "@/nav/attention";
+import { StatusPill } from "@/components/ui/status-pill";
 import { Overlay } from "@/components/ui/overlay";
 import { PhotoGrid, hasUploadedCompletionPhoto, type Photo } from "@/components/ui/photos";
 import { toast } from "sonner";
@@ -175,7 +176,7 @@ function JobDetail({ no }: { no: string }) {
         title={`${j.no} · ${j.what}`}
         sub={
           <span className="flex flex-wrap items-center gap-2">
-            <Pill tone="muted">{STAGES[j.stage]}</Pill>
+            <StatusPill section="jobs" id={j.no} status={STAGES[j.stage]} />
             {j.priority !== "Normal" && <Pill tone="warn">{j.priority}</Pill>}
             <span>{j.asset}</span>
             <span>·</span>

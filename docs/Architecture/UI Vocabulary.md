@@ -368,12 +368,25 @@ something else raises the alarm.
 
 | Record shows | Attention appears as |
 |---|---|
-| a status pill — an invoice | the **pill**, in amber |
-| no status — a customer, a job row | the **chip**, carrying the reason |
+| a status pill — an invoice, a job | the **pill**, in amber |
+| no status — a customer row, a list row | the **chip**, carrying the reason |
+
+One `StatusPill` serves every section. An invoice's `OVERDUE` and a job's `COMPLETED · waiting
+to be closed` are the same situation, and a pill per section is how they drift — one keeps
+asking `attentionMap` while the other picks up a hardcoded status string that quietly stops
+matching. A caller chooses only the **calm** tone, never whether the record needs attention.
 
 Which statuses turn amber is `attentionMap`'s to say, never a list of strings written out again
 in the component. `DRAFT` is amber because `JOB-009` creates an invoice unsent and an unsent
 invoice is money not billed — if that rule changes, the colour follows it.
+
+It is **role-aware for free**, because `attentionMap` is. The same job shows `COMPLETED` in
+amber to Cam, who has to close it, and in grey to the technician, who does not.
+
+**The board is the exception, and deliberately.** Its cards carry no stage pill — the column
+*is* the stage. Since every job rule is a function of stage and role, attention there is always
+a whole column rather than a card, and the column header already carries the count. Marking
+every card in it would repeat the heading six rows down.
 
 > This took two passes to get right. The first instinct was that `DRAFT` is a lifecycle state
 > rather than an alarm, so it should stay grey. But it *is* in the attention count, and a state

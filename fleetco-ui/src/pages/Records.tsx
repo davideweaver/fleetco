@@ -5,7 +5,7 @@ import { useShell } from "@/shell/shell-context";
 import { Btn, DetailHeader, ListDetailLayout, ListHeader, ListRow } from "@/shell/ListDetailLayout";
 import { attentionMap } from "@/nav/attention";
 import { ConfirmWithReason } from "@/components/ui/confirm";
-import { InvoiceStatus } from "@/components/ui/invoice-status";
+import { StatusPill } from "@/components/ui/status-pill";
 import { toast } from "sonner";
 import { Stat } from "./Customers";
 import { EstimateEditor } from "./EstimateEditor";
@@ -58,7 +58,12 @@ export function InvoicesPage() {
               title={`#${selected.no}`}
               sub={
                 <span className="flex items-center gap-2">
-                  <InvoiceStatus no={selected.no} status={selected.status} />
+                  <StatusPill
+                    section="invoices"
+                    id={selected.no}
+                    status={selected.status}
+                    calm={selected.status === "Paid" ? "good" : "muted"}
+                  />
                   <span>Issued {selected.issued} · due {selected.due}</span>
                 </span>
               }

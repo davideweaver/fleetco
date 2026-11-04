@@ -61,6 +61,9 @@ left is coverage and the parts no screen has needed yet.
       are looking at it, and what the badge shows past 99.
 - [ ] **Does it belong in a report?** The AR report and the attention count answer nearly
       the same question. If they disagree, one of them is wrong.
+- [ ] **The completion photo tag is brand amber** (`photos.tsx`), which sits close to the
+      attention amber in the warm palette while meaning the opposite — a `JOB-008` gate
+      *satisfied*. Decide whether that tag keeps a colour at all.
 
 ### Tier 2 — real decisions
 
