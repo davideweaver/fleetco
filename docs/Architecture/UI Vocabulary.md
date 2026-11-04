@@ -626,10 +626,20 @@ roll-up and **Approve**.
 range cannot be the unit: approve Nov 2–4 and nobody can say what Nov 5–8 is, which periods are
 approved, or what reopening would reopen.
 
-So the control **does not offer a range it would then have to refuse**. Review steps whole
-periods — `‹ Nov 2 – 8 ›` — and there is no way to land on half of one. Looking at an arbitrary
-range is a *reporting* question and already has a home: Clocked hours and Job hours take any
-range, because looking is not approving.
+So the control **does not offer a range it would then have to refuse**. The period picker lists
+whole periods and there is no way to express half of one. Looking at an arbitrary range is a
+*reporting* question and already has a home: Clocked hours and Job hours take any range, because
+looking is not approving.
+
+**A list, not a stepper.** A stepper can only answer "what is next to this one". The list answers
+the question `TIME-010` turns on — *which periods are approved* — by putting each period's state
+beside it: a lock when it is approved, an amber count when something still needs you. With a
+stepper you would have to visit a period to find out.
+
+It sits **next to Approve**, because the two are read together: which period, and is it done.
+Unlike Approve it appears on **every** pane — changing the period from Marco's screen is not a
+misreading, since you get Marco's other period, which is what you asked for. Approve has a side
+effect on everyone, which is why it stays on Summary.
 
 **`D-C12` is open** — weekly or fortnightly is not decided. The screen says which assumption it
 is running on (weekly, Monday to Sunday) rather than letting a week look like a settled answer,

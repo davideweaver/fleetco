@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { Check, ChevronLeft, ChevronRight, Lock, Users } from "lucide-react";
+import { CalendarDays, Check, ChevronDown, Lock, Users } from "lucide-react";
 import { toast } from "sonner";
 import { useShell } from "@/shell/shell-context";
 import {
@@ -15,8 +15,10 @@ import {
 } from "@/shell/ListDetailLayout";
 import { PunchClock, useTimeClock, LeftRunningChip } from "@/components/ui/timer";
 import { CorrectTimeDialog } from "@/components/ui/correct-time";
+import { Popover } from "@/components/ui/popover";
 import { Section } from "./Customers";
 import type { DateRange } from "@/components/ui/date-picker";
+import { cn } from "@/lib/utils";
 import {
   addDays,
   fmtRange,
@@ -25,6 +27,7 @@ import {
   isWithin,
   startOfDay,
   startOfWeek,
+  toISODate,
 } from "@/lib/date";
 import {
   DAY_ISO,
@@ -168,7 +171,8 @@ function MyDay() {
  * three numbers.
  */
 function Review() {
-  const [approved, setApproved] = useState(false);
+  /** Keyed by the period's start, so the picker can say which are already done. */
+  const [approvedPeriods, setApprovedPeriods] = useState<Set<string>>(new Set());
   const [correcting, setCorrecting] = useState<
     | { kind: "punch" | "entry"; id: string; what: string; when: string; start: number; end: number | null }
     | null
@@ -190,7 +194,7 @@ function Review() {
   );
   const period: DateRange = { from: periodStart, to: addDays(periodStart, 6) };
   const thisPeriodStart = startOfWeek(fromISODate(DAY_ISO[TODAY_LABEL])!);
-  const isCurrent = isSameDay(periodStart, thisPeriodStart);
+  const approved = approvedPeriods.has(toISODate(periodStart));
 
   const { id } = useParams();
   const { href } = useShell();
@@ -255,34 +259,6 @@ function Review() {
       list={
         <>
           <ListHeader title="Timesheet review" count={employees.length} />
-          {/* Steps whole periods. There is no way to land on half of one. */}
-          <div className="flex items-center gap-1 border-b px-2 py-1.5">
-            <IconStep
-              label="Previous period"
-              onClick={() => setPeriodStart((d) => addDays(d, -7))}
-            >
-              <ChevronLeft className="size-4" />
-            </IconStep>
-            <span className="tnum flex-1 text-center text-sm font-medium">
-              {fmtRange(period.from, period.to, new Date())}
-            </span>
-            <IconStep
-              label="Next period"
-              onClick={() => setPeriodStart((d) => addDays(d, 7))}
-            >
-              <ChevronRight className="size-4" />
-            </IconStep>
-          </div>
-          {!isCurrent && (
-            <button
-              type="button"
-              onClick={() => setPeriodStart(thisPeriodStart)}
-              className="border-b px-3 py-1 text-left text-xs text-muted-foreground underline-offset-2 hover:underline"
-            >
-              Back to this period
-            </button>
-          )}
-
           <div className="min-h-0 flex-1 overflow-y-auto">
             <ListRow
               to={href("/app/time")}
@@ -327,16 +303,32 @@ function Review() {
             eyebrow={`Timesheet · ${fmtRange(period.from, period.to, new Date())}`}
             title={selectedEmployee ? selectedEmployee.name : "Summary"}
             actions={
-              /* On the SUMMARY pane only. Approving locks the period for everyone, so
-                 it belongs with the period's totals — not on a pane headed with one
-                 person's name, where it reads as approving that person. Costing a
-                 click to get here is the right price for that. */
-              who === "all" ? (
-                approved ? (
-                  <span className="inline-flex items-center gap-1.5 rounded-md bg-muted px-3 py-1.5 text-sm text-muted-foreground">
-                    <Lock className="size-3.5" /> Approved
-                  </span>
-                ) : (
+              <>
+                {/* The period applies to the WHOLE screen, so it is on every pane.
+                    Unlike Approve, changing it from Marco's pane is not a misreading —
+                    you get Marco's other period, which is what you asked for. Approve
+                    has a side effect on everyone, which is why it stays on Summary. */}
+                <PeriodPicker
+                  value={periodStart}
+                  onChange={setPeriodStart}
+                  current={thisPeriodStart}
+                  statusOf={(start) => ({
+                    approved: approvedPeriods.has(toISODate(start)),
+                    blocking: punches.filter(
+                      (p) =>
+                        isLeftRunning(p) &&
+                        withinWeek(DAY_ISO[p.day], start)
+                    ).length,
+                  })}
+                />
+                {/* Approving locks the period for everyone, so it belongs with the
+                    period's totals — not on a pane headed with one person's name. */}
+                {who === "all" &&
+                  (approved ? (
+                    <span className="inline-flex items-center gap-1.5 rounded-md bg-muted px-3 py-1.5 text-sm text-muted-foreground">
+                      <Lock className="size-3.5" /> Approved
+                    </span>
+                  ) : (
                   <span
                     onClick={() => {
                       if (blocking > 0) {
@@ -345,7 +337,9 @@ function Review() {
                         });
                         return;
                       }
-                      setApproved(true);
+                      setApprovedPeriods((s) =>
+                        new Set(s).add(toISODate(periodStart))
+                      );
                       toast.success("Pay period approved", {
                         description: `${fmtRange(period.from, period.to, new Date())} is locked. Reopening is audited.`,
                       });
@@ -353,8 +347,8 @@ function Review() {
                   >
                     <Btn primary>Approve period</Btn>
                   </span>
-                )
-              ) : undefined
+                  ))}
+              </>
             }
             sub={
               /* TIME-006 at the top of whatever you selected. Two numbers, side by
@@ -593,24 +587,108 @@ function Review() {
   );
 }
 
-/** A square step button. The period moves a whole week at a time, never a day. */
-function IconStep({
-  label,
-  onClick,
-  children,
+/** Is this day inside the week beginning `start`? */
+function withinWeek(dayISO: string | undefined, start: Date) {
+  const d = dayISO ? fromISODate(dayISO) : null;
+  return d ? isWithin(d, start, addDays(start, 6)) : false;
+}
+
+/**
+ * The pay period, as a list rather than a stepper.
+ *
+ * A stepper can only answer "what is next to this one". The list answers the question
+ * `TIME-010` actually turns on — **which periods are approved** — by showing the state
+ * of each one beside it. With a stepper you would have to visit a period to find out.
+ *
+ * It offers whole periods only, for the same reason review has no date range: approving
+ * half a period is not a thing, so the control never lets you express one.
+ */
+const PERIODS_BACK = 8;
+
+function PeriodPicker({
+  value,
+  onChange,
+  current,
+  statusOf,
 }: {
-  label: string;
-  onClick: () => void;
-  children: React.ReactNode;
+  value: Date;
+  onChange: (d: Date) => void;
+  current: Date;
+  statusOf: (start: Date) => { approved: boolean; blocking: number };
 }) {
+  const [open, setOpen] = useState(false);
+  const today = new Date();
+  const periods = Array.from({ length: PERIODS_BACK }, (_, i) =>
+    addDays(current, -7 * i)
+  );
+
   return (
-    <button
-      type="button"
-      aria-label={label}
-      onClick={onClick}
-      className="grid size-7 shrink-0 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+    <Popover
+      open={open}
+      onOpenChange={setOpen}
+      align="end"
+      label="Choose a pay period"
+      trigger={
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          aria-haspopup="dialog"
+          aria-expanded={open}
+          className={cn(
+            "inline-flex h-9 items-center gap-2 rounded-md border px-2.5 text-sm hover:bg-accent/50",
+            open && "ring-2 ring-ring/40"
+          )}
+        >
+          <CalendarDays className="size-4 shrink-0 text-muted-foreground" />
+          <span className="tnum whitespace-nowrap">
+            {fmtRange(value, addDays(value, 6), today)}
+          </span>
+          <ChevronDown className="size-3.5 shrink-0 text-muted-foreground" />
+        </button>
+      }
     >
-      {children}
-    </button>
+      <div className="w-64">
+        <div className="px-2 pb-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+          Pay period · weekly
+        </div>
+        <ul className="max-h-72 overflow-y-auto">
+          {periods.map((start) => {
+            const s = statusOf(start);
+            const on = isSameDay(start, value);
+            return (
+              <li key={toISODate(start)}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onChange(start);
+                    setOpen(false);
+                  }}
+                  className={cn(
+                    "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm",
+                    on ? "bg-accent font-medium" : "hover:bg-accent/60"
+                  )}
+                >
+                  <span className="tnum flex-1 whitespace-nowrap">
+                    {fmtRange(start, addDays(start, 6), today)}
+                  </span>
+                  {isSameDay(start, current) && (
+                    <span className="text-[11px] text-muted-foreground">now</span>
+                  )}
+                  {/* The state is the point of the list. Approved is settled and quiet;
+                      a count is the attention colour, same as everywhere else. */}
+                  {s.approved ? (
+                    <Lock className="size-3.5 shrink-0 text-muted-foreground" />
+                  ) : s.blocking > 0 ? (
+                    <span className="tnum rounded-full bg-attention px-1.5 text-[10px] font-semibold text-attention-fg">
+                      {s.blocking}
+                    </span>
+                  ) : null}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </Popover>
   );
 }
