@@ -45,7 +45,6 @@ const SCREEN_CONTROLS: Record<string, "calEntry"[]> = {
 };
 
 export function Lab() {
-  const [badges, setBadges] = useState<"off" | "on">("on");
   const [role, setRole] = useState<"owner" | "tech">("owner");
   const [screen, setScreen] = useState(SCREENS[0]);
   const [scale, setScale] = useState(0.7);
@@ -57,7 +56,7 @@ export function Lab() {
   const [entry, setEntry] = useState<"fill" | "stripe" | "both">("both");
 
   const src = (extra = "") =>
-    `${screen.path}${screen.path.includes("?") ? "&" : "?"}role=${role}&badges=${badges}&palette=${palette}&entry=${entry}${dark ? "&theme=dark" : ""}${extra}`;
+    `${screen.path}${screen.path.includes("?") ? "&" : "?"}role=${role}&palette=${palette}&entry=${entry}${dark ? "&theme=dark" : ""}${extra}`;
 
   return (
     <div className="flex h-full flex-col bg-neutral-100 text-neutral-900">
@@ -75,11 +74,6 @@ export function Lab() {
           <Group label="Role">
             <Seg on={role === "owner"} onClick={() => setRole("owner")}>Owner</Seg>
             <Seg on={role === "tech"} onClick={() => setRole("tech")}>Technician</Seg>
-          </Group>
-
-          <Group label="Badges">
-            <Seg on={badges === "on"} onClick={() => setBadges("on")}>On</Seg>
-            <Seg on={badges === "off"} onClick={() => setBadges("off")}>Off</Seg>
           </Group>
 
           <Group label="Palette">
@@ -178,7 +172,7 @@ export function Lab() {
                 style={{ width: d.w * scale, height: d.h * scale }}
               >
                 <iframe
-                  key={`${d.key}-${role}-${badges}-${palette}-${entry}-${screen.key}-${dark}`}
+                  key={`${d.key}-${role}-${palette}-${entry}-${screen.key}-${dark}`}
                   title={d.label}
                   src={src()}
                   style={{

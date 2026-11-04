@@ -337,6 +337,11 @@ It bubbles up unchanged through four layers:
 Every layer reads the same function, so a badge can always be traced down to the rows that
 caused it, and a row can always be traced up to the badge it feeds.
 
+**No layer can be switched off.** The lab used to carry a Badges On/Off toggle, from before
+attention was a convention — and once it was, that toggle produced a state the app can never be
+in: no rail badge, but the row chip and the filter count still there. A badge is not decoration
+to be turned down; it is the top of this ladder.
+
 **A badge says "N things need you here". The list it points at must be able to show you
 which N.** Otherwise the badge tells someone something is wrong and gives them nowhere to go.
 

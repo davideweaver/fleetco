@@ -22,11 +22,13 @@ import type { Role } from "./routes";
  */
 export type Badge = { count?: number; dot?: boolean };
 
-export type BadgeLevel = "off" | "on";
-
-export function badgesFor(role: Role, level: BadgeLevel): Record<string, Badge> {
-  if (level === "off") return {};
-
+/**
+ * There is no "badges off". A badge is not decoration that can be turned down — it is
+ * the top of the attention ladder, and the chip on the row and the filter count are the
+ * same fact further down. Switching one layer off while the other two stayed on showed
+ * a state the app can never actually be in.
+ */
+export function badgesFor(role: Role): Record<string, Badge> {
   // Every badge is derived from the SAME function the list filters on, so the two can
   // never disagree, and no section carries a badge it cannot explain. See attention.ts.
   const out: Record<string, Badge> = {};

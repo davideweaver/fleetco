@@ -8,7 +8,7 @@ import { ContextCluster } from "./ContextCluster";
 import { GROUP_ORDER, itemForPath, labelFor, navFor, phoneNavFor, type Role } from "@/nav/routes";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useHasHover } from "@/lib/use-has-hover";
-import { badgesFor, rollUp, type BadgeLevel } from "@/nav/badges";
+import { badgesFor, rollUp } from "@/nav/badges";
 import { NavBadge } from "@/components/ui/nav-badge";
 import { cn } from "@/lib/utils";
 
@@ -51,14 +51,14 @@ export function AppShell() {
   // wanted when the rail is collapsed and the device can actually hover.
   const showTips = !railOpen && hasHover;
   useSearchHotkey(() => setSearchOpen(true));
-  const badges = badgesFor(role, (params.get("badges") as BadgeLevel) ?? "on");
+  const badges = badgesFor(role);
 
   // Carry the environment across in-app navigation. Without this, clicking a rail item
   // dropped every lab setting but `role` and the preview snapped back to defaults.
   // Screen-scoped params (overlay, photos) are deliberately NOT carried: they belong to
   // the screen that was opened with them, not to the session.
   const query = (() => {
-    const keep = ["role", "badges", "palette", "theme", "entry"];
+    const keep = ["role", "palette", "theme", "entry"];
     const q = new URLSearchParams();
     for (const k of keep) {
       const v = params.get(k);
