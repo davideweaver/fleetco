@@ -171,7 +171,9 @@ function SectionHeader({
   const { openSearch } = useShell();
   return (
     <div className="flex h-band shrink-0 items-center gap-2 border-b px-3">
-      <span className="text-base font-bold tracking-tight">{title}</span>
+      {/* 18px against the rows' 14px. At text-base the gap was two pixels, so the title
+          read as a heavier row rather than a header — bold alone could not carry it. */}
+      <span className="text-lg font-bold tracking-tight">{title}</span>
       {count !== undefined && (
         <span className="tnum rounded-full bg-muted px-1.5 py-0.5 text-[11px] text-muted-foreground">
           {count}
