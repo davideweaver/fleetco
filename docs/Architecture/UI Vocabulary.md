@@ -645,6 +645,15 @@ effect on everyone, which is why it stays on Summary.
 is running on (weekly, Monday to Sunday) rather than letting a week look like a settled answer,
 the same way a report states an unsettled definition.
 
+**On Summary the mark sits on the figure, not in a list.** A punch still running inflates that
+person's payable hours, so an amber dot goes beside *that number* in the roll-up and the row
+clicks through to their entries. A separate "needs you" block on Summary was the same fact told
+twice, a row away from where it can be acted on — and Summary has no Correct button anyway,
+because correcting is per person.
+
+Summary itself carries **no attention chip**, for the same reason: the person who needs you is
+already named on their own row in the list beside it.
+
 **Everyone is a roll-up, not a merged list.** Selecting Everyone shows hours by employee with
 the period's totals — not every person's entries interleaved by day, which is a report nobody
 reads. The per-person view already does detail; Everyone answers the question it is actually

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { CalendarDays, Check, ChevronDown, Lock, Users } from "lucide-react";
 import { toast } from "sonner";
 import { useShell } from "@/shell/shell-context";
@@ -201,6 +201,7 @@ function Review() {
 
   const { id } = useParams();
   const { href } = useShell();
+  const navigate = useNavigate();
   // No id means Everyone — the period as a whole, which is also what a fresh visit wants.
   const who = id ?? "all";
   const selectedEmployee = employees.find((e) => e.id === who);
@@ -275,10 +276,12 @@ function Review() {
                 </span>
               }
               title="Summary"
-              subtitle={`${employees.length} people · approve here`}
+              /* No attention chip here. Summary is a roll-up, and the person who needs
+                 you is already named on their own row below — a chip here would be the
+                 same fact a second time, one row away from where it can be acted on. */
+              subtitle={`${employees.length} people`}
               meta={`${hours(totals.payable)} h`}
               metaSub="payable"
-              attention={blocking > 0 ? `${blocking} needs you` : undefined}
             />
             {employees.map((emp) => {
               const s = forEmployee(emp.id);
@@ -371,18 +374,9 @@ function Review() {
             }
           />
 
-          {/* D-C12 is open, so the screen says which assumption it is running on rather
-              than letting a week look like a settled decision. */}
-          {who === "all" && (
-            <p className="border-b bg-muted/40 px-3 py-1.5 text-xs text-muted-foreground">
-              Not settled — TIME-009 / D-C12: the pay period is assumed weekly,
-              Monday to Sunday. Approval is per period, never a partial range.
-            </p>
-          )}
-
           <div className="min-h-0 flex-1 overflow-auto p-3">
             <div className="space-y-3">
-              {shownPunches.some(isLeftRunning) && (
+              {who !== "all" && shownPunches.some(isLeftRunning) && (
                 <Section title="Needs you">
                   <ul className="divide-y">
                     {shownPunches.filter(isLeftRunning).map((p) => (
@@ -426,7 +420,11 @@ function Review() {
                         const s = forEmployee(emp.id);
                         const n = periodEntries.filter((e) => e.who === emp.id).length;
                         return (
-                          <tr key={emp.id} className="border-b last:border-0">
+                          <tr
+                            key={emp.id}
+                            onClick={() => navigate(href(`/app/time/${emp.id}`))}
+                            className="cursor-pointer border-b last:border-0 hover:bg-accent/50"
+                          >
                             <td className="px-3 py-2">
                               <Link
                                 to={href(`/app/time/${emp.id}`)}
@@ -436,7 +434,20 @@ function Review() {
                               </Link>
                             </td>
                             <td className="tnum px-3 py-2 text-right font-medium">
-                              {hours(s.payable)} h
+                              {/* The mark sits on the FIGURE it affects. A punch still
+                                  running is inflating this number, so the dot belongs
+                                  here rather than in a separate list — and the row is
+                                  the way to go and fix it. */}
+                              <span className="inline-flex items-center gap-1.5">
+                                {s.running > 0 && (
+                                  <span
+                                    aria-label="Includes a punch still running"
+                                    title="Includes a punch still running"
+                                    className="size-2 shrink-0 rounded-full bg-attention"
+                                  />
+                                )}
+                                {hours(s.payable)} h
+                              </span>
                             </td>
                             <td className="tnum px-3 py-2 text-right text-muted-foreground">
                               {hours(s.job)} h
