@@ -20,6 +20,7 @@ const SCREENS = [
   { key: "jobs", label: "Job detail (G-1048)", path: "/app/jobs/G-1048" },
   { key: "board", label: "Job board (wide, no list)", path: "/app/board" },
   { key: "reports", label: "Reports (sections list)", path: "/app/reports/ar-aging" },
+  { key: "schedule2", label: "Schedule (week grid)", path: "/app/schedule" },
   { key: "estimate", label: "Estimate line editor", path: "/app/estimates/E-1048" },
   { key: "form", label: "Form in a panel (new job)", path: "/app/jobs?overlay=form" },
   { key: "form-errors", label: "Form with errors", path: "/app/jobs?overlay=form-errors" },
@@ -40,9 +41,10 @@ export function Lab() {
   const [dark, setDark] = useState(false);
   const [palette, setPalette] = useState<"neutral" | "warm">("warm");
   const [nav, setNav] = useState<"light" | "dark">("dark");
+  const [entry, setEntry] = useState<"fill" | "tag" | "stripe">("fill");
 
   const src = (extra = "") =>
-    `${screen.path}${screen.path.includes("?") ? "&" : "?"}v=${variant}&role=${role}&rail=${rail}&badges=${badges}&palette=${palette}&nav=${nav}${dark ? "&theme=dark" : ""}${extra}`;
+    `${screen.path}${screen.path.includes("?") ? "&" : "?"}v=${variant}&role=${role}&rail=${rail}&badges=${badges}&palette=${palette}&nav=${nav}&entry=${entry}${dark ? "&theme=dark" : ""}${extra}`;
 
   return (
     <div className="flex h-full flex-col bg-neutral-100 text-neutral-900">
@@ -88,6 +90,12 @@ export function Lab() {
           <Group label="Nav">
             <Seg on={nav === "light"} onClick={() => setNav("light")}>Light</Seg>
             <Seg on={nav === "dark"} onClick={() => setNav("dark")}>Dark</Seg>
+          </Group>
+
+          <Group label="Cal entry">
+            <Seg on={entry === "fill"} onClick={() => setEntry("fill")}>Fill</Seg>
+            <Seg on={entry === "tag"} onClick={() => setEntry("tag")}>Tag</Seg>
+            <Seg on={entry === "stripe"} onClick={() => setEntry("stripe")}>Stripe</Seg>
           </Group>
 
           <Group label="Theme">
@@ -139,7 +147,7 @@ export function Lab() {
                 style={{ width: d.w * scale, height: d.h * scale }}
               >
                 <iframe
-                  key={`${d.key}-${variant}-${rail}-${role}-${badges}-${palette}-${nav}-${screen.key}-${dark}`}
+                  key={`${d.key}-${variant}-${rail}-${role}-${badges}-${palette}-${nav}-${entry}-${screen.key}-${dark}`}
                   title={d.label}
                   src={src()}
                   style={{

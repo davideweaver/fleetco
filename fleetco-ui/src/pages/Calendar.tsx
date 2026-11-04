@@ -21,6 +21,7 @@ import {
   type CalendarEntry,
   type EntryKind,
 } from "@/data/sample";
+import { useSearchParams } from "react-router-dom";
 import { useShell } from "@/shell/shell-context";
 import { PageHeader } from "@/shell/ListDetailLayout";
 import { cn } from "@/lib/utils";
@@ -45,8 +46,22 @@ import { cn } from "@/lib/utils";
 const PX_PER_MIN = 48 / 60;
 const SNAP = 15;
 
+/**
+ * How production and installation are told apart. Three candidates, because the first
+ * answer — a thick rounded left bar — spent the accent colour on "kind", which is not a
+ * status, and fought the square grid it sits in.
+ *
+ *   fill    Shape and weight carry the meaning. Production is outlined, installation is
+ *           filled. Survives print and colour blindness, and leaves the accent free.
+ *   tag     Identical cards, a small PROD / INST label. Quietest; relies on reading.
+ *   stripe  A hairline across the top instead of the left, square corners.
+ */
+export type EntryStyle = "fill" | "tag" | "stripe";
+
 export function CalendarPage() {
   const { role } = useShell();
+  const [params] = useSearchParams();
+  const style = (params.get("entry") as EntryStyle) ?? "fill";
   const [entries, setEntries] = useState(seed);
   const [filter, setFilter] = useState<"all" | EntryKind>("all");
 
@@ -111,6 +126,7 @@ export function CalendarPage() {
                   today={i === TODAY}
                   entries={shown.filter((e) => e.day === i)}
                   draggable={owner}
+                  style={style}
                 />
               ))}
             </div>
@@ -145,6 +161,7 @@ function DayColumn({
   today,
   entries,
   draggable,
+  style,
 }: {
   index: number;
   label: string;
@@ -152,6 +169,7 @@ function DayColumn({
   today: boolean;
   entries: CalendarEntry[];
   draggable: boolean;
+  style: EntryStyle;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: String(index) });
   const hours = [];
@@ -180,7 +198,7 @@ function DayColumn({
           <div key={m} className="h-12 border-b border-border/50" />
         ))}
         {placed.map(({ entry, lane, lanes }) => (
-          <Entry key={entry.id} entry={entry} lane={lane} lanes={lanes} draggable={draggable} />
+          <Entry key={entry.id} entry={entry} lane={lane} lanes={lanes} draggable={draggable} style={style} />
         ))}
       </div>
     </div>
@@ -192,17 +210,20 @@ function Entry({
   lane,
   lanes,
   draggable,
+  style,
 }: {
   entry: CalendarEntry;
   lane: number;
   lanes: number;
   draggable: boolean;
+  style: EntryStyle;
 }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: entry.id,
     disabled: !draggable,
   });
 
+  const install = entry.kind === "installation";
   const top = (entry.start - DAY_START) * PX_PER_MIN;
   const height = (entry.end - entry.start) * PX_PER_MIN;
   const width = `calc(${100 / lanes}% - 4px)`;
@@ -221,21 +242,35 @@ function Entry({
         transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
       }}
       className={cn(
-        "absolute overflow-hidden rounded-lg border px-2 py-1 text-xs",
-        // Production and installation are the only two kinds, so a left edge and a word
-        // tell them apart without spending the accent colour on both.
-        entry.kind === "production"
-          ? "border-l-[3px] border-l-brand bg-brand/8"
-          : "border-l-[3px] border-l-foreground/60 bg-muted",
+        "absolute overflow-hidden rounded border px-2 py-1 text-xs",
+        style === "fill" &&
+          (install
+            ? "border-foreground/15 bg-foreground/8"
+            : "border-border bg-surface-3"),
+        style === "tag" && "border-border bg-surface-3",
+        style === "stripe" &&
+          cn(
+            "border-t-2 bg-surface-3",
+            install ? "border-t-foreground/50" : "border-t-brand"
+          ),
         isDragging ? "z-30 opacity-90 shadow-lg" : "z-20",
         draggable && "cursor-grab active:cursor-grabbing"
       )}
     >
-      <div className="truncate font-medium">{entry.jobNo}</div>
+      <div className="flex items-baseline gap-1.5">
+        <span className="truncate font-medium">{entry.jobNo}</span>
+        {style === "tag" && (
+          <span className="ml-auto shrink-0 rounded-sm border px-1 text-[9px] font-medium uppercase tracking-wide text-muted-foreground">
+            {install ? "Inst" : "Prod"}
+          </span>
+        )}
+      </div>
       {height > 42 && <div className="truncate text-muted-foreground">{entry.what}</div>}
       {height > 60 && (
         <div className="mt-0.5 flex items-center gap-1.5 text-[10px] text-muted-foreground">
-          <span className="uppercase tracking-wide">{entry.kind.slice(0, 4)}</span>
+          {style === "fill" && (
+            <span className="uppercase tracking-wide">{install ? "Inst" : "Prod"}</span>
+          )}
           <span>
             {clock(entry.start)}–{clock(entry.end)}
           </span>
