@@ -58,7 +58,7 @@ export function AppShell() {
   // Screen-scoped params (overlay, photos) are deliberately NOT carried: they belong to
   // the screen that was opened with them, not to the session.
   const query = (() => {
-    const keep = ["role", "badges", "palette", "nav", "theme", "entry"];
+    const keep = ["role", "badges", "palette", "theme", "entry"];
     const q = new URLSearchParams();
     for (const k of keep) {
       const v = params.get(k);

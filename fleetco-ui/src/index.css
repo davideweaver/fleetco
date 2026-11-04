@@ -240,7 +240,8 @@ body {
 }
 
 /* ---------------------------------------------------------------------------
-   DARK NAV on a light app. DECIDED (Dave, 2026-11-03): this is the default, not a mode.
+   DARK NAV on a light app. DECIDED (Dave): always, not a mode — so there is no
+   [data-nav] switch, the scope simply applies whenever the theme is light.
 
    The rail is chrome, not content: a dark rail reads as a frame around the work
    rather than as part of it, and it keeps the brightest surface where the money is.
@@ -251,7 +252,7 @@ body {
    its popover — with no component changes at all. That property is the reason the token
    layer exists.
    --------------------------------------------------------------------------- */
-html:not(.dark)[data-nav="dark"] .nav-surface {
+html:not(.dark) .nav-surface {
   --surface-1: oklch(0.2 0 0);
   --foreground: oklch(0.97 0 0);
   --muted-foreground: oklch(0.68 0 0);
@@ -275,7 +276,7 @@ html:not(.dark)[data-nav="dark"] .nav-surface {
   color: var(--foreground);
 }
 
-html:not(.dark)[data-palette="warm"][data-nav="dark"] .nav-surface {
+html:not(.dark)[data-palette="warm"] .nav-surface {
   --surface-1: oklch(0.21 0.012 65);
   --foreground: oklch(0.97 0.008 85);
   --muted-foreground: oklch(0.7 0.016 75);
@@ -295,10 +296,10 @@ html:not(.dark)[data-palette="warm"][data-nav="dark"] .nav-surface {
   color: var(--foreground);
 }
 
-/* In dark theme the whole app is already dark, so the dark-nav scope simply does not
-   apply — hence `html:not(.dark)` above rather than an override trying to undo it.
+/* In dark theme the whole app is already dark, so the scope simply does not apply —
+   hence `html:not(.dark)` rather than an override trying to undo itself.
    `--surface-1: initial` does NOT restore the theme value; it makes the property invalid,
-   which left the rail with no background at all. */
+   which once left the rail with no background at all. */
 
 /* An indeterminate sweep for the two phases that have no percentage: waiting in the
    queue, and waiting for the server to confirm a finished upload. Determinate progress

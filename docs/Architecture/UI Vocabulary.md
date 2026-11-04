@@ -99,11 +99,11 @@ inputs, tables, and the rows inside a list.
 
 ### Dark nav
 
-`[data-nav="dark"]` puts a dark rail and bottom bar on an otherwise light app. The rail is chrome,
+A dark rail and bottom bar on an otherwise light app, **always** — there is no switch. The rail is chrome,
 not content — a dark frame around the work keeps the brightest surface where the money is.
 
 It is a **scoped token override**, not a pile of `dark:` classes: the rule redefines `--foreground`,
-`--accent`, `--border`, `--brand` and friends on `.nav-surface`, and every utility inside already
+`--accent`, `--border`, `--brand` and friends on `.nav-surface` whenever the theme is light, and every utility inside already
 reads those variables, so the nav items, separators, context cluster and its popover all re-skin
 with **no component changes**. That is the token layer earning its keep.
 

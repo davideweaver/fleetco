@@ -52,11 +52,10 @@ export function Lab() {
   const [shown, setShown] = useState<Set<string>>(new Set(["desktop"]));
   const [dark, setDark] = useState(false);
   const [palette, setPalette] = useState<"neutral" | "warm">("warm");
-  const [nav, setNav] = useState<"light" | "dark">("dark");
   const [entry, setEntry] = useState<"fill" | "stripe" | "both">("both");
 
   const src = (extra = "") =>
-    `${screen.path}${screen.path.includes("?") ? "&" : "?"}role=${role}&badges=${badges}&palette=${palette}&nav=${nav}&entry=${entry}${dark ? "&theme=dark" : ""}${extra}`;
+    `${screen.path}${screen.path.includes("?") ? "&" : "?"}role=${role}&badges=${badges}&palette=${palette}&entry=${entry}${dark ? "&theme=dark" : ""}${extra}`;
 
   return (
     <div className="flex h-full flex-col bg-neutral-100 text-neutral-900">
@@ -87,10 +86,6 @@ export function Lab() {
             <Seg on={palette === "warm"} onClick={() => setPalette("warm")}>Warm</Seg>
           </Group>
 
-          <Group label="Nav">
-            <Seg on={nav === "light"} onClick={() => setNav("light")}>Light</Seg>
-            <Seg on={nav === "dark"} onClick={() => setNav("dark")}>Dark</Seg>
-          </Group>
 
 
           <Group label="Theme">
@@ -183,7 +178,7 @@ export function Lab() {
                 style={{ width: d.w * scale, height: d.h * scale }}
               >
                 <iframe
-                  key={`${d.key}-${role}-${badges}-${palette}-${nav}-${entry}-${screen.key}-${dark}`}
+                  key={`${d.key}-${role}-${badges}-${palette}-${entry}-${screen.key}-${dark}`}
                   title={d.label}
                   src={src()}
                   style={{
