@@ -19,32 +19,19 @@ import type { Role } from "./routes";
  */
 export type Badge = { count?: number; dot?: boolean; tone: "brand" | "alert" };
 
-export type BadgeLevel = "off" | "quiet" | "busy";
+export type BadgeLevel = "off" | "on";
 
 export function badgesFor(role: Role, level: BadgeLevel): Record<string, Badge> {
   if (level === "off") return {};
 
-  // Sections that have a list derive their badge from the SAME function the list filters
-  // on, so the two can never disagree. See nav/attention.ts.
-  const derived: Record<string, Badge> = {};
+  // Every badge is derived from the SAME function the list filters on, so the two can
+  // never disagree, and no section carries a badge it cannot explain. See attention.ts.
+  const out: Record<string, Badge> = {};
   for (const section of ["jobs", "customers", "invoices"]) {
     const n = attentionFor(section, role).length;
-    if (n) derived[section] = { count: n, tone: section === "invoices" ? "alert" : "brand" };
+    if (n) out[section] = { count: n, tone: section === "invoices" ? "alert" : "brand" };
   }
-
-  if (level === "quiet") return derived;
-
-  // Busy adds the sections that have no list of their own yet, purely to see a crowded
-  // rail. Nothing here contradicts a list, because none of these have one.
-  return role === "tech"
-    ? { ...derived, schedule: { count: 3, tone: "brand" }, time: { dot: true, tone: "alert" } }
-    : {
-        ...derived,
-        estimates: { count: 4, tone: "brand" },
-        // TIME-009: a pay period waiting to be approved.
-        time: { count: 1, tone: "brand" },
-        materials: { dot: true, tone: "brand" },
-      };
+  return out;
 }
 
 /** What rolls up onto the phone's More button: everything not in the bottom bar. */

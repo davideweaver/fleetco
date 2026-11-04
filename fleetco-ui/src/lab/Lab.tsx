@@ -45,7 +45,7 @@ const SCREEN_CONTROLS: Record<string, "calEntry"[]> = {
 };
 
 export function Lab() {
-  const [badges, setBadges] = useState<"off" | "quiet" | "busy">("quiet");
+  const [badges, setBadges] = useState<"off" | "on">("on");
   const [role, setRole] = useState<"owner" | "tech">("owner");
   const [screen, setScreen] = useState(SCREENS[0]);
   const [scale, setScale] = useState(0.7);
@@ -78,9 +78,8 @@ export function Lab() {
           </Group>
 
           <Group label="Badges">
+            <Seg on={badges === "on"} onClick={() => setBadges("on")}>On</Seg>
             <Seg on={badges === "off"} onClick={() => setBadges("off")}>Off</Seg>
-            <Seg on={badges === "quiet"} onClick={() => setBadges("quiet")}>Quiet</Seg>
-            <Seg on={badges === "busy"} onClick={() => setBadges("busy")}>Busy</Seg>
           </Group>
 
           <Group label="Palette">

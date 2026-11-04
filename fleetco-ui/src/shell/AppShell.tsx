@@ -51,7 +51,7 @@ export function AppShell() {
   // wanted when the rail is collapsed and the device can actually hover.
   const showTips = !railOpen && hasHover;
   useSearchHotkey(() => setSearchOpen(true));
-  const badges = badgesFor(role, (params.get("badges") as BadgeLevel) ?? "quiet");
+  const badges = badgesFor(role, (params.get("badges") as BadgeLevel) ?? "on");
 
   // Carry the environment across in-app navigation. Without this, clicking a rail item
   // dropped every lab setting but `role` and the preview snapped back to defaults.
@@ -183,7 +183,14 @@ export function AppShell() {
                             (railOpen ? (
                               <NavBadge badge={badge} placement="inline" />
                             ) : (
-                              <NavBadge badge={badge} placement="overlay" ring="ring-surface-1" />
+                              /* Collapsed: a dot, not a number. Ten icons each carrying a
+                                 figure is a rail you read instead of glance at — and the
+                                 count is one click away in the list anyway. */
+                              <NavBadge
+                                badge={{ tone: badge.tone, dot: true }}
+                                placement="overlay"
+                                ring="ring-surface-1"
+                              />
                             ))}
                         </Link>
                       );

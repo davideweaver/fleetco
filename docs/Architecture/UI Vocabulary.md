@@ -50,7 +50,7 @@ grep for the thing they mean. It is the same failure the single route table prev
 | ⑥ | **Detail pane** | `ListDetailLayout` | The right pane. Holds a **stat strip** (the row of labelled numbers) and **detail sections** |
 | ⑦ | **Search palette** | `SearchPalette` | Global search. Opened from the rail, `⌘K`, or the phone magnifier. Not a search *field*; there is nowhere to put one |
 | ⑧ | **Nav item** | `AppShell` | One entry in the rail. Grouped into **nav groups** (work / sales / shop / admin) separated by a hairline |
-| ⑨ | **Nav badge** | `NavBadge` | A **count** or a **dot** on a nav item. **Overlay** placement on an icon chip, **inline** at the end of a labelled row |
+| ⑨ | **Nav badge** | `NavBadge` | A **count** or a **dot** on a nav item. **Inline** count at the end of a labelled row; **overlay dot** on a collapsed icon — ten figures on ten icons is a rail you read instead of glance at |
 | ⑩ | **Collapse toggle** | `AppShell` | Switches the rail between expanded and collapsed |
 | ⑪ | **Context cluster** | `ContextCluster` | Avatar, department and account, at the foot of the rail |
 
@@ -337,8 +337,12 @@ both at once, which is the only way this stays true after eight lanes have touch
 The row shows the **reason**, not just a mark: "Payment overdue" rather than a bare dot. A
 mark says *something*; the reason says *what*, and it is the same number of pixels.
 
-**Sections without a list never get a badge they cannot explain.** Where the lab shows one
-(estimates, time, materials under Busy), it is explicitly marked as a visual stress test.
+**Sections without a list never get a badge they cannot explain.** There is no mode that adds
+decorative counts — badges are either on and derived, or off.
+
+**A collapsed rail shows a dot, not a number.** The figure is a click away in the list, and a
+column of ten icons each carrying a count stops being glanceable, which is the only reason a
+collapsed rail exists.
 
 ## Row actions
 
