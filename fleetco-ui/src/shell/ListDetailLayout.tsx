@@ -138,7 +138,7 @@ function FilterChip({
         on
           ? "bg-accent text-accent-foreground"
           : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
-        tone === "attention" && !on && "text-brand"
+        tone === "attention" && !on && "bg-brand/10 text-brand"
       )}
     >
       {children}
@@ -236,7 +236,7 @@ export function ListRow({
       <span className="min-w-0 flex-1">
         <span className="block truncate font-medium">{title}</span>
         {attention ? (
-          <span className="flex items-center gap-1.5 truncate text-xs text-brand">
+          <span className="flex items-center gap-1.5 truncate text-xs font-medium text-brand">
             <span className="size-1.5 shrink-0 rounded-full bg-brand" />
             {attention}
           </span>

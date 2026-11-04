@@ -390,6 +390,21 @@ becomes required, and the confirm button turns to the warning treatment.
 override — overrides are for when nobody answered at all. If that turns out to be his
 daily path rather than an exception, the override should be promoted to a peer.
 
+## Light accents work harder than dark ones
+
+The warm palette's amber sits far from a dark surface and pops. The same hue on cream
+measured **4.06:1** — under the AA floor for small text, and visibly soft, which is why the
+attention cues read fine in dark and faded in light.
+
+`--brand` is therefore **deeper in light than the dark value is light**: `oklch(0.5 0.145 68)`
+against `oklch(0.82 0.15 85)`. It is not the same colour at two brightnesses, and treating it
+as one is how a light theme ends up washed out.
+
+Colour alone was not enough at 12px either: the attention line also carries `font-medium`, and
+an inactive attention chip gets a `bg-brand/10` fill so it reads as a chip rather than as
+coloured text. **Measure, do not eyeball** — both of these looked "fine" until the ratio came
+back.
+
 ## Naming rules
 
 1. **Pane, column, bar, sheet — pick by behaviour, not by looks.**

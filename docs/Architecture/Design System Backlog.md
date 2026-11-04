@@ -63,7 +63,8 @@ queue.
       forty screens later.
 - [ ] **Negative, zero and credit amounts.** `tnum` is in place; the conventions are not.
 - [ ] **Accessibility audit** — contrast across both palettes, both themes, and the
-      nav-active chip.
+      nav-active chip. The light-warm `--brand` was found at 4.06:1 and fixed; assume
+      others are lurking, and check with a measurement rather than by eye.
 - [ ] **Visual regression gate.** Factory gate 8 expects a screenshot contact sheet per
       card, and the lab is the obvious source. **Run it against `dev`, not a production
       build** — a StrictMode-only bug got through precisely because preview was checked.

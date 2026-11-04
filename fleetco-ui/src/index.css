@@ -103,7 +103,10 @@
   --surface-2: oklch(0.973 0.009 85);
   --surface-3: oklch(0.995 0.004 85);
 
-  --brand: oklch(0.58 0.13 72);
+  /* Deeper than it looks like it should be. The dark theme's amber sits far from its
+     surface and pops; the same hue on cream was 4.06:1 — under the AA floor for small
+     text and visibly soft. Light accents have to work harder than dark ones. */
+  --brand: oklch(0.5 0.145 68);
   --brand-foreground: oklch(0.99 0.005 85);
   /* Bronze, not the bright amber: white on bright amber is about 2:1 and unreadable. */
   --nav-active: oklch(0.52 0.12 62);
