@@ -30,6 +30,8 @@ const SCREENS = [
   { key: "states", label: "States", note: "Loading / empty / error / not found", path: "/app/_states" },
   { key: "panel", label: "Panel", note: "Detail panel · opened from the board", path: "/app/board?overlay=panel" },
   { key: "dialog", label: "Dialog", note: "Dialog · close job", path: "/app/jobs/G-1048?overlay=dialog" },
+  { key: "approve", label: "Approval", note: "Record the customer's answer (AUTH-002)", path: "/app/estimates/E-1048?overlay=approve" },
+  { key: "override", label: "Override", note: "Authorize without approval, reason required (AUTH-004)", path: "/app/estimates/E-1048?overlay=override" },
 ];
 
 /**

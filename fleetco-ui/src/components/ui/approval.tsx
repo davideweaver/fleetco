@@ -1,0 +1,284 @@
+import { useState } from "react";
+import { Check, ShieldAlert, X } from "lucide-react";
+import { Overlay } from "./overlay";
+import { Field, Select, TextInput } from "./field";
+import { Btn, Pill } from "@/shell/ListDetailLayout";
+import { cn, money } from "@/lib/utils";
+
+/**
+ * Recording a customer's approval.
+ *
+ * The Rules Catalog calls §5 "the most important section — the record that protects OTC
+ * in a dispute", and `AUTH-011` says V1 approvals are recorded by staff rather than
+ * clicked by the customer. That makes this form a witness statement, and the design
+ * follows from that:
+ *
+ *   AUTH-002  Records WHO gave it, WHEN they gave it, HOW, and who recorded it.
+ *   AUTH-003  Records are permanent. A correction supersedes; both stay visible.
+ *   AUTH-004  An override is NOT customer approval, is never shown as one, and needs a
+ *             reason.
+ *
+ * Two deliberate refusals:
+ *
+ *   - "How" has NO default. Pre-selecting Phone would invent evidence on the customer's
+ *     behalf, which is the one thing this record exists not to do.
+ *   - "Recorded by you, just now" is SHOWN, not asked. It is required by AUTH-002 and it
+ *     is not the user's to choose.
+ */
+export type ApprovalMethod = "phone" | "email" | "in person" | "text" | "other";
+
+export type ApprovalRecord = {
+  id: string;
+  kind: "approved" | "declined" | "override";
+  /** The customer contact, or absent for an override. */
+  contact?: string;
+  method?: ApprovalMethod;
+  givenAt?: string;
+  reason?: string;
+  recordedBy: string;
+  recordedAt: string;
+  supersededBy?: string;
+};
+
+export function RecordApprovalDialog({
+  open,
+  onOpenChange,
+  lines,
+  onRecord,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  lines: { id: string; name: string; priceCents: number; pending: boolean }[];
+  onRecord: (ids: string[], r: Omit<ApprovalRecord, "id">) => void;
+}) {
+  const pending = lines.filter((l) => l.pending);
+  const [picked, setPicked] = useState<Set<string>>(new Set(pending.map((l) => l.id)));
+  const [contact, setContact] = useState("");
+  const [method, setMethod] = useState<ApprovalMethod | "">("");
+  const [kind, setKind] = useState<"approved" | "declined">("approved");
+
+  const ready = picked.size > 0 && contact.trim() && method;
+  const total = lines
+    .filter((l) => picked.has(l.id))
+    .reduce((a, l) => a + l.priceCents, 0);
+
+  return (
+    <Overlay
+      kind="dialog"
+      open={open}
+      onOpenChange={onOpenChange}
+      eyebrow="Estimate E-1048 · Ridgeline Plumbing & Heating"
+      title="Record the customer's answer"
+      footer={
+        <>
+          <Btn>Cancel</Btn>
+          <button
+            type="button"
+            disabled={!ready}
+            onClick={() => {
+              onRecord([...picked], {
+                kind,
+                contact: contact.trim(),
+                method: method as ApprovalMethod,
+                givenAt: "today",
+                recordedBy: "Owner",
+                recordedAt: "just now",
+              });
+              onOpenChange(false);
+            }}
+            className={cn(
+              "rounded-md border border-primary bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground",
+              !ready && "cursor-not-allowed opacity-40"
+            )}
+          >
+            Record {kind === "approved" ? "approval" : "decline"}
+          </button>
+        </>
+      }
+    >
+      <div className="space-y-4 p-4">
+        {/* AUTH-001: approval is per line, so the form is per line. "Approve all" is a
+            convenience over the same records, not a shortcut around them. */}
+        <div>
+          <div className="mb-1.5 flex items-baseline justify-between">
+            <span className="text-sm font-medium">Which lines</span>
+            <button
+              type="button"
+              onClick={() =>
+                setPicked((s) =>
+                  s.size === pending.length ? new Set() : new Set(pending.map((l) => l.id))
+                )
+              }
+              className="text-xs text-muted-foreground underline-offset-2 hover:underline"
+            >
+              {picked.size === pending.length ? "Clear all" : "Select all"}
+            </button>
+          </div>
+          <div className="overflow-hidden rounded-lg border">
+            {pending.map((l) => (
+              <label
+                key={l.id}
+                className="flex cursor-pointer items-center gap-2.5 border-b px-3 py-2 text-sm last:border-0 hover:bg-accent/40"
+              >
+                <input
+                  type="checkbox"
+                  checked={picked.has(l.id)}
+                  onChange={() =>
+                    setPicked((s) => {
+                      const n = new Set(s);
+                      n.has(l.id) ? n.delete(l.id) : n.add(l.id);
+                      return n;
+                    })
+                  }
+                  className="size-4"
+                />
+                <span className="min-w-0 flex-1 truncate">{l.name}</span>
+                <span className="tnum text-muted-foreground">{money(l.priceCents)}</span>
+              </label>
+            ))}
+            {pending.length === 0 && (
+              <div className="px-3 py-4 text-center text-sm text-muted-foreground">
+                Nothing is pending.
+              </div>
+            )}
+          </div>
+          {picked.size > 0 && (
+            <div className="mt-1.5 text-xs text-muted-foreground">
+              {picked.size} line{picked.size === 1 ? "" : "s"} · {money(total)}
+            </div>
+          )}
+        </div>
+
+        <div className="flex gap-2">
+          <Choice on={kind === "approved"} onClick={() => setKind("approved")} tone="good">
+            <Check className="size-4" /> They approved
+          </Choice>
+          <Choice on={kind === "declined"} onClick={() => setKind("declined")} tone="bad">
+            <X className="size-4" /> They declined
+          </Choice>
+        </div>
+
+        <Field label="Who said so" hint="The customer contact who gave the answer.">
+          {({ id }) => (
+            <TextInput
+              id={id}
+              value={contact}
+              onChange={(e) => setContact(e.target.value)}
+              placeholder="Dana Hoff"
+            />
+          )}
+        </Field>
+
+        <Field label="How" hint="No default on purpose — this is the evidence.">
+          {({ id }) => (
+            <Select
+              id={id}
+              value={method}
+              onChange={(e) => setMethod(e.target.value as ApprovalMethod)}
+            >
+              <option value="" disabled>
+                Choose
+              </option>
+              <option value="phone">By phone</option>
+              <option value="email">By email</option>
+              <option value="in person">In person</option>
+              <option value="text">By text</option>
+              <option value="other">Other</option>
+            </Select>
+          )}
+        </Field>
+
+        <p className="rounded-lg bg-muted/50 p-3 text-xs text-muted-foreground">
+          Recorded by <span className="font-medium text-foreground">you</span>, just now.
+          This cannot be edited later — a correction adds a new record and keeps this one.
+        </p>
+      </div>
+    </Overlay>
+  );
+}
+
+function Choice({
+  on,
+  onClick,
+  children,
+  tone,
+}: {
+  on: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+  tone: "good" | "bad";
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "flex flex-1 items-center justify-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium",
+        on
+          ? tone === "good"
+            ? "border-success bg-success/10 text-success"
+            : "border-destructive bg-destructive/10 text-destructive"
+          : "text-muted-foreground hover:bg-accent"
+      )}
+    >
+      {children}
+    </button>
+  );
+}
+
+/**
+ * The line's approval history. AUTH-003: nothing is ever removed, so a superseded record
+ * stays visible and struck rather than disappearing — the fact that someone corrected it
+ * is itself part of the record.
+ */
+export function ApprovalHistory({ records }: { records: ApprovalRecord[] }) {
+  if (records.length === 0) {
+    return <p className="p-3 text-sm text-muted-foreground">No answer recorded yet.</p>;
+  }
+  return (
+    <ul className="divide-y">
+      {records.map((r) => (
+        <li
+          key={r.id}
+          className={cn("flex gap-3 p-3 text-sm", r.supersededBy && "opacity-55")}
+        >
+          <span className="mt-0.5 shrink-0">
+            {r.kind === "override" ? (
+              <ShieldAlert className="size-4 text-warning" />
+            ) : r.kind === "approved" ? (
+              <Check className="size-4 text-success" />
+            ) : (
+              <X className="size-4 text-destructive" />
+            )}
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className={cn("block", r.supersededBy && "line-through")}>
+              {r.kind === "override" ? (
+                <>
+                  {/* AUTH-004: an override is never dressed as customer approval. */}
+                  <span className="font-medium">Overridden</span> by {r.recordedBy} —
+                  no customer approval
+                </>
+              ) : (
+                <>
+                  <span className="font-medium">
+                    {r.kind === "approved" ? "Approved" : "Declined"}
+                  </span>{" "}
+                  by {r.contact}, {r.method === "in person" ? "in person" : `by ${r.method}`}
+                </>
+              )}
+            </span>
+            {r.reason && (
+              <span className="mt-0.5 block text-xs text-muted-foreground">“{r.reason}”</span>
+            )}
+            <span className="mt-0.5 block text-xs text-muted-foreground">
+              Recorded by {r.recordedBy}, {r.recordedAt}
+              {r.supersededBy && " · superseded by a later record"}
+            </span>
+          </span>
+          {r.kind === "override" && <Pill tone="warn">Override</Pill>}
+        </li>
+      ))}
+    </ul>
+  );
+}

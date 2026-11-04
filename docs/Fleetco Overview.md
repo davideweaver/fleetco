@@ -116,6 +116,7 @@ Working queue: `xerro todo list -p Fleetco`
 - [[Work Cards]] — the unit of agent work: format, lifecycle, and the eight rules for writing one
 - [[Rule Coverage Gate]] — making [[Rules Catalog]] machine-checkable, so the spec reviews the agents
 - [[UI Vocabulary]] — the shared names for the parts of a screen, mapped to the components
+- [[Design System Backlog]] — what the design system still has to define, and what is done
 - [[Framework Evaluation]] — **decided 2026-10-13: NestJS** (ADR-027), chosen by spike over Fastify and AdonisJS
 - [[Testing Strategy]] — the verification layer; spec-not-implementation rule
 - [[Code Standards and Guardrails]] — branded types, lint rules, the enforcement hierarchy

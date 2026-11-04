@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { ChevronDown, ChevronRight, Plus } from "lucide-react";
 import {
   componentSum,
@@ -13,6 +14,13 @@ import {
 import { useShell } from "@/shell/shell-context";
 import { Btn, DetailHeader, Pill } from "@/shell/ListDetailLayout";
 import { CellInput, MoneyCell } from "@/components/ui/field";
+import {
+  ApprovalHistory,
+  RecordApprovalDialog,
+  type ApprovalRecord,
+} from "@/components/ui/approval";
+import { ConfirmWithReason } from "@/components/ui/confirm";
+import { toast } from "sonner";
 import { cn, money } from "@/lib/utils";
 
 /**
@@ -34,8 +42,36 @@ import { cn, money } from "@/lib/utils";
  */
 export function EstimateEditor({ estimateId }: { estimateId: string }) {
   const { role } = useShell();
+  const [params] = useSearchParams();
   const owner = role === "owner";
   const [openLines, setOpenLines] = useState<Set<string>>(new Set(["L1"]));
+  const overlay = params.get("overlay");
+  const [recording, setRecording] = useState(overlay === "approve");
+  const [overriding, setOverriding] = useState<string | null>(
+    overlay === "override" ? "L3" : null
+  );
+  const [history, setHistory] = useState<Record<string, ApprovalRecord[]>>({
+    L1: [
+      {
+        id: "a0",
+        kind: "approved",
+        contact: "Dana Hoff",
+        method: "phone",
+        recordedBy: "Owner",
+        recordedAt: "Oct 28, 9:14am",
+      },
+    ],
+    L2: [
+      {
+        id: "a1",
+        kind: "declined",
+        contact: "Dana Hoff",
+        method: "phone",
+        recordedBy: "Owner",
+        recordedAt: "Oct 28, 9:14am",
+      },
+    ],
+  });
 
   const toggle = (id: string) =>
     setOpenLines((s) => {
@@ -63,7 +99,9 @@ export function EstimateEditor({ estimateId }: { estimateId: string }) {
           owner ? (
             <>
               <Btn>Preview</Btn>
-              <Btn primary>Record approval</Btn>
+              <span onClick={() => setRecording(true)}>
+                <Btn primary>Record answer</Btn>
+              </span>
             </>
           ) : undefined
         }
@@ -135,7 +173,91 @@ export function EstimateEditor({ estimateId }: { estimateId: string }) {
             </tr>
           </tfoot>
         </table>
+
+        {/* AUTH-003: the history is the point. Showing only the current state would hide
+            that someone corrected it, and the correction is part of the record. */}
+        {owner && (
+          <div className="px-4 py-4 lg:px-5">
+            <div className="mb-2 text-sm font-semibold">Approval history</div>
+            <div className="space-y-3">
+              {estimateLines.map((l) => (
+                <div key={l.id} className="overflow-hidden rounded-lg border">
+                  <div className="flex items-center gap-2 border-b bg-muted/40 px-3 py-2 text-xs">
+                    <span className="font-medium">{l.name}</span>
+                    <button
+                      type="button"
+                      onClick={() => setOverriding(l.id)}
+                      className="ml-auto text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+                    >
+                      Override
+                    </button>
+                  </div>
+                  <ApprovalHistory records={history[l.id] ?? []} />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
+
+      <RecordApprovalDialog
+        open={recording}
+        onOpenChange={setRecording}
+        lines={estimateLines.map((l) => ({
+          id: l.id,
+          name: l.name,
+          priceCents: linePrice(l),
+          pending: (history[l.id] ?? []).length === 0,
+        }))}
+        onRecord={(ids, rec) => {
+          setHistory((h) => {
+            const next = { ...h };
+            for (const id of ids) {
+              next[id] = [...(next[id] ?? []), { ...rec, id: `a${Date.now()}${id}` }];
+            }
+            return next;
+          });
+          toast.success(`Recorded on ${ids.length} line${ids.length === 1 ? "" : "s"}`, {
+            description: "Permanent. A correction adds a record rather than editing this one.",
+          });
+        }}
+      />
+
+      <ConfirmWithReason
+        open={Boolean(overriding)}
+        onOpenChange={(v) => !v && setOverriding(null)}
+        eyebrow="AUTH-004 · override"
+        title="Authorize without customer approval?"
+        tone="warning"
+        confirmLabel="Override"
+        consequence={
+          <>
+            This line becomes billable without the customer having agreed to it. It is
+            recorded as an <strong>override</strong> and will show that way on every report
+            and in the line history — never as customer approval.
+          </>
+        }
+        reasonLabel="Why are you overriding?"
+        onConfirm={(reason) => {
+          const id = overriding!;
+          setHistory((h) => ({
+            ...h,
+            [id]: [
+              ...(h[id] ?? []),
+              {
+                id: `o${Date.now()}`,
+                kind: "override",
+                reason,
+                recordedBy: "Owner",
+                recordedAt: "just now",
+              },
+            ],
+          }));
+          toast.warning("Recorded as an override", {
+            description: "Shown as an override everywhere, never as customer approval.",
+          });
+        }}
+      />
     </div>
   );
 }
