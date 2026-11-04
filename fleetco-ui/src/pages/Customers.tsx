@@ -1,13 +1,18 @@
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { customers, invoices, jobs, STAGES } from "@/data/sample";
 import { useShell } from "@/shell/shell-context";
-import { Btn, DetailHeader, ListDetailLayout, ListHeader, ListRow, Pill } from "@/shell/ListDetailLayout";
+import { Btn, DetailHeader, ListDetailLayout, ListHeader, ListRow, Monogram, Pill } from "@/shell/ListDetailLayout";
+import { attentionMap } from "@/nav/attention";
 import { money } from "@/lib/utils";
 
 export function CustomersPage() {
   const { id } = useParams();
-  const { href } = useShell();
+  const { href, role } = useShell();
+  const [onlyAttention, setOnlyAttention] = useState(false);
   const selected = customers.find((c) => c.id === id);
+  const needs = attentionMap("customers", role);
+  const rows = onlyAttention ? customers.filter((c) => needs.has(c.id)) : customers;
 
   return (
     <ListDetailLayout
@@ -16,15 +21,24 @@ export function CustomersPage() {
       empty="Pick a customer to see their jobs and invoices."
       list={
         <>
-          <ListHeader title="Customers" count={customers.length} action={<Btn primary>New</Btn>} />
+          <ListHeader
+            title="Customers"
+            count={rows.length}
+            action={<Btn primary>New</Btn>}
+            attention={needs.size}
+            filtered={onlyAttention}
+            onFilter={setOnlyAttention}
+          />
           <div className="min-h-0 flex-1 overflow-y-auto">
-            {customers.map((c) => (
+            {rows.map((c) => (
               <ListRow
                 key={c.id}
                 to={href(`/app/customers/${c.id}`)}
                 selected={c.id === id}
+                lead={<Monogram name={c.name} />}
                 title={c.name}
                 subtitle={`${c.city} · ${c.terms}`}
+                attention={needs.get(c.id)}
                 meta={c.balanceCents ? money(c.balanceCents) : "—"}
                 metaSub={c.openJobs ? `${c.openJobs} open` : undefined}
               />

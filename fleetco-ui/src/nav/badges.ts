@@ -1,4 +1,4 @@
-import { invoices, jobs } from "@/data/sample";
+import { attentionFor } from "./attention";
 import type { Role } from "./routes";
 
 /**
@@ -24,37 +24,26 @@ export type BadgeLevel = "off" | "quiet" | "busy";
 export function badgesFor(role: Role, level: BadgeLevel): Record<string, Badge> {
   if (level === "off") return {};
 
-  if (role === "tech") {
-    const mine = jobs.filter((j) => j.who === "T1");
-    const notStarted = mine.filter((j) => j.stage === 0).length;
-    return level === "busy"
-      ? {
-          jobs: { count: notStarted + 2, tone: "brand" },
-          schedule: { count: 3, tone: "brand" },
-          // TIME-013: a timer left running overnight. A number would say nothing.
-          time: { dot: true, tone: "alert" },
-        }
-      : { jobs: { count: notStarted, tone: "brand" } };
+  // Sections that have a list derive their badge from the SAME function the list filters
+  // on, so the two can never disagree. See nav/attention.ts.
+  const derived: Record<string, Badge> = {};
+  for (const section of ["jobs", "customers", "invoices"]) {
+    const n = attentionFor(section, role).length;
+    if (n) derived[section] = { count: n, tone: section === "invoices" ? "alert" : "brand" };
   }
 
-  const awaitingClose = jobs.filter((j) => j.stage === 5).length;
-  const drafts = invoices.filter((i) => i.status === "Draft").length;
-  const overdue = invoices.filter((i) => i.status === "Overdue").length;
+  if (level === "quiet") return derived;
 
-  return level === "busy"
-    ? {
-        // JOB-007: a technician marked work finished; the owner reviews and closes.
-        jobs: { count: awaitingClose + 3, tone: "brand" },
-        // RPT-004 ready to invoice, plus drafts never sent. Money sitting still.
-        invoices: { count: drafts + overdue + 9, tone: "alert" },
+  // Busy adds the sections that have no list of their own yet, purely to see a crowded
+  // rail. Nothing here contradicts a list, because none of these have one.
+  return role === "tech"
+    ? { ...derived, schedule: { count: 3, tone: "brand" }, time: { dot: true, tone: "alert" } }
+    : {
+        ...derived,
         estimates: { count: 4, tone: "brand" },
         // TIME-009: a pay period waiting to be approved.
         time: { count: 1, tone: "brand" },
         materials: { dot: true, tone: "brand" },
-      }
-    : {
-        jobs: { count: awaitingClose, tone: "brand" },
-        invoices: { count: overdue, tone: "alert" },
       };
 }
 

@@ -1,14 +1,19 @@
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { invoices, jobs } from "@/data/sample";
 import { useShell } from "@/shell/shell-context";
 import { Btn, DetailHeader, ListDetailLayout, ListHeader, ListRow, Pill } from "@/shell/ListDetailLayout";
+import { attentionMap } from "@/nav/attention";
 import { Stat } from "./Customers";
 import { EstimateEditor } from "./EstimateEditor";
 import { money } from "@/lib/utils";
 
 export function InvoicesPage() {
   const { id } = useParams();
-  const { href } = useShell();
+  const { href, role } = useShell();
+  const [onlyAttention, setOnlyAttention] = useState(false);
+  const needs = attentionMap("invoices", role);
+  const rows = onlyAttention ? invoices.filter((v) => needs.has(v.no)) : invoices;
   const selected = invoices.find((v) => v.no === id);
 
   return (
@@ -18,15 +23,22 @@ export function InvoicesPage() {
       empty="Pick an invoice."
       list={
         <>
-          <ListHeader title="Invoices" count={invoices.length} />
+          <ListHeader
+            title="Invoices"
+            count={rows.length}
+            attention={needs.size}
+            filtered={onlyAttention}
+            onFilter={setOnlyAttention}
+          />
           <div className="min-h-0 flex-1 overflow-y-auto">
-            {invoices.map((v) => (
+            {rows.map((v) => (
               <ListRow
                 key={v.no}
                 to={href(`/app/invoices/${v.no}`)}
                 selected={v.no === id}
                 title={`#${v.no} · ${v.customer}`}
                 subtitle={`${v.status} · due ${v.due}`}
+                attention={needs.get(v.no)}
                 meta={money(v.balanceCents || v.totalCents)}
                 metaSub={v.balanceCents ? "balance" : "paid"}
               />

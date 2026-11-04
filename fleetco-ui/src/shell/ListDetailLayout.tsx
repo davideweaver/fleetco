@@ -83,13 +83,66 @@ export function ListHeader({
   title,
   count,
   action,
+  attention = 0,
+  filtered = false,
+  onFilter,
 }: {
   title: string;
   count: number;
   action?: ReactNode;
+  /** How many rows in this list need someone. Drives the rail badge too. */
+  attention?: number;
+  filtered?: boolean;
+  onFilter?: (v: boolean) => void;
 }) {
   return (
-    <SectionHeader title={title} count={count} action={action} />
+    <>
+      <SectionHeader title={title} count={count} action={action} />
+      {/* The badge on the rail says a number; this is where that number goes. Without a
+          way to see only those rows, a badge tells the user something is wrong and gives
+          them nowhere to go. */}
+      {attention > 0 && onFilter && (
+        <div className="flex shrink-0 items-center gap-1 border-b px-2 py-1.5">
+          <FilterChip on={!filtered} onClick={() => onFilter(false)}>
+            All
+          </FilterChip>
+          <FilterChip on={filtered} onClick={() => onFilter(true)} tone="attention">
+            Needs you
+            <span className="tnum ml-1 rounded-full bg-brand px-1.5 text-[10px] text-brand-foreground">
+              {attention}
+            </span>
+          </FilterChip>
+        </div>
+      )}
+    </>
+  );
+}
+
+function FilterChip({
+  on,
+  onClick,
+  children,
+  tone,
+}: {
+  on: boolean;
+  onClick: () => void;
+  children: ReactNode;
+  tone?: "attention";
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "inline-flex items-center rounded-md px-2 py-1 text-xs font-medium",
+        on
+          ? "bg-accent text-accent-foreground"
+          : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
+        tone === "attention" && !on && "text-brand"
+      )}
+    >
+      {children}
+    </button>
   );
 }
 
@@ -151,6 +204,8 @@ export function ListRow({
   subtitle,
   meta,
   metaSub,
+  lead,
+  attention,
 }: {
   to: string;
   selected: boolean;
@@ -158,20 +213,37 @@ export function ListRow({
   subtitle?: string;
   meta?: ReactNode;
   metaSub?: ReactNode;
+  /** A monogram or icon. Gives the eye something to land on when scanning. */
+  lead?: ReactNode;
+  /** Why this row needs someone. Replaces the subtitle when present. */
+  attention?: string;
 }) {
   return (
     <Link
       to={to}
       aria-current={selected ? "true" : undefined}
       className={cn(
-        "flex items-center gap-3 border-b border-border/60 px-3 py-2.5 text-sm",
-        selected ? "bg-accent" : "hover:bg-accent/50"
+        "relative flex items-center gap-3 border-b border-border/60 py-2.5 pr-3 text-sm transition-colors",
+        // The selected row carries a brand edge; the padding shifts so text does not move
+        // when selection changes.
+        selected ? "bg-accent pl-[9px]" : "pl-3 hover:bg-accent/50"
       )}
     >
+      {selected && (
+        <span className="absolute inset-y-0 left-0 w-[3px] rounded-r bg-nav-active" />
+      )}
+      {lead}
       <span className="min-w-0 flex-1">
         <span className="block truncate font-medium">{title}</span>
-        {subtitle && (
-          <span className="block truncate text-xs text-muted-foreground">{subtitle}</span>
+        {attention ? (
+          <span className="flex items-center gap-1.5 truncate text-xs text-brand">
+            <span className="size-1.5 shrink-0 rounded-full bg-brand" />
+            {attention}
+          </span>
+        ) : (
+          subtitle && (
+            <span className="block truncate text-xs text-muted-foreground">{subtitle}</span>
+          )
         )}
       </span>
       {(meta || metaSub) && (
@@ -181,6 +253,23 @@ export function ListRow({
         </span>
       )}
     </Link>
+  );
+}
+
+/** A two-letter monogram. Cheap identity, and it makes a long list scannable. */
+export function Monogram({ name }: { name: string }) {
+  const initials = name
+    .replace(/[^a-zA-Z ]/g, "")
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase();
+  return (
+    <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-muted text-[11px] font-semibold text-muted-foreground">
+      {initials}
+    </span>
   );
 }
 

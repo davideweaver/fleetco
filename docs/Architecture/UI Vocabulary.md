@@ -43,7 +43,8 @@ grep for the thing they mean. It is the same failure the single route table prev
 |---|---|---|---|
 | ① | **Rail** | `AppShell` | The left navigation. **Expanded** (208px, labels) or **collapsed** (56px, icons). Not "sidebar" — that alternative was built, compared, and dropped |
 | ② | **Section header** | `SectionHeader` | The **band** at the top of the list column: section name, count and actions. `ListHeader` on list sections, `PageHeader` on wide ones. **There is no top banner** — it duplicated this |
-| ③ | **List row** | `ListRow` | One record in the list column. A **row**, never a card |
+| ③ | **List row** | `ListRow` | One record in the list column. A **row**, never a card. Carries an optional **monogram** and an **attention reason** |
+| ③a | **Filter chips** | in `ListHeader` | All / Needs you. Only appear when something needs attention |
 | ④ | **Bottom bar** | `AppShell` | The phone's navigation. Four items plus **More**, which opens the **More sheet** |
 | ⑤ | **Detail header** | `DetailHeader` | A **band** carrying the eyebrow and the actions, then the title and subtitle below it |
 | ⑥ | **Detail pane** | `ListDetailLayout` | The right pane. Holds a **stat strip** (the row of labelled numbers) and **detail sections** |
@@ -312,6 +313,28 @@ exact case `JOB-008` turns on.
 > badge fills, small coloured text — and in the warm palette that is a bright amber. A white icon
 > on bright amber is about 2:1 and illegible. The chip is tuned to be *sat on*, so it is a deeper
 > bronze that carries white at roughly 5:1. One token cannot do both jobs.
+
+## Attention
+
+**A badge says "N things need you here". The list it points at must be able to show you
+which N.** Otherwise the badge tells someone something is wrong and gives them nowhere to go.
+
+So the rail badge and the list's "Needs you" filter are derived from **one function** —
+`nav/attention.ts` — and cannot disagree. Changing what counts as needing attention changes
+both at once, which is the only way this stays true after eight lanes have touched it.
+
+| Section | What needs attention | Rule |
+|---|---|---|
+| Customers | Owes money that is past due | `INV-010` status is derived |
+| Jobs (owner) | Work finished, waiting to be closed | `JOB-007` |
+| Jobs (technician) | Assigned and not started | — |
+| Invoices | Overdue, or a draft never sent | `JOB-009` creates it unsent |
+
+The row shows the **reason**, not just a mark: "Payment overdue" rather than a bare dot. A
+mark says *something*; the reason says *what*, and it is the same number of pixels.
+
+**Sections without a list never get a badge they cannot explain.** Where the lab shows one
+(estimates, time, materials under Busy), it is explicitly marked as a visual stress test.
 
 ## Naming rules
 

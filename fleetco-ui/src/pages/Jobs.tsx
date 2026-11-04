@@ -4,6 +4,7 @@ import { ChevronDown, ChevronRight, Camera, Play } from "lucide-react";
 import { jobs, STAGES, wrapComponents, wrapPriceCents } from "@/data/sample";
 import { useShell } from "@/shell/shell-context";
 import { Btn, DetailHeader, ListDetailLayout, ListHeader, ListRow, Pill } from "@/shell/ListDetailLayout";
+import { attentionMap } from "@/nav/attention";
 import { Overlay } from "@/components/ui/overlay";
 import { PhotoGrid, hasUploadedCompletionPhoto, type Photo } from "@/components/ui/photos";
 import { toast } from "sonner";
@@ -19,6 +20,9 @@ export function JobsPage() {
   const [creating, setCreating] = useState(overlay === "form" || overlay === "form-errors");
   // ROLE-003: a technician sees only their assigned jobs, in the list and by URL.
   const visible = role === "tech" ? jobs.filter((j) => j.who === "T1") : jobs;
+  const needs = attentionMap("jobs", role);
+  const [onlyAttention, setOnlyAttention] = useState(false);
+  const rows = onlyAttention ? visible.filter((j) => needs.has(j.no)) : visible;
   const selected = visible.find((j) => j.no === id);
 
   return (
@@ -30,7 +34,10 @@ export function JobsPage() {
         <>
           <ListHeader
             title={role === "tech" ? "My jobs" : "Jobs"}
-            count={visible.length}
+            count={rows.length}
+            attention={needs.size}
+            filtered={onlyAttention}
+            onFilter={setOnlyAttention}
             action={
               role === "owner" ? (
                 <span onClick={() => setCreating(true)}>
@@ -40,13 +47,14 @@ export function JobsPage() {
             }
           />
           <div className="min-h-0 flex-1 overflow-y-auto">
-            {visible.map((j) => (
+            {rows.map((j) => (
               <ListRow
                 key={j.no}
                 to={href(`/app/jobs/${j.no}`)}
                 selected={j.no === id}
                 title={`${j.no} · ${j.what}`}
                 subtitle={`${j.customer} · ${STAGES[j.stage]}`}
+                attention={needs.get(j.no)}
                 meta={role === "owner" ? money(j.valueCents) : undefined}
                 metaSub={j.priority !== "Normal" ? j.priority : j.date}
               />
