@@ -14,22 +14,22 @@ const DEVICES = [
   { key: "desktop", label: "Desktop", sub: "1440 × 900", w: 1440, h: 900 },
 ];
 
+/** `label` is what fits on a chip; `note` is the detail, kept as the hover title. */
 const SCREENS = [
-  { key: "customers", label: "Customers (list → detail)", path: "/app/customers/ridgeline" },
-  { key: "customers-empty", label: "Customers (nothing selected)", path: "/app/customers" },
-  { key: "jobs", label: "Job detail (G-1048)", path: "/app/jobs/G-1048" },
-  { key: "board", label: "Job board (wide, no list)", path: "/app/board" },
-  { key: "reports", label: "Reports (sections list)", path: "/app/reports/ar-aging" },
-  { key: "schedule2", label: "Schedule (week grid)", path: "/app/schedule" },
-  { key: "estimate", label: "Estimate line editor", path: "/app/estimates/E-1048" },
-  { key: "photos", label: "Photos · upload lifecycle", path: "/app/jobs/G-1052?photos=demo" },
-  { key: "form", label: "Form in a panel (new job)", path: "/app/jobs?overlay=form" },
-  { key: "form-errors", label: "Form with errors", path: "/app/jobs?overlay=form-errors" },
-  { key: "states", label: "Loading / empty / error / not found", path: "/app/_states" },
-  { key: "panel", label: "Detail panel (from the board)", path: "/app/board?overlay=panel" },
-  { key: "dialog", label: "Dialog (close job)", path: "/app/jobs/G-1048?overlay=dialog" },
-  { key: "schedule", label: "Schedule (wide)", path: "/app/schedule" },
-  { key: "time", label: "Time & payroll (wide)", path: "/app/time" },
+  { key: "customers", label: "Customer", note: "Customers · list → detail", path: "/app/customers/ridgeline" },
+  { key: "customers-empty", label: "Customer list", note: "Customers · nothing selected", path: "/app/customers" },
+  { key: "jobs", label: "Job", note: "Job detail · G-1048", path: "/app/jobs/G-1048" },
+  { key: "board", label: "Board", note: "Job board · wide, no list column", path: "/app/board" },
+  { key: "schedule", label: "Schedule", note: "Schedule · week grid", path: "/app/schedule" },
+  { key: "estimate", label: "Estimate", note: "Estimate line editor", path: "/app/estimates/E-1048" },
+  { key: "reports", label: "Reports", note: "Reports · sections list", path: "/app/reports/ar-aging" },
+  { key: "time", label: "Time", note: "Time & payroll · wide", path: "/app/time" },
+  { key: "photos", label: "Photos", note: "Photos · upload lifecycle", path: "/app/jobs/G-1052?photos=demo" },
+  { key: "form", label: "Form", note: "Form in a panel · new job", path: "/app/jobs?overlay=form" },
+  { key: "form-errors", label: "Form errors", note: "Form with validation errors", path: "/app/jobs?overlay=form-errors" },
+  { key: "states", label: "States", note: "Loading / empty / error / not found", path: "/app/_states" },
+  { key: "panel", label: "Panel", note: "Detail panel · opened from the board", path: "/app/board?overlay=panel" },
+  { key: "dialog", label: "Dialog", note: "Dialog · close job", path: "/app/jobs/G-1048?overlay=dialog" },
 ];
 
 /**
@@ -39,7 +39,6 @@ const SCREENS = [
  * seconds every time someone reads the bar.
  */
 const SCREEN_CONTROLS: Record<string, "calEntry"[]> = {
-  schedule2: ["calEntry"],
   schedule: ["calEntry"],
 };
 
@@ -148,7 +147,12 @@ export function Lab() {
 
         <div className="mt-2 flex flex-wrap gap-1.5">
           {SCREENS.map((s) => (
-            <Seg key={s.key} on={s.key === screen.key} onClick={() => setScreen(s)}>
+            <Seg
+              key={s.key}
+              on={s.key === screen.key}
+              onClick={() => setScreen(s)}
+              title={s.note}
+            >
               {s.label}
             </Seg>
           ))}
@@ -163,6 +167,7 @@ export function Lab() {
               <div className="mb-1.5 flex items-baseline gap-2">
                 <span className="text-xs font-semibold">{d.label}</span>
                 <span className="tnum text-[11px] text-neutral-500">{d.sub}</span>
+                <span className="text-[11px] text-neutral-400">· {screen.note}</span>
                 <a
                   href={src()}
                   target="_blank"
@@ -254,15 +259,18 @@ function Seg({
   on,
   onClick,
   children,
+  title,
 }: {
   on: boolean;
   onClick: () => void;
   children: React.ReactNode;
+  title?: string;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
+      title={title}
       className={cn(
         "rounded-md border px-2.5 py-1 text-xs font-medium",
         on
