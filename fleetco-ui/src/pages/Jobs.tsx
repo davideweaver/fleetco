@@ -1,9 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { ChevronDown, ChevronRight, Camera, Play } from "lucide-react";
-import { jobs, STAGES, wrapComponents, wrapPriceCents } from "@/data/sample";
+import { isOpenJob, jobs, longJobs, STAGES, wrapComponents, wrapPriceCents } from "@/data/sample";
 import { useShell } from "@/shell/shell-context";
-import { Btn, DetailHeader, ListDetailLayout, ListHeader, ListRow, Pill } from "@/shell/ListDetailLayout";
+import {
+  Btn,
+  DetailHeader,
+  ListDetailLayout,
+  ListHeader,
+  ListRow,
+  ListTail,
+  Pill,
+} from "@/shell/ListDetailLayout";
 import { attentionMap } from "@/nav/attention";
 import { StatusPill } from "@/components/ui/status-pill";
 import { Overlay } from "@/components/ui/overlay";
@@ -15,18 +23,51 @@ import { NewJobPanel } from "./NewJob";
 import { Section, Stat, Td, Th } from "./Customers";
 import { cn, money } from "@/lib/utils";
 
+/** One page of rows. See `ListTail` for why it is 25 and not 50. */
+const PAGE = 25;
+
 export function JobsPage() {
   const { id } = useParams();
   const { href, role } = useShell();
   const [params] = useSearchParams();
   const overlay = params.get("overlay");
   const [creating, setCreating] = useState(overlay === "form" || overlay === "form-errors");
+  // Lab only: `?seed=long` swaps in a year of history so the list column can be judged
+  // at a length the seven story jobs cannot show. Same screen, same components.
+  const all = params.get("seed") === "long" ? longJobs : jobs;
   // ROLE-003: a technician sees only their assigned jobs, in the list and by URL.
-  const visible = role === "tech" ? jobs.filter((j) => j.who === "T1") : jobs;
+  const visible = role === "tech" ? all.filter((j) => j.who === "T1") : all;
   const needs = attentionMap("jobs", role);
   const [onlyAttention, setOnlyAttention] = useState(false);
-  const rows = onlyAttention ? visible.filter((j) => needs.has(j.no)) : visible;
+  // The scope has to contain whatever the URL selected, or you follow a link to a
+  // finished job and the list beside it does not have the row you are looking at.
+  // The default is the working set; the link wins over the default.
+  const [scope, setScope] = useState(() => {
+    const target = id && all.find((j) => j.no === id);
+    return target && !isOpenJob(target) ? "closed" : "open";
+  });
+  const [shown, setShown] = useState(PAGE);
+
+  const scopes = [
+    { key: "open", label: "Open" },
+    { key: "closed", label: "Closed" },
+    { key: "all", label: "All" },
+  ];
+
+  const inScope = onlyAttention
+    ? visible.filter((j) => needs.has(j.no))
+    : scope === "all"
+      ? visible
+      : visible.filter((j) => (scope === "open" ? isOpenJob(j) : !isOpenJob(j)));
+  // Paging is a property of the list you are looking at, so changing the slice starts
+  // it over. Keeping the old depth meant switching to Closed and landing 200 rows in.
+  const rows = inScope.slice(0, shown);
   const selected = visible.find((j) => j.no === id);
+
+  const reslice = (fn: () => void) => {
+    fn();
+    setShown(PAGE);
+  };
 
   return (
     <ListDetailLayout
@@ -37,10 +78,13 @@ export function JobsPage() {
         <>
           <ListHeader
             title={role === "tech" ? "My jobs" : "Jobs"}
-            count={rows.length}
+            count={inScope.length}
             attention={needs.size}
             filtered={onlyAttention}
-            onFilter={setOnlyAttention}
+            onFilter={(v) => reslice(() => setOnlyAttention(v))}
+            scopes={scopes}
+            scope={scope}
+            onScope={(k) => reslice(() => setScope(k))}
             action={
               role === "owner" ? (
                 <span onClick={() => setCreating(true)}>
@@ -56,12 +100,18 @@ export function JobsPage() {
                 to={href(`/app/jobs/${j.no}`)}
                 selected={j.no === id}
                 title={`${j.no} · ${j.what}`}
-                subtitle={`${j.customer} · ${STAGES[j.stage]}`}
-                attention={needs.get(j.no)}
+                subtitle={j.customer}
+                status={<StatusPill section="jobs" id={j.no} status={STAGES[j.stage]} />}
                 meta={role === "owner" ? money(j.valueCents) : undefined}
                 metaSub={j.priority !== "Normal" ? j.priority : j.date}
               />
             ))}
+            <ListTail
+              shown={rows.length}
+              total={inScope.length}
+              page={PAGE}
+              onMore={() => setShown((n) => n + PAGE)}
+            />
           </div>
         </>
       }
@@ -80,7 +130,8 @@ export function JobsPage() {
 function JobDetail({ no }: { no: string }) {
   const { role } = useShell();
   const [params] = useSearchParams();
-  const j = jobs.find((x) => x.no === no)!;
+  // Looks in the same set the list drew from, or every seeded row 404s on click.
+  const j = (params.get("seed") === "long" ? longJobs : jobs).find((x) => x.no === no)!;
   const [open, setOpen] = useState(false);
   // A decision that blocks you: a dialog, not a panel.
   const [closing, setClosing] = useState(params.get("overlay") === "dialog");
@@ -206,12 +257,12 @@ function JobDetail({ no }: { no: string }) {
                   identically, which they cannot if each screen implements start. */}
               <span
                 onClick={() =>
-                  clock.start({ jobNo: j.no, activity: null, closed: j.stage >= 5 })
+                  clock.start({ jobNo: j.no, activity: null, closed: j.closed })
                 }
               >
                 <Btn primary>
                   <span className="flex items-center gap-1.5">
-                    <Play className="size-4" /> Start timer
+                    <Play className="size-4" /> Start this job
                   </span>
                 </Btn>
               </span>

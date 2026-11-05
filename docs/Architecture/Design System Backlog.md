@@ -35,7 +35,10 @@ queue.
 - [x] Destructive confirm with a required reason (`INV-012` void, and the override branch)
 - [x] **Dates** — one grid, `DatePicker` and `DateRangePicker`, presets, shop-local
 - [x] **Report shell + print + CSV** (`RPT-001`/`004`/`006`) — one shell, nine reports
-- [x] **Time** — punch clock, timer, timesheet review, corrections, the period lock
+- [x] **Time** — the day/job clock, timesheet review, corrections, the period lock.
+      The technician's card was rebuilt 2026-11-04: the two clocks are two cards rather
+      than one nested in the other, pay is named once, and job hours read as a part of the
+      day instead of a second addable number. See [[UI Vocabulary]] for why nesting failed.
 
 ## Next
 
@@ -87,8 +90,10 @@ left is coverage and the parts no screen has needed yet.
 
 ### Tier 2 — real decisions
 
-- [ ] **Long lists.** 200 customers, 60 invoices. No pattern for sort, pagination or
-      virtualisation; the backend already does keyset pagination and the UI has nothing.
+- [ ] **Long lists — the rest of it.** `Jobs.tsx` has a 25-row page with load-more, a
+      count and scope chips, and the lab has a Long list screen for judging it, so the
+      pattern exists. Sort and virtualisation do not, and nothing matches the backend's
+      keyset pagination yet.
 - [ ] **Customer-facing surfaces.** Estimate PDF, invoice PDF, emailed templates, hosted
       payment page. A **second design surface** — `ROLE-009` forbids borrowing internal
       components, with no toggle that can defeat it.
@@ -114,6 +119,10 @@ left is coverage and the parts no screen has needed yet.
 - [ ] **Accessibility audit** — contrast across both palettes, both themes, and the
       nav-active chip. The light-warm `--brand` was found at 4.06:1 and fixed; assume
       others are lurking, and check with a measurement rather than by eye.
+      - **Known and open:** `confirm.tsx` hardcodes `text-white` on `bg-destructive`, which
+        is 2.87:1 in dark mode. `--destructive-foreground` now exists (added 2026-11-04 for
+        the clock in/out buttons) and fixes it in one line. This is the case the audit
+        predicts, and the reason the colour lint in the parked section is worth having.
 - [ ] **Check every table at 390px before it lands.** Two tables shipped this session
       that only worked on a desktop. A dense table is the component most likely to be
       built at one width and never looked at again — the lab's Phone toggle exists for
@@ -121,6 +130,45 @@ left is coverage and the parts no screen has needed yet.
 - [ ] **Visual regression gate.** Factory gate 8 expects a screenshot contact sheet per
       card, and the lab is the obvious source. **Run it against `dev`, not a production
       build** — a StrictMode-only bug got through precisely because preview was checked.
+
+## Parked — until OTC reviews and approves the screens
+
+**Why parked:** all of it hardens rules about screens OTC has not signed off on yet. If the
+review moves the Time card again, or changes what a job detail shows, a lint rule and a
+contact sheet built against today's screens are work done twice. Approval first, then the
+guardrails. Gated on the review coming back, not on a date — agreed 2026-11-04.
+
+### Turning the vocabulary into something an agent can follow
+
+The guide is largely written: [[UI Vocabulary]] is 942 lines of it. What is missing is the
+parts that make prose *followable* rather than readable.
+
+- [ ] **The non-negotiables as code, not sentences.** `fleetco-ui` has no ESLint, no tests
+      and no agent instructions file — `typecheck` is the only gate, so every rule in
+      [[UI Vocabulary]] is on the honour system. Three rules cover most of what has actually
+      gone wrong:
+      - ban raw colours (`text-white`, `bg-neutral-*`, hex) outside `index.css` and `lab/`
+      - a contrast test across every fg/bg pair in all four themes, failing under 4.5:1
+      - ban bare `<button>` outside `components/ui/` and `shell/`, so `Btn` stays the one button
+- [ ] **A parts page in the lab** (`/lab/parts`) — every primitive in every state, not only
+      the nineteen assembled screens. One page does three jobs: the agent's catalogue of
+      what already exists, the human's visual diff, and something for the screenshot gate
+      to compare primitives against.
+- [ ] **The `ui` card playbook.** [[Work Cards]] lists `kind: ui` and says the playbook does
+      not exist. It is the actual handoff: pick the layout, pick the header, wire the four
+      states, check at 390px, screenshot it.
+- [ ] **Split the audience.** [[UI Vocabulary]] keeps the *why* for humans — the arguments
+      and the rejected alternatives, which is what stops a settled question being
+      re-litigated. Agents get a short, always-loaded `fleetco-ui/CLAUDE.md`: file map, hard
+      rules, what already exists, and pointers into the long doc by section. 56KB is about
+      14k tokens, and an agent fixing a table should not be loading the Time rules.
+- [ ] **Prove it with one screen.** Hand an agent only the guide and one unbuilt screen —
+      QuickBooks connection states is the right size — with no conversation, and see what
+      comes back. That finds the holes faster than re-reading the document.
+
+**The line to hold:** anything that cannot be linted, an agent will eventually violate.
+Anything that cannot be seen in the lab, a human will not catch. The written guide is the
+narrow middle — the judgement calls that are neither mechanical nor visible.
 
 ## Open questions, not design work
 

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { LogIn, LogOut, Play, Square } from "lucide-react";
+import { Briefcase, ChevronRight, LogIn, LogOut, Play, Square, Wrench } from "lucide-react";
 import { toast } from "sonner";
 import { Btn } from "@/shell/ListDetailLayout";
 import { AttentionChip } from "./attention";
@@ -7,26 +7,40 @@ import { ACTIVITIES, at, hours, jobLabel, minutesOf, NOW } from "@/data/time";
 import { cn } from "@/lib/utils";
 
 /**
- * The technician's main control, and the one screen where getting the model wrong
- * costs real money.
+ * The technician's own control, and the screen where the wrong model costs real money.
  *
  * TWO CLOCKS, never one (`TIME-001`):
  *
- *   The PUNCH is the day. It is attendance, and it is the only thing that is payable
- *   (`TIME-006`). It is drawn as the frame.
- *   The TIMER is what you are working on right now. It is job or activity time, used
- *   for costing and never for pay (`TIME-011`). It is drawn INSIDE the frame.
+ *   THE DAY — "on the clock". Attendance, and the only thing that is paid
+ *             (`TIME-006`). Its own card, carrying the only large number on the screen
+ *             and the only mention of money anywhere in the technician's view.
+ *   THE JOB — what you are on right now. Costing only (`TIME-011`). A second, plainer
+ *             card headed "Right now", which never raises the subject of pay at all.
  *
- * The nesting is the argument: job time happens within an attendance day, so the
- * layout says so before anyone reads a label. A technician who thinks the timer is
- * what pays them will stop it at lunch and lose half a day's wages.
+ * An earlier version nested the job timer INSIDE the punch, on the theory that the
+ * layout would teach the containment. It did not. Two rows with the same dot, the same
+ * type size and the same button shape read as two equal switches, and the labels sent to
+ * rescue it — "costing only", "payable hours come from here, not from job timers" —
+ * explained the data model to someone who only wants to know whether they are getting
+ * paid. A screen that needs a paragraph to be understood is not understood.
+ *
+ * What replaced it needs no paragraph: pay is named once, on the card that pays, and the
+ * other card stays silent about it. Nothing is nested, so nothing has to be decoded;
+ * the hierarchy is carried by size and by two headings in plain words.
+ *
+ * There is still no grand total (`TIME-006`). Job hours appear once, as "6.18 of 7.57 h
+ * on jobs" — a part of the day rather than a second number anyone could be paid from.
  */
 
 export type RunningTimer = { jobNo: string | null; activity: string | null; start: number };
 
+/** Just enough of a job to put it in the picker. */
+export type PickableJob = { no: string; what: string };
+
 export function PunchClock({
   punchedInAt,
   timer,
+  jobs,
   onPunchIn,
   onPunchOut,
   onStop,
@@ -34,112 +48,180 @@ export function PunchClock({
 }: {
   punchedInAt: number | null;
   timer: RunningTimer | null;
+  /** The technician's own open jobs, in the order they should be offered. */
+  jobs: PickableJob[];
   onPunchIn: () => void;
   onPunchOut: () => void;
   onStop: () => void;
   onStart: (t: { jobNo: string | null; activity: string | null }) => void;
 }) {
   const [picking, setPicking] = useState(false);
-  const punchedIn = punchedInAt !== null;
+  const dayMinutes = punchedInAt === null ? 0 : minutesOf({ in: punchedInAt });
+
+  function pick(next: { jobNo: string | null; activity: string | null }) {
+    setPicking(false);
+    onStart(next);
+  }
 
   return (
-    <div className="rounded-xl border bg-surface-3">
-      {/* The frame: attendance. */}
-      <div className="flex flex-wrap items-center gap-3 border-b px-3 py-2.5">
-        <span
-          className={cn(
-            "grid size-2.5 shrink-0 rounded-full",
-            punchedIn ? "bg-success" : "bg-muted-foreground/40"
-          )}
-        />
-        <div className="min-w-0 flex-1">
-          <div className="text-sm font-medium">
-            {punchedIn ? `Punched in at ${at(punchedInAt)}` : "Not punched in"}
+    <div className="space-y-3">
+      {/* THE DAY. The big number, and the only card that mentions money. */}
+      <div className="rounded-xl border bg-surface-3 p-4">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <span
+                className={cn(
+                  "size-2.5 shrink-0 rounded-full",
+                  punchedInAt !== null ? "bg-success" : "bg-muted-foreground/40"
+                )}
+              />
+              <span className="text-sm font-medium">
+                {punchedInAt !== null
+                  ? `On the clock since ${at(punchedInAt)}`
+                  : "Not on the clock"}
+              </span>
+            </div>
+            <div className="tnum mt-2 text-4xl font-semibold tracking-tight">
+              {hours(dayMinutes)} h
+            </div>
+            {/* The one sentence about money on the whole screen. */}
+            <div className="mt-0.5 text-sm text-muted-foreground">
+              Hours you get paid for today
+            </div>
           </div>
-          <div className="text-xs text-muted-foreground">
-            {punchedIn
-              ? `${hours(NOW - punchedInAt)} h today · this is what gets paid`
-              : "Attendance. Payable hours come from here, not from job timers."}
-          </div>
+          {/* Green in, red out. The colour is doing the work here — a technician coming
+              off a truck finds the button by hue and reads the word second, which is how
+              every physical time clock in a shop has always worked. It is the one place
+              in the app where red is not about destruction. */}
+          <span onClick={punchedInAt !== null ? onPunchOut : onPunchIn}>
+            <Btn big tone={punchedInAt !== null ? "destructive" : "success"}>
+              <span className="flex items-center gap-1.5">
+                {punchedInAt !== null ? (
+                  <>
+                    <LogOut className="size-4" /> Clock out
+                  </>
+                ) : (
+                  <>
+                    <LogIn className="size-4" /> Clock in
+                  </>
+                )}
+              </span>
+            </Btn>
+          </span>
         </div>
-        {punchedIn ? (
-          <span onClick={onPunchOut}>
-            <Btn>
-              <span className="flex items-center gap-1.5">
-                <LogOut className="size-4" /> Punch out
-              </span>
-            </Btn>
-          </span>
-        ) : (
-          <span onClick={onPunchIn}>
-            <Btn primary>
-              <span className="flex items-center gap-1.5">
-                <LogIn className="size-4" /> Punch in
-              </span>
-            </Btn>
-          </span>
-        )}
       </div>
 
-      {/* Inside the frame: job and activity time. */}
-      <div className="px-3 py-2.5">
-        {timer ? (
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="grid size-2.5 shrink-0 animate-pulse rounded-full bg-nav-active" />
-            <div className="min-w-0 flex-1">
-              <div className="truncate text-sm font-medium">
-                {timer.jobNo ? jobLabel(timer.jobNo) : timer.activity}
-              </div>
-              <div className="tnum text-xs text-muted-foreground">
-                {at(timer.start)} → now · {hours(NOW - timer.start)} h · costing only
-              </div>
+      {/* RIGHT NOW. Job and activity time, and not a word about pay. */}
+      <div className="overflow-hidden rounded-xl border bg-surface-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 p-4">
+          <div className="min-w-0">
+            <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+              Right now
             </div>
-            <span onClick={onStop}>
-              <Btn>
-                <span className="flex items-center gap-1.5">
-                  <Square className="size-3.5" /> Stop
-                </span>
-              </Btn>
-            </span>
+            {timer ? (
+              <>
+                <div className="mt-1 flex items-center gap-2">
+                  <span className="size-2.5 shrink-0 animate-pulse rounded-full bg-nav-active" />
+                  <span className="truncate font-medium">
+                    {timer.jobNo ? jobLabel(timer.jobNo) : timer.activity}
+                  </span>
+                </div>
+                <div className="tnum mt-0.5 text-sm text-muted-foreground">
+                  Started {at(timer.start)} · {hours(minutesOf({ start: timer.start }))} h
+                </div>
+              </>
+            ) : (
+              <div className="mt-1 text-muted-foreground">Not working on anything</div>
+            )}
           </div>
-        ) : (
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="grid size-2.5 shrink-0 rounded-full bg-muted-foreground/30" />
-            <span className="flex-1 text-sm text-muted-foreground">No timer running</span>
+          {timer ? (
+            <div className="flex gap-2">
+              <span onClick={() => setPicking((v) => !v)}>
+                <Btn big>Switch</Btn>
+              </span>
+              <span
+                onClick={() => {
+                  setPicking(false);
+                  onStop();
+                }}
+              >
+                <Btn big>
+                  <span className="flex items-center gap-1.5">
+                    <Square className="size-3.5" /> Stop
+                  </span>
+                </Btn>
+              </span>
+            </div>
+          ) : (
             <span onClick={() => setPicking((v) => !v)}>
-              <Btn>
+              <Btn big primary>
                 <span className="flex items-center gap-1.5">
                   <Play className="size-3.5" /> Start
                 </span>
               </Btn>
             </span>
-          </div>
-        )}
+          )}
+        </div>
 
-        {picking && !timer && (
-          <div className="mt-2 flex flex-wrap gap-1.5 border-t pt-2">
-            {ACTIVITIES.map((a) => (
-              <button
-                key={a}
-                type="button"
-                onClick={() => {
-                  setPicking(false);
-                  onStart({ jobNo: null, activity: a });
-                }}
-                className="rounded-md border px-2 py-1 text-xs hover:bg-accent"
-              >
-                {a}
-              </button>
-            ))}
-            <span className="self-center text-xs text-muted-foreground">
-              — or start a timer from a job.
-            </span>
+        {/* The picker is the whole answer to "start what?", so it lists the jobs rather
+            than telling someone to go and find one. The old version offered four
+            activity chips and a sentence — "or start a timer from a job" — which sent
+            the technician to another screen for the common case. */}
+        {picking && (
+          <div className="border-t">
+            <div className="px-4 pt-3 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+              Your jobs
+            </div>
+            {jobs.filter((j) => j.no !== timer?.jobNo).length === 0 && (
+              <p className="px-4 pb-3 pt-1 text-sm text-muted-foreground">
+                No open jobs assigned to you.
+              </p>
+            )}
+            <ul className="mt-1 divide-y border-t empty:hidden empty:border-0">
+              {jobs
+                .filter((j) => j.no !== timer?.jobNo)
+                .map((j) => (
+                  <li key={j.no}>
+                    <button
+                      type="button"
+                      onClick={() => pick({ jobNo: j.no, activity: null })}
+                      className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm hover:bg-accent"
+                    >
+                      <Briefcase className="size-4 shrink-0 text-muted-foreground" />
+                      <span className="min-w-0 flex-1 truncate">
+                        {j.no} · {j.what}
+                      </span>
+                      <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
+                    </button>
+                  </li>
+                ))}
+            </ul>
+            <div className="border-t px-4 py-3">
+              <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                Not a job
+              </div>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {ACTIVITIES.filter((a) => a !== timer?.activity).map((a) => (
+                  <button
+                    key={a}
+                    type="button"
+                    onClick={() => pick({ jobNo: null, activity: a })}
+                    className="flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-sm hover:bg-accent"
+                  >
+                    <Wrench className="size-3.5 text-muted-foreground" />
+                    {a}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         )}
       </div>
     </div>
   );
 }
+
 
 /**
  * The state machine behind the controls, kept in one place because the rules are about
@@ -174,7 +256,7 @@ export function useTimeClock(initialPunch: number | null, initialTimer: RunningT
 
     punchIn() {
       setPunchedInAt(NOW);
-      toast.success(`Punched in at ${at(NOW)}`);
+      toast.success(`Clocked in at ${at(NOW)}`);
     },
 
     punchOut() {
@@ -184,11 +266,11 @@ export function useTimeClock(initialPunch: number | null, initialTimer: RunningT
         record(timer, NOW);
         const label = timer.jobNo ?? timer.activity;
         setTimer(null);
-        toast.success(`Punched out at ${at(NOW)}`, {
+        toast.success(`Clocked out at ${at(NOW)}`, {
           description: `${label} stopped too — ${hours(NOW - timer.start)} h.`,
         });
       } else {
-        toast.success(`Punched out at ${at(NOW)}`);
+        toast.success(`Clocked out at ${at(NOW)}`);
       }
       setPunchedInAt(null);
     },
@@ -204,14 +286,14 @@ export function useTimeClock(initialPunch: number | null, initialTimer: RunningT
       // TIME-004, proposed default for D-C11. Refuse, say why, and make the fix one tap
       // away — the same shape as the board's refused drop.
       if (punchedInAt === null) {
-        toast.error("Punch in first", {
-          description: "A job timer needs an active punch.",
+        toast.error("Clock in first", {
+          description: "You have to be on the clock to start work.",
           action: {
-            label: "Punch in",
+            label: "Clock in",
             onClick: () => {
               setPunchedInAt(NOW);
               setTimer({ jobNo: next.jobNo, activity: next.activity, start: NOW });
-              toast.success(`Punched in and started ${next.jobNo ?? next.activity}`);
+              toast.success(`Clocked in and started ${next.jobNo ?? next.activity}`);
             },
           },
         });
@@ -235,7 +317,7 @@ export function useTimeClock(initialPunch: number | null, initialTimer: RunningT
       if (!timer) return;
       record(timer, NOW);
       toast.success(`Stopped ${timer.jobNo ?? timer.activity}`, {
-        description: `${hours(NOW - timer.start)} h logged for costing.`,
+        description: `${hours(NOW - timer.start)} h logged.`,
       });
       setTimer(null);
     },

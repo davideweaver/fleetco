@@ -36,7 +36,9 @@ import { cn, money } from "@/lib/utils";
 export function BoardPage({ onPick }: { onPick: (j: Job) => void }) {
   const { role } = useShell();
   const owner = role === "owner";
-  const [jobs, setJobs] = useState(seedJobs);
+  // JOB-007: closing removes a job from the active board. The board is the shop's
+  // working set, not the archive.
+  const [jobs, setJobs] = useState(() => seedJobs.filter((j) => !j.closed));
   const [dragging, setDragging] = useState<Job | null>(null);
 
   // A pointer sensor with a small distance threshold, so a tap still opens the panel and

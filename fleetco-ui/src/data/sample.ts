@@ -27,6 +27,13 @@ export type Job = {
   date: string;
   priority: Priority;
   stage: number;
+  /**
+   * JOB-007. Closing is a separate act from finishing the work: a technician marks work
+   * finished (stage moves to Completed), someone with `job.close` closes it after review
+   * and that draws the draft invoice (JOB-009). A job can sit at Completed, not closed,
+   * for days — that gap is exactly what the attention rule is pointing at.
+   */
+  closed: boolean;
   valueCents: number;
 };
 
@@ -64,14 +71,79 @@ export const customers: Customer[] = [
 ];
 
 export const jobs: Job[] = [
-  { no: "G-1052", billing: "billable", hasAuthorizedScope: true, customerId: "lancaster-kitchen", customer: "Lancaster Kitchen Supply", what: "Box truck logo kit", asset: "Box truck 7", who: "T1", date: "Nov 3", priority: "Normal", stage: 0, valueCents: 118500 },
-  { no: "G-1053", billing: "billable", hasAuthorizedScope: false, customerId: "conestoga", customer: "Conestoga Tree Care", what: "Bucket truck doors ×3", asset: "Bucket 2", who: "OW", date: "Nov 4", priority: "Normal", stage: 0, valueCents: 64000 },
-  { no: "G-1048", billing: "billable", hasAuthorizedScope: true, customerId: "ridgeline", customer: "Ridgeline Plumbing & Heating", what: "Unit 14 · full wrap", asset: "Unit 14", who: "T1", date: "Nov 2", priority: "High", stage: 1, valueCents: 201900 },
-  { no: "G-1046", billing: "billable", hasAuthorizedScope: true, customerId: "brightway", customer: "Brightway Movers", what: "Rear door graphics", asset: "Truck 3", who: "T1", date: "Oct 31", priority: "Normal", stage: 2, valueCents: 48000 },
-  { no: "G-1044", billing: "billable", hasAuthorizedScope: true, customerId: "keystone", customer: "Keystone Dairy Co-op", what: "Tanker DOT lettering", asset: "Tanker 11", who: "T1", date: "Oct 30", priority: "High", stage: 3, valueCents: 86500 },
-  { no: "G-1043", billing: "internal", hasAuthorizedScope: false, customerId: "millport", customer: "Millport School District", what: "Shop wall mural", asset: "Bay 2 wall", who: "T1", date: "Oct 29", priority: "Normal", stage: 4, valueCents: 158000 },
-  { no: "G-1041", billing: "billable", hasAuthorizedScope: true, customerId: "ridgeline", customer: "Ridgeline Plumbing & Heating", what: "Unit 9 · decal refresh", asset: "Unit 9", who: "T1", date: "Oct 27", priority: "Normal", stage: 5, valueCents: 42000 },
+  { no: "G-1052", billing: "billable", hasAuthorizedScope: true, customerId: "lancaster-kitchen", customer: "Lancaster Kitchen Supply", what: "Box truck logo kit", asset: "Box truck 7", who: "T1", date: "Nov 3", priority: "Normal", stage: 0, closed: false, valueCents: 118500 },
+  { no: "G-1053", billing: "billable", hasAuthorizedScope: false, customerId: "conestoga", customer: "Conestoga Tree Care", what: "Bucket truck doors ×3", asset: "Bucket 2", who: "OW", date: "Nov 4", priority: "Normal", stage: 0, closed: false, valueCents: 64000 },
+  { no: "G-1048", billing: "billable", hasAuthorizedScope: true, customerId: "ridgeline", customer: "Ridgeline Plumbing & Heating", what: "Unit 14 · full wrap", asset: "Unit 14", who: "T1", date: "Nov 2", priority: "High", stage: 1, closed: false, valueCents: 201900 },
+  { no: "G-1046", billing: "billable", hasAuthorizedScope: true, customerId: "brightway", customer: "Brightway Movers", what: "Rear door graphics", asset: "Truck 3", who: "T1", date: "Oct 31", priority: "Normal", stage: 2, closed: false, valueCents: 48000 },
+  { no: "G-1044", billing: "billable", hasAuthorizedScope: true, customerId: "keystone", customer: "Keystone Dairy Co-op", what: "Tanker DOT lettering", asset: "Tanker 11", who: "T1", date: "Oct 30", priority: "High", stage: 3, closed: false, valueCents: 86500 },
+  { no: "G-1043", billing: "internal", hasAuthorizedScope: false, customerId: "millport", customer: "Millport School District", what: "Shop wall mural", asset: "Bay 2 wall", who: "T1", date: "Oct 29", priority: "Normal", stage: 4, closed: false, valueCents: 158000 },
+  { no: "G-1041", billing: "billable", hasAuthorizedScope: true, customerId: "ridgeline", customer: "Ridgeline Plumbing & Heating", what: "Unit 9 · decal refresh", asset: "Unit 9", who: "T1", date: "Oct 27", priority: "Normal", stage: 5, closed: false, valueCents: 42000 },
+  /* The one closed story job. Without it "Closed" is an empty chip, Ready to Invoice
+     (RPT-004) has nothing to show, and nothing exercises the board dropping a job. */
+  { no: "G-1042", billing: "billable", hasAuthorizedScope: true, customerId: "brightway", customer: "Brightway Movers", what: "Cab door decals ×2", asset: "Truck 8", who: "T1", date: "Oct 24", priority: "Normal", stage: 5, closed: true, valueCents: 55000 },
 ];
+
+/* --- A year of history, for judging the list column at length -------------------------
+   Seven rows cannot answer "what happens when this list is long", and that question is
+   a design one, not a performance one: where does the count go, what is the default
+   scope, what sits at the bottom.
+
+   Generated rather than written out, and deterministic — index arithmetic, no random —
+   so the same row is in the same place in every screenshot and every review. The story
+   jobs stay at the front, so every link, board card and search hit still lands. */
+
+const ASSETS = ["Box truck 7", "Unit 3", "Tanker 11", "Van 12", "Flatbed 2", "Unit 9", "Truck 3", "Bucket 2"];
+const SCOPES = [
+  "Door decals",
+  "Full wrap",
+  "DOT lettering",
+  "Partial wrap · rear",
+  "Logo kit",
+  "Fleet numbering",
+  "Window perforated",
+  "Tailgate graphics",
+];
+const MONTHS = ["Oct", "Sep", "Aug", "Jul", "Jun", "May", "Apr", "Mar", "Feb", "Jan"];
+
+export const longJobs: Job[] = [
+  ...jobs,
+  ...Array.from({ length: 305 }, (_, i) => {
+    const c = customers[i % customers.length];
+    // Whole dollars, rounded to $5. A shop quotes $420, not $419.87, and a column of
+    // random cents makes the money column look like test data instead of work.
+    const value = 28000 + ((i * 7919) % 180000);
+    return {
+      no: `G-${1040 - i}`,
+      billing: "billable" as const,
+      hasAuthorizedScope: true,
+      customerId: c.id,
+      customer: c.name,
+      what: SCOPES[i % SCOPES.length],
+      asset: ASSETS[i % ASSETS.length],
+      who: i % 3 === 0 ? "OW" : "T1",
+      // Dates run backwards with the job number. Ascending dates on descending numbers
+      // read as corrupt data to anyone who works here, which is all a reviewer sees.
+      date: `${MONTHS[Math.floor(i / 28) % MONTHS.length]} ${28 - (i % 28)}`,
+      priority: "Normal" as const,
+      // Everything below the story rows is finished work — a long list is mostly
+      // history, and that is why "open" is the default scope rather than "all".
+      stage: STAGES.length - 1,
+      // History is closed work, not a backlog of jobs waiting to be closed. Leaving it
+      // open would put 305 rows behind the attention badge.
+      closed: true,
+      valueCents: value - (value % 500),
+    };
+  }),
+];
+
+/**
+ * Open means not yet closed (JOB-007), which is NOT the same as "work unfinished". A job
+ * sitting at Completed has had its work marked finished but is still waiting for someone
+ * to close it, so it stays in the owner's Open list — it is still their problem, and the
+ * attention rule says so in as many words. Reading `stage === Completed` as closed is the
+ * bug this replaces: it hid the one job that needed an owner from the scope they check.
+ */
+export const isOpenJob = (j: Job) => !j.closed;
 
 export const invoices: Invoice[] = [
   { no: "1184", customerId: "ridgeline", customer: "Ridgeline Plumbing & Heating", issued: "—", due: "—", dueISO: null, status: "Draft", totalCents: 201900, balanceCents: 100950 },
@@ -221,6 +293,109 @@ export const linePrice = (l: EstimateLine) => l.setPriceCents ?? componentSum(l)
 /** AUTH-005: authorized means approved or overridden. Nothing else bills. */
 export const isAuthorized = (l: EstimateLine) =>
   l.approval === "approved" || l.approval === "overridden";
+
+/* --- Invoice lines (INV-001) ----------------------------------------------------------
+   What the customer is handed: one line per authorized customer line, at its authorized
+   price and description. Components never cross over — materials, labor and allowances
+   stay on the job for costing. That is the whole difference between the two documents,
+   so the estimate is itemized and the invoice is rolled up. */
+
+export type InvoiceLine = {
+  id: string;
+  description: string;
+  amountCents: number;
+  /** INV-002: added to the draft by hand — storage, freight, restocking. */
+  custom?: boolean;
+  /**
+   * What is behind the rolled-up line. Carried on the record but never on the customer's
+   * copy (ROLE-009) — the app can show it, the document generator cannot.
+   */
+  components: LineComponent[];
+};
+
+export const invoiceLines: Record<string, InvoiceLine[]> = {
+  // Derived, not transcribed. #1184 is the draft G-1048 produced on close, so its lines
+  // ARE the authorized estimate lines — change an approval above and this follows.
+  "1184": estimateLines.filter(isAuthorized).map((l) => ({
+    id: l.id,
+    description: l.name,
+    amountCents: linePrice(l),
+    components: l.components,
+  })),
+  "1179": [
+    {
+      id: "L1",
+      description: "Decal refresh · Unit 9",
+      amountCents: 42000,
+      components: [
+        { id: "d1", kind: "material", item: "Cut vinyl decal set", qty: 2, unit: "ea", costCents: 4800, sellCents: 11000 },
+        { id: "d2", kind: "labor", item: "Installation", qty: 2, unit: "hr", costCents: 2800, sellCents: 10000 },
+      ],
+    },
+  ],
+  // Two lines, one of them added to the draft, because an invoice that is only ever a
+  // single rolled-up line never shows what INV-002 is for.
+  "1176": [
+    {
+      id: "L1",
+      description: "Shop wall mural · Bay 2 wall",
+      amountCents: 143000,
+      components: [
+        { id: "m1", kind: "material", item: "Wall vinyl", qty: 48, unit: "ft", costCents: 390, sellCents: 1250 },
+        { id: "m2", kind: "labor", item: "Design", qty: 3, unit: "hr", costCents: 3500, sellCents: 9500 },
+        { id: "m3", kind: "labor", item: "Installation", qty: 6, unit: "hr", costCents: 2800, sellCents: 8500 },
+        { id: "m4", kind: "allowance", item: "Install supplies", qty: null, unit: null, costCents: 1500, sellCents: 3500 },
+      ],
+    },
+    {
+      id: "L2",
+      description: "Scaffold rental, billed at cost",
+      amountCents: 15000,
+      custom: true,
+      // Billed at cost, so sell equals cost and the margin column reads zero. A
+      // pass-through that quietly showed full margin is the number that gets trusted.
+      components: [
+        { id: "m5", kind: "custom", item: "Scaffold rental (vendor)", qty: 1, unit: "ea", costCents: 15000, sellCents: 15000 },
+      ],
+    },
+  ],
+  "1171": [
+    {
+      id: "L1",
+      description: "DOT lettering · Tanker 11",
+      amountCents: 86500,
+      components: [
+        { id: "t1", kind: "material", item: "Reflective lettering vinyl", qty: 14, unit: "ft", costCents: 600, sellCents: 1500 },
+        { id: "t2", kind: "labor", item: "Design", qty: 1, unit: "hr", costCents: 3500, sellCents: 9500 },
+        { id: "t3", kind: "labor", item: "Installation", qty: 6, unit: "hr", costCents: 2800, sellCents: 8500 },
+        { id: "t4", kind: "allowance", item: "Install supplies", qty: null, unit: null, costCents: 2200, sellCents: 5000 },
+      ],
+    },
+  ],
+  "1168": [
+    {
+      id: "L1",
+      description: "Rear door graphics · Truck 3",
+      amountCents: 48000,
+      components: [
+        { id: "r1", kind: "material", item: "Cut vinyl graphics", qty: 1, unit: "ea", costCents: 9500, sellCents: 22000 },
+        { id: "r2", kind: "labor", item: "Installation", qty: 2, unit: "hr", costCents: 2800, sellCents: 8500 },
+        { id: "r3", kind: "allowance", item: "Install supplies", qty: null, unit: null, costCents: 1800, sellCents: 9000 },
+      ],
+    },
+  ],
+};
+
+/** INV-006: subtotal is the sum of line amounts. Never stored. */
+export const invoiceSubtotal = (no: string) =>
+  (invoiceLines[no] ?? []).reduce((a, l) => a + l.amountCents, 0);
+
+/** EST-004 at the invoice: cost is the components', margin is what is left of the price. */
+export const invoiceLineCost = (l: InvoiceLine) =>
+  l.components.reduce((a, c) => a + Math.round((c.qty ?? 1) * c.costCents), 0);
+
+export const invoiceCost = (no: string) =>
+  (invoiceLines[no] ?? []).reduce((a, l) => a + invoiceLineCost(l), 0);
 
 /* --- Calendar entries (JOB-014) -------------------------------------------------------
    Either production or installation, one job, own start and end, one or more employees.

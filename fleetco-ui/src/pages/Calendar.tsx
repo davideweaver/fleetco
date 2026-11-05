@@ -21,7 +21,6 @@ import {
   type CalendarEntry,
   type EntryKind,
 } from "@/data/sample";
-import { useSearchParams } from "react-router-dom";
 import { useShell } from "@/shell/shell-context";
 import { PageHeader } from "@/shell/ListDetailLayout";
 import { cn } from "@/lib/utils";
@@ -47,23 +46,19 @@ const PX_PER_MIN = 48 / 60;
 const SNAP = 15;
 
 /**
- * How production and installation are told apart. Three candidates, because the first
- * answer — a thick rounded left bar — spent the accent colour on "kind", which is not a
- * status, and fought the square grid it sits in.
+ * How production and installation are told apart: a hairline stripe across the top AND a
+ * fill, together. Colour to find it, weight to confirm it, and the redundancy is the
+ * point — it still reads on a printed schedule, and it still reads for someone who cannot
+ * tell the two hues apart.
  *
- *   fill    Shape and weight carry the meaning. Production is outlined, installation is
- *           filled. Survives print and colour blindness, and leaves the accent free.
- *   stripe  A hairline across the top instead of the left, square corners.
- *   both    Stripe and fill together — colour to find it, weight to confirm it. The
- *           redundant cue is the point: it still reads on a printed schedule, and it
- *           still reads for someone who cannot tell the two hues apart.
+ * Settled 2026-11-04. Stripe-only and fill-only were built beside it and compared in the
+ * lab; both are gone, along with the `?entry=` switch that chose between them. The first
+ * answer, a thick rounded left bar, lost earlier: it spent the accent colour on "kind",
+ * which is not a status, and fought the square grid it sits in.
  */
-export type EntryStyle = "fill" | "stripe" | "both";
 
 export function CalendarPage() {
   const { role } = useShell();
-  const [params] = useSearchParams();
-  const style = (params.get("entry") as EntryStyle) ?? "both";
   const [entries, setEntries] = useState(seed);
   const [filter, setFilter] = useState<"all" | EntryKind>("all");
 
@@ -128,7 +123,6 @@ export function CalendarPage() {
                   today={i === TODAY}
                   entries={shown.filter((e) => e.day === i)}
                   draggable={owner}
-                  style={style}
                 />
               ))}
             </div>
@@ -163,7 +157,6 @@ function DayColumn({
   today,
   entries,
   draggable,
-  style,
 }: {
   index: number;
   label: string;
@@ -171,7 +164,6 @@ function DayColumn({
   today: boolean;
   entries: CalendarEntry[];
   draggable: boolean;
-  style: EntryStyle;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: String(index) });
   const hours = [];
@@ -200,7 +192,7 @@ function DayColumn({
           <div key={m} className="h-12 border-b border-border/50" />
         ))}
         {placed.map(({ entry, lane, lanes }) => (
-          <Entry key={entry.id} entry={entry} lane={lane} lanes={lanes} draggable={draggable} style={style} />
+          <Entry key={entry.id} entry={entry} lane={lane} lanes={lanes} draggable={draggable} />
         ))}
       </div>
     </div>
@@ -212,13 +204,11 @@ function Entry({
   lane,
   lanes,
   draggable,
-  style,
 }: {
   entry: CalendarEntry;
   lane: number;
   lanes: number;
   draggable: boolean;
-  style: EntryStyle;
 }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: entry.id,
@@ -245,13 +235,9 @@ function Entry({
       }}
       className={cn(
         "absolute overflow-hidden rounded border px-2 py-1 text-xs",
-        (style === "fill" || style === "both") &&
-          (install
-            ? "border-foreground/15 bg-foreground/8"
-            : "border-border bg-surface-3"),
-        (style === "stripe" || style === "both") &&
-          cn("border-t-2", install ? "border-t-foreground/50" : "border-t-brand"),
-        style === "stripe" && "border-border bg-surface-3",
+        install ? "border-foreground/15 bg-foreground/8" : "border-border bg-surface-3",
+        "border-t-2",
+        install ? "border-t-foreground/50" : "border-t-brand",
         isDragging ? "z-30 opacity-90 shadow-lg" : "z-20",
         draggable && "cursor-grab active:cursor-grabbing"
       )}
@@ -260,9 +246,6 @@ function Entry({
       {height > 42 && <div className="truncate text-muted-foreground">{entry.what}</div>}
       {height > 60 && (
         <div className="mt-0.5 flex items-center gap-1.5 text-[10px] text-muted-foreground">
-          {style !== "both" && (
-            <span className="uppercase tracking-wide">{install ? "Inst" : "Prod"}</span>
-          )}
           <span>
             {clock(entry.start)}–{clock(entry.end)}
           </span>

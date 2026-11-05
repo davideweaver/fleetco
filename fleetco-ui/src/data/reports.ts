@@ -133,7 +133,7 @@ const readyToInvoice: ReportDef = {
   // RPT-004 names two exclusions, so both are written out rather than assumed.
   rows: () =>
     jobs
-      .filter((j) => j.stage >= 5 && j.billing === "billable")
+      .filter((j) => j.closed && j.billing === "billable")
       .map((j) => ({
         id: j.no,
         cells: { job: j.no, customer: j.customer, what: j.what, value: money(j.valueCents) },

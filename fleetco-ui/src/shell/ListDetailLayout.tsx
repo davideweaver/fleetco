@@ -82,6 +82,8 @@ export function ListDetailLayout({
  * The list column's header, and on a phone the page's header too — which is why the
  * app has no top banner. The banner showed the same section name this already shows.
  */
+export type Scope = { key: string; label: string };
+
 export function ListHeader({
   title,
   count,
@@ -89,6 +91,9 @@ export function ListHeader({
   attention = 0,
   filtered = false,
   onFilter,
+  scopes,
+  scope,
+  onScope,
 }: {
   title: string;
   count: number;
@@ -97,27 +102,65 @@ export function ListHeader({
   attention?: number;
   filtered?: boolean;
   onFilter?: (v: boolean) => void;
+  /**
+   * What slice of the section this list is showing. A long list is mostly history, so
+   * the answer to "there are 312 of these" is a default scope, not a pager — you open
+   * Jobs to work, and the finished ones are somewhere you go on purpose.
+   */
+  scopes?: Scope[];
+  scope?: string;
+  onScope?: (key: string) => void;
 }) {
   return (
     <>
       <SectionHeader title={title} count={count} action={action} />
       {/* The badge on the rail says a number; this is where that number goes. Without a
           way to see only those rows, a badge tells the user something is wrong and gives
-          them nowhere to go. */}
-      {attention > 0 && onFilter && (
-        <div className="flex shrink-0 items-center gap-1 border-b px-2 py-1.5">
-          <FilterChip on={!filtered} onClick={() => onFilter(false)}>
-            All
-          </FilterChip>
+          them nowhere to go.
+
+          Scope and attention share one row because they are the same kind of control —
+          both narrow what is below them, and splitting them over two rows made the list
+          look like it had two unrelated filters. */}
+      {((attention > 0 && onFilter) || scopes) && (
+        // Scrolls sideways rather than wrapping. Four chips do not fit a 300px column,
+        // and a wrapped chip row changes the list's height depending on how many scopes
+        // a section happens to have — the rows below would start in a different place
+        // on every screen.
+        <div className="flex shrink-0 items-center gap-1 overflow-x-auto border-b px-2 py-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {scopes
+            ? scopes.map((s) => (
+                <FilterChip
+                  key={s.key}
+                  on={!filtered && scope === s.key}
+                  onClick={() => {
+                    onFilter?.(false);
+                    onScope?.(s.key);
+                  }}
+                >
+                  {/* No count on the chip. The header already shows the count for the
+                      scope you are in, and four numbers in one strip — three of them
+                      for slices you are NOT looking at — is arithmetic nobody asked
+                      for. The one count that stays is the attention one, because that
+                      number is the whole reason that chip exists. */}
+                  {s.label}
+                </FilterChip>
+              ))
+            : onFilter && (
+                <FilterChip on={!filtered} onClick={() => onFilter(false)}>
+                  All
+                </FilterChip>
+              )}
           {/* The chip is a control; its COUNT is the attention signal, so the count wears
               the same solid amber as the rail badge and the row chips. Tinting the whole
               control as well would make the filter look like a warning. */}
-          <FilterChip on={filtered} onClick={() => onFilter(true)}>
-            Needs you
-            <span className="tnum ml-1.5 rounded-full bg-attention px-1.5 text-[10px] font-semibold text-attention-fg">
-              {attention}
-            </span>
-          </FilterChip>
+          {attention > 0 && onFilter && (
+            <FilterChip on={filtered} onClick={() => onFilter(true)}>
+              Needs you
+              <span className="tnum ml-1.5 rounded-full bg-attention px-1.5 text-[10px] font-semibold text-attention-fg">
+                {attention}
+              </span>
+            </FilterChip>
+          )}
         </div>
       )}
     </>
@@ -125,10 +168,65 @@ export function ListHeader({
 }
 
 /**
- * Exported because the WIDE pages need it too. A list screen gets its filter from
- * `ListHeader`; the board, the schedule and timesheet review have no list header and
- * were going to grow their own chip, which is how two filters in one app end up
- * looking like two different ideas.
+ * The bottom of a long list.
+ *
+ * A button rather than loading more when the scroll reaches the end. Auto-loading reads
+ * well on a feed you are browsing, and badly on a column you are working: the scrollbar
+ * never settles, the keyboard user never reaches the end, and the thing that owns your
+ * selection is the thing that keeps moving. A button also makes the count honest — you
+ * can see there are 260 more before deciding you would rather search.
+ *
+ * `page` is 25 and not 50 because the column is 300px wide: 25 rows is about two
+ * screens, which is as far as anyone scrolls before they give up and search anyway.
+ */
+export function ListTail({
+  shown,
+  total,
+  onMore,
+  page = 25,
+}: {
+  shown: number;
+  total: number;
+  onMore: () => void;
+  page?: number;
+}) {
+  if (total === 0) return null;
+
+  if (shown >= total) {
+    return (
+      <div className="px-3 py-4 text-center text-xs text-muted-foreground">
+        {/* An end marker, so the bottom of a short list and the bottom of a list that
+            has stopped loading are not the same ambiguous blank. */}
+        {total === 1 ? "1 record" : `All ${total} records`}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col items-center gap-1.5 border-t px-3 py-3">
+      <button
+        type="button"
+        onClick={onMore}
+        className="w-full rounded-md border px-3 py-1.5 text-xs font-medium hover:bg-accent"
+      >
+        Load {Math.min(page, total - shown)} more
+      </button>
+      <span className="tnum text-[11px] text-muted-foreground">
+        Showing {shown} of {total}
+      </span>
+    </div>
+  );
+}
+
+/**
+ * One choice out of a strip of them — the scope of a list, or its attention filter.
+ *
+ * Every chip carries a border, including the ones that are off. A fill on the selected
+ * one alone is how this started, and it read as a line of labels with one highlighted
+ * word: nothing said the other three could be pressed. The border is the affordance;
+ * the fill only says which one won.
+ *
+ * Exported so a wide screen can grow the same control rather than its own. None do yet.
  */
 export function FilterChip({
   on,
@@ -143,11 +241,12 @@ export function FilterChip({
     <button
       type="button"
       onClick={onClick}
+      aria-pressed={on}
       className={cn(
-        "inline-flex items-center rounded-md px-2 py-1 text-xs font-medium",
+        "inline-flex shrink-0 items-center whitespace-nowrap rounded-md border px-2 py-1 text-xs font-medium transition-colors",
         on
-          ? "bg-accent text-accent-foreground"
-          : "text-muted-foreground hover:bg-accent/60 hover:text-foreground"
+          ? "border-foreground/20 bg-accent text-foreground"
+          : "border-border text-muted-foreground hover:border-foreground/20 hover:text-foreground"
       )}
     >
       {children}
@@ -234,6 +333,7 @@ export function ListRow({
   meta,
   metaSub,
   lead,
+  status,
   attention,
 }: {
   to: string;
@@ -244,7 +344,16 @@ export function ListRow({
   metaSub?: ReactNode;
   /** A monogram or icon. Gives the eye something to land on when scanning. */
   lead?: ReactNode;
-  /** Why this row needs someone. Replaces the subtitle when present. */
+  /**
+   * The record's own status, as a `StatusPill`. Gets a full-width line of its own below
+   * the title block — the column is 272px and the money sits beside the title, so a
+   * stage squeezed in next to it has barely 160px and clips every time.
+   *
+   * A row with a status never also draws the chip: one record in one state gets one
+   * mark, and `StatusPill` already turns amber and absorbs the reason.
+   */
+  status?: ReactNode;
+  /** Why this row needs someone, for records with no status to colour. */
   attention?: string;
 }) {
   return (
@@ -252,7 +361,7 @@ export function ListRow({
       to={to}
       aria-current={selected ? "true" : undefined}
       className={cn(
-        "relative flex items-center gap-3 border-b border-border/60 py-2.5 pr-3 text-sm transition-colors",
+        "relative block border-b border-border/60 py-2.5 pr-3 text-sm transition-colors",
         // The selected row carries a brand edge; the padding shifts so text does not move
         // when selection changes.
         selected ? "bg-accent pl-[9px]" : "pl-3 hover:bg-accent/50"
@@ -261,22 +370,32 @@ export function ListRow({
       {selected && (
         <span className="absolute inset-y-0 left-0 w-[3px] rounded-r bg-nav-active" />
       )}
-      {lead}
-      <span className="min-w-0 flex-1">
-        <span className="block truncate font-medium">{title}</span>
-        {attention ? (
-          <AttentionChip reason={attention} className="mt-0.5" />
-        ) : (
-          subtitle && (
+      <span className="flex items-center gap-3">
+        {lead}
+        <span className="min-w-0 flex-1">
+          <span className="block truncate font-medium">{title}</span>
+          {/* The status used to ride in the subtitle — "Ridgeline Plumbing & Heating ·
+              In production" — which needs ~260px in a column that gives it 160. It
+              clipped on every row, and the chip then replaced the whole subtitle, so the
+              flagged row lost its customer too. Identity stays here; status drops below
+              where it has the full width. */}
+          {subtitle && (
             <span className="block truncate text-xs text-muted-foreground">{subtitle}</span>
-          )
+          )}
+        </span>
+        {(meta || metaSub) && (
+          <span className="shrink-0 text-right">
+            {meta && <span className="tnum block text-sm">{meta}</span>}
+            {metaSub && <span className="block text-[11px] text-muted-foreground">{metaSub}</span>}
+          </span>
         )}
       </span>
-      {(meta || metaSub) && (
-        <span className="shrink-0 text-right">
-          {meta && <span className="tnum block text-sm">{meta}</span>}
-          {metaSub && <span className="block text-[11px] text-muted-foreground">{metaSub}</span>}
-        </span>
+      {/* Full width, clear of the money column. `status` wins outright when both are
+          passed — a pill and a chip side by side say the same thing twice. */}
+      {status ? (
+        <span className="mt-1.5 block">{status}</span>
+      ) : (
+        attention && <AttentionChip reason={attention} className="mt-1" />
       )}
     </Link>
   );
@@ -367,18 +486,34 @@ export function DetailHeader({
 export function Btn({
   children,
   primary,
+  big,
+  tone,
 }: {
   children: ReactNode;
   primary?: boolean;
+  /** A 44px tap target, for the few buttons a technician hits with a thumb. */
+  big?: boolean;
+  /**
+   * A solid green or red fill, for the handful of buttons where the COLOUR is the
+   * label — clock in and clock out, which a technician finds by hue before they read
+   * the word. Everywhere else, green and red mean "it worked" and "this is destructive"
+   * and belong on status, not on a control. `tone` outranks `primary`.
+   */
+  tone?: "success" | "destructive";
 }) {
   return (
     <button
       type="button"
       className={cn(
-        "rounded-md border px-3 py-1.5 text-sm font-medium whitespace-nowrap",
-        primary
-          ? "border-primary bg-primary text-primary-foreground"
-          : "hover:bg-accent"
+        "rounded-md border font-medium whitespace-nowrap",
+        big ? "px-4 py-2.5 text-sm" : "px-3 py-1.5 text-sm",
+        tone === "success"
+          ? "border-success bg-success text-success-foreground"
+          : tone === "destructive"
+            ? "border-destructive bg-destructive text-destructive-foreground"
+            : primary
+              ? "border-primary bg-primary text-primary-foreground"
+              : "hover:bg-accent"
       )}
     >
       {children}

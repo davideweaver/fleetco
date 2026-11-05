@@ -359,6 +359,26 @@ both at once, which is the only way this stays true after eight lanes have touch
 The row shows the **reason**, not just a mark: "Payment overdue" rather than a bare dot. A
 mark says *something*; the reason says *what*, and it is the same number of pixels.
 
+**A row's status gets a line of its own, full width.** The list column is 272px, and the money
+sits beside the title, so anything riding in the subtitle has about 160px — not enough for
+"Ridgeline Plumbing & Heating · In production", which wants 260. Packing the status in there
+clipped it on every row; letting the chip then *replace* the subtitle cost the flagged row its
+customer as well, so the row that most deserved context had the least. The title block keeps
+identity (who it is, what it is worth, when it is due); the status drops below it, clear of the
+money column, where it has the room to be read.
+
+So a list row is three lines, not two, and that is the same shape whether or not anything is
+wrong — a flagged row does not grow a fourth line, because the pill it already has turns amber.
+
+**The reason rides in the pill.** `StatusPill` appends a non-empty reason to the status, giving
+`COMPLETED · WAITING TO BE CLOSED` in amber, in the list and on the detail screen alike. A reason
+is left empty when the status is the whole story: an overdue invoice says `OVERDUE` and needs no
+gloss, and a technician's untouched job says `READY FOR PRODUCTION`. Writing "not started" beside
+it is the same sentence twice.
+
+> Keep composed reasons short. The widest the pill can go before it clips is roughly 34
+> uppercase characters at the 272px breakpoint, and `COMPLETED · WAITING TO BE CLOSED` is 32.
+
 ### The chip goes wherever the record goes
 
 One `AttentionChip`, used by the list row, the detail header and a table cell alike. It was
@@ -373,8 +393,11 @@ something else raises the alarm.
 
 | Record shows | Attention appears as |
 |---|---|
-| a status pill — an invoice, a job | the **pill**, in amber |
-| no status — a customer row, a list row | the **chip**, carrying the reason |
+| a status pill — an invoice, a job | the **pill**, in amber, with the reason appended |
+| no status — a customer row, a punch | the **chip**, carrying the reason |
+
+`ListRow` enforces this rather than trusting call sites: give it a `status` and it will not draw
+a chip, whatever else it was passed.
 
 One `StatusPill` serves every section. An invoice's `OVERDUE` and a job's `COMPLETED · waiting
 to be closed` are the same situation, and a pill per section is how they drift — one keeps
@@ -555,30 +578,48 @@ The technician's main control, and the screen where the wrong model costs real m
 
 | | What it is | Drawn as |
 |---|---|---|
-| **Punch** | attendance — the day. The **only** payable thing (`TIME-006`) | the frame |
-| **Timer** | the job or activity you are on now. Costing only (`TIME-011`) | **inside** the frame |
+| **The day** | attendance — "on the clock". The **only** payable thing (`TIME-006`) | its own card, the only large number on the screen |
+| **Right now** | the job or activity you are on. Costing only (`TIME-011`) | a second, plainer card that never mentions pay |
 
-The nesting is the argument. Job time happens *within* an attendance day, so the layout says
-so before anyone reads a label. A technician who believes the timer is what pays them will stop
-it at lunch and lose half a day's wages, and nobody will notice until payday.
+**Pay is named once, on the card that pays.** The day card carries one sentence — "Hours you
+get paid for today" — under a 4xl figure. The "Right now" card says what you are on, when it
+started and how long it has run, and nothing about money. There is no second place for a
+technician to look for their wages, so there is nothing to confuse.
 
-**The two numbers never add up.** "Payable today" and "On jobs today" sit side by side with no
-total, on the technician's screen and in the owner's review. Jason punching 07:00–15:30 and
-logging 6.0 h on jobs plus 1.5 h on cleanup is paid **8.50, not 16.00** — a grand total would
-be the single most expensive thing this screen could get wrong, so the structure refuses it.
+**Nesting was tried and it failed.** The first version drew the job timer *inside* the punch,
+on the theory that containment would teach itself: job time happens within an attendance day,
+so the layout would say so before anyone read a label. It did not. Two rows with the same dot,
+the same type size and the same button shape read as two equal switches, and the captions sent
+to rescue the structure — "costing only", "payable hours come from here, not from job timers" —
+explained the data model to someone who only wants to know whether they are getting paid. A
+screen that needs a paragraph is not understood; the containment is now carried by size and by
+two headings in plain words.
+
+**The two numbers still never add up.** Jason on the clock 07:00–15:30 and logging 6.0 h on
+jobs plus 1.5 h on cleanup is paid **8.50, not 16.00** — a grand total is the single most
+expensive thing this screen could get wrong. The side-by-side tiles that used to carry the rule
+("Payable today", "On jobs today", captioned *not pay*) invited exactly the addition they warned
+against, so job hours now appear once, as a **part of the day**: "6.18 of 7.57 h on jobs",
+beside the Today list. A part cannot be added to its whole.
+
+**Start offers the jobs.** The picker lists the technician's own open jobs as rows, then the
+`TIME-007` activities as chips under "Not a job". The earlier version offered only the four
+activity chips and a sentence — "or start a timer from a job" — which sent the technician to
+another screen for the common case.
 
 ### One state machine, wherever Start is pressed
 
-`useTimeClock` owns every transition, because a timer started from a job detail and one started
-from the time screen must obey the same rules — and cannot, if each screen implements start.
+`useTimeClock` owns every transition, because a timer started from a job detail ("Start this
+job") and one started from the time screen must obey the same rules — and cannot, if each screen
+implements start.
 
 - **`TIME-002`** Starting a timer stops the running one *at the same instant* — no gap, no
   overlap — and the handoff is **announced**: "G-1048 stopped at 10:30 — 2.50 h." A silent swap
   leaves someone wondering where the morning went.
 - **`TIME-004`** (open, `D-C11`) A timer needs an active punch. The proposed default **refuses
-  and offers the fix** — the same shape as the board's refused drop: the toast carries a
-  "Punch in" action that does both.
-- **`TIME-005`** Punching out stops the timer, and the toast names what it stopped.
+  and offers the fix** — the same shape as the board's refused drop: "Clock in first", with a
+  "Clock in" action that does both.
+- **`TIME-005`** Clocking out stops the timer, and the toast names what it stopped.
 - **`TIME-014`** No timer on a closed job, checked before the punch rule — a refusal about the
   job beats one about the punch.
 

@@ -47,6 +47,7 @@ import {
   at,
   employees,
   nameOf,
+  openJobsFor,
   entries as seedEntries,
   hours,
   isLeftRunning,
@@ -62,10 +63,16 @@ export function TimePage() {
 
 /* ------------------------------------------------------------------ technician */
 
+/** Who is looking. One technician in the prototype; a session in the real thing. */
+const ME = "T1";
+
 /**
- * The technician's day. One screen: am I punched in, what am I timing, what have I
- * logged. Nothing here can be edited — `TIME-008` says a technician flags an entry for
- * correction rather than changing it, even their own.
+ * The technician's day, in the order the questions get asked: am I on the clock, what am
+ * I on right now, what have I done today.
+ *
+ * Everything here is read-only. `TIME-008` says a technician cannot change their own
+ * time — the Owner corrects it, with a reason — so the screen says that in one plain
+ * sentence at the bottom instead of showing edit affordances that would refuse.
  */
 function MyDay() {
   const clock = useTimeClock(punches.find((p) => p.id === "p3")!.in, {
@@ -74,9 +81,10 @@ function MyDay() {
     start: 13 * 60 + 10,
   });
 
-  const mine = seedEntries.filter((e) => e.who === "T1" && e.day === TODAY_LABEL);
-  const jobMinutes = mine.reduce((a, e) => a + minutesOf(e), 0);
-  const punchMinutes = clock.punchedInAt !== null ? minutesOf({ in: clock.punchedInAt }) : 0;
+  const mine = seedEntries.filter((e) => e.who === ME && e.day === TODAY_LABEL);
+  const runningMinutes = clock.timer ? minutesOf({ start: clock.timer.start }) : 0;
+  const jobMinutes = mine.reduce((a, e) => a + minutesOf(e), 0) + runningMinutes;
+  const dayMinutes = clock.punchedInAt === null ? 0 : minutesOf({ in: clock.punchedInAt });
 
   return (
     <div className="flex h-full min-h-0 flex-col">
@@ -86,75 +94,70 @@ function MyDay() {
           <PunchClock
             punchedInAt={clock.punchedInAt}
             timer={clock.timer}
+            jobs={openJobsFor(ME)}
             onPunchIn={clock.punchIn}
             onPunchOut={clock.punchOut}
             onStop={clock.stop}
             onStart={(t) => clock.start(t)}
           />
 
-          {/* TIME-006, stated where it is easiest to get wrong. The two numbers sit
-              side by side and there is NO total — adding them would double the day,
-              and someone would eventually be paid from the wrong one. */}
-          <div className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border bg-border">
-            <div className="bg-surface-3 p-3">
-              <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-                Payable today
-              </div>
-              <div className="tnum mt-0.5 text-xl font-semibold">{hours(punchMinutes)} h</div>
-              <div className="text-xs text-muted-foreground">From your punch</div>
+          <div>
+            <div className="mb-2 flex flex-wrap items-baseline justify-between gap-x-3 px-1">
+              <span className="text-sm font-semibold">Today</span>
+              {/* `TIME-006` lives here now, and as a fact rather than a warning. Two
+                  tiles — "Payable today" and "On jobs today" — invited the addition they
+                  were captioned against; "6.18 of 7.57 h" is a part of a whole, and a
+                  part cannot be added to its whole. */}
+              <span className="tnum text-xs text-muted-foreground">
+                {dayMinutes > 0
+                  ? `${hours(jobMinutes)} of ${hours(dayMinutes)} h on jobs`
+                  : `${hours(jobMinutes)} h on jobs`}
+              </span>
             </div>
-            <div className="bg-surface-3 p-3">
-              <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-                On jobs today
-              </div>
-              <div className="tnum mt-0.5 text-xl font-semibold">
-                {hours(jobMinutes + (clock.timer ? minutesOf({ start: clock.timer.start }) : 0))} h
-              </div>
-              <div className="text-xs text-muted-foreground">Costing only · not pay</div>
+
+            <div className="overflow-hidden rounded-xl border bg-surface-3">
+              {mine.length === 0 && !clock.timer ? (
+                <p className="p-4 text-sm text-muted-foreground">
+                  Nothing yet today. Start something above.
+                </p>
+              ) : (
+                <ul className="divide-y">
+                  {clock.timer && (
+                    <li className="flex items-center gap-3 p-4 text-sm">
+                      <span className="size-2 shrink-0 animate-pulse rounded-full bg-nav-active" />
+                      <span className="min-w-0 flex-1 truncate font-medium">
+                        {clock.timer.jobNo ? jobLabel(clock.timer.jobNo) : clock.timer.activity}
+                      </span>
+                      <span className="tnum shrink-0 text-muted-foreground">
+                        {at(clock.timer.start)} → now
+                      </span>
+                    </li>
+                  )}
+                  {[...mine].reverse().map((e) => (
+                    <li key={e.id} className="flex items-center gap-3 p-4 text-sm">
+                      <span className="size-2 shrink-0 rounded-full bg-muted-foreground/30" />
+                      <span className="min-w-0 flex-1 truncate">
+                        {e.jobNo ? jobLabel(e.jobNo) : e.activity}
+                      </span>
+                      <span className="tnum shrink-0 text-right text-muted-foreground">
+                        {at(e.start)}–{at(e.end!)}
+                        <span className="hidden sm:inline"> · {hours(minutesOf(e))} h</span>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           </div>
 
-          <Section title="Today's entries">
-            {mine.length === 0 && !clock.timer ? (
-              <p className="p-3 text-sm text-muted-foreground">Nothing logged yet today.</p>
-            ) : (
-              <ul className="divide-y">
-                {clock.timer && (
-                  <li className="flex items-center gap-3 p-3 text-sm">
-                    <span className="size-2 shrink-0 animate-pulse rounded-full bg-nav-active" />
-                    <span className="min-w-0 flex-1 truncate">
-                      {clock.timer.jobNo ? jobLabel(clock.timer.jobNo) : clock.timer.activity}
-                    </span>
-                    <span className="tnum text-muted-foreground">
-                      {at(clock.timer.start)} → running
-                    </span>
-                  </li>
-                )}
-                {mine.map((e) => (
-                  <li key={e.id} className="flex flex-wrap items-center gap-3 p-3 text-sm">
-                    <span className="min-w-0 flex-1 truncate">
-                      {e.jobNo ? jobLabel(e.jobNo) : e.activity}
-                    </span>
-                    <span className="tnum text-muted-foreground">
-                      {at(e.start)}–{at(e.end!)} · {hours(minutesOf(e))} h
-                    </span>
-
-                  </li>
-                ))}
-              </ul>
-            )}
-          </Section>
-
-          {/* TIME-008, and no queue behind it. In a three-person shop the technician
+          {/* `TIME-008`, with no queue behind it. In a three-person shop the technician
               tells Cam, who corrects it — a flag workflow would be a ticketing system
               for a ten-second conversation. */}
-          <p className="text-xs text-muted-foreground">
-            You cannot edit your own time (TIME-008). If something here is wrong, tell
-            Cam — he can correct it, with a reason, and both versions are kept.
+          <p className="px-1 text-xs text-muted-foreground">
+            Something look wrong? Tell Cam — he can fix it for you.
           </p>
         </div>
       </div>
-
     </div>
   );
 }

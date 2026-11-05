@@ -30,20 +30,12 @@ const SCREENS = [
   { key: "states", label: "States", note: "Loading / empty / error / not found", path: "/app/settings/_states" },
   { key: "dates", label: "Dates", note: "Date picker and date range picker — one grid", path: "/app/settings/_dates" },
   { key: "panel", label: "Panel", note: "Detail panel · opened from the board", path: "/app/board?overlay=panel" },
+  { key: "search", label: "Search", note: "Universal search · simulated query & results", path: "/app/board?search=ridge" },
+  { key: "long-list", label: "Long list", note: "List column at length · scope chips, count, load more", path: "/app/jobs?seed=long" },
   { key: "dialog", label: "Dialog", note: "Dialog · close job", path: "/app/jobs/G-1048?overlay=dialog" },
   { key: "approve", label: "Approval", note: "Record the answer — approve, decline or override (AUTH-002/004)", path: "/app/estimates/E-1048?overlay=approve" },
   { key: "void", label: "Void", note: "Destructive confirm with a required reason (INV-012)", path: "/app/invoices/1179" },
 ];
-
-/**
- * Controls that only mean something on one screen live beside the preview, not in the
- * global bar. A toggle in the header implies it applies to whatever you are looking at,
- * and "Cal entry" sitting there on the invoices screen is a small lie that costs a few
- * seconds every time someone reads the bar.
- */
-const SCREEN_CONTROLS: Record<string, "calEntry"[]> = {
-  schedule: ["calEntry"],
-};
 
 export function Lab() {
   const [role, setRole] = useState<"owner" | "tech">("owner");
@@ -54,10 +46,21 @@ export function Lab() {
   const [shown, setShown] = useState<Set<string>>(new Set(["desktop"]));
   const [dark, setDark] = useState(false);
   const [palette, setPalette] = useState<"neutral" | "warm">("warm");
-  const [entry, setEntry] = useState<"fill" | "stripe" | "both">("both");
+  // Screens are LINKS, not a segmented control, and this counter is what makes them
+  // behave like one. Clicking the screen you are already on has to mean something —
+  // you have navigated three screens deep inside the preview and want to start over —
+  // and with only `screen` in state that click is a no-op, because the state does not
+  // change. Bumping a visit number on every click puts it in the iframe key, so every
+  // click remounts the frame at the screen's own URL, the current one included.
+  const [visit, setVisit] = useState(0);
+
+  const openScreen = (s: (typeof SCREENS)[number]) => {
+    setScreen(s);
+    setVisit((v) => v + 1);
+  };
 
   const src = (extra = "") =>
-    `${screen.path}${screen.path.includes("?") ? "&" : "?"}role=${role}&palette=${palette}&entry=${entry}${dark ? "&theme=dark" : ""}${extra}`;
+    `${screen.path}${screen.path.includes("?") ? "&" : "?"}role=${role}&palette=${palette}${dark ? "&theme=dark" : ""}${extra}`;
 
   return (
     <div className="flex h-full flex-col bg-neutral-100 text-neutral-900">
@@ -136,16 +139,14 @@ export function Lab() {
           </button>
         </div>
 
-        <div className="mt-2 flex flex-wrap gap-1.5">
+        <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+          <span className="text-[11px] font-medium uppercase tracking-wide text-neutral-500">
+            Screens
+          </span>
           {SCREENS.map((s) => (
-            <Seg
-              key={s.key}
-              on={s.key === screen.key}
-              onClick={() => setScreen(s)}
-              title={s.note}
-            >
+            <ScreenLink key={s.key} onClick={() => openScreen(s)} title={s.note}>
               {s.label}
-            </Seg>
+            </ScreenLink>
           ))}
         </div>
       </header>
@@ -173,7 +174,7 @@ export function Lab() {
                 style={{ width: d.w * scale, height: d.h * scale }}
               >
                 <iframe
-                  key={`${d.key}-${role}-${palette}-${entry}-${screen.key}-${dark}`}
+                  key={`${d.key}-${role}-${palette}-${screen.key}-${dark}-${visit}`}
                   title={d.label}
                   src={src()}
                   style={{
@@ -187,29 +188,6 @@ export function Lab() {
               </div>
             </div>
           ))}
-
-          {/* Sits immediately after the last preview rather than pinned to the window
-              edge, so it reads as belonging to what is on screen. */}
-          {SCREEN_CONTROLS[screen.key] && (
-            <aside className="sticky top-0 w-56 shrink-0 rounded-xl border border-neutral-300 bg-white p-3 shadow-sm">
-              <div className="text-[11px] font-medium uppercase tracking-wide text-neutral-500">
-                This screen
-              </div>
-              {SCREEN_CONTROLS[screen.key].includes("calEntry") && (
-                <SideGroup label="Entry style">
-                  <Seg on={entry === "fill"} onClick={() => setEntry("fill")}>
-                    Fill
-                  </Seg>
-                  <Seg on={entry === "stripe"} onClick={() => setEntry("stripe")}>
-                    Stripe
-                  </Seg>
-                  <Seg on={entry === "both"} onClick={() => setEntry("both")}>
-                    Both
-                  </Seg>
-                </SideGroup>
-              )}
-            </aside>
-          )}
         </div>
 
         <p className="mt-5 max-w-3xl text-xs leading-relaxed text-neutral-500">
@@ -225,15 +203,6 @@ export function Lab() {
   );
 }
 
-function SideGroup({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="mt-2.5">
-      <div className="mb-1.5 text-xs font-medium text-neutral-700">{label}</div>
-      <div className="flex flex-wrap gap-1.5">{children}</div>
-    </div>
-  );
-}
-
 function Group({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex items-center gap-2">
@@ -242,6 +211,34 @@ function Group({ label, children }: { label: string; children: React.ReactNode }
       </span>
       <div className="flex items-center gap-1.5">{children}</div>
     </div>
+  );
+}
+
+/**
+ * A screen link. It goes somewhere, so it looks like a link and carries no state at all —
+ * every one of them is identical, including the screen you are looking at. Marking the
+ * current screen is what made the row feel like a segmented control, and a control that
+ * is already "on" invites a click that does nothing. The preview below says which screen
+ * is up; the row only has to take you there.
+ */
+function ScreenLink({
+  onClick,
+  children,
+  title,
+}: {
+  onClick: () => void;
+  children: React.ReactNode;
+  title?: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      title={title}
+      className="text-xs text-neutral-600 underline-offset-4 hover:text-neutral-900 hover:underline"
+    >
+      {children}
+    </button>
   );
 }
 

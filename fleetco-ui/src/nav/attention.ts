@@ -19,6 +19,11 @@ import type { Role } from "./routes";
  *              stopped automatically, and it blocks approving the period — so it has
  *              to be visible without opening the screen.
  */
+/**
+ * `reason` is empty when the record's own status already IS the reason — an overdue
+ * invoice needs no words beyond `OVERDUE`, in amber. `StatusPill` appends a non-empty
+ * reason to the status; `AttentionChip` carries it alone for records with no status.
+ */
 export type Attention = { id: string; reason: string };
 
 export function attentionFor(section: string, role: Role): Attention[] {
@@ -34,12 +39,17 @@ export function attentionFor(section: string, role: Role): Attention[] {
   if (section === "jobs") {
     if (role === "owner") {
       return jobs
-        .filter((j) => j.stage === 5)
-        .map((j) => ({ id: j.no, reason: "Finished · waiting for you to close" }));
+        // JOB-007: finished AND not yet closed. Once it is closed there is nothing
+        // left for the owner to do, so the flag has to clear.
+        .filter((j) => j.stage === 5 && !j.closed)
+        // The pill prefixes the stage, so this reads "COMPLETED · WAITING TO BE CLOSED".
+        .map((j) => ({ id: j.no, reason: "waiting to be closed" }));
     }
+    // "Ready for production", in amber, already says assigned-and-untouched. Spelling
+    // out "not started" beside it is the same sentence twice.
     return jobs
       .filter((j) => j.who === "T1" && j.stage === 0)
-      .map((j) => ({ id: j.no, reason: "Not started" }));
+      .map((j) => ({ id: j.no, reason: "" }));
   }
 
   if (section === "time" && role === "owner") {
@@ -56,9 +66,9 @@ export function attentionFor(section: string, role: Role): Attention[] {
       .filter((i) => i.status === "Overdue" || i.status === "Draft")
       .map((i) => ({
         id: i.no,
-        // The row has no status pill — the chip replaces the subtitle — so it carries
-        // the status as well as the reason.
-        reason: i.status === "Overdue" ? "Overdue" : "Draft · never sent",
+        // The status pill carries both. OVERDUE needs nothing added; DRAFT does, because
+        // a draft is only a problem for having never been sent.
+        reason: i.status === "Overdue" ? "" : "never sent",
       }));
   }
 

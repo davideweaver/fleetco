@@ -44,7 +44,10 @@ export function AppShell() {
   const location = useLocation();
   const role = (params.get("role") as Role) ?? "owner";
   const [moreOpen, setMoreOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
+  // Lab-only: `?search=<query>` opens the palette already showing results, so the lab
+  // can display the search experience without a click.
+  const labSearchQuery = params.get("search");
+  const [searchOpen, setSearchOpen] = useState(() => labSearchQuery !== null);
   const [railOpen, setRailOpen] = useRailOpen();
   const hasHover = useHasHover();
   // Tooltips stand in for the labels the collapsed rail drops, so they are only
@@ -58,7 +61,10 @@ export function AppShell() {
   // Screen-scoped params (overlay, photos) are deliberately NOT carried: they belong to
   // the screen that was opened with them, not to the session.
   const query = (() => {
-    const keep = ["role", "palette", "theme", "entry"];
+    // `seed` is carried even though `overlay` and `photos` are not. Those belong to one
+    // screen; seed defines which records the section HAS, so dropping it on the way from
+    // a list row to its detail would land on a job that no longer exists.
+    const keep = ["role", "palette", "theme", "seed"];
     const q = new URLSearchParams();
     for (const k of keep) {
       const v = params.get(k);
@@ -352,7 +358,12 @@ export function AppShell() {
             </div>
           </div>
         )}
-        <SearchPalette open={searchOpen} onClose={() => setSearchOpen(false)} role={role} />
+        <SearchPalette
+          open={searchOpen}
+          onClose={() => setSearchOpen(false)}
+          role={role}
+          initialQuery={labSearchQuery ?? undefined}
+        />
         {/* Bottom-right on a desktop, top on a phone — the bottom bar owns the bottom. */}
         <Toaster
           position="bottom-right"

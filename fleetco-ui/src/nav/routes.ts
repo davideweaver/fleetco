@@ -83,3 +83,11 @@ export const itemForPath = (pathname: string) =>
   NAV.find((i) => pathname === i.path || pathname.startsWith(i.path + "/"));
 
 export const GROUP_ORDER = ["work", "sales", "shop", "admin"] as const;
+
+/** The rail shows groups as separators, not words. Search has to say them out loud. */
+export const GROUP_LABEL: Record<NavItem["group"], string> = {
+  work: "Work",
+  sales: "Sales",
+  shop: "Shop",
+  admin: "Admin",
+};

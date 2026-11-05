@@ -8,7 +8,7 @@
  * 8.50, not 16.00. Everything below keeps the two apart at the data level so no screen
  * can accidentally add them.
  */
-import { jobs } from "./sample";
+import { isOpenJob, jobs } from "./sample";
 
 /** `TIME-007`. Seeded; the Owner can add, rename and deactivate. */
 export const ACTIVITIES = ["Cleanup", "Meetings", "Training", "General shop"];
@@ -96,6 +96,11 @@ export const entries: Entry[] = [
     },
   },
   { id: "e7", who: "OW", day: "Wed Nov 4", jobNo: null, activity: "Meetings", start: hm(8, 30), end: hm(9, 45) },
+  // Today, for T1, so "My time" is a real day rather than one running row: two closed
+  // entries, a lunch gap at noon, and the timer that is still going. Job time comes to
+  // 6.18 h against 7.57 h on the clock — a part of the day, which is the point.
+  { id: "e8", who: "T1", day: "Wed Nov 4", jobNo: "G-1048", activity: null, start: hm(7, 15), end: hm(11, 30) },
+  { id: "e9", who: "T1", day: "Wed Nov 4", jobNo: null, activity: "Cleanup", start: hm(11, 30), end: hm(12) },
 ];
 
 /**
@@ -157,6 +162,10 @@ export const at = (minutes: number) => {
   const m = minutes % 60;
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
 };
+
+/** The jobs to offer someone starting a timer: their own, still open. */
+export const openJobsFor = (who: string) =>
+  jobs.filter((j) => j.who === who && isOpenJob(j));
 
 export const jobLabel = (no: string) => {
   const j = jobs.find((x) => x.no === no);

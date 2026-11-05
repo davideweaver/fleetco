@@ -38,6 +38,13 @@
   --destructive: oklch(0.577 0.245 27.325);
   --success: oklch(0.52 0.12 155);
   --warning: oklch(0.68 0.15 70);
+  /* Text ON a solid success or destructive fill. Light themes take white — 5.20:1 on
+     the green, 4.91:1 on the red. DARK themes cannot: their success and destructive are
+     lifted to sit off a dark surface, and white on them is 2.53:1 and 2.87:1, nowhere
+     near the floor. So the foreground flips to near-black there, the same way --brand
+     and --nav-active already flip. Never hardcode text-white on these fills. */
+  --success-foreground: oklch(0.99 0 0);
+  --destructive-foreground: oklch(0.99 0 0);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
@@ -122,6 +129,8 @@
   --destructive: oklch(0.55 0.2 27);
   --success: oklch(0.52 0.12 155);
   --warning: oklch(0.66 0.14 70);
+  --success-foreground: oklch(0.99 0.005 85);
+  --destructive-foreground: oklch(0.99 0.005 85);
   --border: oklch(0.89 0.012 80);
   --input: oklch(0.89 0.012 80);
   --ring: oklch(0.7 0.1 80);
@@ -161,6 +170,9 @@
   --accent: oklch(0.375 0.016 68);
   --accent-foreground: oklch(0.96 0.006 85);
   --destructive: oklch(0.68 0.18 25);
+  /* 7.02:1 on the inherited dark green, 5.67:1 on this red. */
+  --success-foreground: oklch(0.21 0.01 70);
+  --destructive-foreground: oklch(0.21 0.01 70);
   --border: oklch(1 0 0 / 13%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.6 0.1 80);
@@ -195,6 +207,9 @@
   --destructive: oklch(0.704 0.191 22.216);
   --success: oklch(0.7 0.13 155);
   --warning: oklch(0.78 0.14 70);
+  /* 7.02:1 on the green, 6.18:1 on the red. */
+  --success-foreground: oklch(0.205 0 0);
+  --destructive-foreground: oklch(0.205 0 0);
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
@@ -237,7 +252,9 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning);
   --color-border: var(--border);
   --color-input: var(--input);

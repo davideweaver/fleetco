@@ -31,8 +31,12 @@ export function StatusPill({
   calm?: "muted" | "good";
 }) {
   const { role } = useShell();
-  if (attentionMap(section, role).has(id)) {
-    return <Pill tone="attention">{status}</Pill>;
+  const needs = attentionMap(section, role);
+  if (needs.has(id)) {
+    // The amber fill says "this needs someone"; the reason says what for. An empty
+    // reason means the status already said it — OVERDUE wants no gloss.
+    const reason = needs.get(id);
+    return <Pill tone="attention">{reason ? `${status} · ${reason}` : status}</Pill>;
   }
   return <Pill tone={calm}>{status}</Pill>;
 }
