@@ -136,6 +136,56 @@ export const longJobs: Job[] = [
   }),
 ];
 
+/* --- Estimates (EST-012) ------------------------------------------------------------
+   Draft → Sent → Approved, Partially approved, or Declined. The last three are derived
+   from line approvals (AUTH-001), which is why the status lives beside the estimate
+   rather than being typed in: Draft and Sent are the only two a person sets.
+
+   Most estimates became a job, so they carry its number. E-1039 is the one that did not
+   — a declined estimate never becomes work, and a list that cannot show that state is a
+   list that implies every estimate eventually wins. */
+
+export type EstimateStatus = "Draft" | "Sent" | "Approved" | "Partially approved" | "Declined";
+
+export type Estimate = {
+  no: string;
+  /** The job it became, if it became one. Declined and draft estimates have none. */
+  jobNo: string | null;
+  customerId: string;
+  customer: string;
+  what: string;
+  /** Sent date (EST-012 records who and when), or "—" for a draft. */
+  sent: string;
+  status: EstimateStatus;
+  /** What was offered. AUTH-005's authorized subtotal is a line-level number. */
+  valueCents: number;
+};
+
+/**
+ * Still waiting on something. A draft has not been sent, a sent estimate has had no
+ * answer, and a partially approved one has lines nobody has answered yet (AUTH-001 makes
+ * approval per line, so "partially" means the conversation is unfinished). Approved and
+ * Declined are the two states where nothing is owed either way.
+ *
+ * Note this is the open/closed split, NOT an attention rule. Nothing in the catalog says
+ * when a quiet estimate starts needing a nudge — EST-013 leaves expiry open (D-C6) — so
+ * the Estimates list has scopes and no "Needs you" chip, and that is honest rather than
+ * an oversight.
+ */
+export const isOpenEstimate = (e: Estimate) =>
+  e.status === "Draft" || e.status === "Sent" || e.status === "Partially approved";
+
+export const estimates: Estimate[] = [
+  { no: "E-1053", jobNo: "G-1053", customerId: "conestoga", customer: "Conestoga Tree Care", what: "Bucket truck doors ×3", sent: "Nov 1", status: "Sent", valueCents: 64000 },
+  { no: "E-1052", jobNo: "G-1052", customerId: "lancaster-kitchen", customer: "Lancaster Kitchen Supply", what: "Box truck logo kit", sent: "Oct 29", status: "Approved", valueCents: 118500 },
+  { no: "E-1048", jobNo: "G-1048", customerId: "ridgeline", customer: "Ridgeline Plumbing & Heating", what: "Unit 14 · full wrap", sent: "Oct 27", status: "Partially approved", valueCents: 201900 },
+  { no: "E-1046", jobNo: "G-1046", customerId: "brightway", customer: "Brightway Movers", what: "Rear door graphics", sent: "Oct 24", status: "Approved", valueCents: 48000 },
+  { no: "E-1044", jobNo: "G-1044", customerId: "keystone", customer: "Keystone Dairy Co-op", what: "Tanker DOT lettering", sent: "Oct 22", status: "Approved", valueCents: 86500 },
+  { no: "E-1043", jobNo: "G-1043", customerId: "millport", customer: "Millport School District", what: "Shop wall mural", sent: "—", status: "Draft", valueCents: 158000 },
+  { no: "E-1041", jobNo: "G-1041", customerId: "ridgeline", customer: "Ridgeline Plumbing & Heating", what: "Unit 9 · decal refresh", sent: "Oct 20", status: "Approved", valueCents: 42000 },
+  { no: "E-1039", jobNo: null, customerId: "keystone", customer: "Keystone Dairy Co-op", what: "Trailer full wrap", sent: "Oct 16", status: "Declined", valueCents: 312000 },
+];
+
 /**
  * Open means not yet closed (JOB-007), which is NOT the same as "work unfinished". A job
  * sitting at Completed has had its work marked finished but is still waiting for someone

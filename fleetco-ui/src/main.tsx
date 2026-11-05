@@ -10,6 +10,7 @@ import { SectionsPage } from "@/pages/Sections";
 import { BoardPage } from "@/pages/Wide";
 import { TimePage } from "@/pages/Time";
 import { CalendarPage } from "@/pages/Calendar";
+import { TodayPage } from "@/pages/Today";
 import "./index.css";
 
 /** `?theme=` and `?palette=` so the lab can show every combination without a store. */
@@ -40,7 +41,9 @@ createRoot(document.getElementById("root")!).render(
         <Route path="/" element={<Navigate to="/lab" replace />} />
         <Route path="/lab" element={<Lab />} />
         <Route path="/app" element={<AppShell />}>
-          <Route index element={<Navigate to="/app/board" replace />} />
+          {/* Today is where signing in lands, for both roles. */}
+          <Route index element={<Navigate to="/app/today" replace />} />
+          <Route path="today" element={<TodayPage />} />
           <Route path="board" element={<BoardPage />} />
           <Route path="schedule" element={<CalendarPage />} />
           {sectionRoutes("time", <TimePage />)}

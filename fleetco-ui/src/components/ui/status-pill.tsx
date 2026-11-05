@@ -14,8 +14,11 @@ import { attentionMap } from "@/nav/attention";
  * own pill is how they drift apart — one ends up asking `attentionMap` and the other
  * ends up with a hardcoded status string that stops matching.
  *
- * `calm` is the tone when nothing is wrong. That is the only thing a caller gets to
- * decide; whether the record needs attention is never the caller's to say.
+ * `calm` is the tone when nothing is wrong, and the only thing a caller gets to decide;
+ * whether the record needs attention is never the caller's to say. It reaches past grey —
+ * an estimate's DECLINED is red and PARTIALLY APPROVED a pale orange — and that stays safe
+ * because none of those tones is `--attention`, the one saturated amber. A caller can say
+ * "this went badly"; only `attentionMap` can say "someone has to act".
  */
 export function StatusPill({
   section,
@@ -28,7 +31,7 @@ export function StatusPill({
   /** The record's id as `attentionFor` reports it: a job number, an invoice number. */
   id: string;
   status: string;
-  calm?: "muted" | "good";
+  calm?: "muted" | "good" | "warn" | "bad";
 }) {
   const { role } = useShell();
   const needs = attentionMap(section, role);

@@ -96,7 +96,7 @@ export const entries: Entry[] = [
     },
   },
   { id: "e7", who: "OW", day: "Wed Nov 4", jobNo: null, activity: "Meetings", start: hm(8, 30), end: hm(9, 45) },
-  // Today, for T1, so "My time" is a real day rather than one running row: two closed
+  // Today, for T1, so the clock on Today is a real day rather than one running row: two closed
   // entries, a lunch gap at noon, and the timer that is still going. Job time comes to
   // 6.18 h against 7.57 h on the clock — a part of the day, which is the point.
   { id: "e8", who: "T1", day: "Wed Nov 4", jobNo: "G-1048", activity: null, start: hm(7, 15), end: hm(11, 30) },

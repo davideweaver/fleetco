@@ -4,16 +4,19 @@ import { ChevronDown, ChevronRight, Plus } from "lucide-react";
 import {
   componentSum,
   estimateLines,
+  estimates,
   isAuthorized,
   lineCost,
   linePrice,
   type Approval,
   type EstimateLine,
+  type EstimateStatus,
   type LineComponent,
 } from "@/data/sample";
 import { useShell } from "@/shell/shell-context";
 import { Btn, DetailHeader, Pill } from "@/shell/ListDetailLayout";
 import { CellInput, MoneyCell } from "@/components/ui/field";
+import { StatusPill } from "@/components/ui/status-pill";
 import {
   ApprovalHistory,
   RecordAnswerDialog,
@@ -77,6 +80,11 @@ export function EstimateEditor({ estimateId }: { estimateId: string }) {
       return next;
     });
 
+  // The line table below is one hardcoded set (L1 approved, L2 declined, L3 pending) and
+  // every estimate still shows it. The header at least reads the row you clicked, so the
+  // list and the screen it opens no longer contradict each other.
+  const est = estimates.find((e) => e.no === estimateId);
+
   const offered = estimateLines.reduce((a, l) => a + linePrice(l), 0);
   const authorized = estimateLines.filter(isAuthorized).reduce((a, l) => a + linePrice(l), 0);
   const cost = estimateLines.filter(isAuthorized).reduce((a, l) => a + lineCost(l), 0);
@@ -84,12 +92,19 @@ export function EstimateEditor({ estimateId }: { estimateId: string }) {
   return (
     <div className="flex h-full min-h-0 flex-col">
       <DetailHeader
-        eyebrow="Estimate · Ridgeline Plumbing & Heating"
-        title={`${estimateId} · Unit 14 full wrap`}
+        eyebrow={`Estimate · ${est?.customer ?? "Ridgeline Plumbing & Heating"}`}
+        title={`${estimateId}${est ? ` · ${est.what}` : " · Unit 14 full wrap"}`}
         sub={
           <span className="flex flex-wrap items-center gap-2">
-            <Pill tone="warn">Partially approved</Pill>
-            <span>Sent Oct 27 · 3 lines</span>
+            <StatusPill
+              section="estimates"
+              id={estimateId}
+              status={est?.status ?? "Partially approved"}
+              calm={estimateTone(est?.status ?? "Partially approved")}
+            />
+            <span>
+              {est && est.sent !== "—" ? `Sent ${est.sent}` : "Not sent"} · 3 lines
+            </span>
           </span>
         }
         actions={
@@ -393,6 +408,11 @@ function PendingButton({ onClick }: { onClick: () => void }) {
     </button>
   );
 }
+
+/** EST-012's five statuses, each in its calm tone. Amber is not among them — that is
+ *  `StatusPill`'s to assign, from `attentionMap`, if an estimate rule ever lands. */
+export const estimateTone = (s: EstimateStatus): "muted" | "good" | "warn" | "bad" =>
+  s === "Approved" ? "good" : s === "Partially approved" ? "warn" : s === "Declined" ? "bad" : "muted";
 
 function ApprovalPill({ approval }: { approval: Approval }) {
   if (approval === "approved") return <Pill tone="good">Approved</Pill>;

@@ -69,6 +69,27 @@ queue.
 
 
 
+### Tier 1 — Today, the rest of it
+
+Built 2026-11-05 as the screen signing in lands on. Three organising principles went into
+the lab — by time, by kind of obligation, by urgency — and **by-kind won for the Owner**;
+the other two are deleted rather than parked behind a flag. The Owner gets two columns
+(scheduled work left, decisions right); the technician gets one column that **is** the
+clock screen, so `/app/time` redirects them here.
+
+- [ ] **Name the parts in [[UI Vocabulary]].** The lede, the block, the day-sheet row and
+      the roll-up have no agreed names yet, and the naming rules say a kept thing gets one.
+- [ ] **The roll-up has no attention rule of its own**, by design — `attentionAll` walks
+      the sections that do. Today's gaps are therefore theirs: estimates and the schedule
+      contribute nothing because neither has a rule yet (see below).
+- [ ] **`phone: 0` pushed Invoices off the owner's bottom bar.** Four slots, and Today
+      took one. Decide whether Invoices or Schedule goes behind More.
+- [ ] **No empty state has been designed.** A shop with a clear day and nothing waiting
+      gets two sentences saying so, which is correct but has not been looked at.
+- [ ] **The technician has no payroll view at all now.** Correct for V1 — `TIME-008` says
+      they cannot change their own time — but "what am I getting paid this period" is a
+      question they will ask, and the answer is currently nowhere.
+
 ### Tier 1 — Attention, the rest of it
 
 `Attention` is the summarised state of a record that bubbles up as a chip, a filter count

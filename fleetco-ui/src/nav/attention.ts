@@ -1,5 +1,6 @@
 import { customers, invoices, jobs } from "@/data/sample";
-import { employees, isLeftRunning, punches } from "@/data/time";
+import { employees, isLeftRunning, nameOf, punches } from "@/data/time";
+import { money } from "@/lib/utils";
 import type { Role } from "./routes";
 
 /**
@@ -77,3 +78,71 @@ export function attentionFor(section: string, role: Role): Attention[] {
 
 export const attentionMap = (section: string, role: Role) =>
   new Map(attentionFor(section, role).map((a) => [a.id, a.reason]));
+
+/* --- The roll-up ----------------------------------------------------------------------
+   Everything that needs someone, across every section, in one list. Today is the only
+   screen that asks for this; every other surface asks per section.
+
+   The rows carry their own label and path rather than leaving Today to switch over
+   sections and rebuild them. The whole argument for `attentionFor` is that a count and
+   the rows behind it can never disagree — a roll-up that re-derives "which record is
+   this" somewhere else gives that back. */
+
+export type AttentionRow = Attention & {
+  section: string;
+  /** What the record is called, in a list that mixes sections. */
+  label: string;
+  sub: string;
+  path: string;
+};
+
+/**
+ * Most-blocking first, and the order is a judgment worth stating: a running punch is
+ * first because `TIME-013` says it blocks approving the period, so it holds up payroll
+ * for everyone. Money owed to the shop comes next, then a finished job waiting on a
+ * decision, then the customer-level view of the same debt — which is last precisely
+ * because the invoice above it already said it.
+ */
+const ROLL_UP_ORDER = ["time", "invoices", "jobs", "customers"];
+
+export function attentionAll(role: Role): AttentionRow[] {
+  const rows = ROLL_UP_ORDER.flatMap((section) =>
+    attentionFor(section, role).map((a) => ({ ...a, section, ...describe(section, a.id) }))
+  );
+  return rows;
+}
+
+/** Where the record lives and what to call it. One place, so Today and the rail agree. */
+function describe(section: string, id: string): { label: string; sub: string; path: string } {
+  if (section === "jobs") {
+    const j = jobs.find((x) => x.no === id);
+    return {
+      label: `${id} · ${j?.what ?? ""}`,
+      sub: j?.customer ?? "",
+      path: `/app/jobs/${id}`,
+    };
+  }
+  if (section === "invoices") {
+    const v = invoices.find((x) => x.no === id);
+    return {
+      label: `Invoice #${id}`,
+      sub: v ? `${v.customer} · ${money(v.balanceCents || v.totalCents)}` : "",
+      path: `/app/invoices/${id}`,
+    };
+  }
+  if (section === "customers") {
+    const c = customers.find((x) => x.id === id);
+    return {
+      label: c?.name ?? id,
+      sub: c ? `${money(c.balanceCents)} outstanding` : "",
+      path: `/app/customers/${id}`,
+    };
+  }
+  // Time's ids are punch ids, but the screen you want is the person's.
+  const p = punches.find((x) => x.id === id);
+  return {
+    label: p ? nameOf(p.who) : id,
+    sub: "Still on the clock",
+    path: `/app/time/${p?.who ?? "summary"}`,
+  };
+}

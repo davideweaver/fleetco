@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import {
   Briefcase,
   CalendarDays,
@@ -20,10 +20,9 @@ import {
   ListHeader,
   ListRow,
   Monogram,
-  PageHeader,
   Pill,
 } from "@/shell/ListDetailLayout";
-import { PunchClock, useTimeClock, LeftRunningChip } from "@/components/ui/timer";
+import { LeftRunningChip } from "@/components/ui/timer";
 import { CorrectTimeDialog } from "@/components/ui/correct-time";
 import { Popover } from "@/components/ui/popover";
 import { Section } from "./Customers";
@@ -47,7 +46,6 @@ import {
   at,
   employees,
   nameOf,
-  openJobsFor,
   entries as seedEntries,
   hours,
   isLeftRunning,
@@ -56,110 +54,18 @@ import {
   punches,
 } from "@/data/time";
 
-export function TimePage() {
-  const { role } = useShell();
-  return role === "owner" ? <Review /> : <MyDay />;
-}
-
-/* ------------------------------------------------------------------ technician */
-
-/** Who is looking. One technician in the prototype; a session in the real thing. */
-const ME = "T1";
-
 /**
- * The technician's day, in the order the questions get asked: am I on the clock, what am
- * I on right now, what have I done today.
+ * Time is the Owner's payroll section. A technician's clock merged into Today on
+ * 2026-11-05 — two screens answering "what is my day" is how they drift, and the
+ * technician's half of this file was never about payroll.
  *
- * Everything here is read-only. `TIME-008` says a technician cannot change their own
- * time — the Owner corrects it, with a reason — so the screen says that in one plain
- * sentence at the bottom instead of showing edit affordances that would refuse.
+ * The route stays and redirects rather than 404ing: old links, the search palette's
+ * history and anything bookmarked mid-shift still land somewhere useful.
  */
-function MyDay() {
-  const clock = useTimeClock(punches.find((p) => p.id === "p3")!.in, {
-    jobNo: "G-1052",
-    activity: null,
-    start: 13 * 60 + 10,
-  });
-
-  const mine = seedEntries.filter((e) => e.who === ME && e.day === TODAY_LABEL);
-  const runningMinutes = clock.timer ? minutesOf({ start: clock.timer.start }) : 0;
-  const jobMinutes = mine.reduce((a, e) => a + minutesOf(e), 0) + runningMinutes;
-  const dayMinutes = clock.punchedInAt === null ? 0 : minutesOf({ in: clock.punchedInAt });
-
-  return (
-    <div className="flex h-full min-h-0 flex-col">
-      <PageHeader title="My time" />
-      <div className="min-h-0 flex-1 overflow-auto p-3">
-        <div className="mx-auto max-w-2xl space-y-3">
-          <PunchClock
-            punchedInAt={clock.punchedInAt}
-            timer={clock.timer}
-            jobs={openJobsFor(ME)}
-            onPunchIn={clock.punchIn}
-            onPunchOut={clock.punchOut}
-            onStop={clock.stop}
-            onStart={(t) => clock.start(t)}
-          />
-
-          <div>
-            <div className="mb-2 flex flex-wrap items-baseline justify-between gap-x-3 px-1">
-              <span className="text-sm font-semibold">Today</span>
-              {/* `TIME-006` lives here now, and as a fact rather than a warning. Two
-                  tiles — "Payable today" and "On jobs today" — invited the addition they
-                  were captioned against; "6.18 of 7.57 h" is a part of a whole, and a
-                  part cannot be added to its whole. */}
-              <span className="tnum text-xs text-muted-foreground">
-                {dayMinutes > 0
-                  ? `${hours(jobMinutes)} of ${hours(dayMinutes)} h on jobs`
-                  : `${hours(jobMinutes)} h on jobs`}
-              </span>
-            </div>
-
-            <div className="overflow-hidden rounded-xl border bg-surface-3">
-              {mine.length === 0 && !clock.timer ? (
-                <p className="p-4 text-sm text-muted-foreground">
-                  Nothing yet today. Start something above.
-                </p>
-              ) : (
-                <ul className="divide-y">
-                  {clock.timer && (
-                    <li className="flex items-center gap-3 p-4 text-sm">
-                      <span className="size-2 shrink-0 animate-pulse rounded-full bg-nav-active" />
-                      <span className="min-w-0 flex-1 truncate font-medium">
-                        {clock.timer.jobNo ? jobLabel(clock.timer.jobNo) : clock.timer.activity}
-                      </span>
-                      <span className="tnum shrink-0 text-muted-foreground">
-                        {at(clock.timer.start)} → now
-                      </span>
-                    </li>
-                  )}
-                  {[...mine].reverse().map((e) => (
-                    <li key={e.id} className="flex items-center gap-3 p-4 text-sm">
-                      <span className="size-2 shrink-0 rounded-full bg-muted-foreground/30" />
-                      <span className="min-w-0 flex-1 truncate">
-                        {e.jobNo ? jobLabel(e.jobNo) : e.activity}
-                      </span>
-                      <span className="tnum shrink-0 text-right text-muted-foreground">
-                        {at(e.start)}–{at(e.end!)}
-                        <span className="hidden sm:inline"> · {hours(minutesOf(e))} h</span>
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </div>
-
-          {/* `TIME-008`, with no queue behind it. In a three-person shop the technician
-              tells Cam, who corrects it — a flag workflow would be a ticketing system
-              for a ten-second conversation. */}
-          <p className="px-1 text-xs text-muted-foreground">
-            Something look wrong? Tell Cam — he can fix it for you.
-          </p>
-        </div>
-      </div>
-    </div>
-  );
+export function TimePage() {
+  const { role, href } = useShell();
+  if (role === "tech") return <Navigate to={href("/app/today")} replace />;
+  return <Review />;
 }
 
 /* ----------------------------------------------------------------------- owner */

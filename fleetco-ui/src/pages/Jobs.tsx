@@ -252,7 +252,7 @@ function JobDetail({ no }: { no: string }) {
                   <Camera className="size-4" /> Add photo
                 </span>
               </Btn>
-              {/* Same state machine as My time. A timer started from a job and one
+              {/* Same state machine as the clock on Today. A timer started from a job and one
                   started from the time screen have to obey TIME-002/004/014
                   identically, which they cannot if each screen implements start. */}
               <span

@@ -26,6 +26,7 @@ export function Overlay({
   onOpenChange,
   title,
   eyebrow,
+  note,
   footer,
   children,
 }: {
@@ -34,6 +35,12 @@ export function Overlay({
   onOpenChange: (v: boolean) => void;
   title: string;
   eyebrow?: string;
+  /**
+   * A line that applies to everything below it — a consequence, a constraint, a filter.
+   * It sits under the header band and does NOT scroll, because something that governs
+   * every row cannot be allowed to scroll away from the rows it governs.
+   */
+  note?: ReactNode;
   footer?: ReactNode;
   children: ReactNode;
 }) {
@@ -76,6 +83,8 @@ export function Overlay({
               <X className="size-6" strokeWidth={1.75} />
             </Dialog.Close>
           </div>
+
+          {note && <div className="shrink-0 border-b">{note}</div>}
 
           <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
 

@@ -7,8 +7,9 @@ import {
   invoiceLineCost,
   invoiceLines,
   invoiceSubtotal,
+  estimates,
   invoices,
-  jobs,
+  isOpenEstimate,
   type InvoiceLine,
 } from "@/data/sample";
 import { useShell } from "@/shell/shell-context";
@@ -26,7 +27,7 @@ import { Popover } from "@/components/ui/popover";
 import { StatusPill } from "@/components/ui/status-pill";
 import { toast } from "sonner";
 import { Section, Stat, Td, Th } from "./Customers";
-import { EstimateEditor, KindTag } from "./EstimateEditor";
+import { EstimateEditor, KindTag, estimateTone } from "./EstimateEditor";
 import { cn, money } from "@/lib/utils";
 
 export function InvoicesPage() {
@@ -399,11 +400,30 @@ function InvoiceLineRows({ line, internal }: { line: InvoiceLine; internal: bool
   );
 }
 
+/* Open is the default for the same reason it is on Jobs: you come here to chase answers,
+   and the ones already settled are somewhere you go on purpose. */
+const ESTIMATE_SCOPES = [
+  { key: "open", label: "Open" },
+  { key: "answered", label: "Answered" },
+  { key: "all", label: "All" },
+];
+
 export function EstimatesPage() {
   const { id } = useParams();
   const { href } = useShell();
-  const rows = jobs.map((j) => ({ ...j, est: `E-${j.no.slice(2)}` }));
-  const selected = rows.find((r) => r.est === id);
+  // Real estimates, not jobs wearing an E- prefix. The status is EST-012's, so the row
+  // can say "Partially approved" and "Declined" — states a job-derived list cannot reach,
+  // and the second of which never becomes a job at all.
+  const selected = estimates.find((r) => r.no === id);
+  // Same guard as Jobs: the scope has to contain whatever the URL selected, or following
+  // a link to a declined estimate leaves the list beside it without that row.
+  const [scope, setScope] = useState(() =>
+    selected && !isOpenEstimate(selected) ? "answered" : "open"
+  );
+  const rows =
+    scope === "all"
+      ? estimates
+      : estimates.filter((e) => (scope === "open" ? isOpenEstimate(e) : !isOpenEstimate(e)));
 
   return (
     <ListDetailLayout
@@ -412,23 +432,38 @@ export function EstimatesPage() {
       empty="Pick an estimate."
       list={
         <>
-          <ListHeader title="Estimates" count={rows.length} action={<Btn primary>New</Btn>} />
+          <ListHeader
+            title="Estimates"
+            count={rows.length}
+            scopes={ESTIMATE_SCOPES}
+            scope={scope}
+            onScope={setScope}
+            action={<Btn primary>New</Btn>}
+          />
           <div className="min-h-0 flex-1 overflow-y-auto">
             {rows.map((r) => (
               <ListRow
-                key={r.est}
-                to={href(`/app/estimates/${r.est}`)}
-                selected={r.est === id}
-                title={`${r.est} · ${r.customer}`}
+                key={r.no}
+                to={href(`/app/estimates/${r.no}`)}
+                selected={r.no === id}
+                title={`${r.no} · ${r.customer}`}
                 subtitle={r.what}
                 meta={money(r.valueCents)}
-                metaSub={r.stage > 0 ? "approved" : "sent"}
+                metaSub={r.sent === "—" ? "not sent" : r.sent}
+                status={
+                  <StatusPill
+                    section="estimates"
+                    id={r.no}
+                    status={r.status}
+                    calm={estimateTone(r.status)}
+                  />
+                }
               />
             ))}
           </div>
         </>
       }
-      detail={selected && <EstimateEditor estimateId={selected.est} />}
+      detail={selected && <EstimateEditor estimateId={selected.no} />}
     />
   );
 }

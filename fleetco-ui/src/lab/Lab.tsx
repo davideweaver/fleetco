@@ -16,6 +16,8 @@ const DEVICES = [
 
 /** `label` is what fits on a chip; `note` is the detail, kept as the hover title. */
 const SCREENS = [
+  // Two shapes behind one screen — flip the role toggle to see the other.
+  { key: "today", label: "Today", note: "Where signing in lands. Owner: two columns. Technician: one column, clock first", path: "/app/today" },
   { key: "customers", label: "Customer", note: "Customers · list → detail", path: "/app/customers/ridgeline" },
   { key: "customers-empty", label: "Customer list", note: "Customers · nothing selected", path: "/app/customers" },
   { key: "jobs", label: "Job", note: "Job detail · G-1048", path: "/app/jobs/G-1048" },

@@ -257,22 +257,32 @@ export function FilterChip({
 /** The same bar for `pane: "wide"` screens, which have no list column. */
 export function PageHeader({
   title,
+  aside,
   count,
   action,
 }: {
   title: string;
+  aside?: ReactNode;
   count?: number;
   action?: ReactNode;
 }) {
-  return <SectionHeader title={title} count={count} action={action} />;
+  return <SectionHeader title={title} aside={aside} count={count} action={action} />;
 }
 
 function SectionHeader({
   title,
+  aside,
   count,
   action,
 }: {
   title: string;
+  /**
+   * A qualifier that belongs to the title — Today's date, not an action. It reads as
+   * part of the heading, so it sits against the title rather than across the band in
+   * the action slot, where the eye has to travel the full width to collect half a
+   * phrase.
+   */
+  aside?: ReactNode;
   count?: number;
   action?: ReactNode;
 }) {
@@ -282,6 +292,13 @@ function SectionHeader({
       {/* 18px against the rows' 14px. At text-base the gap was two pixels, so the title
           read as a heavier row rather than a header — bold alone could not carry it. */}
       <span className="text-lg font-bold tracking-tight">{title}</span>
+      {/* Same size as the title, so the two sit on one line as one phrase. Weight and
+          colour carry the hierarchy on their own — `medium` against `bold`, muted
+          against foreground — which is enough to keep it the title's second half rather
+          than a second heading competing with it. */}
+      {aside && (
+        <span className="text-lg font-medium tracking-tight text-muted-foreground">{aside}</span>
+      )}
       {count !== undefined && (
         <span className="tnum rounded-full bg-muted px-1.5 py-0.5 text-[11px] text-muted-foreground">
           {count}

@@ -136,6 +136,38 @@ The overlay's title is `text-base` — a heading, not a caption — and the clos
 the same as a form control. This is the escape hatch, and on an iPad it is hit with a thumb; a
 32px target in the corner of a dialog is the one nobody can reach in a hurry.
 
+### No card inside a card
+
+**A dialog's own contents never wear a box.** A rounded, bordered group inside a rounded,
+bordered dialog is two radii a few pixels apart and two borders doing one job, with a gutter
+of dead space between the outer edge and the inner one. It is the same rule as everywhere
+else, applied one level in: *panes are separated by tone, borders are for discrete objects* —
+and a list of choices in a dialog is not a discrete object, it is what the dialog is for.
+
+So a list inside an overlay looks like a list anywhere else: **rows edge to edge, separated
+by hairlines, headed by text rather than by a lid.** Where the body is padded, the list
+breaks out of it (`-mx-4 border-y`) rather than inheriting a gutter it does not want.
+
+**A box that means something stays.** The override warning in the approval dialog and the
+destructive block in a confirm are tinted regions carrying a state, not containers holding a
+list. The test is whether removing the border loses information: for a warning it does, for a
+list it does not.
+
+**An icon earns its place by distinguishing rows from each other, not by decorating them.**
+The job picker shows the test run both ways in one dialog. A briefcase on every job row
+repeated the heading two lines above and told the five jobs apart not at all, so it went. The
+four shop-time rows are one word each and otherwise identical, so a brush, a group of people
+and a mortarboard do real work, and they stay — in the same 32px `bg-muted` tile the lists use
+for a monogram, so a row here weighs what a row in the search palette weighs.
+
+**Flat is not the same as simple.** Taking the boxes off first produced a dialog of uniformly
+grey rows with nothing for the eye to catch: the group headings read as more rows, and
+`G-1048 · Unit 14 · full wrap` as one string gave the identifier and the work the same weight.
+What was missing was not borders but **rhythm** — headings banded on `--muted`, the job number
+in a fixed gutter like the day sheet's time column, the customer beneath in a smaller grey.
+Hierarchy comes from tone, position and weight; reaching for a border is what you do when
+those three have not been tried.
+
 ## Forms
 
 | Name | Component | Notes |
@@ -404,6 +436,11 @@ to be closed` are the same situation, and a pill per section is how they drift �
 asking `attentionMap` while the other picks up a hardcoded status string that quietly stops
 matching. A caller chooses only the **calm** tone, never whether the record needs attention.
 
+The calm tone reaches past grey — an estimate's `DECLINED` is red and `PARTIALLY APPROVED` a
+pale orange (`EST-012`). That stays safe because none of those tones is `--attention`, the one
+saturated amber, and the gap between a pale orange tint and that fill is wide enough to read at
+a glance. A caller may say "this went badly"; only `attentionMap` may say "someone has to act".
+
 Which statuses turn amber is `attentionMap`'s to say, never a list of strings written out again
 in the component. `DRAFT` is amber because `JOB-009` creates an invoice unsent and an unsent
 invoice is money not billed — if that rule changes, the colour follows it.
@@ -574,26 +611,77 @@ trigger is genuinely right-aligned.
 
 ## Time: two clocks, never one
 
+> **Where the technician's clock lives.** On **Today**, not in Time. Merged 2026-11-05:
+> two screens answering "what is my day" is how they drift, and a technician's half of
+> Time was never about payroll. `Time & payroll` is now an Owner-only section, `/app/time`
+> redirects a technician to Today, and `titleTech: "Clock"` is gone — it existed because
+> the section's real name never fitted what a technician came for. Everything below still
+> describes the two clocks; only the screen holding them changed.
+
 The technician's main control, and the screen where the wrong model costs real money.
 
-| | What it is | Drawn as |
+**One card, two named regions.** Not two cards, and not one nested inside the other — both of
+those were built first and both failed, in opposite directions.
+
+| Region | What it is | Drawn as |
 |---|---|---|
-| **The day** | attendance — "on the clock". The **only** payable thing (`TIME-006`) | its own card, the only large number on the screen |
-| **Right now** | the job or activity you are on. Costing only (`TIME-011`) | a second, plainer card that never mentions pay |
+| **The day** | attendance — "on the clock". The **only** payable thing (`TIME-006`) | the front of the card: the only 4xl figure, and the one coloured 44px button |
+| **Right now** | the job or activity you are on. Costing only (`TIME-011`) | recessed below it on `--surface-2`: smaller dot, body type, plain buttons, no mention of pay |
 
-**Pay is named once, on the card that pays.** The day card carries one sentence — "Hours you
-get paid for today" — under a 4xl figure. The "Right now" card says what you are on, when it
-started and how long it has run, and nothing about money. There is no second place for a
-technician to look for their wages, so there is nothing to confuse.
+**Pay is named once, in the region that pays.** One sentence — "Hours you get paid for today" —
+under the big figure. Right now says what you are on, when it started and how long it has run,
+and nothing about money. There is no second place to look for wages, so there is nothing to
+confuse.
 
-**Nesting was tried and it failed.** The first version drew the job timer *inside* the punch,
-on the theory that containment would teach itself: job time happens within an attendance day,
-so the layout would say so before anyone read a label. It did not. Two rows with the same dot,
-the same type size and the same button shape read as two equal switches, and the captions sent
-to rescue the structure — "costing only", "payable hours come from here, not from job timers" —
-explained the data model to someone who only wants to know whether they are getting paid. A
-screen that needs a paragraph is not understood; the containment is now carried by size and by
-two headings in plain words.
+**Both of the obvious layouts were tried first.** *Nesting with no other signal* came first: the
+job timer inside the punch, trusting containment to teach itself. It read as two equal switches,
+because both halves carried the same dot, the same type size and the same button shape, and the
+captions sent to rescue it — "costing only", "payable hours come from here, not from job timers"
+— explained the data model to someone who only wants to know whether they are getting paid.
+*Two separate cards* came second: legible, but it said nothing. Two cards in a column are two
+peers, and job time is not a peer of the day — it is a part of it.
+
+What works is the containment of the first with the legibility of the second: one card, a step
+back in surface tone for the inner region, and two headings in plain words. **The hierarchy is
+carried by weight, never by a caption** — a screen that needs a paragraph is not understood.
+
+**"What are you working on?" is a dialog.** It used to expand inside the card, which was fine
+while the clock was the whole screen. On Today it is a 320px column beside a day of rows, and a
+panel that pushes that column past the page moves everything the technician was looking at. A
+choice that blocks until it is answered is a dialog, the same as closing a job.
+
+The first draft of that dialog read as a *navigation menu*, and the four causes are worth
+keeping, because each is a trap any pick-one dialog can fall into:
+
+| It did | So it read as | Instead |
+|---|---|---|
+| Titled itself `Switch to` | an unfinished sentence | **a plain question** — "What are you working on?" |
+| Shouted `SWITCHING FROM G-1052 · BOX TRUCK LOGO KIT` in the eyebrow | the loudest thing on screen being the least important | **a sentence in the body**: "Picking one stops G-1052 at 2:36pm, after 1.43 h" |
+| Headed a group `Not a job` | a label naming what the options are *not* | **named for what it holds** — "Shop time" |
+| Offered rows for jobs and chips for activities | two ways to answer one question | **one list, one row shape** |
+| Put a chevron on every row | a list of doors | **no chevron** — every row here is the end of the journey |
+
+The sentence is `TIME-002` said out loud: starting a timer stops the running one *at the same
+instant*, and the technician should know that before they choose, not from the toast after.
+
+### A note governs its list, so it does not scroll
+
+`Overlay` takes a **`note`** — a region under the header band that stays put while the body
+scrolls. It is for a line that applies to *everything below it*: a consequence, a constraint,
+a filter field. A consequence that scrolls away from the rows it governs is one the person
+reads once and never again.
+
+**One scroll context per overlay.** Group headings inside the body are `sticky` instead of the
+body being carved into separately scrolling regions — two nested scrollers mean two scrollbars
+and a touch flick that moves the wrong one. A pinned band answers the same question for free:
+which group am I in.
+
+**A filter appears only when there is something to filter.** The job picker shows one at eight
+jobs, which is roughly where "Shop time" stops fitting underneath the job list in an 85vh
+dialog. Below that the whole list is on screen already and a search box is a control that can
+only slow you down. It filters the unbounded group *only* — shop time is four fixed rows and is
+the half a long list pushes off the screen, so filtering it as well would hide the thing the
+filter exists to protect.
 
 **The two numbers still never add up.** Jason on the clock 07:00–15:30 and logging 6.0 h on
 jobs plus 1.5 h on cleanup is paid **8.50, not 16.00** — a grand total is the single most
@@ -637,6 +725,12 @@ implements start.
 the Owner work a queue of flags. Nobody asked for it: punch list 4.6 says only "Manual timesheet
 corrections", and Cam never raised it. In a three-person shop the technician tells Cam and Cam
 fixes it — a queue would be a ticketing system for a ten-second conversation.
+
+**And it is not written on the screen either.** Today used to end with "Something look wrong?
+Tell Cam — he can fix it for you." It went on 2026-11-05. Standing instructions printed on a
+screen are read once and then become furniture, and this one was explaining an absence — the
+reason there is nothing to click — to a technician who had not asked. The rule still holds;
+it just does not need a caption to hold it.
 
 That decides the shape of the Owner's screen. With no queue to work, **every entry in the period
 is listed with a Correct… action**, because being told "Tuesday's wrong" and then having to find

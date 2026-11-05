@@ -146,11 +146,16 @@ export function RecordAnswerDialog({
               {picked.size === pending.length ? "Clear all" : "Select all"}
             </button>
           </div>
-          <div className="overflow-hidden rounded-lg border">
+          {/* Edge to edge, not boxed. A rounded, bordered group inside a rounded,
+              bordered dialog is a card inside a card: two radii a few pixels apart and
+              two borders doing one job. Borders are for discrete objects, and a dialog's
+              own contents are not one — so the rows break the body's padding with
+              `-mx-4` and are separated by hairlines, like list rows anywhere else. */}
+          <div className="-mx-4 border-y">
             {pending.map((l) => (
               <label
                 key={l.id}
-                className="flex cursor-pointer items-center gap-2.5 border-b px-3 py-2 text-sm last:border-0 hover:bg-accent/40"
+                className="flex cursor-pointer items-center gap-2.5 border-b px-4 py-2.5 text-sm last:border-0 hover:bg-accent/40"
               >
                 <input
                   type="checkbox"
@@ -169,7 +174,7 @@ export function RecordAnswerDialog({
               </label>
             ))}
             {pending.length === 0 && (
-              <div className="px-3 py-4 text-center text-sm text-muted-foreground">
+              <div className="px-4 py-4 text-sm text-muted-foreground">
                 Nothing is pending.
               </div>
             )}

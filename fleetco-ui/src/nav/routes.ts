@@ -1,6 +1,7 @@
 import {
   BarChart3,
   Briefcase,
+  CalendarCheck,
   CalendarDays,
   Clock,
   FileText,
@@ -53,6 +54,10 @@ export type NavItem = {
 };
 
 export const NAV: NavItem[] = [
+  // First, and where /app lands. No badge: `badges.ts` only walks the sections that own
+  // an attention rule, and Today owns none of its own — it rolls up theirs. A number here
+  // would be every other number in the rail added together and said a second time.
+  { key: "today", group: "work", title: "Today", short: "Today", icon: CalendarCheck, path: "/app/today", pane: "wide", roles: ["owner", "tech"], phone: 0 },
   { key: "board", group: "work", title: "Job board", short: "Board", icon: LayoutGrid, path: "/app/board", pane: "wide", roles: ["owner"], phone: 1 },
   { key: "jobs", group: "work", title: "Jobs", titleTech: "My jobs", short: "Jobs", icon: Briefcase, path: "/app/jobs", pane: "list-detail", listKind: "records", roles: ["owner", "tech"], phone: 2 },
   { key: "schedule", group: "work", title: "Schedule", short: "Schedule", icon: CalendarDays, path: "/app/schedule", pane: "wide", roles: ["owner", "tech"], phone: 3 },
@@ -61,7 +66,10 @@ export const NAV: NavItem[] = [
   { key: "invoices", group: "sales", title: "Invoices", short: "Invoices", icon: Receipt, path: "/app/invoices", pane: "list-detail", listKind: "records", roles: ["owner"], phone: 4 },
   // list-detail for the owner's review, which selects an employee on the left; the
   // technician's own screen is one pane because they are the only person on it.
-  { key: "time", group: "shop", title: "Time & payroll", titleTech: "Clock", short: "Time", icon: Clock, path: "/app/time", landing: "/app/time/summary", pane: "list-detail", roles: ["owner", "tech"], phone: 5 },
+  // Owner only. The technician's clock is on Today, so a second rail entry for it would
+  // be two names for one screen — and `titleTech: "Clock"` existed precisely because
+  // "Time & payroll" was never what a technician came here for.
+  { key: "time", group: "shop", title: "Time & payroll", short: "Time", icon: Clock, path: "/app/time", landing: "/app/time/summary", pane: "list-detail", roles: ["owner"], phone: 5 },
   { key: "materials", group: "shop", title: "Materials & ordering", short: "Materials", icon: Package, path: "/app/materials", pane: "list-detail", listKind: "records", roles: ["owner"] },
   { key: "reports", group: "admin", title: "Reports", short: "Reports", icon: BarChart3, path: "/app/reports", pane: "list-detail", listKind: "sections", roles: ["owner"] },
   { key: "settings", group: "admin", title: "Settings", short: "Settings", icon: Settings, path: "/app/settings", pane: "list-detail", listKind: "sections", roles: ["owner"] },
