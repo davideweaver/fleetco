@@ -133,6 +133,22 @@ rule (INV-004).
 **Source:** PL 1.5 ("unique customer/job/SO IDs"), 7.17 · **Status:** Confirmed (format Proposed) ·
 **Phase:** V1
 
+### PLAT-010 A user arranges their own navigation, and arranging is not permitting
+**Rule:** a user can reorder the sections in their **menu** and hide ones they rarely open. A
+hidden section stays reachable through **More**, stays in search, and keeps its attention badge,
+which rolls up onto the More button. Hiding never grants or removes access: what a user may reach
+is their role's permissions (PLAT-008, ROLE-001). The arrangement is personal and affects nobody
+else's navigation.
+**Examples:**
+- Given an owner who hides Time & payroll, when payroll needs attention, then the badge appears on
+  More rather than vanishing.
+- Given a user who moves Customers to the top, then Customers is also the first button on their
+  phone's bottom bar — one ordering, both devices.
+- Given a role that loses access to a section, then that section leaves the navigation whatever the
+  user's arrangement says, because the role decides and the arrangement only sorts.
+**Source:** Dave, Nov 6 2026 ("I have a cluttered nav rail... let's hide those") · **Status:**
+Confirmed · **Phase:** V1
+
 ---
 
 ## 2. Roles and access (ROLE)
@@ -1055,7 +1071,7 @@ detail in brackets; those details are what Cam should skim.
 
 | Section | Rules | Confirmed | Inferred | Proposed | Decision needed |
 |---|---|---|---|---|---|
-| PLAT Cross-cutting | 9 | 7 | 0 | 1 | 1 |
+| PLAT Cross-cutting | 10 | 8 | 0 | 1 | 1 |
 | ROLE Roles and access | 9 | 6 | 0 | 1 | 2 |
 | CUST Customers and assets | 8 | 3 | 1 | 3 | 1 |
 | EST Estimates | 18 | 8 | 1 | 6 | 3 |
@@ -1068,7 +1084,7 @@ detail in brackets; those details are what Cam should skim.
 | QBO QuickBooks | 6 | 2 | 0 | 1 | 3 |
 | RPT Reports | 7 | 4 | 0 | 1 | 2 |
 | MIG Migration | 3 | 1 | 0 | 2 | 0 |
-| **Total** | **137** | **83** | **7** | **27** | **20** |
+| **Total** | **138** | **84** | **7** | **27** | **20** |
 
 Plus 12 Later constraints (§14) and 27 questions (§15).
 
@@ -1084,6 +1100,7 @@ and permissions are mostly Confirmed, because Cam's notes were precise about the
 | 2026-10-31 | PLAT-006 reworded: shared customers is our design choice, and evidence suggests FullBay keeps customers per shop. Added D-C18. |
 | 2026-11-04 | TIME-008: the technician "flags an entry for correction" clause removed. PL 4.6 says only "Manual timesheet corrections" and Cam never raised a flag workflow — the clause was invented in the first draft and took the source's Confirmed status with it. The rest of TIME-008 stands. |
 | 2026-11-05 | **The estimate reshaped from "every customer line is a container" to a flat list of rows where only a package has contents** (EST-002), by Dave. Added EST-014 package pricing, EST-015 estimate-built packages, EST-016 copy semantics, EST-017 no nesting, EST-018 the print setting, PUR-011 the saved-package catalog record, and a package clause on AUTH-001. ROLE-009 and INV-001 needed no change: "component" now means "a row inside a package", which is exactly what they already say never reaches a customer document. EST-002 drops from Confirmed to Proposed until Cam sees it. Added D-C19 and D-C20. |
+| 2026-11-06 | Added PLAT-010: a user arranges their own navigation, and arranging is not permitting. Raised by Dave, who started from "turn things off by default" and ruled it out himself — what a user may reach is their role, so this is ordering and hiding only. |
 | 2026-11-03 | PLAT-006 UI clause reversed by Dave. The department is visible from V1 even with one department; only switching stays Later. The clause was Proposed, so this is a spec change rather than a correction. |
 
 ## Related

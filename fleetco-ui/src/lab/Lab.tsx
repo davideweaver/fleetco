@@ -28,6 +28,9 @@ const SCREENS = [
   { key: "estimate", label: "Estimate", note: "Estimate line editor", path: "/app/estimates/E-1048" },
   { key: "reports", label: "Reports", note: "Reports · sections list", path: "/app/reports/ar-aging" },
   { key: "time", label: "Time", note: "Time & payroll · wide", path: "/app/time" },
+  // Open two devices for this one. The frames share an origin, so reordering in the
+  // desktop frame moves the phone frame's bottom bar as you click.
+  { key: "nav-order", label: "Nav order", note: "Settings · order the menu, hide behind More", path: "/app/settings/navigation" },
   { key: "photos", label: "Photos", note: "Photos · upload lifecycle", path: "/app/jobs/G-1052?photos=demo" },
   { key: "form", label: "Form", note: "Form in a panel · new job", path: "/app/jobs?overlay=form" },
   { key: "form-errors", label: "Form errors", note: "Form with validation errors", path: "/app/jobs?overlay=form-errors" },

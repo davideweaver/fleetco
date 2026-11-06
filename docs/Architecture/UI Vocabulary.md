@@ -32,6 +32,7 @@ grep for the thing they mean. It is the same failure the single route table prev
 │  ⑧ nav     │                  │     ├ stat strip                │
 │  ⑨ badge   │                  │     └ detail section            │
 │            │                  │                                 │
+│ ⑩a more    │                  │                                 │
 │ ⑩ collapse │                  │                                 │
 │ ⑪ context  │  ← list column → │                                 │
 │    cluster │                  │                                 │
@@ -41,19 +42,64 @@ grep for the thing they mean. It is the same failure the single route table prev
 
 | # | Name | Component | What it is |
 |---|---|---|---|
-| ① | **Rail** | `AppShell` | The left navigation. **Expanded** (208px, labels) or **collapsed** (56px, icons). Not "sidebar" — that alternative was built, compared, and dropped |
+| ① | **Rail** | `AppShell` | The **menu** drawn on a desktop. **Expanded** (208px, labels) or **collapsed** (56px, icons). Not "sidebar" — that alternative was built, compared, and dropped |
 | ② | **Section header** | `SectionHeader` | The **band** at the top of the list column: section name, count and actions. `ListHeader` on list sections, `PageHeader` on wide ones. **There is no top banner** — it duplicated this |
 | ③ | **List row** | `ListRow` | One record in the list column. A **row**, never a card. Carries an optional **monogram** and an **attention reason** |
 | ③a | **Filter chips** | in `ListHeader` | All / Needs you. Only appear when something needs attention |
-| ④ | **Bottom bar** | `AppShell` | The phone's navigation. Four items plus **More**, which opens the **More sheet** |
+| ④ | **Bottom bar** | `AppShell` | The **menu** drawn on a phone. The **first four** sections of the menu order, plus **More**, which opens the **More sheet**. There is no separate phone ordering |
 | ⑤ | **Detail header** | `DetailHeader` | A **band** carrying the eyebrow and the actions, then the title and subtitle below it |
 | ⑤a | **Tabs** | `Tabs` | Two or more views of the record named in ⑤, directly under it. Underlined, never pills, and never a filter |
 | ⑥ | **Detail pane** | `ListDetailLayout` | The right pane. Holds a **stat strip** (the row of labelled numbers) and **detail sections** |
 | ⑦ | **Search palette** | `SearchPalette` | Global search. Opened from the rail, `⌘K`, or the phone magnifier. Not a search *field*; there is nowhere to put one |
-| ⑧ | **Nav item** | `AppShell` | One entry in the rail. Grouped into **nav groups** (work / sales / shop / admin) separated by a hairline |
+| ⑧ | **Nav item** | `AppShell` | One **section** in the menu, in the user's **arrangement**. Grouped into **nav groups** (work / sales / shop / admin) separated by a hairline — but only while the arrangement is the default one |
 | ⑨ | **Nav badge** | `NavBadge` | A **count** or a **dot** on a nav item. **Inline** count at the end of a labelled row; **overlay dot** on a collapsed icon — ten figures on ten icons is a rail you read instead of glance at |
+| ⑩a | **More button** | `AppShell` | Reaches the sections the user has hidden from the menu. Only present when something is hidden, and it wears their badges |
 | ⑩ | **Collapse toggle** | `AppShell` | Switches the rail between expanded and collapsed |
 | ⑪ | **Context cluster** | `ContextCluster` | Avatar, department and account, at the foot of the rail |
+
+### Menu is the word users see; rail and bottom bar are ours
+
+The **menu** is the ordered list of sections. The **rail** and the **bottom bar** are the
+two ways it is drawn, and those two words never reach a user — a phone has no rail, and
+the screen that orders the menu orders both devices at once.
+
+We had no name for the thing itself, so "rail" leaked into the copy and a phone ended up
+reading *Hidden from the rail*. That is what an unnamed concept costs. The rule now:
+
+| Users see | We say internally | What it is |
+|---|---|---|
+| **menu** | menu | The ordered list of sections |
+| — | **rail** | The menu on a desktop, expanded or collapsed |
+| — | **bottom bar** | The menu on a phone, four slots plus More |
+| **More** | More button / More sheet | What reaches the sections held back |
+
+"Menu" has one owner now. A row's `⋯` opens **actions**, not "a menu", and More opens the
+**More sheet** or the **More popover** — naming those "menus" is what made "menu" feel
+too vague to use here in the first place.
+
+### The menu is arranged by the person using it
+
+Settings · Navigation reorders the menu and hides sections behind **More**. One ordered
+list drives both devices: the rail draws all of it, and the phone's bottom bar is its
+first four. A second ordering for the phone existed, said exactly what the menu order
+already said, and was deleted.
+
+Three things this is not:
+
+- **Not a permission.** What a user may reach is their role (PLAT-008, ROLE-001). Hiding
+  a section moves it one click away and nothing more — it stays in search, it stays in the
+  More menus, and it keeps its badge, which rolls up onto the More button. The section you
+  put away because you rarely need it must still be able to ask for you.
+- **Not shared.** It is one person's arrangement of their own menu, stored per role in
+  the browser. Nobody else's menu moves.
+- **Not a form.** There is no Save. Every click writes through and the rail beside the
+  screen moves on it, because "is this menu less cluttered" is a question you answer by
+  looking at the menu, not by reading a list and committing to it.
+
+The nav groups and the arrangement cannot both be true, so the default wins when it is
+still the default: a reordered menu drops its group hairlines. "Customers at the top" puts
+Sales above Work on purpose, and a separator in that menu would be drawing a line between
+sections that no longer have anything in common.
 
 ## Smaller parts
 
@@ -1099,6 +1145,22 @@ becomes required, and the confirm button turns to the warning treatment.
 override — overrides are for when nobody answered at all. If that turns out to be his
 daily path rather than an exception, the override should be promoted to a peer.
 
+## Content starts at the left edge
+
+A page's content block is **left-aligned**, with a `max-w-*` to cap line length when the
+prose would otherwise run the width of a 1440px pane. A max width is not a reason to
+centre: `max-w-2xl` keeps the measure readable, `mx-auto` moves the whole screen into the
+middle and leaves a channel of empty surface down the left that nothing explains.
+
+**Today is the one exception** (`mx-auto max-w-[1000px]`). It is a dashboard rather than a
+record — two columns of cards with no list column beside them — so it has no left edge of
+its own to line up with. Everywhere else there is one: the list column, the detail header,
+the band above. Centring under a left-aligned header is the misalignment this rule exists
+to stop.
+
+`mx-auto` on an icon or a small fixed-width grid inside its own box is a different thing
+and is fine — the calendar grid in the phone's bottom sheet, an empty-state glyph.
+
 ## Light accents work harder than dark ones
 
 The warm palette's amber sits far from a dark surface and pops. The same hue on cream
@@ -1127,14 +1189,21 @@ back.
    *Sheet* covers the screen and is dismissed.
 2. **The thing is named for what it holds, not where it sits.** "List column", not "left column" —
    it is the only pane on a phone and sits nowhere in particular.
-3. **No synonyms.** Sidebar, nav bar, menu, drawer and panel are all **banned** in favour of the
-   names above. A review comment saying "this is the rail, not the sidebar" is doing its job.
+3. **No synonyms.** Sidebar, nav bar, drawer and panel are all **banned** in favour of the names
+   above. A review comment saying "this is the rail, not the sidebar" is doing its job.
+   **Menu** is the exception, and it is not a synonym: the menu is the ordered list of sections,
+   the rail and the bottom bar are how it is drawn. It was banned here until this screen needed a
+   word for the thing a user arranges, and banning it is what pushed "rail" into the UI.
 4. **Two words for two things.** A **count badge** says how many are waiting; a **dot badge** says
    something is off. Never call either a "notification".
 5. **Layout names are role-independent.** There is no "technician rail" — there is a rail, filtered
    by role.
 6. **A new name needs a component.** If there is nothing in `fleetco-ui/src` to point at, the thing
    does not need a name yet.
+7. **Say which names a user may read.** Most names here are ours: *rail*, *bottom bar*, *list
+   column*, *band*. The ones a user sees are **menu**, **More**, **section** and the section names
+   themselves. Copy that reaches for one of ours is a sign the user-facing word is missing — the
+   phone that said *Hidden from the rail* had no rail on it.
 
 ## Known gaps
 

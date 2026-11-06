@@ -10,10 +10,11 @@ import { cn } from "@/lib/utils";
  * viewport ends up half off-screen, so below `pad` it becomes a bottom sheet — the same
  * rule overlays already follow, and it keeps the content identical either way.
  *
- * What we give up and should not forget: it does not flip to stay on screen near the
- * bottom of a tall page. The pickers that use it sit in headers and forms, near the
- * top, so it has not bitten yet. If something puts one at the foot of a long page, that
- * is the thing to fix rather than reaching for a library.
+ * What we give up and should not forget: it does not FLIP to stay on screen. It is told
+ * which way to open instead. The pickers sit in headers and forms near the top and take
+ * the default; the rail's More button sits at the foot of a full-height rail and passes
+ * `side="above"`. Automatic collision detection is the thing a library would buy, and
+ * one honest prop has covered both callers so far.
  */
 export function Popover({
   open,
@@ -21,6 +22,7 @@ export function Popover({
   trigger,
   children,
   align = "start",
+  side = "below",
   label,
 }: {
   open: boolean;
@@ -28,6 +30,8 @@ export function Popover({
   trigger: ReactNode;
   children: ReactNode;
   align?: "start" | "end";
+  /** Which way it opens from the trigger. It does not work this out for itself. */
+  side?: "below" | "above";
   /** Names the thing for assistive tech — "Choose a date", "Choose a date range". */
   label: string;
 }) {
@@ -71,7 +75,10 @@ export function Popover({
             className={cn(
               "z-50 rounded-xl border bg-popover text-popover-foreground shadow-lg",
               "fixed inset-x-0 bottom-0 rounded-b-none p-3",
-              "pad:absolute pad:inset-x-auto pad:bottom-auto pad:top-[calc(100%+6px)]",
+              "pad:absolute pad:inset-x-auto",
+              side === "above"
+                ? "pad:top-auto pad:bottom-[calc(100%+6px)]"
+                : "pad:bottom-auto pad:top-[calc(100%+6px)]",
               "pad:w-auto pad:rounded-b-xl",
               align === "end" ? "pad:right-0" : "pad:left-0"
             )}

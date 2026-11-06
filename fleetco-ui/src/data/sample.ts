@@ -240,6 +240,8 @@ export const reports = [
 ];
 
 export const settingsSections = [
+  // First, and the only one on this list that is about the person rather than the shop.
+  { id: "navigation", name: "Navigation", note: "Order the menu, hide what you rarely open" },
   { id: "departments", name: "Departments", note: "Graphics. Words and stages" },
   { id: "stages", name: "Job stages", note: "Six stages, renameable" },
   { id: "roles", name: "Roles & people", note: "Owner, Technician" },

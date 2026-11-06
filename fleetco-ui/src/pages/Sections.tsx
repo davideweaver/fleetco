@@ -16,6 +16,7 @@ import { useState } from "react";
 import type { DateRange } from "@/components/ui/date-picker";
 import { DatesDemo } from "./Dates";
 import { StatesDemo } from "./States";
+import { NavSettings } from "./NavSettings";
 
 /**
  * The second column's other mode: a list of sections rather than records.
@@ -33,6 +34,14 @@ const DEMOS: Record<string, () => React.ReactElement> = {
   _states: StatesDemo,
 };
 
+/**
+ * Settings that have a screen. Everything else on the list is still a placeholder, so
+ * this map is also the honest answer to "which of these actually work".
+ */
+const FORMS: Record<string, () => React.ReactElement> = {
+  navigation: NavSettings,
+};
+
 export function SectionsPage({ kind }: { kind: "reports" | "settings" }) {
   const { id } = useParams();
   const { href } = useShell();
@@ -48,6 +57,7 @@ export function SectionsPage({ kind }: { kind: "reports" | "settings" }) {
   const selected =
     settings.find((s) => s.id === id) ?? demos.find((s) => s.id === id);
   const Demo = id ? DEMOS[id] : undefined;
+  const Form = kind === "settings" && id ? FORMS[id] : undefined;
   const report = kind === "reports" && id ? REPORTS[id] : undefined;
 
   // The demos are in `ids` so one stays open if that is where you were, but they come
@@ -112,6 +122,10 @@ export function SectionsPage({ kind }: { kind: "reports" | "settings" }) {
             />
             {Demo ? (
               <Demo />
+            ) : Form ? (
+              <div className="min-h-0 flex-1 overflow-y-auto">
+                <Form />
+              </div>
             ) : (
               <div className="grid place-items-center p-10 text-sm text-muted-foreground">
                 Setting form.

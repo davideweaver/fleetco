@@ -17,8 +17,9 @@ export type Role = "owner" | "tech";
 export type Pane = "list-detail" | "wide";
 
 /**
- * ONE route table. The rail, the classic sidebar and the phone bottom bar are three
- * renderers over this array — never three hand-kept lists. VarsityBio keeps two
+ * ONE route table. The rail, the phone bottom bar and the More menus are renderers over
+ * this array — never hand-kept lists. What each ONE of them draws, and in what order, is
+ * the user's own arrangement on top of it: see `preferences.ts`. VarsityBio keeps two
  * (`normalSections` and `mobileNormalNavItems`) and they have already drifted
  * ("Edit Page" vs "Edit"), which is the whole argument for this file.
  */
@@ -44,8 +45,6 @@ export type NavItem = {
    */
   landing?: string;
   roles: Role[];
-  /** Bottom-bar order. Lower wins; undefined means "behind More". */
-  phone?: number;
   /** What the second column holds. Records are data; sections are sub-navigation. */
   listKind?: "records" | "sections";
   /** Rail grouping. With labels gone, a separator between groups is the only
@@ -57,19 +56,19 @@ export const NAV: NavItem[] = [
   // First, and where /app lands. No badge: `badges.ts` only walks the sections that own
   // an attention rule, and Today owns none of its own — it rolls up theirs. A number here
   // would be every other number in the rail added together and said a second time.
-  { key: "today", group: "work", title: "Today", short: "Today", icon: CalendarCheck, path: "/app/today", pane: "wide", roles: ["owner", "tech"], phone: 0 },
-  { key: "board", group: "work", title: "Job board", short: "Board", icon: LayoutGrid, path: "/app/board", pane: "wide", roles: ["owner"], phone: 1 },
-  { key: "jobs", group: "work", title: "Jobs", titleTech: "My jobs", short: "Jobs", icon: Briefcase, path: "/app/jobs", pane: "list-detail", listKind: "records", roles: ["owner", "tech"], phone: 2 },
-  { key: "schedule", group: "work", title: "Schedule", short: "Schedule", icon: CalendarDays, path: "/app/schedule", pane: "wide", roles: ["owner", "tech"], phone: 3 },
+  { key: "today", group: "work", title: "Today", short: "Today", icon: CalendarCheck, path: "/app/today", pane: "wide", roles: ["owner", "tech"] },
+  { key: "board", group: "work", title: "Job board", short: "Board", icon: LayoutGrid, path: "/app/board", pane: "wide", roles: ["owner"] },
+  { key: "jobs", group: "work", title: "Jobs", titleTech: "My jobs", short: "Jobs", icon: Briefcase, path: "/app/jobs", pane: "list-detail", listKind: "records", roles: ["owner", "tech"] },
+  { key: "schedule", group: "work", title: "Schedule", short: "Schedule", icon: CalendarDays, path: "/app/schedule", pane: "wide", roles: ["owner", "tech"] },
   { key: "estimates", group: "sales", title: "Estimates", short: "Estimates", icon: FileText, path: "/app/estimates", pane: "list-detail", listKind: "records", roles: ["owner"] },
   { key: "customers", group: "sales", title: "Customers", short: "Customers", icon: Users, path: "/app/customers", pane: "list-detail", listKind: "records", roles: ["owner"] },
-  { key: "invoices", group: "sales", title: "Invoices", short: "Invoices", icon: Receipt, path: "/app/invoices", pane: "list-detail", listKind: "records", roles: ["owner"], phone: 4 },
+  { key: "invoices", group: "sales", title: "Invoices", short: "Invoices", icon: Receipt, path: "/app/invoices", pane: "list-detail", listKind: "records", roles: ["owner"] },
   // list-detail for the owner's review, which selects an employee on the left; the
   // technician's own screen is one pane because they are the only person on it.
   // Owner only. The technician's clock is on Today, so a second rail entry for it would
   // be two names for one screen — and `titleTech: "Clock"` existed precisely because
   // "Time & payroll" was never what a technician came here for.
-  { key: "time", group: "shop", title: "Time & payroll", short: "Time", icon: Clock, path: "/app/time", landing: "/app/time/summary", pane: "list-detail", roles: ["owner"], phone: 5 },
+  { key: "time", group: "shop", title: "Time & payroll", short: "Time", icon: Clock, path: "/app/time", landing: "/app/time/summary", pane: "list-detail", roles: ["owner"] },
   { key: "materials", group: "shop", title: "Materials & ordering", short: "Materials", icon: Package, path: "/app/materials", pane: "list-detail", listKind: "records", roles: ["owner"] },
   { key: "reports", group: "admin", title: "Reports", short: "Reports", icon: BarChart3, path: "/app/reports", pane: "list-detail", listKind: "sections", roles: ["owner"] },
   { key: "settings", group: "admin", title: "Settings", short: "Settings", icon: Settings, path: "/app/settings", pane: "list-detail", listKind: "sections", roles: ["owner"] },
@@ -80,12 +79,10 @@ export const navFor = (role: Role) => NAV.filter((i) => i.roles.includes(role));
 export const labelFor = (item: NavItem, role: Role) =>
   role === "tech" && item.titleTech ? item.titleTech : item.title;
 
-/** The bottom bar shows four, and More carries the rest with their badges. */
-export const phoneNavFor = (role: Role) =>
-  navFor(role)
-    .filter((i) => i.phone !== undefined)
-    .sort((a, b) => (a.phone ?? 99) - (b.phone ?? 99))
-    .slice(0, 4);
+/* The bottom bar's four sections are the first four of the rail, so there is no second
+   ordering to keep in step — see `phoneSlots` in `preferences.ts`. A `phone?: number`
+   field lived here and had drifted into saying exactly what the rail order already said,
+   which made "ONE route table" two tables wearing one name. */
 
 export const itemForPath = (pathname: string) =>
   NAV.find((i) => pathname === i.path || pathname.startsWith(i.path + "/"));
