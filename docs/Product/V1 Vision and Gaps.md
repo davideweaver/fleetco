@@ -420,6 +420,14 @@ small build that fixes something he actively hates.
 >    and roll up into the parent line by default.
 >
 > Not a question for Cameron. Design work for the spec, with alternatives to weigh then.
+>
+> **Mechanism chosen 2026-11-05 by Dave — both, and neither as originally framed.** The estimate
+> is a **flat list of rows**: catalog material, custom item, labor, allowance, or **package**. Only
+> a package has contents, and contents are the only thing hidden from a customer document. So
+> mechanism 1 (reusable groups) is the package, mechanism 2 (a display flag) is unnecessary —
+> a material the customer should see is simply left at the top level rather than put in a package.
+> A package can also be built inside one estimate and live only there. Written up as EST-002 and
+> EST-014 … EST-018 plus PUR-011 in [[Rules Catalog]], Proposed pending Cam (D-C19, D-C20).
 
 **Three things this resolution carries forward:**
 

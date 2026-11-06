@@ -64,7 +64,7 @@ export function AppShell() {
     // `seed` is carried even though `overlay` and `photos` are not. Those belong to one
     // screen; seed defines which records the section HAS, so dropping it on the way from
     // a list row to its detail would land on a job that no longer exists.
-    const keep = ["role", "palette", "theme", "seed"];
+    const keep = ["role", "palette", "theme", "seed", "sel"];
     const q = new URLSearchParams();
     for (const k of keep) {
       const v = params.get(k);

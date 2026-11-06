@@ -59,6 +59,13 @@
   --surface-1: oklch(0.975 0 0);
   --surface-2: oklch(0.99 0 0);
   --surface-3: oklch(1 0 0);
+
+  /* The stripe on a dense table, and the tone of a nested row inside one. A real token
+     rather than `bg-muted/20`, because --muted sits within 0.03 lightness of the pane
+     in every theme — at any alpha that reads as a rendering artefact, and on dark it
+     vanished outright. Dark needs a BIGGER step than light to look like the same
+     stripe: the eye reads lightness ratios, not differences. */
+  --row-band: oklch(0.955 0 0);
   --font-app: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   /* PLACEHOLDER brand hue. The active rail chip needs a colour to read as a chip;
      this is the one value to swap when the palette is chosen. */
@@ -141,6 +148,7 @@
   --surface-1: oklch(0.948 0.013 85);
   --surface-2: oklch(0.973 0.009 85);
   --surface-3: oklch(0.995 0.004 85);
+  --row-band: oklch(0.925 0.016 85);
 
   /* Deeper than it looks like it should be. The dark rail's amber sits far from its
      surface and pops; the same lightness on cream was 4.06:1 — under the AA floor for
@@ -182,6 +190,7 @@
   --surface-1: oklch(0.175 0.01 68);
   --surface-2: oklch(0.25 0.012 68);
   --surface-3: oklch(0.305 0.013 68);
+  --row-band: oklch(0.225 0.013 68);
   /* Dark is where the reference's bright yellow actually works. */
   --brand: oklch(0.82 0.15 85);
   --brand-foreground: oklch(0.21 0.02 75);
@@ -234,6 +243,7 @@
   --surface-1: oklch(0.175 0 0);
   --surface-2: oklch(0.205 0 0);
   --surface-3: oklch(0.235 0 0);
+  --row-band: oklch(0.215 0 0);
 }
 
 @theme inline {
@@ -276,6 +286,7 @@
   --color-pill-bad-fg: var(--pill-bad-fg);
   --color-pill-warn: var(--pill-warn);
   --color-pill-warn-fg: var(--pill-warn-fg);
+  --color-row-band: var(--row-band);
   --color-surface-1: var(--surface-1);
   --color-surface-2: var(--surface-2);
   --color-surface-3: var(--surface-3);

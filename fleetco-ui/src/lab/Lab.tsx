@@ -19,7 +19,9 @@ const SCREENS = [
   // Two shapes behind one screen — flip the role toggle to see the other.
   { key: "today", label: "Today", note: "Where signing in lands. Owner: two columns. Technician: one column, clock first", path: "/app/today" },
   { key: "customers", label: "Customer", note: "Customers · list → detail", path: "/app/customers/ridgeline" },
-  { key: "customers-empty", label: "Customer list", note: "Customers · nothing selected", path: "/app/customers" },
+  // `pick=none` defeats the remembered-selection restore. Without it a desktop frame
+  // immediately selects a row and this screen cannot show the empty pane at all.
+  { key: "customers-empty", label: "Customer list", note: "Customers · nothing selected", path: "/app/customers?pick=none" },
   { key: "jobs", label: "Job", note: "Job detail · G-1048", path: "/app/jobs/G-1048" },
   { key: "board", label: "Board", note: "Job board · wide, no list column", path: "/app/board" },
   { key: "schedule", label: "Schedule", note: "Schedule · week grid", path: "/app/schedule" },
@@ -35,7 +37,7 @@ const SCREENS = [
   { key: "search", label: "Search", note: "Universal search · simulated query & results", path: "/app/board?search=ridge" },
   { key: "long-list", label: "Long list", note: "List column at length · scope chips, count, load more", path: "/app/jobs?seed=long" },
   { key: "dialog", label: "Dialog", note: "Dialog · close job", path: "/app/jobs/G-1048?overlay=dialog" },
-  { key: "approve", label: "Approval", note: "Record the answer — approve, decline or override (AUTH-002/004)", path: "/app/estimates/E-1048?overlay=approve" },
+  { key: "approve", label: "Approval", note: "Approve, decline or override, per line (AUTH-002/004)", path: "/app/estimates/E-1048?overlay=approve" },
   { key: "void", label: "Void", note: "Destructive confirm with a required reason (INV-012)", path: "/app/invoices/1179" },
 ];
 
@@ -48,6 +50,8 @@ export function Lab() {
   const [shown, setShown] = useState<Set<string>>(new Set(["desktop"]));
   const [dark, setDark] = useState(false);
   const [palette, setPalette] = useState<"neutral" | "warm">("warm");
+  // Open question: how a selected list row is marked. Four candidates, live in the lab.
+  const [sel, setSel] = useState<"card" | "right" | "tint" | "fill">("card");
   // Screens are LINKS, not a segmented control, and this counter is what makes them
   // behave like one. Clicking the screen you are already on has to mean something —
   // you have navigated three screens deep inside the preview and want to start over —
@@ -62,7 +66,7 @@ export function Lab() {
   };
 
   const src = (extra = "") =>
-    `${screen.path}${screen.path.includes("?") ? "&" : "?"}role=${role}&palette=${palette}${dark ? "&theme=dark" : ""}${extra}`;
+    `${screen.path}${screen.path.includes("?") ? "&" : "?"}role=${role}&palette=${palette}&sel=${sel}${dark ? "&theme=dark" : ""}${extra}`;
 
   return (
     <div className="flex h-full flex-col bg-neutral-100 text-neutral-900">
@@ -88,6 +92,13 @@ export function Lab() {
           </Group>
 
 
+
+          <Group label="Selected row">
+            <Seg on={sel === "card"} onClick={() => setSel("card")} title="The row lifts off the column as a card">Card</Seg>
+            <Seg on={sel === "right"} onClick={() => setSel("right")} title="Fill plus an edge on the detail-pane side">Right edge</Seg>
+            <Seg on={sel === "tint"} onClick={() => setSel("tint")} title="Fill plus the title in brand colour">Tint</Seg>
+            <Seg on={sel === "fill"} onClick={() => setSel("fill")} title="A deeper surface and nothing else">Fill</Seg>
+          </Group>
 
           <Group label="Theme">
             <Seg on={!dark} onClick={() => setDark(false)}>Light</Seg>
@@ -176,7 +187,7 @@ export function Lab() {
                 style={{ width: d.w * scale, height: d.h * scale }}
               >
                 <iframe
-                  key={`${d.key}-${role}-${palette}-${screen.key}-${dark}-${visit}`}
+                  key={`${d.key}-${role}-${palette}-${sel}-${screen.key}-${dark}-${visit}`}
                   title={d.label}
                   src={src()}
                   style={{

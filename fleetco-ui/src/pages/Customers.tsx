@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { customers, invoices, jobs, STAGES } from "@/data/sample";
 import { useShell } from "@/shell/shell-context";
+import { useRestoredSelection } from "@/shell/last-selection";
 import { Btn, DetailHeader, ListDetailLayout, ListHeader, ListRow, Monogram } from "@/shell/ListDetailLayout";
 import { attentionMap } from "@/nav/attention";
 import { StatusPill } from "@/components/ui/status-pill";
@@ -14,6 +15,13 @@ export function CustomersPage() {
   const selected = customers.find((c) => c.id === id);
   const needs = attentionMap("customers", role);
   const rows = onlyAttention ? customers.filter((c) => needs.has(c.id)) : customers;
+
+  useRestoredSelection({
+    section: "customers",
+    id,
+    ids: rows.map((c) => c.id),
+    to: (cid) => `/app/customers/${cid}`,
+  });
 
   return (
     <ListDetailLayout

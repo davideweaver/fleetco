@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import { demoScreens, reports, settingsSections } from "@/data/sample";
 import { useShell } from "@/shell/shell-context";
+import { useRestoredSelection } from "@/shell/last-selection";
 import {
   DetailHeader,
   ListDetailLayout,
@@ -48,6 +49,15 @@ export function SectionsPage({ kind }: { kind: "reports" | "settings" }) {
     settings.find((s) => s.id === id) ?? demos.find((s) => s.id === id);
   const Demo = id ? DEMOS[id] : undefined;
   const report = kind === "reports" && id ? REPORTS[id] : undefined;
+
+  // The demos are in `ids` so one stays open if that is where you were, but they come
+  // after the settings, so the first-row fallback is always a real setting.
+  useRestoredSelection({
+    section: kind,
+    id,
+    ids: [...settings, ...demos].map((s) => s.id),
+    to: (sid) => `${base}/${sid}`,
+  });
 
   return (
     <ListDetailLayout

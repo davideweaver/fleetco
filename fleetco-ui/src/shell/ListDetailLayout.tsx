@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { ChevronLeft, Search } from "lucide-react";
 import { useShell } from "./shell-context";
 import { AttentionChip } from "@/components/ui/attention";
@@ -373,6 +373,34 @@ export function ListRow({
   /** Why this row needs someone, for records with no status to colour. */
   attention?: string;
 }) {
+  // TEMPORARY (`?sel=`, driven by the lab's "Selected row" toggle): four candidates for
+  // how a selected row is marked, live side by side. Collapses to the winner.
+  const [labParams] = useSearchParams();
+  const sel = labParams.get("sel") ?? "card";
+  const marks: Record<string, { row: string; mark: ReactNode }> = {
+    // The row lifts off the column as a card, clear of both edges — so nothing of it
+    // touches the dark rail. The card is a pseudo-element rather than margin, so moving
+    // selection shifts no other row.
+    card: {
+      row:
+        "isolate border-transparent pl-3 font-medium before:absolute before:inset-x-1.5 " +
+        "before:inset-y-0.5 before:-z-10 before:rounded-lg before:border before:border-border " +
+        "before:bg-surface-3 before:shadow-sm",
+      mark: null,
+    },
+    // The brand edge, moved to the side the detail pane is on. Padding shifts so the
+    // text does not move when selection changes.
+    right: {
+      row: "bg-accent pl-3 pr-[9px]",
+      mark: <span className="absolute inset-y-0 right-0 w-[3px] rounded-l bg-nav-active" />,
+    },
+    // Colour carried by the type, not by a rule.
+    tint: { row: "bg-accent pl-3 text-nav-active [&_.font-medium]:font-semibold", mark: null },
+    // Surface alone — no rule, no outline, no card. The quietest of the four.
+    fill: { row: "bg-accent pl-3 font-medium", mark: null },
+  };
+  const treatment = marks[sel] ?? marks.card;
+
   return (
     <Link
       to={to}
@@ -381,12 +409,10 @@ export function ListRow({
         "relative block border-b border-border/60 py-2.5 pr-3 text-sm transition-colors",
         // The selected row carries a brand edge; the padding shifts so text does not move
         // when selection changes.
-        selected ? "bg-accent pl-[9px]" : "pl-3 hover:bg-accent/50"
+        selected ? treatment.row : "pl-3 hover:bg-accent/50"
       )}
     >
-      {selected && (
-        <span className="absolute inset-y-0 left-0 w-[3px] rounded-r bg-nav-active" />
-      )}
+      {selected && treatment.mark}
       <span className="flex items-center gap-3">
         {lead}
         <span className="min-w-0 flex-1">
@@ -478,24 +504,35 @@ export function DetailHeader({
   title,
   sub,
   actions,
+  tabs,
 }: {
   eyebrow?: string;
   title: string;
   sub?: ReactNode;
   actions?: ReactNode;
+  /**
+   * The record's `Tabs` strip, which belongs to this header rather than to the pane
+   * below it — the tabs are views of the record named right here.
+   *
+   * It goes in as a slot rather than being rendered next to the header, because the two
+   * of them have to agree about one hairline: the strip draws its own bottom border, so
+   * the header drops its. Two lines eight pixels apart is a gap with nothing in it.
+   */
+  tabs?: ReactNode;
 }) {
   return (
-    <div className="border-b">
+    <div className={cn(!tabs && "border-b")}>
       <div className="flex h-band items-center gap-3 px-4 lg:px-5">
         <div className="min-w-0 flex-1 truncate text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
           {eyebrow}
         </div>
         {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
       </div>
-      <div className="px-4 pb-4 lg:px-5">
+      <div className={cn("px-4 lg:px-5", tabs ? "pb-2.5" : "pb-4")}>
         <h2 className="truncate text-lg font-semibold lg:text-xl">{title}</h2>
         {sub && <div className="mt-0.5 text-sm text-muted-foreground">{sub}</div>}
       </div>
+      {tabs}
     </div>
   );
 }

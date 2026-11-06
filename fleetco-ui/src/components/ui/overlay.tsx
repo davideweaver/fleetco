@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
  *
  *   DIALOG  a decision or a short form that blocks you. You answer, then carry on.
  *           Centred on a desktop, full screen on a phone.
- *           "Close this job?", "Record approval", "Void invoice — reason?"
+ *           "Close this job?", "Approval", "Void invoice — reason?"
  *
  *   PANEL   inspecting or editing a record while its context stays on screen behind.
  *           From the right on a desktop, up from the bottom on a phone.

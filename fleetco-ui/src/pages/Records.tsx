@@ -12,7 +12,9 @@ import {
   isOpenEstimate,
   type InvoiceLine,
 } from "@/data/sample";
+import { catalogMaterials } from "@/data/estimate";
 import { useShell } from "@/shell/shell-context";
+import { useRestoredSelection } from "@/shell/last-selection";
 import {
   Btn,
   DetailHeader,
@@ -42,6 +44,13 @@ export function InvoicesPage() {
   const needs = attentionMap("invoices", role);
   const rows = onlyAttention ? invoices.filter((v) => needs.has(v.no)) : invoices;
   const selected = invoices.find((v) => v.no === id);
+
+  useRestoredSelection({
+    section: "invoices",
+    id,
+    ids: rows.map((v) => v.no),
+    to: (no) => `/app/invoices/${no}`,
+  });
 
   return (
     <ListDetailLayout
@@ -190,10 +199,11 @@ export function InvoicesPage() {
                 </>
               ) : (
                 <>
-                  One line per authorized estimate line (INV-001), plus anything added to
-                  the draft by hand (INV-002). The materials, labor and allowances behind
-                  each line stay on the job for costing — the estimate is itemized, the
-                  invoice is rolled up.
+                  One line per authorized estimate row (INV-001), plus anything added to
+                  the draft by hand (INV-002). A material or labor row the customer was
+                  always meant to read prints as itself; what is inside a package stays on
+                  the job for costing, and an itemized package lists what is included
+                  without prices (EST-018).
                 </>
               )}
             </p>
@@ -376,6 +386,21 @@ function InvoiceLineRows({ line, internal }: { line: InvoiceLine; internal: bool
         <Td right>{money(line.amountCents)}</Td>
       </tr>
 
+      {/* EST-018: on the customer's copy an itemized package lists what is included, and
+          nothing else. No quantities, no prices — the row keeps one approved number. */}
+      {!internal && line.print === "itemized" && line.components.length > 0 && (
+        <tr className="border-b last:border-0">
+          <Td className="pt-0 text-xs text-muted-foreground">
+            <ul className="space-y-0.5 pl-4">
+              {line.components.map((c) => (
+                <li key={c.id}>Includes {c.item.toLowerCase()}</li>
+              ))}
+            </ul>
+          </Td>
+          <Td />
+        </tr>
+      )}
+
       {internal &&
         line.components.map((c) => (
           <tr key={c.id} className="border-b border-border/50 bg-muted/25 text-muted-foreground">
@@ -425,6 +450,13 @@ export function EstimatesPage() {
       ? estimates
       : estimates.filter((e) => (scope === "open" ? isOpenEstimate(e) : !isOpenEstimate(e)));
 
+  useRestoredSelection({
+    section: "estimates",
+    id,
+    ids: rows.map((e) => e.no),
+    to: (no) => `/app/estimates/${no}`,
+  });
+
   return (
     <ListDetailLayout
       hasSelection={Boolean(selected)}
@@ -468,18 +500,21 @@ export function EstimatesPage() {
   );
 }
 
-const materials = [
-  { id: "mpi-1105", name: "Avery MPI 1105 wrap film", unit: "ft", costCents: 310, priceCents: 750, vendor: "Grimco" },
-  { id: "dol-1460z", name: "Avery DOL 1460Z overlaminate", unit: "ft", costCents: 205, priceCents: 450, vendor: "Grimco" },
-  { id: "latex-ink", name: "Latex ink", unit: "job", costCents: 3800, priceCents: 8500, vendor: "HP" },
-  { id: "install-kit", name: "Install supplies", unit: "job", costCents: 2200, priceCents: 4500, vendor: "Fellers" },
-  { id: "cast-vinyl", name: "Cast vinyl · white", unit: "ft", costCents: 280, priceCents: 690, vendor: "Fellers" },
-];
+/* One catalog, one home. This list used to be a second copy of the materials the estimate
+   editor offers, and the two had already drifted apart on units and prices. */
+const materials = catalogMaterials;
 
 export function MaterialsPage() {
   const { id } = useParams();
   const { href } = useShell();
   const selected = materials.find((m) => m.id === id);
+
+  useRestoredSelection({
+    section: "materials",
+    id,
+    ids: materials.map((m) => m.id),
+    to: (mid) => `/app/materials/${mid}`,
+  });
 
   return (
     <ListDetailLayout
@@ -497,7 +532,7 @@ export function MaterialsPage() {
                 selected={m.id === id}
                 title={m.name}
                 subtitle={`${m.vendor} · per ${m.unit}`}
-                meta={money(m.priceCents)}
+                meta={money(m.sellCents)}
                 metaSub={`cost ${money(m.costCents)}`}
               />
             ))}
@@ -510,8 +545,8 @@ export function MaterialsPage() {
             <DetailHeader eyebrow="Material" title={selected.name} sub={`${selected.vendor} · priced per ${selected.unit}`} />
             <div className="grid gap-px border-b bg-border sm:grid-cols-3">
               <Stat label="Last cost" value={money(selected.costCents)} />
-              <Stat label="Selling price" value={money(selected.priceCents)} />
-              <Stat label="Margin" value={`${Math.round((1 - selected.costCents / selected.priceCents) * 100)}%`} />
+              <Stat label="Selling price" value={money(selected.sellCents)} />
+              <Stat label="Margin" value={`${Math.round((1 - selected.costCents / selected.sellCents) * 100)}%`} />
             </div>
             <div className="grid place-items-center p-10 text-sm text-muted-foreground">
               PUR-009: receiving records cost. V1 keeps no live stock count.

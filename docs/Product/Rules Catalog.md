@@ -248,11 +248,33 @@ recorded or evidenced (certificate on file, expiry).
 created without an estimate (Quick job).
 **Source:** PL 1.1, 1.2, 2.9 · **Status:** Confirmed (job-without-estimate Inferred) · **Phase:** V1
 
-### EST-002 An estimate is customer lines with internal components
-**Rule:** an estimate has one or more **customer lines** (what the customer sees, e.g. "Full wrap
-— 2019 Ford Transit"). Each customer line has zero or more **components**: catalog material,
-custom material, labor, or allowance. Components are internal.
-**Source:** PL 1.21, 2.1; G7 (DAVE) · **Status:** Confirmed · **Phase:** V1
+### EST-002 An estimate is a flat list of rows, and only a package has contents
+**Rule:** an estimate is an ordered list of **rows**. A row is what the customer sees, so "row"
+and **customer line** mean the same thing everywhere in this catalog. A row is one of five kinds:
+
+| Row kind | Carries | Customer sees |
+|---|---|---|
+| **Catalog material** | a catalog material, quantity, unit, cost, selling price | the row |
+| **Custom item** | a typed description, optional quantity, cost, selling price, no catalog record (EST-008) | the row |
+| **Labor** | hours and a rate | the row |
+| **Allowance** | a description and an estimated cost, no quantity (EST-006) | the row |
+| **Package** | a name, a price, and **contents**: rows of the four kinds above | the name and the price only |
+
+**A package is the only container.** Its contents are the **components** of that row, and
+components are the only thing hidden from a customer document (ROLE-009, INV-001). A material,
+labor or custom row sitting at the top level of the estimate is customer-facing and prints as
+itself.
+
+**Why it is flat.** Cam estimates ad hoc: one job is a package for the wrap, plus two loose
+material rows, plus a labor row, plus a typed-in custom row, in any order. A model where every
+customer line is a container forces a wrapper around single items that do not want one, and
+makes "show this one material to the customer" a special case instead of just leaving it at the
+top level.
+
+**Note:** this is why ink and Goo Gone allowances belong *inside* a package. An allowance left at
+the top level is a line the customer reads.
+**Source:** PL 1.21, 2.1; G7 (DAVE); DAVE 2026-11-05 · **Status:** Proposed (reshaped from
+"every line is a container" on 2026-11-05; verify with Cam) · **Phase:** V1
 
 ### EST-003 How a customer line is priced
 **Rule (proposed):** a customer line's price is the sum of its components' selling amounts, unless
@@ -306,6 +328,58 @@ moment of applying (EST-007), not values saved in the template.
 **Source:** PL 1.20, 1.21; G7 · **Status:** Confirmed (copy semantics and current-values Proposed)
 · **Phase:** V1
 
+### EST-014 A package's price follows its contents until someone sets it
+**Rule:** a package row is priced by EST-003 like any other row — the price is the sum of its
+components' selling amounts until the Owner types a price on the row, and then the typed price
+wins and the component sum is kept beside it for comparison. Editing a component of a package
+whose price has been set does **not** move the price.
+**Example:** a package of twelve components summing to $2,300.00 shows $2,300.00. The Owner types
+$2,500.00. Swapping the laminate for a dearer one leaves the customer price at $2,500.00 and moves
+only the internal cost and margin (EST-004).
+**Source:** PL 1.21; DAVE 2026-11-05 · **Status:** Proposed · **Phase:** V1
+
+### EST-015 A package can be built inside one estimate and live only there
+**Rule:** the Owner can create a package directly on an estimate, name it, and fill it, without
+any catalog record for the package itself. **Its components can be any mix of the four leaf kinds**
+(EST-002): catalog materials picked from the catalog, custom items typed in on the spot with no
+catalog record (EST-008), labor, and allowances. There is no restriction that an estimate-built
+package hold only catalog items, and no restriction that a saved package hold only catalog items
+either — the two are the same thing, one of them just has no catalog record behind the name.
+It behaves exactly like a package added from the catalog, including hiding its components on
+customer documents, and it belongs to that estimate and is not reusable.
+**Example:** "Rear door graphics" built on the spot, holding 12 ft of catalog cast vinyl, a typed-in
+"outsourced router cut — $185" with no catalog record, a $20 ink allowance, and 3 hours of labor.
+The customer sees "Rear door graphics" and one price.
+**Note:** saving an estimate-built package back to the catalog for reuse is **not** in V1 (D-C20).
+**Source:** DAVE 2026-11-05 · **Status:** Proposed · **Phase:** V1
+
+### EST-016 Saved packages are copied in, like templates
+**Rule:** adding a saved package (PUR-011) copies its name, its price rule and its components into
+the estimate as ordinary editable rows, taking each catalog material's **current** values at the
+moment of adding (EST-007). Editing or deleting the saved package later never changes an estimate
+that used it, and editing the copy never changes the saved package.
+**Source:** PL 1.20, 1.21; EST-009 applied to packages · **Status:** Proposed · **Phase:** V1
+
+### EST-017 A package never contains a package
+**Rule:** package contents are leaf rows only. One level of nesting, always.
+**Why:** two levels make every price, cost, margin and tax question ambiguous, and nobody asked
+for it.
+**Source:** STD; DAVE 2026-11-05 · **Status:** Proposed · **Phase:** V1
+
+### EST-018 A package row can be told to print its contents
+**Rule:** every package row carries a print setting. The default is **rolled up** — the customer
+document shows the name and the price only. The Owner can set a row to **itemized**, and then the
+customer document lists the component descriptions beneath the package name, **without quantities,
+costs or prices**. The setting is per row on the estimate, so the same saved package can be rolled
+up on one job and itemized on the next. A saved package may carry a default, which is copied in
+like everything else (EST-016).
+**Why the printed list has no prices:** the row keeps one approved price (AUTH-001) and one tax
+treatment (INV-007). Printing per-component prices would show the customer numbers nobody approved
+and that may not sum to the row. A customer who should see priced materials gets them as top-level
+rows instead (EST-002) — that is what the flat list is for.
+**Source:** DAVE 2026-11-05 · **Status:** Proposed (what "show the materials" means is D-C19) ·
+**Phase:** V1
+
 ### EST-010 No Shop Supplies fee line
 **Rule:** graphics estimates and invoices never get an automatic Shop Supplies fee. Supplies are in
 the package price.
@@ -334,8 +408,10 @@ not delivery tracking.
 
 ### AUTH-001 Approval is per customer line
 **Rule:** each customer line is Pending, Approved, Declined, or Overridden. "Approve all" sets every
-pending line at once and records one approval per line.
-**Source:** PL 2.8; FB (Toggle All) · **Status:** Confirmed · **Phase:** V1
+pending line at once and records one approval per line. A **package row is approved as one row** —
+its components are never approved, declined or overridden separately (EST-002).
+**Source:** PL 2.8; FB (Toggle All) · **Status:** Confirmed (package clause Proposed, 2026-11-05) ·
+**Phase:** V1
 
 ### AUTH-002 What an approval records
 **Rule:** a customer approval or decline records: the customer contact who gave it (name), when they
@@ -590,6 +666,15 @@ stopped automatically.
 **Rule:** a catalog material has a name, unit of measure, default cost, default selling price, and
 an optional preferred vendor. Selling prices are entered by hand; there is no automatic markup in V1.
 **Source:** PL 2.4 · **Status:** Confirmed · **Phase:** V1
+
+### PUR-011 Saved packages
+**Rule:** a saved package is a catalog record: a name, an optional default price, an optional
+default print setting (EST-018), and a list of components — catalog materials with quantities,
+labor, allowances and custom items. It holds no stock, no vendor and no inventory meaning. It is
+a starting point for an estimate row, nothing more.
+**Example:** "Full wrap — one-ton van" with vinyl, laminate, an ink allowance, install supplies
+and 16 hours of labor.
+**Source:** PL 1.20, 1.21; DAVE 2026-11-05 · **Status:** Proposed · **Phase:** V1
 
 ### PUR-002 Vendors
 **Rule:** a vendor has a name and business contact details. Payment terms and tax-exempt status are
@@ -938,6 +1023,8 @@ Grouped by who answers. Each references the rules it unblocks.
 | D-C15 | Collect deposits by card link? (Alignment 4.3) | PAY-003 |
 | D-C16 | If a deposit ends up bigger than the final invoice, refund it or hold it? | PAY-004 |
 | D-C17 | What should work in progress show you? (Alignment 4.7) | RPT-005 |
+| D-C19 | When you want a package's materials shown on an invoice, do you mean the list of what is included, or the materials with their own prices? | EST-002, EST-018 |
+| D-C20 | A package you build inside one estimate — do you ever want to save it for reuse, or is building it fresh each time fine? | EST-015 |
 | D-C18 | If a company uses both graphics and the Lancaster shop, is it one customer in FullBay or two? Roughly how many graphics customers also use the shops? Is it the same in QuickBooks? | PLAT-006, QBO-005, MIG-001 |
 
 ### For accounting
@@ -971,19 +1058,19 @@ detail in brackets; those details are what Cam should skim.
 | PLAT Cross-cutting | 9 | 7 | 0 | 1 | 1 |
 | ROLE Roles and access | 9 | 6 | 0 | 1 | 2 |
 | CUST Customers and assets | 8 | 3 | 1 | 3 | 1 |
-| EST Estimates | 13 | 9 | 1 | 0 | 3 |
+| EST Estimates | 18 | 8 | 1 | 6 | 3 |
 | AUTH Approval | 11 | 9 | 0 | 1 | 1 |
 | JOB Jobs, board, schedule | 18 | 12 | 1 | 3 | 2 |
 | TIME Time and payroll | 14 | 9 | 1 | 3 | 1 |
-| PUR Materials and POs | 10 | 9 | 0 | 0 | 1 |
+| PUR Materials and POs | 11 | 9 | 0 | 1 | 1 |
 | INV Invoicing | 12 | 5 | 3 | 3 | 1 |
 | PAY Payments and deposits | 11 | 8 | 0 | 1 | 2 |
 | QBO QuickBooks | 6 | 2 | 0 | 1 | 3 |
 | RPT Reports | 7 | 4 | 0 | 1 | 2 |
 | MIG Migration | 3 | 1 | 0 | 2 | 0 |
-| **Total** | **131** | **84** | **7** | **20** | **20** |
+| **Total** | **137** | **83** | **7** | **27** | **20** |
 
-Plus 12 Later constraints (§14) and 25 questions (§15).
+Plus 12 Later constraints (§14) and 27 questions (§15).
 
 **Where the risk sits:** the Decision-needed rules cluster in money: tax, rounding, deposits,
 surcharge, QuickBooks. Those are also the rules hardest to change after invoices exist. Workflow
@@ -996,6 +1083,7 @@ and permissions are mostly Confirmed, because Cam's notes were precise about the
 | 2026-10-31 | First draft. Mined from Cam's punch-list notes, the 10/23 debrief, V1 Vision and Gaps, V1 Alignment, Domain Model and Code Standards. No new FullBay access. |
 | 2026-10-31 | PLAT-006 reworded: shared customers is our design choice, and evidence suggests FullBay keeps customers per shop. Added D-C18. |
 | 2026-11-04 | TIME-008: the technician "flags an entry for correction" clause removed. PL 4.6 says only "Manual timesheet corrections" and Cam never raised a flag workflow — the clause was invented in the first draft and took the source's Confirmed status with it. The rest of TIME-008 stands. |
+| 2026-11-05 | **The estimate reshaped from "every customer line is a container" to a flat list of rows where only a package has contents** (EST-002), by Dave. Added EST-014 package pricing, EST-015 estimate-built packages, EST-016 copy semantics, EST-017 no nesting, EST-018 the print setting, PUR-011 the saved-package catalog record, and a package clause on AUTH-001. ROLE-009 and INV-001 needed no change: "component" now means "a row inside a package", which is exactly what they already say never reaches a customer document. EST-002 drops from Confirmed to Proposed until Cam sees it. Added D-C19 and D-C20. |
 | 2026-11-03 | PLAT-006 UI clause reversed by Dave. The department is visible from V1 even with one department; only switching stays Later. The clause was Proposed, so this is a spec change rather than a correction. |
 
 ## Related

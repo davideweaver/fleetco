@@ -1,3 +1,11 @@
+import {
+  isAuthorized,
+  offeredTotal,
+  rowPrice,
+  rowsFor,
+  type RowComponent,
+} from "./estimate";
+
 /* The canonical V1 story, copied from docs/Product/v1-video/lib/wire.js so the lab,
    the client guide and (later) the seed factories all tell the same story.
    Story job: G-1048, Ridgeline Plumbing & Heating, Unit 14 full wrap, $2,019.00. */
@@ -176,14 +184,14 @@ export const isOpenEstimate = (e: Estimate) =>
   e.status === "Draft" || e.status === "Sent" || e.status === "Partially approved";
 
 export const estimates: Estimate[] = [
-  { no: "E-1053", jobNo: "G-1053", customerId: "conestoga", customer: "Conestoga Tree Care", what: "Bucket truck doors ×3", sent: "Nov 1", status: "Sent", valueCents: 64000 },
-  { no: "E-1052", jobNo: "G-1052", customerId: "lancaster-kitchen", customer: "Lancaster Kitchen Supply", what: "Box truck logo kit", sent: "Oct 29", status: "Approved", valueCents: 118500 },
-  { no: "E-1048", jobNo: "G-1048", customerId: "ridgeline", customer: "Ridgeline Plumbing & Heating", what: "Unit 14 · full wrap", sent: "Oct 27", status: "Partially approved", valueCents: 201900 },
-  { no: "E-1046", jobNo: "G-1046", customerId: "brightway", customer: "Brightway Movers", what: "Rear door graphics", sent: "Oct 24", status: "Approved", valueCents: 48000 },
-  { no: "E-1044", jobNo: "G-1044", customerId: "keystone", customer: "Keystone Dairy Co-op", what: "Tanker DOT lettering", sent: "Oct 22", status: "Approved", valueCents: 86500 },
-  { no: "E-1043", jobNo: "G-1043", customerId: "millport", customer: "Millport School District", what: "Shop wall mural", sent: "—", status: "Draft", valueCents: 158000 },
-  { no: "E-1041", jobNo: "G-1041", customerId: "ridgeline", customer: "Ridgeline Plumbing & Heating", what: "Unit 9 · decal refresh", sent: "Oct 20", status: "Approved", valueCents: 42000 },
-  { no: "E-1039", jobNo: null, customerId: "keystone", customer: "Keystone Dairy Co-op", what: "Trailer full wrap", sent: "Oct 16", status: "Declined", valueCents: 312000 },
+  { no: "E-1053", jobNo: "G-1053", customerId: "conestoga", customer: "Conestoga Tree Care", what: "Bucket truck doors ×3", sent: "Nov 1", status: "Sent", valueCents: offeredTotal("E-1053") },
+  { no: "E-1052", jobNo: "G-1052", customerId: "lancaster-kitchen", customer: "Lancaster Kitchen Supply", what: "Box truck logo kit", sent: "Oct 29", status: "Approved", valueCents: offeredTotal("E-1052") },
+  { no: "E-1048", jobNo: "G-1048", customerId: "ridgeline", customer: "Ridgeline Plumbing & Heating", what: "Unit 14 · full wrap", sent: "Oct 27", status: "Partially approved", valueCents: offeredTotal("E-1048") },
+  { no: "E-1046", jobNo: "G-1046", customerId: "brightway", customer: "Brightway Movers", what: "Rear door graphics", sent: "Oct 24", status: "Approved", valueCents: offeredTotal("E-1046") },
+  { no: "E-1044", jobNo: "G-1044", customerId: "keystone", customer: "Keystone Dairy Co-op", what: "Tanker DOT lettering", sent: "Oct 22", status: "Approved", valueCents: offeredTotal("E-1044") },
+  { no: "E-1043", jobNo: "G-1043", customerId: "millport", customer: "Millport School District", what: "Shop wall mural", sent: "—", status: "Draft", valueCents: offeredTotal("E-1043") },
+  { no: "E-1041", jobNo: "G-1041", customerId: "ridgeline", customer: "Ridgeline Plumbing & Heating", what: "Unit 9 · decal refresh", sent: "Oct 20", status: "Approved", valueCents: offeredTotal("E-1041") },
+  { no: "E-1039", jobNo: null, customerId: "keystone", customer: "Keystone Dairy Co-op", what: "Trailer full wrap", sent: "Oct 16", status: "Declined", valueCents: offeredTotal("E-1039") },
 ];
 
 /**
@@ -266,89 +274,15 @@ export const departments = [
   { id: "mobile", name: "Mobile" },
 ];
 
-/* --- Estimate lines (EST-002): customer lines, each with internal components. ---------
-   Three lines in three approval states, because AUTH-005 — only authorized lines reach an
-   invoice — is the thing the screen has to make obvious. */
-
-export type ComponentKind = "material" | "custom" | "labor" | "allowance";
-export type Approval = "pending" | "approved" | "declined" | "overridden";
-
-export type LineComponent = {
-  id: string;
-  kind: ComponentKind;
-  item: string;
-  /** Allowances have no quantity at all (EST-006). */
-  qty: number | null;
-  unit: string | null;
-  costCents: number;
-  sellCents: number;
-};
-
-export type EstimateLine = {
-  id: string;
-  name: string;
-  approval: Approval;
-  /** EST-003: when the owner sets a price, it wins and the component sum is kept. */
-  setPriceCents: number | null;
-  how?: string;
-  components: LineComponent[];
-};
-
-export const estimateLines: EstimateLine[] = [
-  {
-    id: "L1",
-    name: "Full wrap · Unit 14",
-    approval: "approved",
-    setPriceCents: null,
-    how: "Approved by Dana Hoff by phone, Oct 28",
-    components: [
-      { id: "c1", kind: "material", item: "Avery MPI 1105 wrap film", qty: 62, unit: "ft", costCents: 310, sellCents: 750 },
-      { id: "c2", kind: "material", item: "Avery DOL 1460Z overlaminate", qty: 62, unit: "ft", costCents: 205, sellCents: 450 },
-      { id: "c3", kind: "allowance", item: "Latex ink", qty: null, unit: null, costCents: 3800, sellCents: 8500 },
-      { id: "c4", kind: "allowance", item: "Install supplies", qty: null, unit: null, costCents: 2200, sellCents: 4500 },
-      { id: "c5", kind: "labor", item: "Design", qty: 4, unit: "hr", costCents: 3500, sellCents: 9500 },
-      { id: "c6", kind: "labor", item: "Installation", qty: 9, unit: "hr", costCents: 2800, sellCents: 8500 },
-    ],
-  },
-  {
-    id: "L2",
-    name: "Hood decal kit",
-    approval: "declined",
-    setPriceCents: null,
-    how: "Declined by Dana Hoff by phone, Oct 28",
-    components: [
-      { id: "c7", kind: "custom", item: "Cut vinyl hood decal (custom item)", qty: 1, unit: "ea", costCents: 4200, sellCents: 11000 },
-      { id: "c8", kind: "labor", item: "Installation", qty: 1.5, unit: "hr", costCents: 2800, sellCents: 8500 },
-    ],
-  },
-  {
-    id: "L3",
-    name: "Rear window perforated",
-    approval: "pending",
-    // EST-003: priced as a package, not by summing. The component total is kept.
-    setPriceCents: 48000,
-    components: [
-      { id: "c9", kind: "material", item: "Perforated window film", qty: 18, unit: "ft", costCents: 420, sellCents: 980 },
-      { id: "c10", kind: "labor", item: "Installation", qty: 2, unit: "hr", costCents: 2800, sellCents: 8500 },
-    ],
-  },
-];
-
-export const componentSum = (l: EstimateLine) =>
-  l.components.reduce((a, c) => a + Math.round((c.qty ?? 1) * c.sellCents), 0);
-export const lineCost = (l: EstimateLine) =>
-  l.components.reduce((a, c) => a + Math.round((c.qty ?? 1) * c.costCents), 0);
-/** EST-003: the set price wins where there is one. */
-export const linePrice = (l: EstimateLine) => l.setPriceCents ?? componentSum(l);
-/** AUTH-005: authorized means approved or overridden. Nothing else bills. */
-export const isAuthorized = (l: EstimateLine) =>
-  l.approval === "approved" || l.approval === "overridden";
-
 /* --- Invoice lines (INV-001) ----------------------------------------------------------
-   What the customer is handed: one line per authorized customer line, at its authorized
-   price and description. Components never cross over — materials, labor and allowances
-   stay on the job for costing. That is the whole difference between the two documents,
-   so the estimate is itemized and the invoice is rolled up. */
+   What the customer is handed: one line per authorized ROW, at its authorized price and
+   description. A leaf row — a material, labor, a custom item — prints as itself, because
+   it was always customer-facing. A package prints its name and its price, and its
+   components stay on the job for costing (ROLE-009).
+
+   The one exception is shape, not visibility: a package set to `itemized` (EST-018) also
+   prints the component DESCRIPTIONS, with no quantities and no prices. The customer reads
+   what is included; the money stays one approved number. */
 
 export type InvoiceLine = {
   id: string;
@@ -356,27 +290,36 @@ export type InvoiceLine = {
   amountCents: number;
   /** INV-002: added to the draft by hand — storage, freight, restocking. */
   custom?: boolean;
+  /** A package line, as opposed to a material or labor line that stands on its own. */
+  isPackage?: boolean;
+  /** EST-018, copied from the estimate row. Absent means rolled up. */
+  print?: "rolled-up" | "itemized";
   /**
-   * What is behind the rolled-up line. Carried on the record but never on the customer's
-   * copy (ROLE-009) — the app can show it, the document generator cannot.
+   * What is behind the line. Carried on the record but never priced on the customer's
+   * copy (ROLE-009) — the app can show the money, the document generator cannot.
    */
-  components: LineComponent[];
+  components: RowComponent[];
 };
 
 export const invoiceLines: Record<string, InvoiceLine[]> = {
   // Derived, not transcribed. #1184 is the draft G-1048 produced on close, so its lines
-  // ARE the authorized estimate lines — change an approval above and this follows.
-  "1184": estimateLines.filter(isAuthorized).map((l) => ({
-    id: l.id,
-    description: l.name,
-    amountCents: linePrice(l),
-    components: l.components,
-  })),
+  // ARE the authorized estimate rows — change an approval in the editor and this follows.
+  "1184": rowsFor("E-1048")
+    .filter(isAuthorized)
+    .map((r) => ({
+      id: r.id,
+      description: r.name,
+      amountCents: rowPrice(r),
+      isPackage: r.kind === "package",
+      print: r.print,
+      components: r.components,
+    })),
   "1179": [
     {
       id: "L1",
       description: "Decal refresh · Unit 9",
       amountCents: 42000,
+      isPackage: true,
       components: [
         { id: "d1", kind: "material", item: "Cut vinyl decal set", qty: 2, unit: "ea", costCents: 4800, sellCents: 11000 },
         { id: "d2", kind: "labor", item: "Installation", qty: 2, unit: "hr", costCents: 2800, sellCents: 10000 },
@@ -390,6 +333,7 @@ export const invoiceLines: Record<string, InvoiceLine[]> = {
       id: "L1",
       description: "Shop wall mural · Bay 2 wall",
       amountCents: 143000,
+      isPackage: true,
       components: [
         { id: "m1", kind: "material", item: "Wall vinyl", qty: 48, unit: "ft", costCents: 390, sellCents: 1250 },
         { id: "m2", kind: "labor", item: "Design", qty: 3, unit: "hr", costCents: 3500, sellCents: 9500 },
@@ -414,6 +358,10 @@ export const invoiceLines: Record<string, InvoiceLine[]> = {
       id: "L1",
       description: "DOT lettering · Tanker 11",
       amountCents: 86500,
+      isPackage: true,
+      // The estimate row was itemized (EST-018), so the customer's copy lists what is
+      // included. Prices stay on this side of the line.
+      print: "itemized" as const,
       components: [
         { id: "t1", kind: "material", item: "Reflective lettering vinyl", qty: 14, unit: "ft", costCents: 600, sellCents: 1500 },
         { id: "t2", kind: "labor", item: "Design", qty: 1, unit: "hr", costCents: 3500, sellCents: 9500 },
@@ -427,6 +375,8 @@ export const invoiceLines: Record<string, InvoiceLine[]> = {
       id: "L1",
       description: "Rear door graphics · Truck 3",
       amountCents: 48000,
+      isPackage: true,
+      print: "itemized" as const,
       components: [
         { id: "r1", kind: "material", item: "Cut vinyl graphics", qty: 1, unit: "ea", costCents: 9500, sellCents: 22000 },
         { id: "r2", kind: "labor", item: "Installation", qty: 2, unit: "hr", costCents: 2800, sellCents: 8500 },

@@ -3,6 +3,7 @@ import { useParams, useSearchParams } from "react-router-dom";
 import { ChevronDown, ChevronRight, Camera, Play } from "lucide-react";
 import { isOpenJob, jobs, longJobs, STAGES, wrapComponents, wrapPriceCents } from "@/data/sample";
 import { useShell } from "@/shell/shell-context";
+import { useRestoredSelection } from "@/shell/last-selection";
 import {
   Btn,
   DetailHeader,
@@ -30,7 +31,11 @@ export function JobsPage() {
   const { id } = useParams();
   const { href, role } = useShell();
   const [params] = useSearchParams();
-  const overlay = params.get("overlay");
+  // Read once. Restoring the last selection replaces the URL with the selected job's,
+  // and `overlay` is not one of the params carried across in-app navigation — read it on
+  // every render and the lab's "Form errors" screen would lose its errors a tick after
+  // opening. The overlay belongs to the visit, not to the address bar.
+  const [overlay] = useState(() => params.get("overlay"));
   const [creating, setCreating] = useState(overlay === "form" || overlay === "form-errors");
   // Lab only: `?seed=long` swaps in a year of history so the list column can be judged
   // at a length the seven story jobs cannot show. Same screen, same components.
@@ -63,6 +68,13 @@ export function JobsPage() {
   // it over. Keeping the old depth meant switching to Closed and landing 200 rows in.
   const rows = inScope.slice(0, shown);
   const selected = visible.find((j) => j.no === id);
+
+  useRestoredSelection({
+    section: "jobs",
+    id,
+    ids: rows.map((j) => j.no),
+    to: (no) => `/app/jobs/${no}`,
+  });
 
   const reslice = (fn: () => void) => {
     fn();

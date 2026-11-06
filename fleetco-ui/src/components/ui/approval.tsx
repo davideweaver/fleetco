@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Check, ShieldAlert, X } from "lucide-react";
 import { Overlay } from "./overlay";
 import { Field, Select, TextArea, TextInput } from "./field";
@@ -40,16 +40,55 @@ export type ApprovalRecord = {
   supersededBy?: string;
 };
 
-export function RecordAnswerDialog({
+/**
+ * A checkbox that can say "some of them". `indeterminate` is a DOM property and not an
+ * attribute, so it cannot be set in JSX — it has to be written onto the node, which is
+ * the whole reason this is a component and not three more lines in the dialog.
+ */
+function TriCheckbox({
+  checked,
+  some,
+  disabled,
+  label,
+  onChange,
+}: {
+  checked: boolean;
+  some: boolean;
+  disabled?: boolean;
+  label: string;
+  onChange: () => void;
+}) {
+  const ref = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (ref.current) ref.current.indeterminate = some;
+  }, [some]);
+
+  return (
+    <input
+      ref={ref}
+      type="checkbox"
+      checked={checked}
+      disabled={disabled}
+      aria-label={label}
+      onChange={onChange}
+      className="size-4 disabled:opacity-40"
+    />
+  );
+}
+
+export function ApprovalDialog({
   open,
   onOpenChange,
   lines,
   onRecord,
+  eyebrow,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   lines: { id: string; name: string; priceCents: number; pending: boolean }[];
   onRecord: (ids: string[], r: Omit<ApprovalRecord, "id">) => void;
+  /** Which estimate this is. Named by the caller, because the dialog serves all of them. */
+  eyebrow?: string;
 }) {
   const pending = lines.filter((l) => l.pending);
   const [picked, setPicked] = useState<Set<string>>(new Set(pending.map((l) => l.id)));
@@ -74,14 +113,18 @@ export function RecordAnswerDialog({
         : picked.size > 0 && contact.trim().length > 0 && Boolean(method);
   const total = lines.filter((l) => picked.has(l.id)).reduce((a, l) => a + l.priceCents, 0);
 
+  // The submit says what is about to be filed, in the plainest word for it. "Record the
+  // answer" was the old name everywhere here, and it described our bookkeeping rather
+  // than the thing the Owner came to do — AUTH-011 is why the record exists, not what to
+  // call the button.
   const label =
     kind === "approved"
-      ? "Record approval"
+      ? "Save approval"
       : kind === "declined"
-        ? "Record decline"
+        ? "Save decline"
         : kind === "override"
-          ? "Override"
-          : "Record";
+          ? "Save override"
+          : "Save";
 
   return (
     <Overlay
@@ -94,8 +137,8 @@ export function RecordAnswerDialog({
         }
         onOpenChange(v);
       }}
-      eyebrow="Estimate E-1048 · Ridgeline Plumbing & Heating"
-      title="Record the answer"
+      eyebrow={eyebrow}
+      title="Approval"
       footer={
         <>
           <Btn>Cancel</Btn>
@@ -132,20 +175,29 @@ export function RecordAnswerDialog({
       <div className="space-y-4 p-4">
         {/* AUTH-001: approval is per line, so the form is per line. */}
         <div>
-          <div className="mb-1.5 flex items-baseline justify-between">
-            <span className="text-sm font-medium">Which lines</span>
-            <button
-              type="button"
-              onClick={() =>
+          {/* The all-switch is a checkbox in the rows' own column, not a "Select all"
+              link off on the right. It is the same control doing the same thing one
+              level up, so it should be the same shape and in the same place — a word at
+              the other end of the row made the reader cross the dialog to find a toggle
+              that was already under their cursor.
+
+              Three states, not two: ticked when every line is picked, a dash when some
+              are, empty when none. Without the dash, "some picked" and "none picked"
+              look identical from the header. */}
+          <label className="mb-1.5 flex cursor-pointer items-center gap-2.5">
+            <TriCheckbox
+              checked={pending.length > 0 && picked.size === pending.length}
+              some={picked.size > 0 && picked.size < pending.length}
+              disabled={pending.length === 0}
+              label={picked.size === pending.length ? "Clear every line" : "Pick every line"}
+              onChange={() =>
                 setPicked((s) =>
                   s.size === pending.length ? new Set() : new Set(pending.map((l) => l.id))
                 )
               }
-              className="text-xs text-muted-foreground underline-offset-2 hover:underline"
-            >
-              {picked.size === pending.length ? "Clear all" : "Select all"}
-            </button>
-          </div>
+            />
+            <span className="text-sm font-medium">Which lines</span>
+          </label>
           {/* Edge to edge, not boxed. A rounded, bordered group inside a rounded,
               bordered dialog is a card inside a card: two radii a few pixels apart and
               two borders doing one job. Borders are for discrete objects, and a dialog's

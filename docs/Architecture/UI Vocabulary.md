@@ -47,6 +47,7 @@ grep for the thing they mean. It is the same failure the single route table prev
 | ③a | **Filter chips** | in `ListHeader` | All / Needs you. Only appear when something needs attention |
 | ④ | **Bottom bar** | `AppShell` | The phone's navigation. Four items plus **More**, which opens the **More sheet** |
 | ⑤ | **Detail header** | `DetailHeader` | A **band** carrying the eyebrow and the actions, then the title and subtitle below it |
+| ⑤a | **Tabs** | `Tabs` | Two or more views of the record named in ⑤, directly under it. Underlined, never pills, and never a filter |
 | ⑥ | **Detail pane** | `ListDetailLayout` | The right pane. Holds a **stat strip** (the row of labelled numbers) and **detail sections** |
 | ⑦ | **Search palette** | `SearchPalette` | Global search. Opened from the rail, `⌘K`, or the phone magnifier. Not a search *field*; there is nowhere to put one |
 | ⑧ | **Nav item** | `AppShell` | One entry in the rail. Grouped into **nav groups** (work / sales / shop / admin) separated by a hairline |
@@ -213,7 +214,8 @@ need.
 |---|---|---|
 | **Cell input** | `CellInput` | Editing inside a table. Transparent until hovered or focused, so the table reads as a table and edits as a form |
 | **Money cell** | `MoneyCell` | Formatted while you read it (`$2,019.00`), raw while you type it (`2019.00`) |
-| **Kind tag** | — | The small outlined label on a component: material, labor, allowance, custom item |
+| **Kind tag** | `KindTag` | The kind of a row: material, labor, allowance, custom item. Plain micro-caps, not a chip — a filled pill on forty rows competes with the names beside it, for the least urgent fact on the row |
+| **Row band** | `--row-band` | The one tint a dense table uses, for a striped group and for a nested row |
 
 **Dense tables do not use the 40px form control.** A grid of forty bordered boxes is unreadable;
 the border arrives on hover and focus instead. Money columns are always `tnum` and right-aligned —
@@ -223,6 +225,101 @@ lining up, which is the only thing a money column is for.
 **Column priority, not horizontal scroll.** The estimate editor drops Margin below 1280 and Cost
 below 1024, and the approval pill moves under the line name below `@md`. The line name and the
 price never drop — they are what the screen is for.
+
+**One number per column.** Quantity rode beside the name on the estimate until 2026-11-06, and
+"62 ft", "4 hr" and "1 ea" never landed in the same place, so there was no reading down the page
+to see how much of anything was on the job. A figure in a column of its own is scannable; the same
+figure inline is prose.
+
+### Banding: by group, never by row
+
+**A dense table has exactly one tint, `--row-band`, and it does two jobs.** A nested row is
+*always* tinted, so "this is inside that" reads everywhere. A top-level row takes the same tint on
+alternate groups, so a banded parent and its children become one block and the next parent starts
+clean.
+
+**Never stripe every row.** Zebra on a tree cuts a package away from the contents underneath it,
+which is the one relationship the estimate table exists to show. Alternate the *group*.
+
+**It is a token, not an alpha.** `bg-muted/20` was tried first and was invisible: `--muted` sits
+within 0.03 lightness of the pane in every theme, so at any alpha it reads as a rendering artefact,
+and on dark it disappeared outright. **Dark needs a bigger step than light** to look like the same
+stripe — roughly 0.06 against 0.04 — because the eye reads lightness as a ratio, not a difference.
+
+**Hierarchy is tone, position and weight together, never one of them.** On the estimate a package
+is semibold, a top-level row is medium, and a row inside a package is normal weight, muted, and
+indented. Every one of those was the same before, and a long package read as one grey block with
+no top to it.
+
+## Tabs
+
+**Tabs are two or more views of ONE record**, under that record's header. The system
+already had three ways of moving between things before this one, so the line around it is
+drawn tightly or it eats the other three.
+
+| What moves you | From | To |
+|---|---|---|
+| **The rail** | one section | another section — a different kind of record |
+| **The list column** | one record | another record of the same kind |
+| **Filter chips** | a list | the same list with fewer rows in it |
+| **Tabs** | one view of a record | another view of **the same record** |
+
+**The test: could both panels be on screen at once and still make sense?** If yes they are
+sections of one page and want a heading (`Section`), not a tab — a tab would be hiding
+something for no reason. If they would fight for the same space, each wants the whole
+pane, and what they have in common is the record named in the header above them.
+
+The estimate editor is the first and the clearest case. The rows and the approval history
+are both about estimate E-1048 and nothing else, and both are as long as the estimate is.
+The history used to sit *underneath* the table, which is where it stopped being read: on a
+real wrap it was a screen and a half below the rows it describes.
+
+**Never tabs for a filter, even when it looks like one.** `Open · Answered · All` on the
+Estimates list stays a row of chips, and that difference is load-bearing: a chip is a lens
+over a list, a tab is a different thing to read. Give them one shape and you have taught
+people that clicking either does the same sort of thing, and then the counts stop meaning
+anything.
+
+**Never tabs where a URL should go.** Reports and Settings are a list of sections in the
+list column, because each one is a place you send someone. A tab is a view of the record
+you are already on.
+
+**Drawn as an underline, never a pill**, for exactly that reason: pills are already filter
+chips, three inches away on the same screen. The underline sits at `-bottom-px` so it
+lands *on* the container's border — a line floating above it reads as a button someone
+decorated.
+
+**The strip goes INSIDE the detail header**, as `DetailHeader`'s `tabs` slot, and the
+header drops its own bottom border when it has one. The tabs are views of the record named
+immediately above them, so one hairline closes the whole group; two lines eight pixels
+apart is a gap with nothing in it.
+
+**The tabs sit on the right, under the header's actions.** The left of that band belongs to
+the record — eyebrow, then name — and a strip of controls starting there competes with the
+one thing the pane is about. Every other control in the band is already on the right, so
+the tabs join them. They keep the same right margin the buttons do: the strip's `px-1.5`
+plus each tab's own `px-2.5` lands on the header's `px-4`, because hard against the edge
+reads as a rendering accident. Once the tabs overflow a narrow screen, `justify-end` stops
+applying and the strip reads from the left like any other sideways scroller.
+
+**A count only where the number is a fact worth knowing.** "Approval history 4" earns it;
+a count on a tab that always reads the same is furniture.
+
+**One tab is not a tab strip.** A technician has no second view of an estimate, so they
+get no strip — a lone tab is a line across the screen saying nothing.
+
+**Other rules the strip follows:**
+
+- **It scrolls sideways** rather than wrapping or shrinking. Four tabs on a 390px phone
+  are otherwise two rows of nubs or four unreadable ones.
+- **The active tab is in the URL** (`?tab=history`), on `replace` — a link can land on a
+  particular view, and Back still means Back rather than undoing a tab click.
+- **Only the active panel is mounted.** A hidden panel that stays mounted keeps its scroll
+  position and its half-typed input, and someone comes back to a screen they do not
+  remember leaving in that state.
+- **Arrow keys move between tabs**, with one tab stop for the whole strip. That is what
+  `role="tablist"` promises a screen reader, and it is the behaviour a keyboard user
+  expects from anything that looks like this.
 
 ## Board, drag and refusal
 
