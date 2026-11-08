@@ -54,6 +54,7 @@ Status key: `PROPOSED` · `ACCEPTED` · `SUPERSEDED` · `REOPENED`
 | 033 | S3 and CloudFront for the frontend, not Vercel | `PROPOSED` |
 | 034 | Feature flags are release mechanism, with two CI gates | `PROPOSED` |
 | 035 | QuickBooks is the real tenancy boundary, and needs its own control | `PROPOSED` |
+| 036 | **One product monorepo; planning stays in its own repository** | `PROPOSED` |
 
 ## ADR-001 — Modular monolith, not microservices, for phase one `PROPOSED`
 
@@ -972,34 +973,6 @@ dependency can be removed without touching application code.
 > process is still perfectly healthy. The leak suite asserts `/health`, `/ready` and `/metrics`
 > stay outside the OpenAPI document and expose no tenant identifiers.
 
-## Open Architectural Questions
-
-- **Mobile and offline — the highest-priority open item.** Blocked on Q5. If technicians need
-  offline-capable tablets in bays, a sync engine replaces ADR-015 and ADR-001 may reopen. This is
-  the single largest architectural input still outstanding.
-- ~~**Deployment topology.**~~ **Resolved 2026-10-09** — pooled, single database. See ADR-006.
-- **Accounting integration boundary.** Needs Q6 answered. QuickBooks sync is a notorious source of
-  complexity and deserves a hard module boundary from the start.
-- **Authorization model richness.** Role-based is probably sufficient, but the customer-authorization
-  workflow in heavy-duty repair has approval thresholds that may want something richer.
-- **Document and photo storage volume.** Defect photos and signed authorizations add up; affects
-  storage cost modeling. Blocked on Q8.
-- **PDF generation** for invoices and estimates. Unglamorous, always underestimated, needs an owner.
-- ~~**Neon-managed vs. self-hosted Better Auth.**~~ **Closed 2026-10-09** — Neon dropped
-  (ADR-023), so Better Auth is self-hosted per ADR-012.
-- **FullBay data migration architecture.** Blocked on Q1. If an export exists, the import pipeline
-  and its reconciliation strategy need designing as a first-class module, not a one-off script.
-
-## Related
-
-- [[Stack Evaluation]]
-- [[Tenancy Model]]
-- [[Evolution Path]]
-- [[Auth and Identity]]
-- [[Realtime and Events]]
-- [[Operations]]
-- [[Open Questions]]
-
 ## ADR-029 — Two deployed environments, no staging `PROPOSED`
 
 **Context.** ADR-024 planned a phased progression to a persistent `staging` environment. A later
@@ -1175,3 +1148,122 @@ of OTC's businesses.
 **Consequences.** The immutable class means a business created with the wrong class must be archived
 and recreated, which is correct — a class change would silently re-file history. The reconciliation
 job is the first scheduled task whose failure is a money alarm rather than an infrastructure one.
+
+## ADR-036 — One product monorepo; planning stays in its own repository `PROPOSED`
+
+> **Renumbered 2026-11-08.** Written as ADR-029 on 2026-11-01 on a branch that was never merged,
+> while ADR-029 was independently used for the two-environment decision. Found and merged while
+> pruning branches. **It also supersedes B4 in [[AWS Buildout]]**, which reached the same monorepo
+> conclusion without noticing the planning/product split — the part that actually matters.
+
+**Context.** Everything so far lives in this `fleetco` repository: discovery and commercial docs,
+architecture docs, and four framework spikes plus the `fleetco-nestjs-vehicles` harness. That is
+right for discovery. It is the wrong shape for a product, for two reasons. The product code needs
+a home it can be built, deployed and handed over from. And this repository contains material that
+should never travel with the code: [[Engagement Terms]], pricing briefs, meeting transcripts and
+the apprenticeship plan. The question is whether the product is one repository or several, and
+what moves out of this one.
+
+**Decision.**
+
+1. **One product monorepo** (working name `fleetco-app`), using pnpm workspaces and Turborepo:
+
+   ```
+   fleetco-app/
+   ├── apps/
+   │   ├── api/          NestJS modular monolith (ADR-001, ADR-027). One image, several
+   │   │                 entrypoints: api (HTTP + SSE), worker (outbox + jobs), later mcp
+   │   └── web/          React + TypeScript + Vite, deployed to Vercel
+   ├── packages/
+   │   ├── contracts/    Zod schemas, the single source of the OpenAPI document (ADR-014)
+   │   ├── api-client/   typed client generated from that document
+   │   └── config/       shared tsconfig, eslint and vitest presets
+   ├── infra/            empty until a second environment exists (ADR-026)
+   └── docs/             ADRs and technical docs, moved from here
+   ```
+
+2. **Business modules stay inside `apps/api`, not as workspace packages.** Module boundaries are
+   enforced by `@Module({ exports })` and lint rules (ADR-027, [[Code Standards and Guardrails]]),
+   not by package boundaries.
+3. **This `fleetco` repository stays as the planning repository.** Commercial, meeting, discovery
+   and apprenticeship material stays here. Technical docs move to the product repository the day
+   it is created: this ADR log, [[Code Standards and Guardrails]], [[Tenancy Model]],
+   [[Testing Strategy]], [[Agent Playbooks]], [[Domain Model]] and [[Rules Catalog]].
+4. **The spikes are archived here, not migrated.** The product repository starts from a copy of
+   `fleetco-nestjs-vehicles` as its template, without the spike's history.
+5. **New surfaces join the monorepo as apps.** The customer portal, if [[Evolution Path]]'s
+   security-posture trigger ever fires, becomes `apps/portal`. The MCP server is an entrypoint of
+   `apps/api` (see [[AI Readiness]]). Technicians use the responsive web app (punch-list row
+   10.1), so there is no native mobile repository.
+
+**Rationale.**
+
+- **Features cross the API–web boundary as a unit.** [[AI Readiness]] requires every UI action to
+  be a public OpenAPI operation called through the generated client. Most features therefore touch
+  contracts, API and web at once. One repository makes that one pull request. Separate
+  repositories make it a published client package, a version bump and a coordinated release,
+  between repositories owned by the same person.
+- **One CI run enforces every guardrail.** "The frontend may only call the generated client," the
+  tenancy and layering lint rules, and the leak suite all run over one tree at one commit. Split
+  repositories need cross-repository checks to say the same thing, and those are the checks that
+  get skipped.
+- **Agents write the code and need the whole flow in one checkout.** Every line is
+  agent-written (ADR-027). An agent that can see route, service, repository and UI together
+  produces consistent changes. An agent that sees half of them guesses at the other half.
+- **Deployment does not argue for splitting.** ADR-021 already runs several services from one
+  image. Vercel builds a subdirectory with ignored-build rules, and ECS builds one Dockerfile.
+  The monorepo changes nothing about either target.
+- **Turborepo, not Nx.** The need is task caching and "only build what changed." Nx's generators,
+  project graph plugins and module-boundary system duplicate what Nest and our lint rules already
+  do, and add a tool one person must keep current.
+- **The planning split is about who sees what, not tidiness.** The product repository will be
+  shared with contractors, possibly with Charlie after the apprenticeship ([[After the 12 Weeks]]),
+  and possibly owned by OTC. Pricing, engagement terms and meeting transcripts should not be
+  readable by anyone who can read the code, and removing them from git history later is much
+  harder than never adding them.
+
+**Consequences.**
+
+- **Repository ownership must be settled before the first commit.** Whether `fleetco-app` lives
+  under Dave's account or an OTC/Fleetco GitHub organisation follows from the IP ownership item in
+  [[Engagement Terms]], which is still open. Transferring a repository later is possible but moves
+  CI secrets, Vercel and AWS integrations, and deploy keys with it.
+- **Release attribution is set from CI.** As ADR-028 notes, an SDK inferring its release from git
+  gets it wrong when the service is not the whole repository. In a monorepo it never is, so the
+  release version is always passed explicitly by the pipeline.
+- **Vercel and CI need path filters.** A docs-only or API-only change should not trigger a
+  frontend preview build, and the reverse. Turborepo's affected-task detection covers CI. Vercel
+  needs an ignored-build step.
+- **Two places to look, for a while.** Links between this repository and the product repository
+  become plain URLs rather than wiki links. Accepted cost of the split.
+- **Reversible.** If the portal or MCP server ever needs separate access control, `apps/portal`
+  can be split out with its history using `git filter-repo`. Merging separate repositories later
+  is the harder direction, which is a reason to start together.
+
+## Open Architectural Questions
+
+- **Mobile and offline — the highest-priority open item.** Blocked on Q5. If technicians need
+  offline-capable tablets in bays, a sync engine replaces ADR-015 and ADR-001 may reopen. This is
+  the single largest architectural input still outstanding.
+- ~~**Deployment topology.**~~ **Resolved 2026-10-09** — pooled, single database. See ADR-006.
+- **Accounting integration boundary.** Needs Q6 answered. QuickBooks sync is a notorious source of
+  complexity and deserves a hard module boundary from the start.
+- **Authorization model richness.** Role-based is probably sufficient, but the customer-authorization
+  workflow in heavy-duty repair has approval thresholds that may want something richer.
+- **Document and photo storage volume.** Defect photos and signed authorizations add up; affects
+  storage cost modeling. Blocked on Q8.
+- **PDF generation** for invoices and estimates. Unglamorous, always underestimated, needs an owner.
+- ~~**Neon-managed vs. self-hosted Better Auth.**~~ **Closed 2026-10-09** — Neon dropped
+  (ADR-023), so Better Auth is self-hosted per ADR-012.
+- **FullBay data migration architecture.** Blocked on Q1. If an export exists, the import pipeline
+  and its reconciliation strategy need designing as a first-class module, not a one-off script.
+
+## Related
+
+- [[Stack Evaluation]]
+- [[Tenancy Model]]
+- [[Evolution Path]]
+- [[Auth and Identity]]
+- [[Realtime and Events]]
+- [[Operations]]
+- [[Open Questions]]

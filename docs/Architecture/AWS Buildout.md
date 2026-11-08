@@ -195,7 +195,18 @@ account split.
 ## CI/CD
 
 GitHub Actions, GitHub OIDC for AWS auth, **no long-lived AWS keys anywhere.** One private monorepo
-in a new OTC GitHub org (B4): `apps/api`, `apps/ui`, `infra/`.
+in a new OTC GitHub org: `apps/api`, `apps/web`, `packages/contracts`, `packages/api-client`,
+`infra/`. **Shape set by ADR-036, which supersedes B4** — B4 said "one monorepo" and stopped there;
+ADR-036 adds the part it missed, that **the product repository and the planning repository are
+separate.** Engagement terms, pricing and meeting transcripts stay in the planning repository, for
+access reasons rather than tidiness: the product repository will be shared with contractors,
+possibly Charlie, possibly owned by OTC, and scrubbing commercial material out of git history later
+is far harder than never committing it.
+
+**One consequence for this document:** it belongs in the planning repository and stays here, but the
+ADR log, [[Tenancy Model]], [[Code Standards and Guardrails]], [[Testing Strategy]],
+[[Agent Playbooks]], [[Domain Model]] and [[Rules Catalog]] move to the product repository the day
+it is created. M6 work, not now.
 
 ### Build Once, Promote The Artifact
 
@@ -566,7 +577,7 @@ Settled 2026-11-07, revised 2026-11-08. Reasoning for the contested ones is in
 | B1 | Does `stage` run against production resources? | **No stage environment. `prod` + `dev`, flags, a test business, clone dry-run** `REVISED 2026-11-08` |
 | B2 | Who owns the AWS account and the bill? | **OTC** |
 | B3 | Terraform or CDK? | **Terraform** |
-| B4 | One repository or several? | **Monorepo, new OTC GitHub org, private** |
+| B4 | One repository or several? | **Superseded by ADR-036** — one product monorepo, and planning stays in this repository |
 | B5 | Vercel or S3 + CloudFront? | **S3 + CloudFront** — Vercel's free tier is not licensed for commercial use |
 | B6 | NAT gateway or public subnets? | **One NAT in `prod`; public subnets in `dev`** |
 | B7 | Does `stage` run a worker? | **Moot — no stage.** Replaced by: the dispatcher is in-process for V1, split out when a handler does real outbound work |

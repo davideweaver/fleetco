@@ -228,9 +228,10 @@ server, which doubles as early dogfooding of the tool catalog before any employe
 
 To add to [[Architecture Decisions]] if this plan is accepted:
 
-> **ADR-036 — API-first for every client; agent access through an MCP adapter later** `PROPOSED`
+> **ADR-037 — API-first for every client; agent access through an MCP adapter later** `PROPOSED`
 >
-> *(Renumbered 2026-11-08 — ADR-029 is now the two-environment decision.)*
+> *(Renumbered twice on 2026-11-08: written as 029, which is the two-environment decision, then
+> 036, which an unmerged branch had already claimed for the monorepo ADR.)*
 >
 > **Decision.** Every user-facing action is a documented public API operation, and every client,
 > including the web app, uses it. AI agents will reach the system through a thin MCP server that
