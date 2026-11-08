@@ -1,15 +1,19 @@
 ---
+status: current
+summary: Making the product agent-usable later. Three items are V1 work; the rest is deferred
 created: 2026-11-01
+updated: 2026-11-08
 tags: [fleetco, architecture, ai, agents, mcp, api, plan]
-status: plan-for-later
 source: Dave's voice note 2026-11-01, written up by Claude
 ---
 
 ## Overview
 
-> **This is a plan for later, not V1 scope.** Fleetco has not asked for any AI features, and none
-> are being built for V1. This document records the intent so that V1 is built in a way that makes
-> AI features cheap to add later, instead of a rewrite.
+> **No AI features are in V1.** Fleetco has not asked for any. This document records the intent so
+> that V1 is built in a way that makes AI features cheap to add later, instead of a rewrite.
+>
+> **But three things in it are V1 work** — see [[#What Is Actually V1]]. Reviewed 2026-11-08 against
+> the decisions already made, and the rest turn out to be either already decided or free.
 
 **The one idea that makes everything else work: every client is a client of the same API.** The
 web app, its responsive phone and tablet view, an AI agent running in the background, an
@@ -75,8 +79,38 @@ API design that agents happen to depend on. Most extend decisions already made.
     what a background agent subscribes to: `estimate.awaiting_approval`, `invoice.overdue`. Keep
     event names and payloads documented with the same care as the API.
 
-Items 1, 2 and 12 are already decided; this document only adds the AI reason to keep them. Items
-3 through 11 are new asks for V1 and are small individually.
+## What Is Actually V1
+
+Checked item by item on 2026-11-08 against decisions already recorded elsewhere. **An earlier version
+of this document said "items 3 through 11 are new asks." That was too broad — only three are.**
+
+### The three that are real V1 work
+
+| # | Item | Why it cannot wait |
+|---|---|---|
+| **9** | **Actor attribution** — `Principal` can say "the background agent, acting for the owner" or "Sam's assistant, acting as Sam", and every outbox event carries the actor kind | **The highest-regret item on this page.** Adding the column later means backfilling history that *cannot be reconstructed*. One field and one column now; impossible later. Do this even if AI never ships, because it also distinguishes a human from a scheduled job in the audit trail |
+| **7** | **Machine-readable errors** — a stable error `code`, the offending field, a human message | Error codes become a contract the moment a second client exists. Changing them later breaks callers. The web UI wants them anyway for field-level messages |
+| **3** | **API descriptions written for a stranger** — a plain `summary` on every operation, `.describe()` on every Zod field in [[Domain Model]] vocabulary | **Only cheap if done continuously.** Retrofitting descriptions across a Rules-Catalog-sized surface later is a genuine slog, and the OpenAPI document is what agents writing *our own code* read. Enforce at review, not as a separate task |
+
+### The nine that need no new work
+
+| # | Item | Already covered by |
+|---|---|---|
+| 1 | Every UI action is a public API operation | ADR-014. A CI check that the frontend may only call the generated client makes it structural |
+| 2 | Business rules in services, never the UI | [[Code Standards and Guardrails]] layering rule |
+| 4 | Task-shaped operations, not only CRUD | A design posture, not extra work — "approve estimate" is what the UI needs anyway, and [[Rules Catalog]] is already written as actions |
+| 5 | Free-text search on customers, vehicles, work orders | V1 regardless. People need it more than agents do |
+| 6 | Idempotency keys on writes | Already **P0** on [[Infrastructure Checklist]] |
+| 8 | Preview before commit | Already domain states — estimate draft, invoice draft |
+| 10 | Permissions fine-grained enough to grant a subset | **Already solved by PLAT-008**: code checks a permission string, never a role name, and roles are data. A third role is a data change, not a code change. **The role *editor* is correctly out of V1** — ROLE-001 fixes V1 at two roles, Owner and Technician |
+| 11 | Rate limits per credential, not only per IP | [[Infrastructure Checklist]] has rate limiting at P1 "per IP **and** per account"; per-credential is a small extension of the same work |
+| 12 | Events are the agent trigger surface | ADR-009, ADR-015 |
+
+**So the V1 ask is three items, and one of them is a review standard rather than a task.** That is a
+much smaller commitment than this document originally implied, and #9 is the one that would hurt to
+skip.
+
+
 
 ## How the API and MCP Fit Together
 
@@ -113,7 +147,7 @@ matches the existing topology of two ECS services from one image (see [[Hosting 
 
 ```
 api      ← HTTP + SSE. 2 tasks minimum, behind an ALB.
-worker   ← outbox dispatcher + scheduled jobs. 1 task.
+                 (the outbox dispatcher runs in-process — see [[Hosting and Deployment]])
 mcp      ← MCP over Streamable HTTP. 1–2 tasks. Talks only to `api`.   (later)
 ```
 
@@ -194,7 +228,9 @@ server, which doubles as early dogfooding of the tool catalog before any employe
 
 To add to [[Architecture Decisions]] if this plan is accepted:
 
-> **ADR-029 — API-first for every client; agent access through an MCP adapter later** `PROPOSED`
+> **ADR-036 — API-first for every client; agent access through an MCP adapter later** `PROPOSED`
+>
+> *(Renumbered 2026-11-08 — ADR-029 is now the two-environment decision.)*
 >
 > **Decision.** Every user-facing action is a documented public API operation, and every client,
 > including the web app, uses it. AI agents will reach the system through a thin MCP server that
@@ -204,8 +240,10 @@ To add to [[Architecture Decisions]] if this plan is accepted:
 > clients rather than new implementations of existing rules, and support for any assistant
 > vendor comes from an open standard rather than a per-vendor integration.
 >
-> **Consequences.** API descriptions, idempotency, structured errors and actor attribution are
-> required in V1, before any AI feature exists. The MCP server is deferred until Fleetco wants it.
+> **Consequences.** API descriptions, structured errors and **actor attribution** are required in
+> V1, before any AI feature exists — actor attribution especially, because it cannot be
+> reconstructed later. Idempotency and permission-string checks are already required by other
+> decisions. The MCP server is deferred until Fleetco wants it.
 
 ## Open Questions
 
