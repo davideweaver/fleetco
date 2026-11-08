@@ -1,7 +1,9 @@
 ---
+status: living
+summary: Component names and shell anatomy. The names here are the code
 created: 2026-11-03
+updated: 2026-11-08
 tags: [fleetco, architecture, ui, design-system, vocabulary, agents]
-status: live — the names in here are the component names in `fleetco-ui/src`
 source: Claude Code (Xerro), from the device lab
 ---
 
@@ -20,6 +22,26 @@ grep for the thing they mean. It is the same failure the single route table prev
 > right and this file is stale** — fix the file.
 
 ![The shell, expanded rail, list and detail](media/ui-vocabulary.png)
+
+## Business
+
+**A Business is a line of business inside the tenant** — graphics, fleet, trailers, and a test
+Business for development. **Renamed from "Department" on 2026-11-08 (ADR-005):** a department shares
+a customer list and a general ledger, and these do not. Code says `business`; `departments` in
+`sample.ts` is renamed.
+
+The **BusinessSwitcher** lives in the context cluster at the bottom of the rail and lists the
+Businesses the signed-in user is granted. Switching is a navigation to `/b/{businessId}/…`, so **two
+tabs can sit in two Businesses without interfering** — which makes the active Business's visual
+identity load-bearing rather than decorative:
+
+- The Business name appears in the context cluster **and in the browser tab title**
+  (`[GFX] Job 1042 — Fleetco`). The title is the only thing visible when a tab is unfocused, which
+  is exactly when a wrong-Business entry happens.
+- A **test Business** re-skins the rail through a scoped token override on `.nav-surface`, not a
+  top banner.
+- A Business the user cannot reach shows a full-pane "This business isn't available to you" with the
+  picker — **never a silent fallback to another Business.**
 
 ## The shell
 

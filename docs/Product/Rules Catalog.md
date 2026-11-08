@@ -1,8 +1,9 @@
 ---
+status: current
+summary: 131 numbered rules with examples, plus the D-* decision queue
 created: 2026-10-31
-updated: 2026-10-31
+updated: 2026-11-08
 tags: [fleetco, otc, v1, rules, business-logic, spec, testing]
-status: first draft — mined from existing docs, no new FullBay access; awaiting Cam's answers
 source: Claude Code (Xerro), from Cam's punch list notes, the 10/23 debrief, V1 Vision and Gaps, Domain Model, Code Standards
 ---
 
@@ -94,25 +95,38 @@ They are voided or reversed, and the original remains. Canceling a job never rem
 records.
 **Source:** PL 1.10 · **Status:** Confirmed · **Phase:** V1
 
-### PLAT-006 Every business record belongs to a department
-**Rule:** jobs, estimates, invoices, POs, catalog materials and time entries each carry a
-department. V1 has one department, Graphics. The department is **shown** in the context menu at the
-bottom of the rail, with Graphics selected; *switching* between departments is FUT-002.
+### PLAT-006 Every record belongs to a Business
+**Rule:** jobs, estimates, invoices, POs, catalog materials, time entries, **and customers** each
+belong to exactly one **Business**. A user is granted access per Business and switches between them
+from the context menu at the bottom of the rail.
 
-**Design choice, not a FullBay fact:** in the new system, one company is one customer record shared
-by every department. A customer has no department.
+**Rewritten 2026-11-08 — ADR-005.** Three changes from the previous version:
 
-This is **not** how FullBay appears to work. Customer lists export one shop at a time (MTG
-00:00:45), a customer is "set up with the Lancaster shop" (MTG 00:04:52), and myOTCFleet uses a
-separate FullBay API key per shop. What FullBay shares across shops is configuration (parts markups,
-labor rates; MTG 00:22:53), not customers. We chose one shared record because Cam's biggest FullBay
-complaint was one company split into many customer records (G5).
+1. **"Department" becomes "Business."** A department shares a customer list and a general ledger.
+   OTC's graphics, fleet and trailer lines have separate books, separate QuickBooks classes and
+   separate customers, so the word was straining — which is why the old version of this rule had to
+   say, defensively, that a customer has no department.
+2. **Customers are now Business-scoped.** This **reverses** the previous design choice, which was
+   *"one company is one customer record shared by every department."* That choice was made because
+   Cam's biggest FullBay complaint was one company split across many customer records (G5), so the
+   reversal has a real cost and is **gated on D-C18.**
+3. **Switching is V1, not Later.** FUT-002 is promoted, because the developer's test Business and
+   Dan's evaluation of fleet and trailers both need it from day one.
+
+**If D-C18 says shared companies are real**, the fix is a tenant-scoped `customer_links` grouping
+that says "these records are one company" for rollups and statements — **not** moving customers to
+tenant scope, which would reintroduce a second enforced scope on the busiest table in the system.
+FUT-003 (parent customers) is the related deferred item.
+
+**Still not a FullBay fact.** Customer lists export one shop at a time (MTG 00:00:45), a customer is
+"set up with the Lancaster shop" (MTG 00:04:52), and myOTCFleet uses a separate FullBay API key per
+shop. What FullBay shares across shops is **configuration** — parts markups, labor rates (MTG
+00:22:53) — which this rule does **not** share. See D-C22.
 
 **Consequence:** if FullBay holds one record per shop, the shop cutover must merge duplicates across
-shop exports and match them to QuickBooks (QBO-005). See D-C18.
-**Source:** PL 1.23 (switcher Later), V1 Alignment §1 (QuickBooks class), G5, DAVE (visibility) ·
-**Status:** Proposed (FullBay's actual behavior is D-C18) · **Phase:** V1 (data and visibility),
-Later (switching)
+exports and match them to QuickBooks (QBO-005). See D-C18.
+**Source:** PL 1.23, V1 Alignment §1 (QuickBooks class), G5, DAVE (visibility) · **Status:** Proposed
+(FullBay's actual behavior is D-C18) · **Phase:** V1, switching included
 
 ### PLAT-007 External IDs are stored, not synced
 **Rule:** customers and jobs can store a GoHighLevel contact ID and opportunity ID. Migrated
@@ -1000,7 +1014,7 @@ for whoever designs the tables.
 | ID | Later rule | What it means for V1's data |
 |---|---|---|
 | FUT-001 | Office, Manager, Accounting roles; per-user Inherit / Allow / Deny overrides; Office never sees pay rates (PL 0.2, 0.4) | Permissions as data (PLAT-008); wage data separately permissioned |
-| FUT-002 | Graphics, Mechanical and Mobile departments with a switcher (PL 1.23) | Department on every record (PLAT-006) |
+| ~~FUT-002~~ | **Promoted to V1 2026-11-08** — Businesses with a switcher. See PLAT-006 and ADR-005 | — |
 | FUT-003 | Parent customers with departments; contacts across several customers (G5) | Parent column now (CUST-002); contacts not owned by one customer only |
 | FUT-004 | Mechanical service orders with Action Items: Concern / Cause / Correction, each with parts and labor (PL 1.4) | Customer line + components must generalize to Action Item + part and labor lines |
 | FUT-005 | Live stock per location; templates deduct stock (PL 1.21, 3.x) | Catalog material IDs stable; components keep a catalog reference |
@@ -1042,6 +1056,8 @@ Grouped by who answers. Each references the rules it unblocks.
 | D-C19 | When you want a package's materials shown on an invoice, do you mean the list of what is included, or the materials with their own prices? | EST-002, EST-018 |
 | D-C20 | A package you build inside one estimate — do you ever want to save it for reuse, or is building it fresh each time fine? | EST-015 |
 | D-C18 | If a company uses both graphics and the Lancaster shop, is it one customer in FullBay or two? Roughly how many graphics customers also use the shops? Is it the same in QuickBooks? | PLAT-006, QBO-005, MIG-001 |
+| D-C21 | **Does FullBay sync all the businesses into one QuickBooks company file with a class per business, or is there a separate sync per business?** Decides whether invoice numbers must be unique across all businesses, and whether the class or the connection is what keeps the books apart | QBO-002, INV-004, PLAT-006, ADR-035 |
+| D-C22 | **Does any employee work across businesses in the same week?** Overtime is per person per week by law, so shared techs mean payroll cannot be scoped to one business. Also: are parts markups and labor rates meant to be shared across businesses, as FullBay shares them today? | TIME-009, PLAT-006, ADR-005 |
 
 ### For accounting
 
