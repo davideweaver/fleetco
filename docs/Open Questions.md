@@ -1,6 +1,8 @@
 ---
+status: current
+summary: Q1-Q18 — the project-level unknowns and who answers them
 created: 2026-10-08
-updated: 2026-10-28
+updated: 2026-11-08
 tags: [project, business, fleetco, questions, blockers]
 source: Claude Code (Xerro)
 ---
@@ -226,7 +228,7 @@ captures which we are not planning to replace at all.
 The $5,000 has lost its `Confirmed` status until an invoice is seen. Closely related to Q8
 (volumes).
 
-### Q17. Does Fleetco have an existing AWS account? `OPEN`
+### Q17. Does Fleetco have an existing AWS account? `ANSWERED`
 
 **Narrowed 2026-10-09.** ADR-021 and ADR-023 settled on AWS on the merits — Aurora fast clone,
 S3 Object Lock, and better SSE handling through an ALB. The remaining question is only
@@ -241,6 +243,14 @@ name should the account and the billing be in — and who owns it if Dave stops 
 *Why it matters:* account ownership is really a **Q3 question in disguise.** If Fleetco owns the
 account, Dave needs durable access. If Dave owns it, Fleetco's business depends on infrastructure
 in someone else's name. Settle it in writing before production holds real data.
+
+**Answered 2026-11-08: OTC owns the account and the bill** ([[AWS Buildout]] B2). Three
+consequences. **Dave needs durable, documented access** — a named Identity Center user with
+administrator access, and a written answer to what happens to it if the engagement ends. That piece
+is handed to M2 and is the only part still open. **Creating the Organization is Cameron's task**,
+with OTC's payment method, which makes it the one thing blocking the whole buildout that is not
+Dave's to do — INFRA-046 pre-writes it as a 30-minute screen-share script. And **Dave should keep a
+personal AWS account** for throwaway experiments, since OTC's is no longer the place to try things.
 
 ### Q15. What are the real support expectations? `OPEN`
 

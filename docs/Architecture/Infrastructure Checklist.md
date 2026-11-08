@@ -1,5 +1,8 @@
 ---
+status: current
+summary: What has to exist, phased P0/P1/P2
 created: 2026-10-09
+updated: 2026-11-08
 tags: [fleetco, architecture, infrastructure, observability, checklist, saas]
 source: Claude Code (Xerro)
 ---
@@ -28,7 +31,7 @@ Out of everything below, these are the items most often missed and most painful 
 
 | Item | Why it bites |
 |---|---|
-| **Request-scoped logging context** | Adding `tenant_id`/`user_id`/`request_id` to logs later means touching every log call in the codebase. P0 or regret it. |
+| **Request-scoped logging context** | Adding `tenant_id`/`business_id`/`user_id`/`request_id` to logs later means touching every log call in the codebase. P0 or regret it. |
 | **Idempotency keys on writes** | A double-submitted invoice is a billing error, not a UI glitch. Must be designed in, not patched. |
 | **Time zone strategy** | Store UTC, render in shop-local. Labor hours and invoice dates are wrong forever if this is decided late. |
 | **Email deliverability (SPF/DKIM/DMARC)** | Invoices land in spam silently. Nobody reports it; they just don't pay. Must be done before the first invoice is sent. |
@@ -52,7 +55,11 @@ Out of everything below, these are the items most often missed and most painful 
 
 | Item | When | Tool / approach |
 |---|---|---|
-| Structured JSON logging | **P0** | Pino. Every line carries `request_id`, `tenant_id`, `user_id`, route |
+| Structured JSON logging | **P0** | Pino. Every line carries `request_id`, `tenant_id`, `business_id`, `user_id`, route |
+| **Write attribution** | **P0** | `application_name` set to `<env>@<sha>` on every connection. Near-free, and it is what makes a data-repair script scopeable when a release writes wrong values |
+| **Actor attribution** | **P0** | `Principal` records the actor kind and an optional "on behalf of", and every outbox event carries it. **Cannot be reconstructed later** — see [[AI Readiness]]. Distinguishes a person from a scheduled job in the audit trail even with no AI features |
+| **Machine-readable error codes** | **P0** | A stable `code`, the offending field, a human message. Becomes a contract the moment a second client exists. [[AI Readiness]] |
+| **API descriptions written for a stranger** | **P0 standard** | A plain `summary` per operation and `.describe()` on every Zod field, in [[Domain Model]] vocabulary. A review standard, not a task — only cheap if done continuously |
 | Request ID propagation | **P0** | Generated at the edge, threaded through. *Not* distributed tracing — see [[Evolution Path]] non-goals |
 | PII logging policy | **P0** | A written list of what must never be logged: passwords, tokens, full payment data. Enforced by a redaction serializer |
 | Backend error tracking | **P0** | Sentry, with release tagging so errors map to a deploy |
@@ -74,7 +81,7 @@ Out of everything below, these are the items most often missed and most painful 
 | Session replay | **P1** | Dramatically reduces solo-operator support cost — see what the service advisor actually did. **Requires PII masking rules before enabling**, given customer and hospital data |
 | Analytics consent / masking policy | **P1** | Written before replay is switched on, not after |
 | Usage metering | **P2** | Needed even without usage-based billing — you cannot size or price what you cannot measure |
-| Feature flags | **P2** | Decouples deploy from release; lets a risky change go to one customer first |
+| **Feature flags** | **P0** | **Promoted from P2 by ADR-029.** With no staging environment a flag is the only thing between a half-finished feature and a real customer. LaunchDarkly behind a port, compiled-in defaults, **plus the two CI gates in ADR-034** |
 
 ## Security
 
@@ -109,14 +116,22 @@ Out of everything below, these are the items most often missed and most painful 
 | Cross-tenant leak suite as a required gate | **P0** | No override. See [[Tenancy Model]] |
 | Migration automation | **P0** | Drizzle, forward-only, expand/deploy/contract. See [[Operations]] |
 | Seed and fixture data | **P0** | A realistic dataset for local dev and tests. Skipping this slows every future day |
-| **Infrastructure as code** (Terraform/CDK) | **P0 from Phase 1** | Mandatory once a second environment exists, or they drift. ADR-026 |
-| Vercel frontend previews per PR | **P0 from Phase 1** | Free and automatic; points at `staging`. Deployed *backend* previews were dropped — see [[Environments]] |
-| **Non-prod mailer allowlist** | **P0 from Phase 1** | Staging emailing invoices to real customers is the likeliest real-world leak. Enforce in the mailer, not in config |
+| **Infrastructure as code** (Terraform) | **P0** | Mandatory once a second environment exists, or they drift. ADR-026, resolved to Terraform by ADR-030 |
+| **No long-lived AWS keys** | **P0** | GitHub OIDC, trust conditioned on repo **and environment**. ADR-031 |
+| **Flag gate: both branches tested** | **P0** | CI fails if a flag lacks a test for its on and off path. ADR-034 |
+| **Flag gate: expiry date** | **P0** | CI fails once a flag passes its recorded expiry. Keeps few flags alive at once |
+| **Additive-only migration checker (allowlist)** | **P0** | A denylist misses `ADD CONSTRAINT NOT VALID`, a new unique index, `DROP INDEX`, `SET DEFAULT`, DML in a migration, `TRUNCATE`, sequence resets, triggers. Allowlist, and everything else needs a reviewed annotation |
+| **Clone-and-dry-run release gate** | **P0 before production** | Clone production, migrate the copy, time it, destroy it. Replaces a staging environment for the one thing staging was uniquely good at. ADR-029 |
+| **Repo protections** | **P0** | CODEOWNERS on `.github/workflows/**` and `infra/envs/prod/**`, plus a `v*` tag ruleset. The pipeline is the highest-privilege code in the repo |
+| Frontend previews per PR on CloudFront | **P1** | Build to an S3 preview prefix, bot comments the URL. No database. Deployed *backend* previews stay dropped — see [[Environments]] |
+| **Non-prod mailer allowlist** | **P0** | The likeliest real-world leak. Enforce in the mailer, not in config |
+| **Test-business guard (`is_test`)** | **P0** | A test business lives *inside production*, so business isolation protects data but not side effects. Mailer to a catch-all, sandbox integration credentials, test payment keys — enforced in the adapters, not in config |
+| **Business create and delete** | **P0** | Dave's test business needs both. **Delete is the one that gets skipped** — and it is this document's own "what happens when a customer leaves" item, built early for convenience instead of late under compliance pressure |
 | Separate AWS accounts, prod vs non-prod | **P0 before production** | ADR-025. Best guard against a destructive command in the wrong place |
 | Release versioning + changelog | **P1** | Support needs to ask "what version are you on" and get a useful answer |
-| Staging with scrubbed production data | **P1** | Scrubbed, not a copy. Real shapes, fake people. **The scrubber is load-bearing for privacy and needs tests** |
-| Aurora fast clone script | **P1** | On-demand copy-on-write clone for risky migrations — replaces Neon branching |
-| Documented rollback path | **P1** | "Roll forward only" is a valid policy, but it must be a decision with a plan for when forward is broken |
+| **The scrubber** | **P1** | Production data is only ever restored into nonprod **scrubbed**. Real shapes, fake people. **Load-bearing for privacy and needs tests** (INFRA-049) |
+| Aurora fast clone | **P0 before production** | Now in the release path rather than on demand — see the clone-and-dry-run gate above |
+| Documented rollback path | **P1** | "Roll forward only" is a valid policy, but it must be a decision with a plan for when forward is broken. **Deploy API before UI; roll UI back before API** |
 
 ## Reliability
 
@@ -176,6 +191,7 @@ skeleton, which is why they belong in the skeleton rather than in a later sprint
 
 ## Related
 
+- [[AWS Buildout]] — the buildout, the pipeline, and the INFRA card list
 - [[Operations]] — procedures: backup, restore, migrations, support, incidents
 - [[Environments]] — environment progression, parity rules, real-world guards
 - [[Testing Strategy]] — CI gates and the test layers

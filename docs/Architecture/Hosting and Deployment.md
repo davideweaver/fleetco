@@ -1,6 +1,8 @@
 ---
+status: current
+summary: Fargate, ALB, SSE, portability discipline, deploy pipeline
 created: 2026-10-09
-updated: 2026-10-09
+updated: 2026-11-08
 tags: [fleetco, architecture, hosting, deployment, aws, fargate, kubernetes]
 source: Claude Code (Xerro)
 ---
@@ -108,19 +110,28 @@ can force a 6am decision.
 
 ## Process Topology
 
-**Two ECS services from one image:**
+> **Corrected 2026-11-08.** This section described two ECS services. **The code has one.** The
+> outbox dispatcher starts inside the API process (`fleetco-nestjs-vehicles/src/main.ts:49`); there
+> is no worker entrypoint, and `platform/outbox/dispatcher.ts` records that the handler registry is
+> not written yet. [[Realtime and Events]] said "dispatched in-process" all along, so this document
+> was the one out of step. An adversarial review of [[AWS Buildout]] caught it when a safety
+> argument had been built on the two-service topology.
+
+**For V1, one ECS service from one image:**
 
 ```
-api      ← HTTP + SSE. 2 tasks minimum, behind an ALB.  (framework: ADR-027)
-worker   ← outbox dispatcher + scheduled jobs. 1 task.
+api      ← HTTP + SSE + the in-process outbox dispatcher.
+           2 tasks minimum, behind an ALB.  (framework: ADR-027)
 ```
 
-Keeping the dispatcher out of the request path means a slow QuickBooks sync cannot inflate request
-latency, and a crash in one does not take down the other.
+Two tasks means two dispatchers, which is **safe** — `FOR UPDATE SKIP LOCKED` guarantees each outbox
+row is claimed exactly once (see [[Realtime and Events]]) — and it removes a deployable.
 
-The worker runs a single task to keep outbox ordering simple. `FOR UPDATE SKIP LOCKED` already
-makes multiple workers safe (see [[Realtime and Events]]), so this is a simplicity choice rather
-than a correctness one.
+**Split the worker out when a handler does real outbound work** — a QuickBooks sync, bulk email.
+At that point the original argument applies and is still right: keeping a slow vendor call out of
+the request path stops it inflating request latency, and a crash in one does not take down the
+other. It just is not true yet, and a diagram describing a service that does not exist is worse
+than no diagram. INFRA-050.
 
 ## AWS Specifics Worth Getting Right
 
@@ -128,20 +139,21 @@ than a correctness one.
 |---|---|
 | **ALB idle timeout** | **Default is 60 seconds, which will kill SSE connections constantly.** Raise it (3600s) or SSE appears mysteriously broken. The single most likely configuration bug in this stack. |
 | ALB deregistration delay | Set to exceed the app's graceful-shutdown window so draining actually completes (ADR-022, rule 7) |
-| **NAT Gateway** | ~$32/month if tasks sit in private subnets. Avoidable: public subnets with public IPs and security groups allowing inbound **only** from the ALB. Neon is a TLS public endpoint anyway. Cheaper and simpler; private subnets plus NAT is the more defensible answer under an enterprise security review. **A real decision, not a default.** |
+| **NAT Gateway** | **Decided 2026-11-08 ([[AWS Buildout]] B6): one NAT in `prod` (~$32/month), public subnets in `dev` ($0).** The difference is not whether an attacker can reach a task today — it is what one wrong security-group rule costs. In a public subnet it exposes the application; in a private subnet there is no route, so the same mistake is inert. `prod` is the only environment anyone audits. **VPC interface endpoints are *not* the cheap alternative** — about $7.30/month each per AZ, and five are needed, so ~$73 against $32. |
 | Fargate platform version | Pin `LATEST` and AWS patches the substrate — this is the "no maintenance" property |
-| Secrets | **SSM Parameter Store SecureString is free**; Secrets Manager is $0.40/secret/month. For a handful of secrets, Parameter Store is the better call |
+| Secrets | **SSM Parameter Store SecureString is free**; Secrets Manager is $0.40/secret/month. For a handful of secrets, Parameter Store is the better call. **One exception:** the RDS Data API requires a Secrets Manager secret ([[AWS Buildout]] B17) |
 | Scheduled jobs | EventBridge Scheduler invoking a one-off ECS task. Plain commands per ADR-022 rule 6 |
 | CloudWatch Logs | $0.50/GB ingested — **set a retention policy**, do not keep forever |
 | ECR | Set a lifecycle policy to expire old images, or storage creeps |
-| Fargate Spot | Not for `api` (interruptions). Viable for `worker`, since outbox dispatch is idempotent and resumable — up to ~70% cheaper |
+| Fargate Spot | Not for `api`, which now carries the dispatcher as well. Revisit if the worker is ever split out |
+| **CloudFront** | Static UI only. **Do not route the API through it** — SSE holds a connection for an hour and CloudFront applies its own origin read timeout. ADR-033 |
 | Region | Must match the Aurora cluster's region. Latency to the database matters more than latency to users |
 
 ## Cost
 
 **Caveat: approximate, from knowledge with a May 2026 cutoff. Verify in the AWS calculator.**
 
-Two sizings, `api` ×2 plus `worker` ×1, always on:
+Two sizings, `api` ×2, always on (the dispatcher runs in-process):
 
 | Item | Right-sized (0.25–0.5 vCPU) | Comfortable (1 vCPU / 2GB) |
 |---|---|---|
@@ -191,16 +203,23 @@ becomes the work that never gets prioritized.
 
 ## Deploy Pipeline
 
-1. Push to `main`
-2. CI: typecheck, lint, tests, **and the cross-tenant leak suite as a required gate**
-3. Build and tag the image with the commit SHA; push to ECR
-4. Apply migrations (expand phase only — see [[Operations]])
-5. Update the `api` service; ECS rolls tasks over, health-gated, old tasks draining
-6. Update the `worker` service
-7. Smoke check, then tag the release
+Full treatment in [[AWS Buildout]]; the shape:
 
-Rollback is redeploying the previous image tag. Because migrations are expand/contract and
-forward-compatible, the previous image always works against the current schema.
+1. Open a pull request. CI runs typecheck, lint, tests, **the leak suite as a required gate**, a
+   from-scratch migration, the two flag gates, and `terraform plan` for both environments.
+2. Merge to `main`. **One API image and one UI bundle are built, and never rebuilt** — everything
+   downstream promotes those two artifacts by digest and by S3 prefix (ADR-031).
+3. `dev` deploys itself: migrate, roll the service, smoke test.
+4. Tag a release and start the production workflow by hand, naming the artifacts.
+5. **Clone production's database, run the release's migrations against the clone, record the timing,
+   destroy it.** This is the dress rehearsal that replaces a staging environment (ADR-029).
+6. Additive-only check, snapshot, migrate.
+7. Roll the API tasks one at a time, health-gated, draining. **Then the UI** — a new UI against an
+   old API fails on endpoints that do not exist yet.
+8. Smoke check, tag the release. Destructive migrations wait for `contract.yml`, one release later.
+
+Rollback is re-running the workflow with the previous artifacts — **UI first, API second**. Because
+migrations are additive, the previous image always works against the current schema.
 
 **Deploy during business hours**, deliberately, while someone is awake to notice.
 
@@ -219,6 +238,7 @@ tolerable. ADR-023.
 
 ## Related
 
+- [[AWS Buildout]] — the buildout, the pipeline, and the decision log
 - [[Stack Evaluation]] — the full stack and cost model
 - [[Operations]] — deploys, rollback, migrations, incident response
 - [[Infrastructure Checklist]] — graceful shutdown, health endpoints, secrets

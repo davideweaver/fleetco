@@ -1,6 +1,8 @@
 ---
+status: current
+summary: The full stack and the cost model
 created: 2026-10-08
-updated: 2026-10-09
+updated: 2026-11-08
 tags: [fleetco, architecture, stack, postgres, aurora, aws, cost]
 source: Claude Code (Xerro)
 ---
@@ -113,8 +115,9 @@ billing accuracy. Document stores make the invoicing and inventory math harder, 
 | Realtime | SSE from our API, fed by the outbox | Same authorization path as REST; supports replay |
 | Fanout | Postgres `LISTEN/NOTIFY` | No Redis — durability is the outbox table |
 | File storage | **S3**, versioning + Object Lock | Defect photos, signed authorizations, invoices — some are statutory records |
-| Compute | **ECS Fargate** — `api` ×2 + `worker` ×1 | No cluster, no nodes, no ECS API deprecations |
-| Frontend hosting | Vercel | Zero-config for Vite/React, free preview deploys |
+| Compute | **ECS Fargate** — `api` ×2, dispatcher in-process | No cluster, no nodes, no ECS API deprecations. Worker splits out when a handler does real outbound work |
+| Frontend hosting | **S3 + CloudFront** (ADR-033) | In the same Terraform as everything else. Vercel's free tier is not licensed for commercial use, so it was $20–40/seat against ~$5 |
+| Feature flags | **LaunchDarkly** free tier, behind a port (ADR-034) | Release mechanism, not a convenience — there is no staging environment |
 | Errors | Sentry | Non-negotiable on software a business depends on |
 
 Full hosting treatment in [[Hosting and Deployment]]; environments in [[Environments]].
@@ -125,22 +128,30 @@ Full hosting treatment in [[Hosting and Deployment]]; environments in [[Environm
 
 | Item | Monthly |
 |---|---|
-| Fargate: `api` ×2 + `worker` ×1 (right-sized) | $27 |
+| Fargate: `api` ×2 (right-sized) | $18 |
 | ALB | $20 |
-| NAT gateway *(optional — see [[Hosting and Deployment]])* | $0–32 |
+| NAT gateway — **one, in `prod`** (ADR-029/B6) | $32 |
+| CloudFront + S3 for the UI | $5 |
 | Aurora Serverless v2, 0.5 ACU floor + 50 GB | $50–60 |
 | S3 + requests + egress | $5–25 |
 | Parameter Store, ECR, CloudWatch Logs | $7–10 |
 | **AWS subtotal** | **$109–174** |
-| Non-production environments *(see [[Environments]])* | $20–65 |
-| Vercel (frontend) | $20 |
+| `dev`, the only non-production environment *(see [[Environments]])* | $41–51 |
+| Release-time database clones — copy-on-write, destroyed after | ~$1 |
+| ~~Vercel~~ — replaced by CloudFront, counted above | — |
+| LaunchDarkly (free Developer tier; billed per running process) | $0–10 |
+| GitHub Team, 2–3 seats | $8–12 |
 | Sentry | $26 |
 | PostHog (analytics + session replay) | $0–50 |
 | Transactional email + SMS (Resend / Twilio) | $20–50 |
 | Uptime monitoring, domain, misc. | $5–15 |
-| **Total through first production customer** | **$200–400** |
+| **Total through first production customer** | **$230–375** |
 
-**Revision history on this figure.** The original "under $100" omitted email, SMS, error tracking,
+**Revised 2026-11-08.** The third environment was removed (ADR-029), the frontend moved from Vercel
+to CloudFront (ADR-033), LaunchDarkly and GitHub Team were added, and the NAT gateway stopped being
+optional. Net effect is roughly flat.
+
+**Earlier revision history on this figure.** The original "under $100" omitted email, SMS, error tracking,
 and object egress. Pooled deployment (ADR-006) then made it flat with tenant count rather than a
 per-tenant multiple. Realistic Fargate and Aurora sizing corrected it upward. Dropping Neon
 removed Redis and trimmed it slightly. Non-production environments were then added explicitly, and
@@ -166,6 +177,7 @@ comfortably share one deploy. That is a good problem and a long way off.
 
 ## Related
 
+- [[AWS Buildout]] — the buildout and the current cost model
 - [[Platform Choice]] — the Neon-versus-AWS-native evaluation
 - [[Hosting and Deployment]] — Fargate, ALB, SSE, Kubernetes triggers
 - [[Environments]] — non-production topology and cost

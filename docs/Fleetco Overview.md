@@ -1,8 +1,9 @@
 ---
+status: current
+summary: The one-page picture: what this is, where it stands, what is next
 created: 2026-10-08
-updated: 2026-11-01
+updated: 2026-11-08
 tags: [project, business, fleetco, fullbay, architecture]
-status: evaluating
 source: Claude Code (Xerro)
 ---
 
@@ -153,7 +154,7 @@ only Fleetco has.**
 | M3 | Feature inventory validated by Fleetco | **In progress** — 217-item punch list is with Cameron |
 | M4 | Phase-one scope locked (the [[PRD]]) | Blocked on M3 |
 | M5 | Data migration feasibility proven | **Downgraded for V1** — graphics likely starts fresh. Full dump requested from FullBay |
-| M6 | Walking skeleton deployed to `staging` | Not started |
+| M6 | Walking skeleton deployed to `dev` | Not started |
 | M7 | Phase-one feature build | Not started |
 | M8 | Pilot customer cutover | Not started |
 

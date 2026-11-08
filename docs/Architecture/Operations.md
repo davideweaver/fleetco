@@ -1,5 +1,8 @@
 ---
+status: current
+summary: Running it: backup, restore, migrations, support, incidents
 created: 2026-10-09
+updated: 2026-11-08
 tags: [fleetco, architecture, operations, backup, oncall, migrations, sre]
 source: Claude Code (Xerro)
 ---
@@ -51,8 +54,10 @@ all," the architecture is fine but the *staffing* is not, and that changes the p
   a destructive command run with real credentials — which is the realistic failure mode here.
 - **S3 versioning and Object Lock** on the bucket holding defect photos and signed
   authorizations. Those are legal records (Q9) and a bad delete must be recoverable.
-- **Restore drills, quarterly, written up.** An untested backup is a hope. The drill must
-  include: restore to a fresh database, point a staging API at it, verify invoice totals match.
+- **Restore drills, quarterly, written up.** An untested backup is a hope. The drill must include:
+  restore a scrubbed snapshot into the non-production account, point a `dev` API at it, verify
+  invoice totals match. **The release-time clone exercises the same machinery on every release**, so
+  the quarterly drill is a verification rather than a first attempt.
 - **Document the restore procedure as a runbook someone else can follow.** This is the single
   highest-value operational artifact in the project.
 
@@ -68,6 +73,14 @@ considerably easier when ADR-006 resolved to a single shared database.
   script rather than by memory
 - **A tested rollback path** for every release. "Roll forward only" is a reasonable policy but
   it has to be a *decision*, with a plan for the case where forward is broken.
+- **Additive-only is enforced as an allowlist, not a denylist** — a denylist misses
+  `ADD CONSTRAINT ... NOT VALID`, a new unique index, `DROP INDEX`, `ALTER COLUMN SET DEFAULT`, DML
+  inside a migration file, and sequence resets. And **a new constraint ships in the release after
+  the code that satisfies it**, which reverses the usual expand order.
+- **`lock_timeout` and `statement_timeout` on the migration connection.** Without them a migration
+  that cannot get its lock holds the queue and every write in the application piles up behind it.
+- **Data backfills are not migrations.** They are worker commands — idempotent, resumable, batched,
+  observable — run between expand and contract. A deploy never waits on one.
 - **One database, one migration run.** ADR-006 settled on pooled deployment, which removes the
   fan-out migration tooling, per-tenant version tracking, and partial-failure handling that siloed
   deployment would have required before tenant two. Schema drift across N databases was the
@@ -85,6 +98,7 @@ what matters for running the system day to day.
 | Uptime | Any external checker | Hits a real `/health` that touches the database |
 | Logs | Provider-native, structured JSON | With a request id on every line |
 | Request tracing | A request id threaded through | Not distributed tracing — see [[Evolution Path]] non-goals |
+| **Write attribution** | `application_name` = `<env>@<sha>` per connection | Near-free, and it is what lets a data-repair script be scoped after a bad release |
 | Business-level alarms | Custom checks | **The important ones.** See below. |
 
 **Business-level alarms matter more than infrastructure alarms** on a system like this. CPU
@@ -98,32 +112,45 @@ being fine is not interesting. These are:
 
 ## Environments
 
-Full treatment in [[Environments]]. The short version:
+Full treatment in [[Environments]] and [[AWS Buildout]]. The short version, **revised 2026-11-08
+(ADR-029)**:
 
-- **Phase 0** — local plus CI only, nothing deployed
-- **Phase 1** — add `staging`, one persistent deployed environment on synthetic data
-- **Phase 2** — add `dev` at cutover, so `staging` stays stable for Fleetco and migration rehearsal
-- **Never more than two** non-production environments before tenant two
+- **Two deployed environments: `prod` and `dev`.** No staging environment.
+- Next-version work is exercised by **feature flags**, a **test business inside production**, and a
+  **clone-and-dry-run gate** on every release.
+- A staging environment on a *clone* of production is deferred with a trigger; on *live* production
+  resources it is ruled out permanently.
 
-Production runs **two Fargate tasks minimum** behind the ALB from the first customer. Not for load
-— so that a deploy, a crash, or a memory leak is not an outage.
+Production runs **two Fargate tasks minimum** behind the ALB from the first customer. Not for load —
+so that a deploy, a crash, or a memory leak is not an outage. Both tasks also run the in-process
+outbox dispatcher, which is safe because `FOR UPDATE SKIP LOCKED` claims each row once.
 
 Three rules that matter operationally: **separate AWS accounts for production and non-production**
-(ADR-025 — the best protection against a destructive command run in the wrong place),
-**infrastructure as code from the second environment onward** (ADR-026 — hand-clicked environments
-diverge and then "it works in staging" means nothing), and **non-production must be structurally
-unable to email real customers.**
+(ADR-025 — and with no staging environment this is a complete guard, since nothing deployed in the
+production account is anything but production), **infrastructure as code** (ADR-026/030), and
+**neither `dev` nor a test business may reach the real world** — a mailer allowlist, sandbox
+integration credentials, and an `is_test` flag enforced in the adapters rather than in
+configuration.
 
 Platform choice, process topology, and the portability rules are in [[Hosting and Deployment]].
 
 ## Deploys
 
-- Push to main, CI runs tests, deploy on green
-- **The cross-tenant leak suite is a required gate.** No override.
-- Health check must pass before the old instance drains
-- Deploy during business hours deliberately, while someone is awake to notice — a 2am deploy
-  with nobody watching is worse than a 2pm one
+- Push to `main`, CI runs, `dev` deploys on green
+- **The leak suite is a required gate.** No override
+- Production is a **manual, `v*`-tagged dispatch** naming the artifact built earlier — never a
+  rebuild (ADR-031)
+- **The release clones production's database and runs the migrations against the copy first**, and
+  records the timing. A migration that misbehaves does so against a throwaway clone
+- Health check must pass before the old task drains
+- **Deploy the API before the UI; roll the UI back before the API.** A new UI against an old API
+  fails on endpoints that do not exist yet
+- Deploy during business hours deliberately, while someone is awake to notice — a 2am deploy with
+  nobody watching is worse than a 2pm one
 - **Never deploy on a Friday afternoon** unless fixing something actively broken
+- **Ship changes that cannot be flag-gated on their own** — a framework major, a large refactor, a
+  dependency bump with real surface area. Those are the releases with no dress rehearsal, so they
+  get a release to themselves and the rollback command ready
 
 ## Support
 
@@ -182,5 +209,6 @@ belongs in the Q3 compensation conversation.
 - [[Auth and Identity]] — impersonation for support
 - [[Stack Evaluation]] — cost model
 - [[Infrastructure Checklist]] — what has to exist, phased P0/P1/P2
+- [[AWS Buildout]] — the buildout, the pipeline, rollback scenarios
 - [[Hosting and Deployment]] — platform choice, process groups, deploy pipeline
 - [[Environments]] — non-production topology, IaC, the real-world guards

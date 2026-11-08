@@ -1,6 +1,8 @@
 ---
+status: current
+summary: ADR log, 001-035. The decision index is at the top
 created: 2026-10-08
-updated: 2026-10-12
+updated: 2026-11-08
 tags: [fleetco, architecture, adr, decisions]
 source: Claude Code (Xerro)
 ---
@@ -21,7 +23,7 @@ Status key: `PROPOSED` · `ACCEPTED` · `SUPERSEDED` · `REOPENED`
 | 002 | Postgres, not MongoDB | `PROPOSED` |
 | 003 | Supabase as infrastructure, not as the application | `SUPERSEDED` by 010 |
 | 004 | Avoid the high-lock-in Supabase tier | `SUPERSEDED` by 011 |
-| 005 | The tenant is the fleet management company | `PROPOSED` |
+| 005 | **The business is the unit of tenancy** | `PROPOSED` (rewritten 2026-11-08) |
 | 006 | Pooled deployment, single shared database | `PROPOSED` (resolved) |
 | 007 | Users modeled as `user ↔ membership ↔ tenant` | `PROPOSED` (re-justified) |
 | 008 | Subdomain-based tenant resolution | `SUPERSEDED` by 018 |
@@ -40,11 +42,18 @@ Status key: `PROPOSED` · `ACCEPTED` · `SUPERSEDED` · `REOPENED`
 | 021 | AWS ECS Fargate, not Kubernetes | `PROPOSED` |
 | 022 | Platform-portable containerization discipline | `PROPOSED` |
 | 023 | AWS-native platform: Aurora + S3, Neon dropped | `PROPOSED` |
-| 024 | One non-prod environment first, two at cutover | `PROPOSED` |
+| 024 | One non-prod environment first, two at cutover | `SUPERSEDED` by 029 |
 | 025 | Separate AWS accounts for production and non-production | `PROPOSED` |
-| 026 | Infrastructure as code once a second environment exists | `PROPOSED` |
+| 026 | Infrastructure as code once a second environment exists | `PROPOSED` (resolved by 030) |
 | 027 | NestJS, decided by spike | `PROPOSED` (resolved) |
 | 028 | Observability: Sentry + Pino behind a Telemetry port; metrics backend deferred | `PROPOSED` |
+| 029 | Two deployed environments, no staging | `PROPOSED` |
+| 030 | Terraform, not CDK | `PROPOSED` (resolves 026) |
+| 031 | GitHub Actions with OIDC, build once, promote the artifact | `PROPOSED` |
+| 032 | Agent access model: read-only in production | `PROPOSED` |
+| 033 | S3 and CloudFront for the frontend, not Vercel | `PROPOSED` |
+| 034 | Feature flags are release mechanism, with two CI gates | `PROPOSED` |
+| 035 | QuickBooks is the real tenancy boundary, and needs its own control | `PROPOSED` |
 
 ## ADR-001 — Modular monolith, not microservices, for phase one `PROPOSED`
 
@@ -98,23 +107,101 @@ under this very ADR. See [[Stack Evaluation]].
 > vendor-independent principle. The lock-in-by-tier analysis is preserved in [[Stack Evaluation]]
 > because it is the reasoning that produced ADR-010.
 
-## ADR-005 — The tenant is the fleet management company `PROPOSED`
+## ADR-005 — The business is the unit of tenancy `PROPOSED`
 
-**Decision.** One level of tenancy (`tenant_id` on every domain table), two levels of
-authorization (shop staff, and portal users scoped to a `customer_id`). A separate vendor/operator
-plane with its own auth.
+**Rewritten 2026-11-08**, replacing "the tenant is the fleet management company" in full. ADR-006
+(pooled), ADR-018 (single hostname) and ADR-029 (two environments) are unaffected; ADR-007 is
+extended rather than changed.
 
-**Rationale.** FullBay's two login types are two *roles*, not two tenancy levels. Modeling them as
-nested tenants roughly doubles complexity for no benefit. Full treatment in [[Tenancy Model]].
+**Context.** A **tenant** is a company; a **business** is a line of business inside it. OTC is one
+tenant holding four businesses — graphics, fleet, trailers, and a test business for the developer.
+OTC is the only tenant for the next one to two years; resale would add more. Users are global to the
+tenant and granted access per business. Everything domain-level belongs to exactly one business.
+Businesses are created and deleted as a V1 feature, because the test business needs both
+(ADR-029).
 
-**Consequences.** Cross-tenant and cross-customer leak tests become a required CI suite.
+The original ADR-005 assumed one level of scope and made it the tenant. That assumption is what has
+to change. The question is whether the replacement enforces one level or two.
 
-**Revised 2026-10-09.** The original consequence — "the vendor plane is a separate application" —
-is **deferred.** That rule exists to run a SaaS business across many tenants, and resale is now
-assessed as a small possibility (Q7). For phase one the operator capability is an **admin role
-inside the single application, with impersonation and a full audit trail** (see
-[[Auth and Identity]]). The separation rule returns if tenant two ever appears, and the
-`tenant_id` discipline in ADR-006 is what keeps that cheap.
+**Decision. One enforced level: `business_id`, on every domain table, and no `tenant_id` there.**
+
+- Domain tables carry `business_id uuid NOT NULL REFERENCES platform.businesses(id)`, denormalized
+  onto child tables rather than reached through a join. A schema gate fails the build if a domain
+  table lacks it, or carries `tenant_id`.
+- Child rows reference their parent by the composite pair `(business_id, parent_id)`, against a
+  `UNIQUE (business_id, id)` on the parent. **Cross-business parenting becomes impossible in the
+  database**, not merely unlikely in the service.
+- The tenant survives as the grouping for the user directory, roles, numbering uniqueness and
+  billing, on its own small set of tenant-scoped tables. It applies no predicate to domain queries.
+- **Two authorization levels, one tenancy level.** Business replaces tenant in the chokepoint's
+  first slot; it does not add a slot. The second slot is a row filter — a discriminated union of
+  `all` (staff), `customer` (portal) and `assignee` (technician, ROLE-003) — of which exactly one
+  applies.
+- The active business is carried in the **request path** (`/v1/b/{businessId}/…`), never on the
+  session, and resolved and validated on every request. **There is no default business.**
+- A business is **archived**, not deleted. Hard purge is permitted only for a business whose
+  immutable `is_test` flag is set.
+
+**Rationale.**
+
+- **The original rationale stands, and is the reason for one level rather than two.** Nested
+  tenancy roughly doubles complexity for no benefit. Enforcing both ids would overturn that;
+  enforcing only `business_id` honours it.
+- **Two predicates would not be two independent checks.** Under two levels both ids derive from the
+  same membership lookup, so a bug there produces a consistent pair and both predicates pass. The
+  cross-tenant check earns its keep only when its inputs have independent provenance — the
+  session's tenant and the request's business — and that is one assertion in one resolver, not a
+  predicate repeated on sixty tables. A denormalized `tenant_id` on a domain row can only catch a
+  disagreement the column itself creates.
+- **`business_id` is globally unique and a business never moves between tenants**, so
+  `WHERE business_id = X` already implies the tenant. **That invariant is load-bearing: if it ever
+  has to change, this decision reopens.**
+- **Chokepoint arity is the reviewable property.** Every line is agent-written and reviewed by one
+  person, so "do all the scope predicates apply to this new table?" must never need answering
+  twice. One required scope key per table, chosen by which repository base class it extends, is a
+  compiler question rather than a memory question.
+- **The business boundary is crossed by live traffic every day** (ADR-029's test business); the
+  tenant boundary will not be for years. Enforcing the boundary that is actually crossed is worth
+  more than enforcing the hypothetical one.
+
+**Consequences.**
+
+- `tenant_id` leaves every domain table, so ADR-006's extraction path — filter by `tenant_id`, dump
+  the subset — becomes a join through `platform.businesses`. A view definition, not a rewrite.
+- **There is no data-layer backstop for a cross-tenant leak.** A resolver bug is a cross-tenant
+  breach rather than a cross-business one. The compensating control is a leak test that **stubs the
+  grant check to pass and asserts a foreign-tenant business still 404s**, proving the two checks are
+  independent.
+- The leak suite's central case becomes a **multi-business user**: legitimately a member of two
+  businesses, acting in one, must not reach the other by passing its ids. Full case list in
+  [[Tenancy Model]]. Still a required deploy gate.
+- Outbox topics become `business:{businessId}:…` and `customer:{businessId}:{customerId}`; the
+  replay index becomes `(business_id, topic, id)`; ordering is guaranteed per business.
+- Because the active business lives in the request rather than the session, **two browser tabs can
+  sit in two businesses without interfering** — the intended behaviour, and it makes visual
+  distinctness of the active business a requirement rather than a courtesy.
+- **Switching business re-mints the session only when it crosses tenants**, never within one. This
+  supersedes the "switching business should re-mint the session" note in [[AWS Buildout]], which
+  would have changed a cookie all tabs share and destroyed the two-tab property.
+- **Soft delete is settled at the business level** — one predicate on one row at the chokepoint —
+  rather than `deleted_at` on sixty tables, resolving [[Infrastructure Checklist]]'s cross-cutting
+  item more cheaply than that document anticipated. Domain rows keep their own lifecycles: void,
+  cancel, inactive.
+- `platform.audit_log` and `platform.document_numbers` survive a purge by design (PLAT-004,
+  PLAT-009) and therefore carry no foreign key to `platform.businesses`. The missing key is
+  load-bearing and is commented as such.
+- Numbers are allocated from a **per-business gap-free sequence with an immutable prefix**, unique
+  tenant-wide by constraint — because QBO-002 syncs every business into one QuickBooks company file,
+  which is one `DocNumber` namespace (INV-004).
+- **The integration edge is not covered by this decision and needs its own control** — see
+  ADR-035.
+- **PLAT-006 and the `fleetco-ui` context cluster say "department" and assume customers are shared
+  across them. Both change.** The concept is a **Business** in the UI and `business` in code, and
+  customers are business-scoped. **This reverses a documented design choice** made because Cam's
+  biggest FullBay complaint was one company split across many customer records (G5), and it is
+  gated on D-C18.
+- **This promotes FUT-002 (the switcher) into V1 scope**, which is a PRD decision as much as an
+  architectural one.
 
 ## ADR-006 — Pooled deployment, single shared database `PROPOSED`
 
@@ -656,7 +743,7 @@ configure; and vendor concentration means one compromised credential set affects
 mitigated by the off-account backup requirement. The counterargument section in [[Platform Choice]]
 holds the full version.
 
-## ADR-024 — One non-production environment first, two at cutover `PROPOSED`
+## ADR-024 — One non-production environment first, two at cutover `SUPERSEDED` by 029
 
 **Context.** Environments were previously scattered across [[Operations]] and the
 [[Infrastructure Checklist]] as a four-item list (local, preview-per-PR, staging, production), and
@@ -912,3 +999,177 @@ dependency can be removed without touching application code.
 - [[Realtime and Events]]
 - [[Operations]]
 - [[Open Questions]]
+
+## ADR-029 — Two deployed environments, no staging `PROPOSED`
+
+**Context.** ADR-024 planned a phased progression to a persistent `staging` environment. A later
+plan made `staging` run against *production's own* database, buckets and integrations, to give OTC a
+canary on real data. An adversarial review of that plan found seven serious defects, every one of
+them a consequence of **two code versions sharing a live database permanently** — and verified that
+the containment property the plan leaned on did not exist in the code, because the outbox dispatcher
+runs inside the API process (`main.ts:49`).
+
+**Decision. Two deployed environments: `prod` and `dev`. No staging environment.** Next-version work
+is exercised by three mechanisms instead:
+
+1. **Feature flags** — ship off, then on for Dave, then Cameron, then everyone. Per feature rather
+   than per release.
+2. **A test business inside production** — real system, isolated data, deletable, and nothing lands
+   in OTC's books.
+3. **A clone-and-dry-run gate on every release** — fast-clone production's database, run the
+   release's migrations against the copy, record the timing, destroy it.
+
+**Rationale.** A staging environment answers two questions, and each has a cheaper answer. "Can
+someone try this first?" is a flag and a test business. "Will this migration behave on real data?" is
+the clone. What remains unique to staging is rehearsing a change that *cannot* be flag-gated — a
+framework major, a large refactor — and the mitigation for those is release hygiene, not a permanent
+second stack.
+
+The deciding criterion was **review surface**. The compatibility surface of two permanent versions on
+one database is far wider than the schema: data values, constraints, event payloads, cached reference
+data, OAuth refresh tokens, scheduled-job versions. Automated checking reaches about a third of it;
+the rest becomes standing human vigilance, which is this project's scarcest resource
+([[Software Factory]]).
+
+**Consequences.** Feature flags move from P2 to P0 and become part of the release mechanism, which is
+why ADR-034 adds two CI gates for them. The clone gate must live in the normal release path rather
+than being an on-demand tool, because on-demand rehearsal rots. The scrubber gets an owner, since
+production data is only ever restored into nonprod scrubbed. ADR-025's account boundary becomes a
+complete guard again, because nothing deployed in the production account is anything but production.
+
+**Deferred with a trigger, not rejected: a staging environment on a *clone* of production — never on
+production itself.** About a day of work, because everything it needs gets built anyway. The trigger
+is the first change that cannot be flag-gated and that makes Dave nervous. Full option analysis in
+[[Environment Strategy Options]].
+
+## ADR-030 — Terraform, not CDK `PROPOSED` (resolves 026)
+
+**Decision.** Terraform, with the environment as a variable and separate root modules per
+environment rather than workspaces. State in S3 per account with native S3 locking.
+
+**Rationale.** CDK's advantage — TypeScript, the same language as the application — is real. It loses
+on the criterion that matters most here: **`terraform plan` is a legible diff of real resources, so
+the plan is the artifact Dave reviews instead of reviewing the agent's reasoning.** With every line
+of infrastructure written by an agent, a reviewable dry-run is worth a second language. Drift
+detection is also first-class, which matters because a nightly plan is how a hand-clicked change gets
+caught.
+
+**Consequences.** HCL in the repository. Separate root modules make it structurally impossible for
+one environment's apply to touch another's data resources.
+
+## ADR-031 — GitHub Actions with OIDC, build once, promote the artifact `PROPOSED`
+
+**Decision.** GitHub Actions in one private monorepo in an OTC organisation. **No long-lived AWS
+keys**; GitHub OIDC with the trust policy conditioned on `repo:<org>/<repo>:environment:prod`.
+**Build once and promote the artifact** — an image digest for the API, a versioned S3 prefix for the
+UI — never rebuilt from source. Production deploys are manual, `v*`-tagged, and only Dave can create
+a `v*` tag.
+
+**Rationale.** Identical artifacts make rollback a config change and remove "it built differently
+this time" as a failure mode. The environment-scoped OIDC condition is the real security boundary:
+scoped to the repository instead of the repository *and* environment, every test run can reach
+production.
+
+**Consequences.** GitHub's required-reviewers gate is unavailable on a private repository without
+Enterprise, so the human gate is manual dispatch plus a tag ruleset plus CODEOWNERS on the workflow
+and production Terraform paths. Stated plainly: with one person shipping, required reviewers was
+always Dave approving Dave. The UI must read its API base URL at runtime, or one artifact cannot
+serve both environments.
+
+**Migration discipline:** additive-only, enforced as an **allowlist** rather than a denylist, with
+one rule that reverses the usual order — a new constraint ships in the release *after* the code that
+satisfies it.
+
+## ADR-032 — Agent access model: read-only in production `PROPOSED`
+
+**Decision.** `AgentReadOnly` in all accounts as the default; `AgentDeploy` with write access in
+`nonprod` only. **No agent role has write access in the production account.** Production mutations
+happen only through the release workflow. SCPs on the production OU deny cluster and bucket deletion,
+deny disabling CloudTrail, and deny every region but `us-east-1`.
+
+**Rationale.** The managed AWS MCP Server makes an agent genuinely useful against live AWS, and the
+Agent Toolkit's IAM condition keys can distinguish an agent's call from a human's. But what makes
+infrastructure 90% agent-doable is **Terraform in a repo behind CI, not the MCP server** —
+agent-written code reviewed as a plan diff and applied by a pipeline is reproducible, auditable and
+revertible. An agent calling live APIs is none of those, even when it is right.
+
+**Consequences.** The MCP server is scoped to research, read-only diagnosis and throwaway `dev`
+provisioning. Nightly drift detection catches anything that reached a console by hand.
+
+## ADR-033 — S3 and CloudFront for the frontend, not Vercel `PROPOSED`
+
+**Decision.** The React application is served from S3 behind CloudFront, in the same Terraform as
+everything else. **The API is not behind CloudFront** — the browser calls the ALB directly, with
+CORS.
+
+**Rationale.** Vercel's free tier is not licensed for commercial use, so the comparison is $20–40 per
+month per seat against roughly $5, and the only thing Vercel then uniquely supplies is per-pull-request
+previews — about a day of work to reproduce on CloudFront and free afterwards. Keeping the frontend in
+Terraform gives one IaC story, one bill, and one place that answers "what is deployed."
+
+The API stays off CloudFront because SSE holds a connection open for an hour and CloudFront applies
+its own origin read timeout to that path. SSE breaking invisibly is already the most likely
+configuration bug in this stack (ADR-022, the ALB idle timeout); a second copy of it is not worth a
+free WAF.
+
+**Consequences.** We own SPA routing, cache invalidation and the preview mechanism. `index.html` must
+be served no-cache or invalidated on every origin-path flip. Deploy the API before the UI and roll the
+UI back before the API, since a new UI against an old API fails on endpoints that do not exist yet.
+
+## ADR-034 — Feature flags are release mechanism, with two CI gates `PROPOSED`
+
+**Decision.** LaunchDarkly, free Developer tier, behind a `FeatureFlags` port. Every flag has a
+default compiled into the application and the SDK runs in streaming mode with local evaluation, so a
+vendor outage cannot change whether Fleetco can invoice — and that is tested. **Flags move from P2 to
+P0.**
+
+**Two CI gates, because flags are now load-bearing and vigilance is the wrong mechanism:**
+
+1. Every flag referenced in code has a test exercising **both** branches. Build fails otherwise.
+2. Every flag records an expiry date at creation, and CI fails once it passes.
+
+**Rationale.** With no staging environment (ADR-029) a flag is the only thing between a half-finished
+feature and a real customer, which is a bigger job than flags usually have. Renting beats building
+because the switch is an afternoon but the admin screen, the change history and per-user targeting are
+not — and targeting is what gives OTC early access without a second environment. Three live flags is
+eight combinations, so the real mitigation for the permutation problem is **few flags alive at once,
+killed quickly**, which gate 2 enforces structurally.
+
+**Consequences.** Another vendor, but one confined to a port with compiled-in defaults. Billing is per
+*running process* and fractional by connection time, so the bill scales with task count rather than
+user count — around 2.7 connections in practice, inside the free tier. ServiceTitan's LaunchDarkly
+account cannot be used; Fleetco needs its own under OTC.
+
+## ADR-035 — QuickBooks is the real tenancy boundary, and it needs its own control `PROPOSED`
+
+**Context.** QBO-002 sends every finalized invoice to **one** QuickBooks company file, with a class
+identifying the business. So at the integration edge, "nothing is shared across businesses" is
+false: the chart of accounts, the QuickBooks customer list and the invoice-number namespace are all
+shared, and the only thing separating two businesses' books is a string field on an outbound
+payload.
+
+**A mis-set class puts money in the wrong books on a statutory record. No chokepoint, predicate,
+foreign key or leak test can catch it, because it happens after the boundary** — which makes it a
+worse failure than the cross-business data leak ADR-005 is built to prevent.
+
+**Decision.**
+
+- `quickbooks_class` is a column on `platform.businesses`, set at create, **immutable**.
+- The accounting adapter **derives the class from the resolved business** and has no overload that
+  accepts one as a parameter.
+- A business with `is_test` set makes the adapter **refuse to sync at all** — not sync to a sandbox.
+  A half-working sandbox sync is how test invoices reach real books.
+- A test asserts that for every synced payload, the class equals that of the business the source row
+  belongs to, with the source row read back through its own business scope.
+- **A monthly per-business reconciliation** compares our invoice total against QuickBooks' total for
+  that class and alerts on any difference. This is the only detector that works for an error already
+  past the boundary, and [[Operations]] states that invoicing correctness matters more than uptime.
+
+**Open and blocking the design, not the decision:** does OTC currently run **one** QuickBooks sync
+with a class per business, or **a separate sync per business**? D-C21. If it is one file, the above
+is required as written. If each business has its own file or its own connection, the number-space
+constraint relaxes and the class control becomes a connection control instead.
+
+**Consequences.** The immutable class means a business created with the wrong class must be archived
+and recreated, which is correct — a class change would silently re-file history. The reconciliation
+job is the first scheduled task whose failure is a money alarm rather than an infrastructure one.

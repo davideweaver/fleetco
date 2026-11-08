@@ -1,5 +1,8 @@
 ---
+status: current
+summary: The outbox, SSE, LISTEN/NOTIFY, replay
 created: 2026-10-09
+updated: 2026-11-08
 tags: [fleetco, architecture, realtime, events, outbox, sse]
 source: Claude Code (Xerro)
 ---
@@ -13,6 +16,13 @@ mechanism: a transactional outbox table that we own.
 transaction as the state change, dispatched in-process, fanned out across API instances via
 Postgres `LISTEN/NOTIFY`, and pushed to browsers over SSE — authorized by the same code path as
 our REST endpoints.**
+
+> **Confirmed 2026-11-08.** "In-process" is accurate and matches the code
+> (`fleetco-nestjs-vehicles/src/main.ts:49`). [[Hosting and Deployment]] drew a separate `worker`
+> service that does not exist; it has been corrected rather than this document. Two API tasks means
+> two dispatchers, which is safe — `FOR UPDATE SKIP LOCKED` claims each row exactly once. **The
+> worker splits out when a handler does real outbound work** (QuickBooks sync, bulk email), to keep
+> a slow vendor call out of the request path.
 
 ## Ordering Is Part of the Contract
 

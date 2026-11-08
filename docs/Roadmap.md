@@ -1,5 +1,8 @@
 ---
+status: current
+summary: Milestones M1-M8, what gates each, what the deliverable is
 created: 2026-10-09
+updated: 2026-11-08
 tags: [fleetco, roadmap, milestones, planning, tracking]
 source: Claude Code (Xerro)
 ---
@@ -103,7 +106,7 @@ understood.
 ### M6 — Walking skeleton deployed
 
 **Deliverable.** Auth, tenancy, and one end-to-end slice — create a service order, see it in the
-customer portal — deployed to `staging`, with the P0 items from the
+customer portal — deployed to `dev`, with the P0 items from the
 [[Infrastructure Checklist]] in place.
 
 **Gated by:** M4's scope, and Q5 answered (offline can reshape the architecture per ADR-001 and
