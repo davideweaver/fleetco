@@ -244,13 +244,16 @@ name should the account and the billing be in — and who owns it if Dave stops 
 account, Dave needs durable access. If Dave owns it, Fleetco's business depends on infrastructure
 in someone else's name. Settle it in writing before production holds real data.
 
-**Answered 2026-11-08: OTC owns the account and the bill** ([[AWS Buildout]] B2). Three
-consequences. **Dave needs durable, documented access** — a named Identity Center user with
-administrator access, and a written answer to what happens to it if the engagement ends. That piece
-is handed to M2 and is the only part still open. **Creating the Organization is Cameron's task**,
-with OTC's payment method, which makes it the one thing blocking the whole buildout that is not
-Dave's to do — INFRA-046 pre-writes it as a 30-minute screen-share script. And **Dave should keep a
-personal AWS account** for throwaway experiments, since OTC's is no longer the place to try things.
+**Answered 2026-11-08: OTC owns the account and the bill** ([[AWS Buildout]] B2). **Closed
+completely** — Dave's access to it is assumed rather than negotiated, and deliberately not written
+into the engagement terms: he is running the whole thing, and papering an administrator's own access
+to infrastructure he built is not a problem worth creating. Revisit only if someone else ever
+operates it.
+
+Two consequences remain, both practical. **Creating the Organization is Cameron's task**, with OTC's
+payment method — the one thing blocking the whole buildout that is not Dave's to do, which is why
+INFRA-046 pre-writes it as a 30-minute screen-share script. And **Dave should keep a personal AWS
+account** for throwaway experiments, since OTC's is no longer the place to try things.
 
 ### Q15. What are the real support expectations? `OPEN`
 

@@ -454,7 +454,6 @@ a research and diagnosis tool here, and **never the path by which production cha
 | 9 | Confirm the billing-alert subscription | Dave |
 | 10 | **Review the first `terraform plan` line by line, once** | Dave |
 | 11 | Dispatch each production deploy | Dave |
-| 12 | Get durable AWS access written into the engagement terms | Dave |
 
 **~90% is real, with one caveat: items 1–3 are not Dave's to do**, and they block everything. Which
 is why INFRA-046 pre-writes them as a 30-minute screen-share script to walk Cameron through, rather
@@ -475,7 +474,7 @@ An `INFRA` lane in the [[Work Cards]] format. Owner is `agent`, `dave`, `cameron
 
 | ID | Title | Owner | Size |
 |---|---|---|---|
-| INFRA-046 | **The go-ahead script** — a 30-minute runbook for Cameron covering 001–003, plus Dave's durable-access wording for the engagement terms | agent | S |
+| INFRA-046 | **The go-ahead script** — a 30-minute runbook for Cameron covering 001–003 | agent | S |
 | INFRA-001 | Organization, three accounts, Identity Center, MFA | **cameron** | M |
 | INFRA-002 | SCPs for the prod OU, `us-east-1` lock, `prevent_destroy` | both | S |
 | INFRA-003 | Terraform backend bootstrap — state bucket + S3 locking per account | agent | S |
@@ -614,7 +613,7 @@ enabling cross-subdomain cookies.
 | [[Infrastructure Checklist]] | **Feature flags P2 → P0.** Add the two flag gates, the additive-only allowlist, no-long-lived-keys, the scrubber, business delete |
 | [[Operations]] | §Environments and §Deploys — two environments, the clone dry-run, the new ordering rules |
 | [[Stack Evaluation]] | Frontend moves from Vercel to S3 + CloudFront; LaunchDarkly joins the vendor list; cost model updated |
-| [[Open Questions]] | Q17 → `ANSWERED` (OTC owns the account), with durable access handed to M2 |
+| [[Open Questions]] | Q17 → `ANSWERED` and closed — OTC owns the account; Dave's access is assumed, not negotiated |
 | [[Architecture Decisions]] | Six new ADRs — **029** two environments · **030** Terraform · **031** the pipeline · **032** the agent access model · **033** CloudFront for the frontend · **034** flags as release mechanism |
 
 ## Still Open
@@ -626,7 +625,6 @@ enabling cross-subdomain cookies.
   this document:** the earlier note that "switching business should re-mint the session" is wrong
   within a tenant — it would change a cookie all tabs share. Re-mint on tenant crossings only.
   Remaining unknowns are D-C18, D-C21 and D-C22 in [[Rules Catalog]].
-- **Dave's durable AWS access, in writing.** Belongs in the M2 engagement terms.
 - **A paid escalation path** when neither Dave nor Cameron can fix it. Q13's residual risk.
 - **Which GitHub plan OTC buys**, which decides whether the approve button is available at all.
 
