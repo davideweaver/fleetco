@@ -2,7 +2,7 @@
 
 # Fleetco docs
 
-57 documents. Generated 2026-11-08.
+59 documents. Generated 2026-11-08.
 
 **Read this first to find out what is true.** Every document carries a `status`:
 
@@ -47,7 +47,7 @@ Regenerate with `python3 docs/_tools/docindex.py`.
 | [Domain Model](Product/Domain%20Model.md) | The ubiquitous language — entities and what they mean | 2026-10-30 |
 | [Feature Inventory](Product/Feature%20Inventory.md) | The scope-control document: smallest feature set that works | 2026-10-30 |
 | [Rules Catalog](Product/Rules%20Catalog.md) | 131 numbered rules with examples, plus the D-* decision queue | 2026-11-08 |
-| [V1 Scope from Punch List](Product/V1%20Scope%20from%20Punch%20List.md) | V1 scope, drafted from Cameron's marked punch list | 2026-10-30 |
+| [V1 Scope from Punch List](Product/V1%20Scope%20from%20Punch%20List.md) | V1 scope from Cameron's marked punch list. Portal and QuickBooks answered 2026-10-30; the accounting handoff is still to pick | 2026-10-30 |
 | [Project Brief](Project%20Brief.md) | The engagement in plain terms, and the risks named up front | 2026-10-30 |
 | [Roadmap](Roadmap.md) | Milestones M1-M8, what gates each, what the deliverable is | 2026-11-08 |
 
@@ -74,7 +74,7 @@ Regenerate with `python3 docs/_tools/docindex.py`.
 | [Framework Evaluation](Architecture/Framework%20Evaluation.md) | Why NestJS, decided by spike. Recorded as ADR-027 | 2026-10-30 |
 | [Platform Choice](Architecture/Platform%20Choice.md) | Why AWS-native over Neon. Recorded as ADR-023 | 2026-10-30 |
 
-## reference — 4
+## reference — 5
 
 *Findings that remain true. Not a plan, not a decision.*
 
@@ -83,9 +83,10 @@ Regenerate with `python3 docs/_tools/docindex.py`.
 | [myotcfleet Codebase](Architecture/myotcfleet%20Codebase.md) | The prototype's code, assessed | 2026-10-30 |
 | [Data Export Feasibility](FullBay/Data%20Export%20Feasibility.md) | Can we get OTC's data out of FullBay? Partly, painfully | 2026-10-30 |
 | [FullBay Analysis](FullBay/FullBay%20Analysis.md) | What FullBay does and where it hurts | 2026-10-30 |
+| [QuickBooks Integration Research](Product/QuickBooks%20Integration%20Research.md) | How QuickBooks Online works with FullBay and with us. One company file, businesses separated by class. Launch handoff still to pick: export vs. API push | 2026-11-08 |
 | [myotcfleet Recon](Product/myotcfleet%20Recon.md) | What the existing myOTCFleet prototype actually is | 2026-10-30 |
 
-## draft — 5
+## draft — 4
 
 *Being written. Do not rely on it.*
 
@@ -95,9 +96,8 @@ Regenerate with `python3 docs/_tools/docindex.py`.
 | [Competitive Landscape](FullBay/Competitive%20Landscape.md) | Who else plays here. Stub | 2026-10-30 |
 | [Next Phase Discussion](Next%20Phase%20Discussion.md) | The M1 plan presentation | 2026-10-30 |
 | [PRD](Product/PRD.md) | The contract for V1. Written last | 2026-10-30 |
-| [V1 Alignment](V1%20Alignment.md) | A business-readable V1 summary for Dan and Cameron | 2026-11-03 |
 
-## artifact — 12
+## artifact — 14
 
 *A record of a moment — meeting, transcript, audit, prompt. Never updated.*
 
@@ -107,6 +107,7 @@ Regenerate with `python3 docs/_tools/docindex.py`.
 | [Meeting One-Pager 2026-10-23](Meeting%20One-Pager%202026-10-23.md) | The client-safe handout from that meeting | 2026-10-30 |
 | [2026-10-23 Cameron Walkthrough Debrief](Meetings/2026-10-23%20Cameron%20Walkthrough%20Debrief.md) | What the Cameron walkthrough established | 2026-10-30 |
 | [2026-10-23 Cameron Walkthrough Transcript](Meetings/2026-10-23%20Cameron%20Walkthrough%20Transcript.md) | Raw transcript of that walkthrough | 2026-10-30 |
+| [2026-10-30 Cameron Reply to V1 Alignment](Meetings/2026-10-30%20Cameron%20Reply%20to%20V1%20Alignment.md) | Cameron's reply to the V1 alignment doc: portal out, in-app email and two-way QuickBooks settled | 2026-11-08 |
 | [Full marks JSON](Meetings/Punchlist%20From%20Cam%20for%20v1/Full%20marks%20JSON.md) | Cameron's 217 punch-list marks. The raw file to trust | 2026-10-30 |
 | [Key decisions](Meetings/Punchlist%20From%20Cam%20for%20v1/Key%20decisions.md) | Cameron's decisions pulled from the punch list | 2026-10-30 |
 | [Notes left on items](Meetings/Punchlist%20From%20Cam%20for%20v1/Notes%20left%20on%20items.md) | Cameron's per-item notes | 2026-10-30 |
@@ -115,6 +116,7 @@ Regenerate with `python3 docs/_tools/docindex.py`.
 | [FIXES](Product/v1-video/flows/FIXES.md) | Fixes applied during the guide build | 2026-11-03 |
 | [tenant-business-model-prompt](Prompts/tenant-business-model-prompt.md) | The prompt used to design the tenant/business model | 2026-11-08 |
 | [prod-stage-review-prompt](Reviews/prod-stage-review-prompt.md) | The adversarial review prompt that killed the stage environment | 2026-11-08 |
+| [V1 Alignment](V1%20Alignment.md) | The V1 summary sent to Dan and Cameron. Cameron replied 2026-10-30 | 2026-11-03 |
 
 ## superseded — 1
 

@@ -76,6 +76,9 @@ FullBay also advertises an **"integration data team"** that will assist with lar
 | **Whip Around (DVIR/inspections)** | One-way (Whip Around → FullBay for defects; FullBay → Whip Around for status) | No bulk read-back path; proprietary connection, not a general API. |
 | **MOTOR / Mitchell 1 (parts & labor guides)** | Read-only reference data embedded in FullBay | These are FullBay *importing* third-party catalog data for technician reference — not a source of Fleetco's own historical parts-usage data. |
 
+> **Correction 2026-10-30:** later research found no evidence the sync is two-way. FullBay pushes
+> into QBO and nothing comes back. See [[QuickBooks Integration Research]] section 2.
+
 The QuickBooks sync is the one integration surface genuinely worth checking first, since it's bidirectional, well-documented on FullBay's own site, and standard accounting software has far better export tooling than FullBay itself appears to.
 
 ## 5. Public accounts of migrating off FullBay

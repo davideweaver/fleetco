@@ -154,7 +154,7 @@ Dave's instrument as much as in Cameron's answers.
 |---|---|---|---|---|
 | G1 | Design proof approval has no home | **High** | **A** + D | Cameron |
 | G2 | Authorization leaves no artifact | **High** | **B** | Cameron + Dave |
-| G3 | Nothing in V1 sends email, but payment links need to reach customers. **Dave's position 2026-11-01: email invoices + estimates only, one editable template per email type; raise with Cameron** | **High** | **C** | Dave |
+| G3 | Nothing in V1 sends email, but payment links need to reach customers. Cameron closed this 2026-10-30 (manual send). **Reopened by Dave 2026-11-01: email invoices + estimates only, one editable template per email type; raise with Cameron** | **High** | **C** | Dave |
 | G4 | Units and assets are undefined | Medium-High | **B** | Dave + Cameron |
 | G5 | Customer hierarchy deferred with the portal | Low for V1, **High for the model** | **B** | Dave |
 | G6 | Deposits are recorded but not collected | Medium, cheap win | **B** + C | Cameron |
@@ -227,6 +227,10 @@ list.
 **Recommend offering this.** It's the highest value-per-hour item in the whole scope.
 
 ### G3. Nothing in V1 sends email, but payment links need to reach customers
+
+> **Closed 2026-10-30 by Cameron:** no in-app email or texting in V1. Export the PDF, copy the payment
+> link, send from existing email. The recommendation below is superseded. See
+> [[2026-10-30 Cameron Reply to V1 Alignment]].
 
 > **Traces to — Type C.** A contradiction inside the punch list itself.
 > Manual side: **3.12** *"downloadable PDF for manual sending through existing email"* · **1.2**
@@ -600,6 +604,11 @@ sanity check on how many photos a wrap job really produces. Ask Jason, not Camer
 
 ### G14. Invoice numbering + two-way QBO + open-invoice migration
 
+> **Updated 2026-10-30:** Cameron withdrew two-way QBO as a requirement and asked for the simplest
+> practical handoff. Proposal (export-based, app as source of truth, open FullBay invoices stay in
+> QBO) is in [[2026-10-30 Cameron Reply to V1 Alignment]]. Numbering and cutover still need the
+> bookkeeper.
+
 > **Traces to — Type A + D.** Cameron's notes flag all three pieces **individually**, which is why
 > this is worth showing him: he half-saw it.
 > **7.17**: *"prevent collisions with existing invoice/accounting records during migration and
@@ -725,13 +734,15 @@ whole picture is in one place.
 |---|---|
 | 2026-10-28 | Created from [[V1 Scope from Punch List]] and [[2026-10-23 Cameron Walkthrough Debrief]]. 15 gaps registered. |
 | 2026-10-28 | Added provenance to every gap — a traces-to block with punch list rows, transcript timestamps, and why each one slipped. Added the four-type taxonomy (A flagged by Cameron, B meeting vs. punch list, C internal contradiction, D nobody raised it). Two root causes identified: the portal deferral, and the punch list being shaped by FullBay's surface. |
+| 2026-10-30 | Cameron's reply: G3 closed (manual send), G2 approve link declined, portal out confirmed, two-way QBO withdrawn (G14 updated). |
 | 2026-11-01 | Added §8 "Proposed V1 adds" table (A1–A6): email, deposit link, approve link, proof approval, resilient photo upload, duplicate-customer warning. Unpruned. |
 | 2026-11-01 | §7 item 1: framework marked decided (NestJS, 2026-10-13, ADR-027) instead of open. |
-| 2026-11-01 | G3: recorded Dave's position — V1 emails invoices and estimates only, from one editable template each; per-business-unit template variants, multiple send methods, reminders, PO email, and inbound out. Added effort, risks both ways, and the in/out fence. Added to §6 and §8. |
+| 2026-11-01 | **G3 reopened** — Dave's position: V1 emails invoices and estimates only, from one editable template each; per-business-unit template variants, multiple send methods, reminders, PO email, and inbound out. Added effort, risks both ways, and the in/out fence. Added to §6 and §8. |
 
 ## Related
 
 - [[V1 Scope from Punch List]] — the 62 V1 items, as Cameron marked them
 - [[2026-10-23 Cameron Walkthrough Debrief]] — how the business actually runs
 - [[PRD]] — write it from this document
+- [[2026-10-30 Cameron Reply to V1 Alignment]] — portal, email and QBO decisions
 - [[Domain Model]] · [[Feature Inventory]] · [[Open Questions]] · [[Architecture Decisions]]

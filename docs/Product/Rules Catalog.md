@@ -1056,7 +1056,7 @@ Grouped by who answers. Each references the rules it unblocks.
 | D-C19 | When you want a package's materials shown on an invoice, do you mean the list of what is included, or the materials with their own prices? | EST-002, EST-018 |
 | D-C20 | A package you build inside one estimate — do you ever want to save it for reuse, or is building it fresh each time fine? | EST-015 |
 | D-C18 | If a company uses both graphics and the Lancaster shop, is it one customer in FullBay or two? Roughly how many graphics customers also use the shops? Is it the same in QuickBooks? | PLAT-006, QBO-005, MIG-001 |
-| D-C21 | **Does FullBay sync all the businesses into one QuickBooks company file with a class per business, or is there a separate sync per business?** Decides whether invoice numbers must be unique across all businesses, and whether the class or the connection is what keeps the books apart | QBO-002, INV-004, PLAT-006, ADR-035 |
+| ~~D-C21~~ | **ANSWERED 2026-10-30, found on merge.** One QuickBooks Online company for everything, business units separated by **class** — Cameron: *"but it's all separated by class."* So invoice numbers must be unique across every business, and the class is what keeps the books apart. See [[QuickBooks Integration Research]] | QBO-002, INV-004, PLAT-006, ADR-035 |
 | D-C22 | **Does any employee work across businesses in the same week?** Overtime is per person per week by law, so shared techs mean payroll cannot be scoped to one business. Also: are parts markups and labor rates meant to be shared across businesses, as FullBay shares them today? | TIME-009, PLAT-006, ADR-005 |
 
 ### For accounting

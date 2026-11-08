@@ -1165,10 +1165,12 @@ worse failure than the cross-business data leak ADR-005 is built to prevent.
   that class and alerts on any difference. This is the only detector that works for an error already
   past the boundary, and [[Operations]] states that invoicing correctness matters more than uptime.
 
-**Open and blocking the design, not the decision:** does OTC currently run **one** QuickBooks sync
-with a class per business, or **a separate sync per business**? D-C21. If it is one file, the above
-is required as written. If each business has its own file or its own connection, the number-space
-constraint relaxes and the class control becomes a connection control instead.
+**Confirmed, not assumed.** D-C21 asked whether OTC runs one QuickBooks sync with a class per
+business or a separate sync per business. [[QuickBooks Integration Research]], written 2026-10-30
+and merged 2026-11-08, settles it with Cameron's own words: **one QuickBooks Online company for
+everything, business units separated by class** — *"but it's all separated by class."* So every
+control above is required as written, and the invoice-number namespace really is shared across all
+of OTC's businesses.
 
 **Consequences.** The immutable class means a business created with the wrong class must be archived
 and recreated, which is correct — a class change would silently re-file history. The reconciliation
