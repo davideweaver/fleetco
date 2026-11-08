@@ -151,7 +151,7 @@ only Fleetco has.**
 |---|---|---|
 | M1 | High-level plan presented to Fleetco | **Half done** — walked through with Cameron 2026-10-23; **Dan has not heard it** |
 | M2 | Engagement terms agreed in writing | **Raised, deferred to Dan.** Structure floated, no numbers |
-| M3 | Feature inventory validated by Fleetco | **In progress** — 217-item punch list is with Cameron |
+| M3 | Feature inventory validated by Fleetco | **Done 2026-10-28** — Cameron returned all 217 rows marked. See [[V1 Scope from Punch List]] |
 | M4 | Phase-one scope locked (the [[PRD]]) | Blocked on M3 |
 | M5 | Data migration feasibility proven | **Downgraded for V1** — graphics likely starts fresh. Full dump requested from FullBay |
 | M6 | Walking skeleton deployed to `dev` | Not started |

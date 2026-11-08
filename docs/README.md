@@ -62,7 +62,7 @@ Regenerate with `python3 docs/_tools/docindex.py`.
 | [Coin Rush Handbook](Apprenticeship/Coin%20Rush%20Handbook.md) | Charlie's 12-week developer handbook — the apprenticeship curriculum | 2026-11-01 |
 | [Design System Backlog](Architecture/Design%20System%20Backlog.md) | Design-system work, ticked off as it lands | 2026-11-05 |
 | [UI Vocabulary](Architecture/UI%20Vocabulary.md) | Component names and shell anatomy. The names here are the code | 2026-11-08 |
-| [V1 Vision and Gaps](Product/V1%20Vision%20and%20Gaps.md) | The working V1 picture and the gap register | 2026-11-06 |
+| [V1 Vision and Gaps](Product/V1%20Vision%20and%20Gaps.md) | The working V1 picture and the gap register | 2026-11-08 |
 
 ## decided — 3
 

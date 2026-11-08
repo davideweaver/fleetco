@@ -2,7 +2,7 @@
 status: living
 summary: The working V1 picture and the gap register
 created: 2026-10-28
-updated: 2026-11-06
+updated: 2026-11-08
 tags: [fleetco, otc, v1, vision, gaps, product, working-doc]
 source: Claude Code (Xerro)
 ---
@@ -154,7 +154,7 @@ Dave's instrument as much as in Cameron's answers.
 |---|---|---|---|---|
 | G1 | Design proof approval has no home | **High** | **A** + D | Cameron |
 | G2 | Authorization leaves no artifact | **High** | **B** | Cameron + Dave |
-| G3 | Nothing in V1 sends email, but payment links need to reach customers. Cameron closed this 2026-10-30 (manual send). **Reopened by Dave 2026-11-01: email invoices + estimates only, one editable template per email type; raise with Cameron** | **High** | **C** | Dave |
+| G3 | Nothing in V1 sends email, but payment links need to reach customers. Cameron closed this 2026-10-30 (manual send); Dave reopened it 2026-11-01. **Closed 2026-11-08 — Dave's call, not escalated to Cam: V1 emails estimates and invoices from the system, one editable template per type. POs stay manual.** In V1: sending domain, SPF/DKIM/DMARC, bounce handling, the outbox. Out: per-business template variants, multiple send methods, reminders, PO email, inbound | **Closed** | **C** | Dave |
 | G4 | Units and assets are undefined | Medium-High | **B** | Dave + Cameron |
 | G5 | Customer hierarchy deferred with the portal | Low for V1, **High for the model** | **B** | Dave |
 | G6 | Deposits are recorded but not collected | Medium, cheap win | **B** + C | Cameron |
@@ -737,6 +737,7 @@ whole picture is in one place.
 | 2026-10-30 | Cameron's reply: G3 closed (manual send), G2 approve link declined, portal out confirmed, two-way QBO withdrawn (G14 updated). |
 | 2026-11-01 | Added §8 "Proposed V1 adds" table (A1–A6): email, deposit link, approve link, proof approval, resilient photo upload, duplicate-customer warning. Unpruned. |
 | 2026-11-01 | §7 item 1: framework marked decided (NestJS, 2026-10-13, ADR-027) instead of open. |
+| 2026-11-08 | **G3 closed on Dave's own call** rather than raised with Cam. V1 emails estimates and invoices; POs manual. Email deliverability moves from "if" to a dated V1 dependency — see [[Infrastructure Checklist]]. |
 | 2026-11-01 | **G3 reopened** — Dave's position: V1 emails invoices and estimates only, from one editable template each; per-business-unit template variants, multiple send methods, reminders, PO email, and inbound out. Added effort, risks both ways, and the in/out fence. Added to §6 and §8. |
 
 ## Related

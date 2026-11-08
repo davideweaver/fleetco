@@ -153,7 +153,7 @@ Out of everything below, these are the items most often missed and most painful 
 | Impersonation with audit trail | **P1** | Converts most support calls from 30 minutes to 3. See [[Auth and Identity]] |
 | Support intake channel | **P1** | A shared mailbox or channel — not texts to a personal phone. See Q15 |
 | Runbooks | **P1** | Restore, rollback, common failures. Written so someone who is *not* Dave can follow them |
-| Email deliverability: SPF, DKIM, DMARC | **P1** | Before the first invoice is emailed. See the bite table |
+| Email deliverability: SPF, DKIM, DMARC | **P1, now triggered** | **G3 closed 2026-11-08: V1 emails estimates and invoices, so this has a date rather than an "if".** Before the first invoice is emailed. Needs a sending subdomain, a warm-up period and bounce handling — none of it fast, so start early. See the bite table |
 | Cost and billing alerts | **P1** | A runaway query or egress spike should page someone, not surprise a credit card |
 | Status page | **P2** | Even a trivial one, once there is more than one tenant |
 | A2P 10DLC registration | **P2** | Only if SMS ships. **Start weeks early** |
