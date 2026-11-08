@@ -1,7 +1,9 @@
 ---
+status: current
+summary: How V1 gets built: cards, lanes, gates, review queues
 created: 2026-11-03
+updated: 2026-11-03
 tags: [fleetco, architecture, agents, factory, delivery, plan]
-status: plan — does not start before M2 (signed terms). Shape, budget and cadence are Dave's call at that point
 source: Dave + Claude Code (Xerro), brainstorm 2026-11-03
 ---
 

@@ -1,6 +1,8 @@
 ---
+status: current
+summary: When to extract a module, and the non-goals
 created: 2026-10-08
-updated: 2026-10-09
+updated: 2026-10-30
 tags: [fleetco, architecture, migration, modular-monolith, microservices]
 source: Claude Code (Xerro)
 ---

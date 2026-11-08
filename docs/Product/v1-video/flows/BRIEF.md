@@ -1,3 +1,10 @@
+---
+status: artifact
+summary: The brief every flow agent read
+created: 2026-10-30
+updated: 2026-10-30
+---
+
 # Brief: building V1 flow videos and pictures
 
 You are building part of a guide that shows OTC Fleet Services what version 1 of their new shop

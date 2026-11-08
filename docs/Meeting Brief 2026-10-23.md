@@ -1,7 +1,9 @@
 ---
+status: artifact
+summary: Prep for the 2026-10-23 meeting with OTC
 created: 2026-10-22
+updated: 2026-10-30
 tags: [fleetco, meeting, brief, m1, m2, aws, compensation, v1]
-status: prep for 2026-10-23 morning meeting with OTC
 source: Dave + Xerro
 audience: Dave (talking brief); the numbers in §2 and §5 are show-able
 ---

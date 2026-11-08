@@ -1,3 +1,10 @@
+---
+status: reference
+summary: Can we get OTC's data out of FullBay? Partly, painfully
+created: 2026-10-30
+updated: 2026-10-30
+---
+
 # FullBay Data Export Feasibility
 
 **Date:** 2026-10-09 · **Updated:** 2026-10-28 with observations from inside the live account

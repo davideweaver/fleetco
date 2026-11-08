@@ -1,8 +1,10 @@
 ---
+status: superseded
+summary: Early FullBay feature inventory for client markup
 created: 2026-10-09
 updated: 2026-10-09
+superseded_by: V1 Scope from Punch List
 tags: [fleetco, features, fullbay, product, client-review]
-status: draft for client markup — public sources plus one logged-in pass
 source: Claude Code (Xerro)
 ---
 

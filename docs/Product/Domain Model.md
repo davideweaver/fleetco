@@ -1,8 +1,9 @@
 ---
+status: current
+summary: The ubiquitous language — entities and what they mean
 created: 2026-10-08
-updated: 2026-10-09
+updated: 2026-10-30
 tags: [fleetco, domain-model, schema, ubiquitous-language]
-status: corrected against a live FullBay account — aggregates and vocabulary validated, field detail deferred
 source: Claude Code (Xerro)
 ---
 

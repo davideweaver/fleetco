@@ -1,7 +1,9 @@
 ---
+status: draft
+summary: The contract for V1. Written last
 created: 2026-10-08
+updated: 2026-10-30
 tags: [fleetco, prd, product, requirements]
-status: outline only — write last
 source: Claude Code (Xerro)
 ---
 

@@ -1,5 +1,8 @@
 ---
+status: current
+summary: What the lint layer enforces on agent output
 created: 2026-10-09
+updated: 2026-11-01
 tags: [fleetco, architecture, standards, guardrails, agents, typescript]
 source: Claude Code (Xerro)
 ---

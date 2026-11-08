@@ -1,7 +1,9 @@
 ---
+status: living
+summary: Design-system work, ticked off as it lands
 created: 2026-11-04
+updated: 2026-11-05
 tags: [fleetco, architecture, ui, design-system, backlog]
-status: live — tick items as they land in `fleetco-ui`
 source: Claude Code (Xerro)
 ---
 

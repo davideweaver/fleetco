@@ -1,9 +1,11 @@
 ---
+status: draft
+summary: A business-readable V1 summary for Dan and Cameron
 created: 2026-10-29
+updated: 2026-11-03
 tags: [fleetco, otc, v1, alignment, client-facing]
-status: draft for Dave to send to Dan and Cameron
-audience: OTC (Dan and Cameron). Business readers, not engineers.
 source: Claude Code (Xerro), from [[V1 Scope from Punch List]] and [[V1 Vision and Gaps]]
+audience: OTC (Dan and Cameron). Business readers, not engineers.
 ---
 
 **To:** Dan, Cameron

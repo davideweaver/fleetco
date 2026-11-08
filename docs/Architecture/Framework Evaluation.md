@@ -1,8 +1,10 @@
 ---
+status: decided
+summary: Why NestJS, decided by spike. Recorded as ADR-027
 created: 2026-10-09
+updated: 2026-10-30
 tags: [fleetco, architecture, framework, nestjs, fastify, adonisjs, evaluation]
 source: Claude Code (Xerro)
-status: decided 2026-10-13 — NestJS, recorded as ADR-027
 ---
 
 ## Overview

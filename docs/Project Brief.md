@@ -1,5 +1,8 @@
 ---
+status: current
+summary: The engagement in plain terms, and the risks named up front
 created: 2026-10-08
+updated: 2026-10-30
 tags: [project, business, fleetco, brief]
 source: Claude Code (Xerro)
 ---

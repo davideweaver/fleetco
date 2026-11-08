@@ -1,8 +1,10 @@
 ---
+status: current
+summary: V1 scope, drafted from Cameron's marked punch list
 created: 2026-10-28
+updated: 2026-10-30
 tags: [fleetco, otc, scope, v1, product, punch-list]
 source: Cameron's completed punch list, returned 2026-10-28
-status: scope drafted from Cameron's marks — three items need confirmation before it's a contract
 ---
 
 **Source:** `Meetings/Punchlist From Cam for v1/` — `Key decisions.md`, `Notes left on items.md`,

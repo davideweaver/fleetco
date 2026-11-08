@@ -1,9 +1,11 @@
 ---
+status: artifact
+summary: The client-safe handout from that meeting
 created: 2026-10-23
+updated: 2026-10-30
 tags: [fleetco, meeting, one-pager, client-safe]
-status: client-safe handout / on-screen reference for the 2026-10-23 OTC meeting
-audience: shareable with Dan and Cam
 source: condensed from [[Meeting Brief 2026-10-23]]
+audience: shareable with Dan and Cam
 ---
 
 # OTC — Platform Review & Next Phase

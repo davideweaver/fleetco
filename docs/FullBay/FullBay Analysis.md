@@ -1,5 +1,8 @@
 ---
+status: reference
+summary: What FullBay does and where it hurts
 created: 2026-10-08
+updated: 2026-10-30
 tags: [fleetco, fullbay, competitive-analysis, research]
 source: Claude Code (Xerro)
 confidence: mixed — see confidence markers per section

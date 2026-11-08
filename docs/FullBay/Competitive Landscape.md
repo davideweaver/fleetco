@@ -1,7 +1,9 @@
 ---
+status: draft
+summary: Who else plays here. Stub
 created: 2026-10-08
+updated: 2026-10-30
 tags: [fleetco, competitive-analysis, market, saas]
-status: stub — needs research
 source: Claude Code (Xerro)
 ---
 

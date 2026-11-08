@@ -1,7 +1,9 @@
 ---
+status: current
+summary: Making the Rules Catalog machine-readable and gating on it
 created: 2026-11-03
+updated: 2026-11-03
 tags: [fleetco, architecture, testing, ci, factory, spec]
-status: spec — ready to build in Stage 0. Not started
 source: Claude Code (Xerro), from [[Software Factory]]
 ---
 

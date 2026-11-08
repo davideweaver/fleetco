@@ -1,5 +1,8 @@
 ---
+status: current
+summary: Test layers and the CI gates
 created: 2026-10-09
+updated: 2026-10-30
 tags: [fleetco, architecture, testing, quality, agents]
 source: Claude Code (Xerro)
 ---

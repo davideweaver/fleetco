@@ -1,8 +1,9 @@
 ---
+status: draft
+summary: Role, compensation, IP, scope boundaries. Not yet presented
 created: 2026-10-11
-updated: 2026-10-11
+updated: 2026-10-30
 tags: [project, business, fleetco, engagement, compensation, m1, m2]
-status: draft — iterating, not yet presented
 source: Dave + Xerro, working session on role/compensation
 ---
 

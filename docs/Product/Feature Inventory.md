@@ -1,8 +1,9 @@
 ---
+status: current
+summary: The scope-control document: smallest feature set that works
 created: 2026-10-08
-updated: 2026-10-28
+updated: 2026-10-30
 tags: [fleetco, features, scope, product]
-status: pilot redefined as the graphics department — V1 shape drafted, awaiting Cameron's punch list
 source: Claude Code (Xerro)
 ---
 

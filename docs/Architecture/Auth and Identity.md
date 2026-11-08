@@ -1,5 +1,8 @@
 ---
+status: current
+summary: Sessions, cookies, memberships, impersonation, SSO path
 created: 2026-10-09
+updated: 2026-10-30
 tags: [fleetco, architecture, auth, identity, sso, security]
 source: Claude Code (Xerro)
 ---

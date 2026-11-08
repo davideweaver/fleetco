@@ -1,3 +1,10 @@
+---
+status: artifact
+summary: Cameron's per-item notes
+created: 2026-10-30
+updated: 2026-10-30
+---
+
 0.1  Full User seats (V1)
     → V1: Internal employee accounts with exactly two predefined roles: Owner and Technician. Owner has unrestricted access to every feature included in the software. Technician has limited operational access, initially for graphics installers; detailed permissions still need clarification. No internal per-seat licensing fees. This is the internal graphics shop management application, separate from the customer-facing myOTCFleet.com platform. Additional roles and individual permission overrides are later scope.
 

@@ -1,8 +1,10 @@
 ---
+status: decided
+summary: Why AWS-native over Neon. Recorded as ADR-023
 created: 2026-10-09
+updated: 2026-10-30
 tags: [fleetco, architecture, aws, gcp, neon, aurora, rds, evaluation]
 source: Claude Code (Xerro)
-status: accepted — recorded as ADR-023
 ---
 
 ## Overview

@@ -1,3 +1,10 @@
+---
+status: artifact
+summary: The V1 walkthrough guide build
+created: 2026-10-30
+updated: 2026-10-30
+---
+
 # V1 walkthrough video
 
 A narrated, ~3 minute wireframe video of graphics V1: one job from estimate to paid invoice,

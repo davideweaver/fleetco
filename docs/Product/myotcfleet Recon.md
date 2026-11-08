@@ -1,5 +1,8 @@
 ---
+status: reference
+summary: What the existing myOTCFleet prototype actually is
 created: 2026-10-10
+updated: 2026-10-30
 tags: [fleetco, myotcfleet, recon, product, architecture]
 source: Claude Code (Xerro) — authenticated frontend crawl of https://myotcfleet.com
 confidence: high for anything observed directly; gaps marked explicitly

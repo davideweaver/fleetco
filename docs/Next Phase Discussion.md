@@ -1,8 +1,10 @@
 ---
+status: draft
+summary: The M1 plan presentation
 created: 2026-10-11
+updated: 2026-10-30
 tags: [fleetco, planning, discussion, m1, meeting]
 source: Claude Code (Xerro)
-status: draft for Dave's next Fleetco meeting — M1 deliverable
 audience: Fleetco (business readers, not engineers)
 ---
 

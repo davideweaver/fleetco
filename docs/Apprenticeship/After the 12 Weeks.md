@@ -1,5 +1,8 @@
 ---
+status: living
+summary: What happens when the apprenticeship ends
 created: 2026-11-01
+updated: 2026-11-01
 tags: [fleetco, apprenticeship, charlie, frameworks, onboarding]
 source: Claude Code, from Dave's planning chat of 2026-10-24
 ---

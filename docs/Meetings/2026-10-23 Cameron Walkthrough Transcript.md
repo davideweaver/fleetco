@@ -1,8 +1,11 @@
 ---
+status: artifact
+summary: Raw transcript of that walkthrough
 created: 2026-10-28
-date: 2026-10-23
+updated: 2026-10-30
 tags: [fleetco, otc, meeting, transcript, fullbay, source-material]
 source: on-site recording at OTC, imported to vault 2026-10-28
+date: 2026-10-23
 attendees: Dave Weaver, Cameron (OTC)
 ---
 

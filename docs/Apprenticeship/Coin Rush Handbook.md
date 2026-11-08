@@ -1,5 +1,8 @@
 ---
+status: living
+summary: Charlie's 12-week developer handbook — the apprenticeship curriculum
 created: 2026-11-01
+updated: 2026-11-01
 tags: [fleetco, apprenticeship, charlie, handbook, coin-rush]
 source: Claude Code, from Dave's planning chat of 2026-10-24
 ---

@@ -1,7 +1,9 @@
 ---
+status: current
+summary: The card format — one card, one agent, one PR
 created: 2026-11-03
+updated: 2026-11-03
 tags: [fleetco, architecture, agents, factory, cards, process]
-status: template — first draft. Not in use until M2
 source: Claude Code (Xerro), from [[Software Factory]]
 ---
 

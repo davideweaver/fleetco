@@ -1,5 +1,8 @@
 ---
+status: current
+summary: Checklists an agent follows for common jobs
 created: 2026-10-09
+updated: 2026-11-01
 tags: [fleetco, architecture, agents, playbooks, checklists]
 source: Claude Code (Xerro)
 ---

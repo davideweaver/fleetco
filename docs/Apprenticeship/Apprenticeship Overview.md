@@ -1,5 +1,8 @@
 ---
+status: living
+summary: Charlie's paid apprenticeship — the living plan
 created: 2026-11-01
+updated: 2026-11-01
 tags: [fleetco, apprenticeship, charlie, training, planning]
 source: Claude Code, from Dave's planning chat of 2026-10-24
 ---

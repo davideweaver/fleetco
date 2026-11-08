@@ -1,3 +1,10 @@
+---
+status: artifact
+summary: Fixes applied during the guide build
+created: 2026-11-03
+updated: 2026-11-03
+---
+
 # Fix pass: canonical rules for every V1 guide screen and narration
 
 Apply these everywhere in the files you own. They come from a scope review against

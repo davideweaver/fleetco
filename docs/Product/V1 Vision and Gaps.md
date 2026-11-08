@@ -1,8 +1,9 @@
 ---
+status: living
+summary: The working V1 picture and the gap register
 created: 2026-10-28
-updated: 2026-11-01
+updated: 2026-11-06
 tags: [fleetco, otc, v1, vision, gaps, product, working-doc]
-status: living document — iterate with Cameron, then feed the PRD
 source: Claude Code (Xerro)
 ---
 
