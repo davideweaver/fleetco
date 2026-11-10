@@ -21,7 +21,7 @@ it, using Git properly, working with APIs and databases, and deploying without b
 |---|---|
 | **This document** | Principles, working relationship, Codex rules, weekly report, status and open decisions |
 | [[Shop Tracker Handbook]] | The 12-week, week-by-week handbook Charlie works from |
-| [[After the 12 Weeks]] | The path into TypeScript, React, NestJS and PostgreSQL, and the first Fleetco tasks |
+| [[After the 12 Weeks]] | Adding service orders to Shop Tracker, then the first Fleetco tasks |
 
 ## Status and open decisions
 
@@ -31,8 +31,12 @@ it, using Git properly, working with APIs and databases, and deploying without b
 - **Pay.** $25 an hour, for training time as well as Fleetco work.
 - **Hours.** About 10 a week.
 - **Training project.** A small shop-management web app, Shop Tracker, instead of the Coin Rush
-  game. It uses real entities (customers, units, service orders, action items) and realistic
-  data, and teaches everything the game was meant to. See [[Shop Tracker Handbook]].
+  game. It uses real entities and realistic data, and teaches everything the game was meant to.
+  See [[Shop Tracker Handbook]].
+- **One part of the app, on the real stack sooner.** The 12 weeks build only customers and units
+  (with odometer readings and maintenance schedules). Weeks 1 to 5 are plain JavaScript; from
+  week 6 it switches to Fleetco's stack one piece a week: TypeScript, Vitest and CI, NestJS,
+  PostgreSQL with Drizzle, then React. Service orders come after week 12.
 
 **Still undecided:**
 
@@ -46,9 +50,6 @@ it, using Git properly, working with APIs and databases, and deploying without b
 - **Hour tracking and payroll.** How hours are recorded, what counts as assigned work versus
   optional study, and handling payroll and employment correctly for a minor who is still in high
   school. The rate is settled; these aren't, and pay starts this week.
-- **TypeScript timing.** The 12-week handbook is plain JavaScript and Node.js. TypeScript only
-  arrives after week 12, though Fleetco is written in TypeScript. Revisit if Fleetco work starts
-  earlier than planned.
 
 ## Principles
 
@@ -58,8 +59,9 @@ it, using Git properly, working with APIs and databases, and deploying without b
    explain the code it generates, spot when it is wrong, and prove changes work.
 3. **Progressively more responsibility.** Start with isolated tasks and work toward owning a small
    feature from the React interface through the API and database.
-4. **Fundamentals before frameworks.** The first phase is plain HTML, CSS, JavaScript and Node.js.
-   React and NestJS come once Charlie understands the problems they solve.
+4. **Fundamentals before frameworks, but not for long.** Five weeks of plain HTML, CSS,
+   JavaScript and Node.js, so Charlie has felt the problems the frameworks solve. Then Fleetco's
+   real stack from week 6.
 5. **Milestones, not deadlines.** If the fundamentals land in eight weeks, move faster. If HTTP and
    persistence take longer, that's fine: those are exactly the concepts worth getting right.
 
