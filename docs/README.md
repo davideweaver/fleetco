@@ -2,7 +2,7 @@
 
 # Fleetco docs
 
-59 documents. Generated 2026-11-08.
+59 documents. Generated 2026-11-10.
 
 **Read this first to find out what is true.** Every document carries a `status`:
 
@@ -57,9 +57,9 @@ Regenerate with `python3 docs/_tools/docindex.py`.
 
 | Doc | What it is | Updated |
 |---|---|---|
-| [After the 12 Weeks](Apprenticeship/After%20the%2012%20Weeks.md) | What happens when the apprenticeship ends | 2026-11-01 |
-| [Apprenticeship Overview](Apprenticeship/Apprenticeship%20Overview.md) | Charlie's paid apprenticeship — the living plan | 2026-11-01 |
-| [Coin Rush Handbook](Apprenticeship/Coin%20Rush%20Handbook.md) | Charlie's 12-week developer handbook — the apprenticeship curriculum | 2026-11-01 |
+| [After the 12 Weeks](Apprenticeship/After%20the%2012%20Weeks.md) | What happens when the apprenticeship ends | 2026-11-10 |
+| [Apprenticeship Overview](Apprenticeship/Apprenticeship%20Overview.md) | Charlie's paid apprenticeship — the living plan | 2026-11-10 |
+| [Shop Tracker Handbook](Apprenticeship/Shop%20Tracker%20Handbook.md) | Charlie's 12-week developer handbook — building Shop Tracker, a small shop-management app | 2026-11-10 |
 | [Design System Backlog](Architecture/Design%20System%20Backlog.md) | Design-system work, ticked off as it lands | 2026-11-05 |
 | [UI Vocabulary](Architecture/UI%20Vocabulary.md) | Component names and shell anatomy. The names here are the code | 2026-11-08 |
 | [V1 Vision and Gaps](Product/V1%20Vision%20and%20Gaps.md) | The working V1 picture and the gap register | 2026-11-08 |

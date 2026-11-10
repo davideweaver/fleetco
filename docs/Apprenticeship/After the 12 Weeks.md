@@ -2,14 +2,14 @@
 status: living
 summary: What happens when the apprenticeship ends
 created: 2026-11-01
-updated: 2026-11-01
+updated: 2026-11-10
 tags: [fleetco, apprenticeship, charlie, frameworks, onboarding]
 source: Claude Code, from Dave's planning chat of 2026-10-24
 ---
 
 ## Overview
 
-What follows [[Coin Rush Handbook]]: learning the frameworks Fleetco actually uses, then a
+What follows [[Shop Tracker Handbook]]: learning the frameworks Fleetco actually uses, then a
 staged path into real Fleetco work. Principles and guardrails are in [[Apprenticeship Overview]].
 
 By this point Charlie works with abstractions Charlie understands, rather than memorizing
@@ -49,30 +49,33 @@ build a small feature that connects the two. That's where the architecture click
 
 - A small TypeScript command-line app that reads a JSON file, validates it, transforms it and
   writes a report, with automated tests.
-- A responsive vehicle list with search, filters, an edit form and validation. Mock data first,
+- A responsive unit list with search, filters, an edit form and validation. Mock data first,
   then a real API.
-- A typed REST API for vehicles with create, read, update and delete, tested independently of the
+- A typed REST API for units with create, read, update and delete, tested independently of the
   UI.
-- A relational model of vehicles and maintenance work orders, with queries for overdue
+- A relational model of units and service orders, with queries for overdue
   maintenance, joins across related records and basic integrity constraints.
 - An explanation of how a React app, an API, a database, the network and access permissions fit
   together. Later, a deploy of a small app to a controlled development environment.
 
-## A bridge project: Fleet Maintenance Tracker
+## A bridge project: Shop Tracker on Fleetco's stack
 
-Before touching Fleetco's production code, build a small training app on the same stack:
+Before touching Fleetco's production code, rebuild Shop Tracker (from [[Shop Tracker Handbook]])
+on the stack Fleetco uses:
 
-- **React:** vehicle list, vehicle details and maintenance work orders
-- **NestJS:** the REST API
-- **PostgreSQL:** vehicles and work orders
+- **TypeScript** throughout
+- **React:** the unit list, order detail and shop board
+- **NestJS:** the REST API, replacing the hand-written `node:http` server
+- **PostgreSQL:** the same tables and seed data, now with migrations
 - **GitHub:** issues, branches, pull requests and code review
-- **Tests and a basic CI pipeline**
+- **Tests and the CI pipeline**, carried over
 - **Deployment** once the local version works
 
-It beats a generic to-do app because the data model and workflows resemble the system Charlie
-will work on, and it's a safe place to make mistakes away from Fleetco's data. Start deliberately
-small: list vehicles, add a vehicle, create a work order, mark a work order complete. That's
-enough to teach the whole vertical slice.
+Rebuilding an app Charlie already understands is the point. The domain and the rules are known,
+so every difference is the framework, and it's obvious what React and NestJS do that the plain
+version made him do by hand. It's still a safe place to make mistakes away from Fleetco's data.
+Start with one vertical slice (list units, open an order, authorize a line, complete it) before
+porting the rest.
 
 ## First Fleetco work
 
