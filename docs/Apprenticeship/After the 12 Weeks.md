@@ -1,78 +1,74 @@
 ---
 status: living
-summary: What happens when the apprenticeship ends
+summary: What happens after the 12-week handbook: service orders, then real Fleetco work
 created: 2026-11-01
-updated: 2026-11-01
+updated: 2026-11-10
 tags: [fleetco, apprenticeship, charlie, frameworks, onboarding]
 source: Claude Code, from Dave's planning chat of 2026-10-24
 ---
 
 ## Overview
 
-What follows [[Coin Rush Handbook]]: learning the frameworks Fleetco actually uses, then a
-staged path into real Fleetco work. Principles and guardrails are in [[Apprenticeship Overview]].
-
-By this point Charlie works with abstractions Charlie understands, rather than memorizing
-framework conventions without knowing what they do.
+What follows [[Shop Tracker Handbook]]. By week 12 Charlie has built one part of Shop Tracker
+(customers and units) on Fleetco's own stack: TypeScript, NestJS, PostgreSQL with Drizzle, React,
+Vitest and GitHub Actions. What's left is depth, the next part of the app, and then a staged path
+into real Fleetco work. Principles and guardrails are in [[Apprenticeship Overview]].
 
 The goal was never to finish twelve weeks knowing everything. It's to become someone who can take
 a task, investigate it, implement it, test it, explain it and deliver it responsibly.
 
-## The framework sequence
+## The next part of Shop Tracker: service orders
 
-1. **TypeScript.** Add static typing to what you know of JavaScript: everyday types, functions,
-   object types, narrowing, classes and modules. You've now felt the problems types solve.
-2. **React.** Components, props, state, forms and hooks. Thinking in React matters most: breaking
-   a business interface into components and reasoning about data flowing through them.
-3. **NestJS.** Controllers, services, dependency injection, DTOs, validation, status codes, error
-   handling and application structure. Learn why frameworks like Express and NestJS exist, and
-   what they do that `node:http` made you do by hand.
-4. **PostgreSQL in depth.** Relationships, constraints, transactions and migrations. Understand
-   the SQL the application generates rather than treating the ORM as magic.
-5. **Production engineering.** Authentication, authorization, deployment, monitoring and
-   operational practice, learned in context.
+Before touching Fleetco's production code, add the heart of a repair shop to Shop Tracker, on the
+same stack. This is the part that was cut from the 12 weeks to reach the real technologies
+sooner.
 
-Don't learn React and NestJS as two unrelated frameworks. Once TypeScript and HTTP are solid,
-build a small feature that connects the two. That's where the architecture clicks.
+1. When a unit needs work, the shop opens a **service order**.
+2. Each problem goes on the order as an **action item**: the *concern*, then the *cause* the
+   technician finds, then the *correction*.
+3. The shop prices each line (labor hours and parts) and sends the estimate.
+4. The customer **authorizes** each line. No work on a line until it's authorized: Fleetco's
+   authorization gate.
+5. The order is completed and invoiced, and the server works out the total.
+
+Suggested order of work:
+
+- **The stages and rules**, as tested service code first:
+  `Open → Diagnosing → Estimate sent → Authorized → In progress → Completed → Invoiced`. A unit
+  can't have two open orders; a line needs a cause before it's priced; no work on an unauthorized
+  line; every line needs a correction before the order completes; an invoiced order can't change.
+- **Money.** Totals in whole cents, calculated from the lines, with a shop supplies fee and tax.
+  Never sent by the browser.
+- **Tables and endpoints:** `service_orders` and `action_items`, joined to units. Extend the seed
+  script with service history.
+- **Screens:** an order's detail, a unit's service history, and a list of open orders.
+- **A live shop board:** a column per stage, updated in every open browser with Server-Sent
+  Events. Two people moving the same order at once: the server refuses the stale change rather
+  than silently overwriting it.
+- **Reports:** open orders by stage, and total billed per customer.
+
+Start with one vertical slice (open an order, add a line, authorize it, complete it) before the
+rest. The domain is Fleetco's, so compare each decision with the [[Domain Model]] and the
+[[Rules Catalog]].
+
+## Going deeper
+
+Learned in context, as the work needs it:
+
+- **TypeScript:** generics, utility types, and types shared between the API and React.
+- **React:** custom hooks, data-fetching libraries, and larger forms.
+- **NestJS:** guards, interceptors, configuration, and generating OpenAPI from Zod schemas.
+- **PostgreSQL:** transactions, constraints, indexes, and reading a query plan.
+- **Production engineering:** authentication, authorization, monitoring and operational practice.
 
 **Resources** (official and free; no bootcamp needed)
 
 - TypeScript Handbook: https://www.typescriptlang.org/docs/handbook/intro.html
 - React Learn: https://react.dev/learn
-- Thinking in React: https://react.dev/learn/thinking-in-react
-- NestJS First Steps: https://docs.nestjs.com/first-steps
-- MDN HTTP overview: https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Overview
-- PostgreSQL tutorial: https://www.postgresql.org/docs/current/tutorial.html
+- NestJS documentation: https://docs.nestjs.com/
+- Drizzle: https://orm.drizzle.team/docs/overview
+- PostgreSQL documentation: https://www.postgresql.org/docs/current/
 - AWS Cloud Essentials: https://aws.amazon.com/training/learn-about/cloud-practitioner/
-
-**Practice deliverables**
-
-- A small TypeScript command-line app that reads a JSON file, validates it, transforms it and
-  writes a report, with automated tests.
-- A responsive vehicle list with search, filters, an edit form and validation. Mock data first,
-  then a real API.
-- A typed REST API for vehicles with create, read, update and delete, tested independently of the
-  UI.
-- A relational model of vehicles and maintenance work orders, with queries for overdue
-  maintenance, joins across related records and basic integrity constraints.
-- An explanation of how a React app, an API, a database, the network and access permissions fit
-  together. Later, a deploy of a small app to a controlled development environment.
-
-## A bridge project: Fleet Maintenance Tracker
-
-Before touching Fleetco's production code, build a small training app on the same stack:
-
-- **React:** vehicle list, vehicle details and maintenance work orders
-- **NestJS:** the REST API
-- **PostgreSQL:** vehicles and work orders
-- **GitHub:** issues, branches, pull requests and code review
-- **Tests and a basic CI pipeline**
-- **Deployment** once the local version works
-
-It beats a generic to-do app because the data model and workflows resemble the system Charlie
-will work on, and it's a safe place to make mistakes away from Fleetco's data. Start deliberately
-small: list vehicles, add a vehicle, create a work order, mark a work order complete. That's
-enough to teach the whole vertical slice.
 
 ## First Fleetco work
 

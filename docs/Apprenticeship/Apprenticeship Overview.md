@@ -2,7 +2,7 @@
 status: living
 summary: Charlie's paid apprenticeship — the living plan
 created: 2026-11-01
-updated: 2026-11-01
+updated: 2026-11-10
 tags: [fleetco, apprenticeship, charlie, training, planning]
 source: Claude Code, from Dave's planning chat of 2026-10-24
 ---
@@ -20,13 +20,23 @@ it, using Git properly, working with APIs and databases, and deploying without b
 | Document | What it holds |
 |---|---|
 | **This document** | Principles, working relationship, Codex rules, weekly report, status and open decisions |
-| [[Coin Rush Handbook]] | The 12-week, week-by-week handbook Charlie works from |
-| [[After the 12 Weeks]] | The path into TypeScript, React, NestJS and PostgreSQL, and the first Fleetco tasks |
+| [[Shop Tracker Handbook]] | The 12-week, week-by-week handbook Charlie works from |
+| [[After the 12 Weeks]] | Adding service orders to Shop Tracker, then the first Fleetco tasks |
 
 ## Status and open decisions
 
-**Start date.** After Charlie's football season, at least a week or two from 2026-11-01. Not yet
-fixed.
+**Decided 2026-11-10** (Dave talked it through with Charlie):
+
+- **Start date.** The week of 2026-11-09.
+- **Pay.** $25 an hour, for training time as well as Fleetco work.
+- **Hours.** About 10 a week.
+- **Training project.** A small shop-management web app, Shop Tracker, instead of the Coin Rush
+  game. It uses real entities and realistic data, and teaches everything the game was meant to.
+  See [[Shop Tracker Handbook]].
+- **One part of the app, on the real stack sooner.** The 12 weeks build only customers and units
+  (with odometer readings and maintenance schedules). Weeks 1 to 5 are plain JavaScript; from
+  week 6 it switches to Fleetco's stack one piece a week: TypeScript, Vitest and CI, NestJS,
+  PostgreSQL with Drizzle, then React. Service orders come after week 12.
 
 **Still undecided:**
 
@@ -35,14 +45,11 @@ fixed.
 - **When paid tickets begin.** Training time is paid. When Charlie moves on to paid Fleetco
   delivery tickets is open (within weeks, after a month of foundations, or after two or three
   months).
-- **Deployment architecture.** Week 11 deploys Coin Rush to a development environment. Where and
+- **Deployment architecture.** Week 11 deploys Shop Tracker to a development environment. Where and
   how depends on Fleetco's own hosting decisions (see [[Hosting and Deployment]]).
-- **Pay rate, hour tracking and payroll.** The hourly rate, how hours are recorded, what counts as
-  assigned work versus optional study, and handling payroll and employment correctly for a minor
-  who is still in high school.
-- **TypeScript timing.** The 12-week handbook is plain JavaScript and Node.js. TypeScript only
-  arrives after week 12, though Fleetco is written in TypeScript. Revisit if Fleetco work starts
-  earlier than planned.
+- **Hour tracking and payroll.** How hours are recorded, what counts as assigned work versus
+  optional study, and handling payroll and employment correctly for a minor who is still in high
+  school. The rate is settled; these aren't, and pay starts this week.
 
 ## Principles
 
@@ -52,13 +59,15 @@ fixed.
    explain the code it generates, spot when it is wrong, and prove changes work.
 3. **Progressively more responsibility.** Start with isolated tasks and work toward owning a small
    feature from the React interface through the API and database.
-4. **Fundamentals before frameworks.** The first phase is plain HTML, CSS, JavaScript and Node.js.
-   React and NestJS come once Charlie understands the problems they solve.
+4. **Fundamentals before frameworks, but not for long.** Five weeks of plain HTML, CSS,
+   JavaScript and Node.js, so Charlie has felt the problems the frameworks solve. Then Fleetco's
+   real stack from week 6.
 5. **Milestones, not deadlines.** If the fundamentals land in eight weeks, move faster. If HTTP and
    persistence take longer, that's fine: those are exactly the concepts worth getting right.
 
-**Time.** Roughly 6 to 8 hours a week around school and sports, on a flexible schedule with
-concrete deliverables. Over six months that is about 150 to 200 hours of deliberate practice.
+**Time.** About 10 hours a week around school and sports, on a flexible schedule with concrete
+deliverables. The 12-week handbook is about 120 hours; over six months that is about 250 hours of
+deliberate practice.
 
 ## Target skills
 
@@ -101,7 +110,7 @@ then depth in whatever the next task needs.
 Dave is both project lead and Charlie's father, so learning time and delivery work are kept
 separate.
 
-- **Self-directed learning.** Charlie follows the handbook and builds Coin Rush.
+- **Self-directed learning.** Charlie follows the handbook and builds Shop Tracker.
 - **Paid project work.** Defined Fleetco tasks, with tests, reviews and documentation of what was
   delivered.
 - **Weekly review.** 30 minutes on what Charlie learned, where Charlie got stuck, and what's next.
@@ -110,8 +119,9 @@ separate.
 
 **Guardrails**
 
-- Training happens in a separate repository (Charlie's own `coin-rush`), with no Fleetco
-  credentials, customer data or production access.
+- Training happens in a separate repository (Charlie's own `shop-tracker`), with no Fleetco
+  credentials, customer data or production access. Shop Tracker's data is invented, never copied
+  from Fleetco or OTC.
 - Fleetco work goes through the normal review process. No direct production changes, no
   unsupervised access to sensitive data, and no merging unreviewed agent-generated code.
 - Basic security and data-handling rules apply from day one. Production security architecture
