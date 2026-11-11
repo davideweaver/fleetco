@@ -1,8 +1,8 @@
 ---
 status: current
-summary: Q1-Q18 — the project-level unknowns and who answers them
+summary: Q1-Q28 — the project-level unknowns and who answers them
 created: 2026-10-08
-updated: 2026-11-08
+updated: 2026-11-10
 tags: [project, business, fleetco, questions, blockers]
 source: Claude Code (Xerro)
 ---
@@ -432,6 +432,10 @@ See [[V1 Scope from Punch List]] for the full analysis.
   integration in V1**, type approved work into the shop system by hand. Later, inbound requests
   should generate *draft* estimates for Owner review, never auto-send. **Cheap action now:** store
   external GoHighLevel contact and opportunity IDs on customers and jobs.
+  **Reversed 2026-11-09** by the [[2026-11-09 Cameron V1 Review]]: moving an opportunity into Print
+  Production should now *create the job* from its linked quote, and customer sending moves to
+  HighLevel too. The API integration Cameron ruled out for V1 is back in V1. Confirm the trigger
+  contract and the account ownership — see [[Meeting Brief — Requirements Lock]] §3.
 - **Q25. Sales tax rates and taxability settings?** `OPEN — blocks go-live, not development` Punch
   list 7.23 requires matching the current configuration; rates were not supplied. Ask accounting.
   Do not guess.
@@ -442,9 +446,37 @@ See [[V1 Scope from Punch List]] for the full analysis.
   Cameron doesn't know; verify with accounting. **Feeds Q18:** if processing is bundled into the
   $5,000, part of that bill isn't software, and we aren't replacing it.
 
+### Added 2026-11-10, from the V1 review
+
+- **Q28. Which outside tools is OTC keeping for good, and which are stepping stones?** `OPEN — asked
+  in the next meeting` Never asked, and the record points both ways. The punch list says *"the
+  preferred architecture continues to use GoHighLevel for messaging rather than building a duplicate
+  texting platform"*, which reads permanent. Row 11.12 marks two-way texting **Later** and the
+  2026-10-30 reply says *"emailing and texting inside the software can come later"*, which reads like
+  the app eventually takes it over. Both are his words three weeks apart.
+
+  **Needs a per-tool answer** — permanent, stepping stone, or undecided — for GoHighLevel, Box and
+  Box Sign, email sending, QuickBooks, and myOTCFleet's backend.
+
+  **Why it can't wait for post-V1.** It decides whether the HighLevel integration is an investment or
+  scaffolding: permanent means integrate deeply and never duplicate their surface, stepping stone
+  means keep the seam thin. Same work, opposite design. And if the signed proof lives only in Box
+  Sign, the artifact that settles a wrong-version dispute isn't ours — the same vendor-lock failure
+  that forced ten years of FullBay data to be pulled out a file at a time (see Q1).
+
+  **The rule that holds either way, cheap now and unrecoverable later:** own the record, reference
+  the file. Our tables hold the proof version, who signed, when, and what it covers, plus a vendor
+  reference. Leaving Box becomes a file migration, not a loss of history.
+
+  **Likely outcome, worth stating plainly:** keeping GoHighLevel, Box and QuickBooks is probably
+  correct — rebuilding a CRM, an e-signature service and a general ledger is not what this project is
+  for. The risk isn't integration, it's **accidental permanence**: nobody decides, and the
+  architecture gets settled by whatever got wired first. Record the answer as an ADR once given.
+
 ## Related
 
 - [[Roadmap]] — which milestone each question gates
+- [[Meeting Brief — Requirements Lock]] — where Q28 and the reversed half of Q24 get asked
 - [[Architecture Decisions]]
 - [[Operations]]
 - [[Project Brief]]

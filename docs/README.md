@@ -2,7 +2,7 @@
 
 # Fleetco docs
 
-59 documents. Generated 2026-11-08.
+61 documents. Generated 2026-11-10.
 
 **Read this first to find out what is true.** Every document carries a `status`:
 
@@ -43,7 +43,7 @@ Regenerate with `python3 docs/_tools/docindex.py`.
 | [Testing Strategy](Architecture/Testing%20Strategy.md) | Test layers and the CI gates | 2026-10-30 |
 | [Work Cards](Architecture/Work%20Cards.md) | The card format — one card, one agent, one PR | 2026-11-03 |
 | [Fleetco Overview](Fleetco%20Overview.md) | The one-page picture: what this is, where it stands, what is next | 2026-11-08 |
-| [Open Questions](Open%20Questions.md) | Q1-Q18 — the project-level unknowns and who answers them | 2026-11-08 |
+| [Open Questions](Open%20Questions.md) | Q1-Q28 — the project-level unknowns and who answers them | 2026-11-10 |
 | [Domain Model](Product/Domain%20Model.md) | The ubiquitous language — entities and what they mean | 2026-10-30 |
 | [Feature Inventory](Product/Feature%20Inventory.md) | The scope-control document: smallest feature set that works | 2026-10-30 |
 | [Rules Catalog](Product/Rules%20Catalog.md) | 131 numbered rules with examples, plus the D-* decision queue | 2026-11-08 |
@@ -86,7 +86,7 @@ Regenerate with `python3 docs/_tools/docindex.py`.
 | [QuickBooks Integration Research](Product/QuickBooks%20Integration%20Research.md) | How QuickBooks Online works with FullBay and with us. One company file, businesses separated by class. Launch handoff still to pick: export vs. API push | 2026-11-08 |
 | [myotcfleet Recon](Product/myotcfleet%20Recon.md) | What the existing myOTCFleet prototype actually is | 2026-10-30 |
 
-## draft — 4
+## draft — 5
 
 *Being written. Do not rely on it.*
 
@@ -94,10 +94,11 @@ Regenerate with `python3 docs/_tools/docindex.py`.
 |---|---|---|
 | [Engagement Terms](Engagement%20Terms.md) | Role, compensation, IP, scope boundaries. Not yet presented | 2026-10-30 |
 | [Competitive Landscape](FullBay/Competitive%20Landscape.md) | Who else plays here. Stub | 2026-10-30 |
+| [Meeting Brief — Requirements Lock](Meeting%20Brief%20—%20Requirements%20Lock.md) | Topics for the meeting that locks the requirements the V1 review changed, each grounded in the review's own wording | 2026-11-10 |
 | [Next Phase Discussion](Next%20Phase%20Discussion.md) | The M1 plan presentation | 2026-10-30 |
 | [PRD](Product/PRD.md) | The contract for V1. Written last | 2026-10-30 |
 
-## artifact — 14
+## artifact — 15
 
 *A record of a moment — meeting, transcript, audit, prompt. Never updated.*
 
@@ -108,6 +109,7 @@ Regenerate with `python3 docs/_tools/docindex.py`.
 | [2026-10-23 Cameron Walkthrough Debrief](Meetings/2026-10-23%20Cameron%20Walkthrough%20Debrief.md) | What the Cameron walkthrough established | 2026-10-30 |
 | [2026-10-23 Cameron Walkthrough Transcript](Meetings/2026-10-23%20Cameron%20Walkthrough%20Transcript.md) | Raw transcript of that walkthrough | 2026-10-30 |
 | [2026-10-30 Cameron Reply to V1 Alignment](Meetings/2026-10-30%20Cameron%20Reply%20to%20V1%20Alignment.md) | Cameron's reply to the V1 alignment doc: portal out, in-app email and two-way QuickBooks settled | 2026-11-08 |
+| [2026-11-09 Cameron V1 Review](Meetings/2026-11-09%20Cameron%20V1%20Review.md) | Cameron's written review of the V1 guide — proofs on Box Sign, deposits in V1, HighLevel creates the job, QuickBooks one-way | 2026-11-09 |
 | [Full marks JSON](Meetings/Punchlist%20From%20Cam%20for%20v1/Full%20marks%20JSON.md) | Cameron's 217 punch-list marks. The raw file to trust | 2026-10-30 |
 | [Key decisions](Meetings/Punchlist%20From%20Cam%20for%20v1/Key%20decisions.md) | Cameron's decisions pulled from the punch list | 2026-10-30 |
 | [Notes left on items](Meetings/Punchlist%20From%20Cam%20for%20v1/Notes%20left%20on%20items.md) | Cameron's per-item notes | 2026-10-30 |
