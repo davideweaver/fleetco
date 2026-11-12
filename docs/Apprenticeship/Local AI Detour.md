@@ -64,24 +64,30 @@ explain why I was wrong, write no code."
 heck is the event loop anyway?" — 26 minutes, JSConf EU, free, and the best explanation of this
 subject that exists: https://www.youtube.com/watch?v=8aGhZQkoFbQ.
 
-**What loupe can and cannot do.** His visualizer (http://latentflip.com/loupe/) is a playground,
-not a lesson: a code box, a run button, and no sequence to follow. Worse, it parses with 2014-era
-esprima, so **`async`, `await`, `const` and arrow functions are silently discarded** — paste any of
-them in and the editor just goes blank with no error. Verified 2026-11-12 by loading each into the
-tool and watching the code vanish from the URL.
+**The visualizer is JS Visualizer 9000, not loupe.** https://www.jsv9000.app/ Loupe (the tool in
+the talk) was tried first and abandoned on 2026-11-12 for three reasons, all confirmed by driving it
+in a browser:
 
-So loupe is good for exactly one thing, the call stack and the callback queue, and it cannot show
-asynchrony as Charlie will ever write it. It gets **five fixed links** in the repo README, ES5 only,
-each with a question to answer, about fifteen minutes. The links work because loupe base64-encodes
-the program into `?code=`, so he never has to paste anything.
+1. **It has no output panel.** `console.log` goes to the browser's devtools console, prefixed
+   `Loupe @ N >`, with nothing on the page. Dave could not get it to work and assumed it was flaky.
+   Anyone predicting print order without F12 open sees nothing at all.
+2. **It silently discards modern JavaScript.** It parses with 2014-era esprima, so `async`, `await`,
+   `const` and arrow functions vanish from the editor with no error.
+3. **Fixed 750ms animation steps**, and the panels empty when it finishes, so the run is easy to miss.
 
-**It also has no output panel, which makes it look broken.** Dave hit this on 2026-11-12: the page
-shows only Call Stack, Web Apis and Callback Queue, and `console.log` goes to the *browser's* devtools
-console, prefixed `Loupe @ N >`. Confirmed by running L1 in a browser and finding the log in devtools
-with nothing on the page. Anyone predicting print order without F12 open sees nothing and concludes
-the tool is flaky. The README now says to open devtools first, in bold, before the links. It also
-flags the 750ms step delay, the Rerun button, and the Delay slider under the hammer icon, since the
-animation finishes and empties while you are still looking for output.
+JS Visualizer 9000 fixes all three: output appears **on the page** in a blue box, it runs `const`,
+arrows and promises, and a **Step** button means Charlie sets the pace. It also adds a **Microtask
+Queue** that loupe does not have, and an Event Loop panel that names the current phase in plain
+English as it runs.
+
+It uses **its own built-in examples** rather than hand-encoded URLs, so there are no links to rot:
+Call Stack, Task Queue, Microtask Queue, Tasks vs Microtasks, then Wrapping setTimeout in Promise,
+which is literally the `sleep()` from the warmup.
+
+**It cannot do `async`/`await` either** (syntax error, confirmed). That turns out to help rather
+than hurt: `await` *is* promises underneath, so watching a `.then` callback sit in the Microtask
+Queue is watching what `await` does, written the long way. The README says exactly that, which
+makes the limitation into the lesson.
 
 Everything about `async`/`await` itself moves to `warmup/`. Nothing online does the
 predict-and-check part, which is why it is hand-built. The closest things, if Charlie wants more
