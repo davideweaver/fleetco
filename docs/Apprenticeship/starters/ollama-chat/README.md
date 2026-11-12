@@ -47,15 +47,38 @@ Two things to set up before you start:
 
 ### The five scenes, in order
 
-| | Scene | Why it's here |
+| | Scene | What happens |
 |---|---|---|
-| 1 | [One thing at a time](https://jseventloop.tech/play/sync-basics) | The call stack, with nothing async at all. The baseline |
-| 2 | [Blocking the loop](https://jseventloop.tech/play/blocking-loop) | Being stuck is not the same as waiting. Same idea as `warmup/01` |
-| 3 | [async/await, unmasked](https://jseventloop.tech/play/async-await) | **The important one.** Read the write-up under the animation twice |
-| 4 | [fetch, a real network wait](https://jseventloop.tech/play/fetch-then) | The real shape of it. This is what your chat app does all day |
-| 5 | [Promise.all, waiting in parallel](https://jseventloop.tech/play/promise-all) | One at a time or all at once. Same choice as `warmup/04` versus `warmup/05` |
+| 1 | [One thing at a time](https://jseventloop.tech/play/sync-basics) | Opens a shop, makes a coffee, closes the shop. Three lines, printed in the order you wrote them. Nothing waits for anything |
+| 2 | [Blocking the loop](https://jseventloop.tech/play/blocking-loop) | Sets a timer, then runs `while (true)` forever. The timer **never fires**. Watch the queue hold a callback that never gets a turn |
+| 3 | [async/await, unmasked](https://jseventloop.tech/play/async-await) | Prints "ordering", hits an `await`, and the function *leaves the stack*. "walk away" prints next. "order arrived" prints last |
+| 4 | [fetch, a real network wait](https://jseventloop.tech/play/fetch-then) | Asks a server for a user. Prints "requesting", then "not waiting", then the answer whenever it turns up |
+| 5 | [Promise.all, waiting in parallel](https://jseventloop.tech/play/promise-all) | Starts two 100ms waits, then waits for both together. Takes 100ms, not 200ms |
 
 Write your prediction and the real answer for each one in `warmup/NOTES.md`.
+
+**Scene 2** is `warmup/01-blocking.js`'s point: being stuck is not the same as waiting.
+**Scene 3** is the one to slow down on; see below. **Scene 5** catches a mistake almost everyone
+makes: the two timers start the moment you *call* the function, not when you `await` it. `await`
+does not start the work. That is the difference between `warmup/04` and `warmup/05`.
+
+### What is `fetch`?
+
+Scene 4 needs a word of introduction if you have not met it.
+
+`fetch` is how JavaScript asks another computer for something over the internet. You hand it a
+web address, it sends the request, and some time later an answer comes back.
+
+**That "some time later" is the entire reason async exists.** A trip out to another machine and
+back takes anywhere from 20 milliseconds to several seconds, and you cannot know which in advance.
+Your program is not allowed to stand still for it.
+
+You have already used it: `warmup/08-real-network.js` is `fetch` asking the government's VIN
+service about three trucks. And it is what your chat app does all day, because `fetch` is how you
+will talk to Ollama next session.
+
+One thing that might look odd in scene 4: it uses `.then()` instead of `await`. Same machinery,
+older way of writing it. You will see both in real code.
 
 ### Why there are so many setTimeouts in these
 
@@ -98,7 +121,7 @@ Same ideas, different code, no crossover. Don't go looking for your files on the
 That is a genuinely useful thing to know about tools in general: a thing that models your system
 is never the same as your system.
 
-### Scene 5 is the one to slow down on
+### Scene 3 is the one to slow down on
 
 It answers the question you couldn't answer about your quiz app. The site puts it better
 than I can, so here it is, and it is worth reading twice:
