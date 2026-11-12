@@ -87,34 +87,18 @@ neither of the others had:
   to use. The tool does the predict-then-check that the warmup was hand-rolling.
 - **Fifteen curated scenes**, linked in a chain, each with a written explanation underneath.
 
-**Its Playground will not run the warmup files, and that was nearly a trap.** Checked on
-2026-11-12 by pasting warmup code in: it takes a deliberately tiny grammar -- `console.log`,
-`setTimeout(fn, ms)`, `.then` chains, `queueMicrotask`, `await Promise.resolve()`,
-`await new Promise(r => setTimeout(r, ms))`, and calls to declared functions. No `const`, no loops,
-no arrays, no `require`, and you cannot `await` your own async function. Anything else gets a red
-"Can't visualize this yet". An earlier draft of the README said a scene **is**
-`warmup/01-blocking.js`, which would have had Charlie paste a warmup file in and hit that wall. It
-now says "same idea as", and a short section explains the limit and why it exists: the site
-**simulates** the event loop rather than executing the code, which is exactly how it can show the
-queues, where Node runs the real thing and shows nothing. Charlie needs both, and that is worth
-knowing about tools generally.
+**Its Playground will not run the warmup files.** Checked on 2026-11-12 by pasting warmup code in:
+it takes a deliberately tiny grammar -- `console.log`, `setTimeout(fn, ms)`, `.then` chains,
+`queueMicrotask`, `await Promise.resolve()`, `await new Promise(r => setTimeout(r, ms))`, and calls
+to declared functions. No `const`, no loops, no arrays, no `require`, and you cannot `await` your
+own async function. Anything else gets a red "Can't visualize this yet". It simulates the event
+loop rather than executing code, which is how it can show the queues at all.
 
-One snippet of `warmup/04` was rewritten to fit the grammar and verified accepted (23 steps, with
-the trailing `console.log` correctly printing first). It is given as **paste-this text, not a
-link**: the Playground's `?code=` parameter updates as you type but does not restore on a fresh
-load, also checked.
-
-**setTimeout is scenery, not a subject.** Dave read the first cut and said the timeouts were
-confusing, that he had never thought of them as part of learning `async`/`await`. He was right
-about half of it, and the half he was right about was two of the seven scenes. `setTimeout(0),
-alone` and `Promise vs setTimeout` are the microtask-versus-task ordering puzzle: a real thing,
-an interview question, and something Charlie will not write once while building this app. They
-are dropped entirely, and the matching stretch block in `warmup/02-order.js` is labelled skippable.
-
-A section explaining that a timer is only a stand-in for anything slow was written and then also
-cut: once the two ordering scenes were gone, the remaining timers no longer draw enough attention
-to need defending. Keep it that way. If `setTimeout` starts looking like a topic again, something
-has crept back in.
+That mattered while an earlier draft claimed a scene **was** `warmup/01-blocking.js` and offered a
+paste-in snippet. Both are gone, along with the section warning about the Playground: with nothing
+pointing Charlie at it, he has no reason to go there. Part 1 is five links he clicks, Part 2 is
+eight files he runs with `node`. If a future edit reintroduces "try your own code here", the
+warning has to come back with it.
 
 Five scenes are picked, ordered so each maps to something Charlie will actually do: `sync-basics`, `blocking-loop` (same idea as `01`),
 **`async-await`**, `fetch-then` (the real shape, and what the chat app does), and `promise-all`

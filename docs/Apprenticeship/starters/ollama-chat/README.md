@@ -73,30 +73,6 @@ service about three trucks, and it is how you will talk to Ollama next session.
 Scene 4 writes it with `.then()` rather than `await`. Same machinery, older spelling, and you will
 see both in real code.
 
-### Don't try to run the warmup files on that site
-
-The site has a "Playground" where you can type your own code. Skip it. If you paste a warmup
-file in, it refuses in red and you will think you broke something.
-
-It accepts only a tiny slice of JavaScript: `console.log`, `setTimeout`, `.then()` chains, and a
-couple of `await` shapes. No `const`, no loops, no arrays, no `require`. The warmup files are
-nowhere near that.
-
-**Why so limited?** Because it is not running your code. It is a **simulator**: it reads the code,
-works out what the event loop would do, and animates that. A real JavaScript engine runs your code
-properly but can show you nothing, because the stack and the queues are invisible from the inside.
-
-| | Shows you the machinery | Runs real code |
-|---|---|---|
-| The website | yes | no |
-| Node, in `warmup/` | no | yes |
-
-So Part 1 is seven scenes **the site wrote**, and Part 2 is eight programs **you run in Node**.
-Same ideas, different code, no crossover. Don't go looking for your files on the website.
-
-That is a genuinely useful thing to know about tools in general: a thing that models your system
-is never the same as your system.
-
 ### Scene 3 is the one to slow down on
 
 It answers the question you couldn't answer about your quiz app. The site puts it better
