@@ -41,6 +41,65 @@ anyone watching the bill, and you will learn more, because nothing is hidden beh
 else's service. Fleetco will run models both ways, and the reasons are the same ones you are about
 to feel directly.
 
+## Before Project A: the async lab
+
+Charlie wrote working `await` code in `test-test` and, asked why, said the error told him to.
+Project A assumes `async` and `await` are at least familiar, so there is a two-hour lab first.
+It is ready to go: `repos/async-lab`, to be handed to Charlie as his own repository.
+
+**The design.** Nine small programs. Running them is not the work — **writing down what he thinks
+will happen first** is the work. The deliverable is `NOTES.md`, full of predictions, including the
+wrong ones. That shape was chosen because it is the one exercise Codex cannot do for him: a
+prediction he did not make himself is worth nothing, and he will be able to tell. The README gives
+him a legitimate use for Codex instead — *after* each exercise, "I predicted X, it printed Y,
+explain why I was wrong, write no code."
+
+**Stage 0 is somebody else's and better than anything written here.** Philip Roberts, "What the
+heck is the event loop anyway?" — 26 minutes, JSConf EU, free, and the best explanation of this
+subject that exists: https://www.youtube.com/watch?v=8aGhZQkoFbQ. Then his visualizer, loupe:
+http://latentflip.com/loupe/.
+
+Nothing else online does the predict-and-check part, which is why it is a hand-built repo and not
+a link. The closest things, if Charlie wants more reading: javascript.info's promises chapter
+(https://javascript.info/async, good, with exercises) and MDN's asynchronous JavaScript module.
+Both explain well; neither makes him commit to an answer before he finds out.
+
+**The capstone is exercise 09, and it is the whole point.** He opens his own `test-test`, deletes
+the word `await` from `const response = await rl.question(...)`, predicts, and runs it. All five
+questions flash past and he scores zero, because `response` holds a pending promise and a promise
+is never equal to `"A"`. His own code, his own bug, an absurd result. Then he writes three or four
+sentences on why that code needed `await`, with no AI. That paragraph is how Dave knows the lab
+worked.
+
+### Answer key — Dave's copy
+
+Charlie works from the repo's README and should not see this. Every output below was run and
+confirmed on Node 24.
+
+| | Answer | What it is for |
+|---|---|---|
+| **01** | Roughly **0 dots** during `sleepSync(1000)`, **10 dots** during `await sleep(1000)` | The difference between waiting and being stuck, visible on screen. The whole lab in one run |
+| **02** | `1, 2, 4, 3` | `2` before `4` is the surprise: an `async` function body runs synchronously until it hits the first `await`. `3` last |
+| **02 stretch** | `1, 2, 4, 7, 6, 5, 3` | Advanced and not the point. The point is that every synchronous line ran before anything that waited. Do not let him think he has to memorize microtask ordering |
+| **03 A** | `A: Promise { <pending> }` | The moment. `return 6` gives back a promise, always. He has certainly seen this and worked around it without knowing why |
+| **03 B / C** | `B: 6` and `C: 6` | Two ways to open the envelope: `.then()` and `await` |
+| **03 D** | `SyntaxError: await is only valid in async functions and the top level bodies of modules` | Deliberately the exact error he hit in `test-test`. Now it is an answer rather than an instruction |
+| **04** | `3.00s`, each unit arriving a second apart | A loop with `await` is sequential |
+| **05** | `1.00s` | `Promise.all` starts all three, then waits for the slowest |
+| **05 discussion** | Each call depends on the previous result; you would flood the server; order of writes matters; you want to stop at the first failure; rate limits | The real question. "Always use `Promise.all`" is the wrong lesson and this is where it gets headed off |
+| **06** | `0 units in 0.00s` | Silently, instantly wrong. `forEach` does not wait for an `async` callback, and nothing warns you. Fixes: `for...of`, or `Promise.all(map(...))` |
+| **07 a** | Caught, then "still running" | The ordinary case |
+| **07 c** | Caught the first rejection; the other two still ran and their results are thrown away | Leads to `Promise.allSettled` |
+| **07 b** | Prints "no error here" and "finished", **then the process dies with an unhandled rejection and exit code 1** | The scariest one. A missing `await` means `try`/`catch` cannot see the error — the block exits before the rejection arrives. Run it last |
+| **08** | About `0.9s` sequential versus `0.3s` parallel, varying run to run. The three VINs decode to a 2012 Freightliner Cascadia, a 2007 Kenworth W9 and a 2017 Mack | Real waiting, real variance |
+| **08 `NOTAVIN`** | **HTTP 200 with an error code in the body.** The request succeeded; the answer is a failure | The best question in the lab. "Did it work?" has two different answers and his code has to check both |
+| **09** | Five questions flash past, score 0 out of 5. `response` is a pending promise, which never equals `"A"` | His code, his bug |
+
+**Where the time goes.** Stage 0 is 30 minutes, 01 to 07 about an hour, 08 and 09 half an hour.
+One session. If 06 and 07b do not land, those two are worth a second session on their own — a
+silent empty array and a process that dies after printing "finished" are the two failures he will
+actually meet in Project A.
+
 ## Project A: `ollama-chat`
 
 **Objective.** Type a question in a terminal, get an answer back from a model running on your own
@@ -53,7 +112,8 @@ computer, and keep the conversation going.
 - HTTP from the client side: method, URL, headers, request body, status code, response body
 - JSON as the thing on the wire, and objects as the thing in your program — and that they are
   not the same thing
-- Promises, `async`/`await`, and what `await` actually waits for
+- Promises, `async`/`await`, and what `await` actually waits for — groundwork done in the async
+  lab above
 - Streaming responses, and why a stream is not just a slower string
 - Errors you cannot prevent: the server is not running, the model is not installed, the network
   hangs, the response is not what you expected

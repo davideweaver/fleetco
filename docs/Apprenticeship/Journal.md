@@ -22,6 +22,7 @@ records the work.
 |---|---|
 | `Cdweave24/shop-tracker` | The training project. [[Shop Tracker Handbook]] |
 | `Cdweave24/test-test` | Week 1 multiple-choice quiz. Finished, kept as a baseline |
+| `async-lab` | Built and ready to hand over, in `repos/async-lab`. Not yet on GitHub |
 | `Cdweave24/ollama-chat` | Not started. [[Local AI Detour]] Project A |
 | `Cdweave24/quiz-ai` | Not started. [[Local AI Detour]] Project B |
 
@@ -131,11 +132,15 @@ Not a quiz. These are the places where the answer tells Dave whether the code is
 
 ### Next
 
-1. Week 2 of the handbook: issues, a branch per issue, a pull request Dave reviews, and a
+1. **The async lab, as soon as tonight.** Two hours, built and tested, waiting in
+   `repos/async-lab` to be handed over as Charlie's own repository. Nine programs where the work
+   is predicting the output before running it, ending with his own quiz app and the `await`
+   removed. Answer key is in [[Local AI Detour]].
+2. Week 2 of the handbook: issues, a branch per issue, a pull request Dave reviews, and a
    deliberate merge conflict. The issues come from the two reviews above — start with the
    case-sensitive answer bug and the stale README.
-2. Add a `package.json` to both repos.
-3. Then [[Local AI Detour]], Project A.
+3. Add a `package.json` to both repos.
+4. Then [[Local AI Detour]], Project A.
 
 ---
 
