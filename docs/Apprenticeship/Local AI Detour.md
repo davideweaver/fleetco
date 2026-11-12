@@ -64,30 +64,35 @@ explain why I was wrong, write no code."
 heck is the event loop anyway?" — 26 minutes, JSConf EU, free, and the best explanation of this
 subject that exists: https://www.youtube.com/watch?v=8aGhZQkoFbQ.
 
-**The visualizer is JS Visualizer 9000, not loupe.** https://www.jsv9000.app/ Loupe (the tool in
-the talk) was tried first and abandoned on 2026-11-12 for three reasons, all confirmed by driving it
-in a browser:
+**The visualizer is The Event Loop, Visualized** (https://jseventloop.tech/). Two others were tried
+and rejected first, both driven in a browser on 2026-11-12:
 
-1. **It has no output panel.** `console.log` goes to the browser's devtools console, prefixed
-   `Loupe @ N >`, with nothing on the page. Dave could not get it to work and assumed it was flaky.
-   Anyone predicting print order without F12 open sees nothing at all.
-2. **It silently discards modern JavaScript.** It parses with 2014-era esprima, so `async`, `await`,
-   `const` and arrow functions vanish from the editor with no error.
-3. **Fixed 750ms animation steps**, and the panels empty when it finishes, so the run is easy to miss.
+| Tool | Why not |
+|---|---|
+| **loupe** (the one in the talk) | No output panel at all: `console.log` goes to devtools, nothing on the page, so it looks broken. Parses with 2014 esprima, so `async`, `await`, `const` and arrows are silently discarded. Fixed 750ms steps |
+| **JS Visualizer 9000** | Better: on-page output, a Step button, a microtask queue. But **still a syntax error on `async`/`await`** |
 
-JS Visualizer 9000 fixes all three: output appears **on the page** in a blue box, it runs `const`,
-arrows and promises, and a **Step** button means Charlie sets the pace. It also adds a **Microtask
-Queue** that loupe does not have, and an Event Loop panel that names the current phase in plain
-English as it runs.
+The third one handles `async`/`await` properly, which was Dave's requirement. It also has what
+neither of the others had:
 
-It uses **its own built-in examples** rather than hand-encoded URLs, so there are no links to rot:
-Call Stack, Task Queue, Microtask Queue, Tasks vs Microtasks, then Wrapping setTimeout in Promise,
-which is literally the `sleep()` from the warmup.
+- **A built-in console pane**, so output is on the page.
+- **Step forwards and backwards**, at any speed, with the step number in the URL.
+- **Three explanation levels** for the same animation: "Explain simply", "Developer", "Under the
+  hood". Charlie starts simple and re-walks it as a developer.
+- **A prediction question before every scene**, multiple choice, with a "skip" link he is told not
+  to use. The tool does the predict-then-check that the warmup was hand-rolling.
+- **Fifteen curated scenes**, linked in a chain, each with a written explanation underneath.
 
-**It cannot do `async`/`await` either** (syntax error, confirmed). That turns out to help rather
-than hurt: `await` *is* promises underneath, so watching a `.then` callback sit in the Microtask
-Queue is watching what `await` does, written the long way. The README says exactly that, which
-makes the limitation into the lesson.
+Seven are picked, in an order that lines up with the warmup: `sync-basics`, then `blocking-loop`
+(which is `01-blocking.js`), `settimeout-zero`, `promise-vs-settimeout`, **`async-await`**,
+`promise-all` (which is `04` versus `05`, three seconds versus one), and `fetch-then` (which is
+`08`). All seven return 200, checked.
+
+The README quotes the site's own description of `await` splitting a function in two and leaving the
+frame suspended rather than blocked, then restates it plainly: **`await` does not stop your program,
+it steps the function out of the way and comes back when the answer shows up.** Followed by the two
+consequences that bite in Phase 1: code before the first `await` runs immediately, and every
+`await` costs a trip through the queue even when the value is already there.
 
 Everything about `async`/`await` itself moves to `warmup/`. Nothing online does the
 predict-and-check part, which is why it is hand-built. The closest things, if Charlie wants more
