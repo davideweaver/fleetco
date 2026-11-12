@@ -83,7 +83,24 @@ neither of the others had:
   to use. The tool does the predict-then-check that the warmup was hand-rolling.
 - **Fifteen curated scenes**, linked in a chain, each with a written explanation underneath.
 
-Seven are picked, in an order that lines up with the warmup: `sync-basics`, then `blocking-loop`
+**Its Playground will not run the warmup files, and that was nearly a trap.** Checked on
+2026-11-12 by pasting warmup code in: it takes a deliberately tiny grammar -- `console.log`,
+`setTimeout(fn, ms)`, `.then` chains, `queueMicrotask`, `await Promise.resolve()`,
+`await new Promise(r => setTimeout(r, ms))`, and calls to declared functions. No `const`, no loops,
+no arrays, no `require`, and you cannot `await` your own async function. Anything else gets a red
+"Can't visualize this yet". An earlier draft of the README said a scene **is**
+`warmup/01-blocking.js`, which would have had Charlie paste a warmup file in and hit that wall. It
+now says "same idea as", and a short section explains the limit and why it exists: the site
+**simulates** the event loop rather than executing the code, which is exactly how it can show the
+queues, where Node runs the real thing and shows nothing. Charlie needs both, and that is worth
+knowing about tools generally.
+
+One snippet of `warmup/04` was rewritten to fit the grammar and verified accepted (23 steps, with
+the trailing `console.log` correctly printing first). It is given as **paste-this text, not a
+link**: the Playground's `?code=` parameter updates as you type but does not restore on a fresh
+load, also checked.
+
+Seven scenes are picked, in an order that lines up with the warmup: `sync-basics`, then `blocking-loop`
 (which is `01-blocking.js`), `settimeout-zero`, `promise-vs-settimeout`, **`async-await`**,
 `promise-all` (which is `04` versus `05`, three seconds versus one), and `fetch-then` (which is
 `08`). All seven return 200, checked.
