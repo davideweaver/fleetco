@@ -109,13 +109,12 @@ confusing, that he had never thought of them as part of learning `async`/`await`
 about half of it, and the half he was right about was two of the seven scenes. `setTimeout(0),
 alone` and `Promise vs setTimeout` are the microtask-versus-task ordering puzzle: a real thing,
 an interview question, and something Charlie will not write once while building this app. They
-are now optional and labelled as trivia, as is the matching stretch block in `warmup/02-order.js`.
+are dropped entirely, and the matching stretch block in `warmup/02-order.js` is labelled skippable.
 
-Where `setTimeout` earns its keep is as a **stand-in for anything slow** -- you cannot conjure a
-slow thing without a server, and every fake delay in the warmup is a timer underneath. The README
-now says that outright, so the question Dave asked does not have to be asked twice: *when you see
-`setTimeout(fn, 1000)`, read it as "something that takes a second". The lesson is never about the
-timer.*
+A section explaining that a timer is only a stand-in for anything slow was written and then also
+cut: once the two ordering scenes were gone, the remaining timers no longer draw enough attention
+to need defending. Keep it that way. If `setTimeout` starts looking like a topic again, something
+has crept back in.
 
 Five scenes are picked, ordered so each maps to something Charlie will actually do: `sync-basics`, `blocking-loop` (same idea as `01`),
 **`async-await`**, `fetch-then` (the real shape, and what the chat app does), and `promise-all`

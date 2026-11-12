@@ -73,23 +73,6 @@ service about three trucks, and it is how you will talk to Ollama next session.
 Scene 4 writes it with `.then()` rather than `await`. Same machinery, older spelling, and you will
 see both in real code.
 
-### Why there are so many setTimeouts in these
-
-Fair question, and it threw an experienced developer who read this before you.
-
-`setTimeout` is **not** what you are here to learn. You will hardly ever write one. The reason
-it is all over these examples is that the examples need *something slow* to point at, and a
-timer is the only slow thing you can conjure up without a server. It is a stand-in for the real
-slow things: a network request, a database query, a model thinking.
-
-So when you see `setTimeout(fn, 1000)`, read it as "something that takes a second". The lesson is
-never about the timer.
-
-*Optional, and only if you are curious: [setTimeout(0), alone](https://jseventloop.tech/play/settimeout-zero)
-and [Promise vs setTimeout](https://jseventloop.tech/play/promise-vs-settimeout) are about which
-kind of waiting cuts in line ahead of which. It is a real thing, people ask it in job interviews,
-and it will not come up once while you build this app. Skip them unless you want them.*
-
 ### Don't try to run the warmup files on that site
 
 The site has a "Playground" where you can type your own code. Skip it. If you paste a warmup
