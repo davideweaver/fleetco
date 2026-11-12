@@ -41,11 +41,13 @@ anyone watching the bill, and you will learn more, because nothing is hidden beh
 else's service. Fleetco will run models both ways, and the reasons are the same ones you are about
 to feel directly.
 
-## Before Project A: the async lab
+## Before Project A: the warmup
 
 Charlie wrote working `await` code in `test-test` and, asked why, said the error told him to.
-Project A assumes `async` and `await` are at least familiar, so there is a two-hour lab first.
-It is ready to go: `repos/async-lab`, to be handed to Charlie as his own repository.
+Project A assumes `async` and `await` are at least familiar, so there is a warmup first. It lives
+**inside** `ollama-chat` rather than in a repo of its own (`repos/ollama-chat`, ready to hand
+over), because one repo is one assignment, and because the warmup's fake model is deliberately the
+same shape as the one he writes in Phase 1.
 
 **The design.** Nine small programs. Running them is not the work — **writing down what he thinks
 will happen first** is the work. The deliverable is `NOTES.md`, full of predictions, including the
@@ -54,17 +56,28 @@ prediction he did not make himself is worth nothing, and he will be able to tell
 him a legitimate use for Codex instead — *after* each exercise, "I predicted X, it printed Y,
 explain why I was wrong, write no code."
 
-**Stage 0 is somebody else's and better than anything written here.** Philip Roberts, "What the
+**The video is somebody else's and better than anything written here.** Philip Roberts, "What the
 heck is the event loop anyway?" — 26 minutes, JSConf EU, free, and the best explanation of this
-subject that exists: https://www.youtube.com/watch?v=8aGhZQkoFbQ. Then his visualizer, loupe:
-http://latentflip.com/loupe/.
+subject that exists: https://www.youtube.com/watch?v=8aGhZQkoFbQ.
 
-Nothing else online does the predict-and-check part, which is why it is a hand-built repo and not
-a link. The closest things, if Charlie wants more reading: javascript.info's promises chapter
-(https://javascript.info/async, good, with exercises) and MDN's asynchronous JavaScript module.
-Both explain well; neither makes him commit to an answer before he finds out.
+**What loupe can and cannot do.** His visualizer (http://latentflip.com/loupe/) is a playground,
+not a lesson: a code box, a run button, and no sequence to follow. Worse, it parses with 2014-era
+esprima, so **`async`, `await`, `const` and arrow functions are silently discarded** — paste any of
+them in and the editor just goes blank with no error. Verified 2026-11-12 by loading each into the
+tool and watching the code vanish from the URL.
 
-**The capstone is exercise 09, and it is the whole point.** He opens his own `test-test`, deletes
+So loupe is good for exactly one thing, the call stack and the callback queue, and it cannot show
+asynchrony as Charlie will ever write it. It gets **five fixed links** in the repo README, ES5 only,
+each with a question to answer, about fifteen minutes. The links work because loupe base64-encodes
+the program into `?code=`, so he never has to paste anything.
+
+Everything about `async`/`await` itself moves to `warmup/`. Nothing online does the
+predict-and-check part, which is why it is hand-built. The closest things, if Charlie wants more
+reading: javascript.info's promises chapter (https://javascript.info/async, good, with exercises)
+and MDN's asynchronous JavaScript module. Both explain well; neither makes him commit to an answer
+before he finds out.
+
+**The capstone is in his own repo, and it is the whole point.** He opens his own `test-test`, deletes
 the word `await` from `const response = await rl.question(...)`, predicts, and runs it. All five
 questions flash past and he scores zero, because `response` holds a pending promise and a promise
 is never equal to `"A"`. His own code, his own bug, an absurd result. Then he writes three or four
@@ -93,14 +106,45 @@ confirmed on Node 24.
 | **07 b** | Prints "no error here" and "finished", **then the process dies with an unhandled rejection and exit code 1** | The scariest one. A missing `await` means `try`/`catch` cannot see the error — the block exits before the rejection arrives. Run it last |
 | **08** | About `0.9s` sequential versus `0.3s` parallel, varying run to run. The three VINs decode to a 2012 Freightliner Cascadia, a 2007 Kenworth W9 and a 2017 Mack | Real waiting, real variance |
 | **08 `NOTAVIN`** | **HTTP 200 with an error code in the body.** The request succeeded; the answer is a failure | The best question in the lab. "Did it work?" has two different answers and his code has to check both |
-| **09** | Five questions flash past, score 0 out of 5. `response` is a pending promise, which never equals `"A"` | His code, his bug |
+| **capstone** | Five questions flash past, score 0 out of 5. `response` is a pending promise, which never equals `"A"` | His code, his bug |
+| **L1 to L5** | Stack empties before the queue runs; timers fire in time order, not code order; clicks pile up in the queue | Loupe. Why waiting needs somewhere to wait |
 
-**Where the time goes.** Stage 0 is 30 minutes, 01 to 07 about an hour, 08 and 09 half an hour.
-One session. If 06 and 07b do not land, those two are worth a second session on their own — a
-silent empty array and a process that dies after printing "finished" are the two failures he will
-actually meet in Project A.
+**Where the time goes.** Video 26 minutes, loupe 15, the warmup about an hour, the capstone 15.
+That is one session, with Phase 1 below as the next one. If 06 and 07b do not land, those two are
+worth a session on their own: a silently empty array and a process that dies after printing
+"finished" are the two failures he will actually meet in Phase 1.
 
 ## Project A: `ollama-chat`
+
+Split into two sessions, and the split is the lesson. **Phase 1 builds the entire app against a
+fake model**, so nothing is installed and nothing is on the network. **Phase 2 writes the real
+model behind the same function** and changes one import.
+
+### Phase 1 — the app, with a fake model
+
+`fakeModel.js` exposes one function, `async respond(messages)`, and `chat.js` is built against it:
+the readline loop, the conversation array of `{ role, content }` objects, `/exit`, `/clear`,
+`/history`, and error handling. Three things make the fake earn its place:
+
+1. **It thinks for half a second to a second and a half**, randomly, so the waiting is real and
+   variable rather than instant.
+2. **It reports what it can see** — "I can see 5 messages, your last one was 9 words." Conversation
+   history is the one genuinely invisible thing in a chat app, and this makes it visible. It is
+   also how `/clear` becomes provable instead of assumed.
+3. **It throws if the last message contains "break"**, so there is an error worth catching.
+
+The checkable rule: **`chat.js` must not know the model is fake.** If the word "fake" appears
+anywhere outside `fakeModel.js`, the seam is not done. That is the same seam as the grader in
+Project B, arriving two weeks early, discovered by needing it rather than by being told.
+
+Stretch, both of which only work if the async is right: stream the reply one word at a time with
+an async generator and `for await`, which is the exact shape the real NDJSON reader needs; and a
+spinner while the model thinks, which is `warmup/01-blocking.js` turned into something useful.
+
+### Phase 2 — the real model
+
+Everything below, starting with installing Ollama. By the end of Phase 1 most of steps 4, 5, 7 and
+9 are already done, so this session is mostly step 1, step 2 and the streaming reader.
 
 **Objective.** Type a question in a terminal, get an answer back from a model running on your own
 computer, and keep the conversation going.
@@ -213,7 +257,8 @@ sensible defaults. Try the same question at temperature 0 and at 1.5, several ti
 write down what you see. Then set `"options": { "seed": 42, "temperature": 0 }` and ask the same
 question twice. Explain the result.
 
-**9. Split it up.** By now `chat.js` does too much. Separate it into at least:
+**9. Split it up.** If Phase 1 was done properly this is already true, so use this step to check
+it rather than to do it. `chat.js` should be separated into at least:
 
 - a module that knows how to talk to Ollama, and nothing about terminals
 - a module that knows about the terminal, and nothing about HTTP

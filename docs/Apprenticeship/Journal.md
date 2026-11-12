@@ -22,8 +22,7 @@ records the work.
 |---|---|
 | `Cdweave24/shop-tracker` | The training project. [[Shop Tracker Handbook]] |
 | `Cdweave24/test-test` | Week 1 multiple-choice quiz. Finished, kept as a baseline |
-| `async-lab` | Built and ready to hand over, in `repos/async-lab`. Not yet on GitHub |
-| `Cdweave24/ollama-chat` | Not started. [[Local AI Detour]] Project A |
+| `Cdweave24/ollama-chat` | Built and ready to hand over, in `repos/ollama-chat`: the loupe links, the warmup, and the Phase 1 spec. Not yet on GitHub |
 | `Cdweave24/quiz-ai` | Not started. [[Local AI Detour]] Project B |
 
 ---
@@ -132,10 +131,11 @@ Not a quiz. These are the places where the answer tells Dave whether the code is
 
 ### Next
 
-1. **The async lab, as soon as tonight.** Two hours, built and tested, waiting in
-   `repos/async-lab` to be handed over as Charlie's own repository. Nine programs where the work
-   is predicting the output before running it, ending with his own quiz app and the `await`
-   removed. Answer key is in [[Local AI Detour]].
+1. **`ollama-chat`, Phase 1, as soon as tonight.** Built and tested in `repos/ollama-chat`,
+   waiting to be handed over. The event loop video, then five fixed loupe links, then eight warmup
+   programs where the work is predicting the output before running it, then the chat app built
+   against a fake model he writes himself. Nothing installed, nothing on the network. Answer key
+   is in [[Local AI Detour]].
 2. Week 2 of the handbook: issues, a branch per issue, a pull request Dave reviews, and a
    deliberate merge conflict. The issues come from the two reviews above — start with the
    case-sensitive answer bug and the stale README.
