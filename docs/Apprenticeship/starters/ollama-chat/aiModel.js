@@ -5,8 +5,11 @@
 // be confused with the other kind of model you will meet in a few weeks, which
 // is the shape of a record in a database. See the README.
 //
-// In Part 3 you write a bigger version of this file yourself.
-const { sleep } = require("./sleep");
+// This is the only file in the project that knows anything about where answers
+// come from. In Part 3 you add a `respond()` function to it. Next session you
+// rip out the pretending and make it talk to a real model, and nothing else in
+// the project has to change. That is the whole design.
+const { sleep } = require("./warmup/lib/sleep");
 
 const ANSWERS = {
   "what is a promise":

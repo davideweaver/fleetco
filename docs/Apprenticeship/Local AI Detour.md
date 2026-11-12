@@ -173,17 +173,21 @@ test: a **data model is a shape** that describes information, an **AI model is a
 and answers. "Add a field to the model" versus "which model are you running". It also points out
 that his `units.json` objects were already a data model, so he has met one without the word.
 
-The files Charlie writes are **`fakeAiModel.js`** and, next session, **`ollamaAiModel.js`**. Dave
-asked for the `Ai` after going looking for `fakeModel.js` in the zip: the word "model" alone reads
-as a database record to anyone with a server background, and both senses are about to be in play.
-"Model" still appears on its own everywhere else, because that is what the Ollama world calls it
-and the API field is literally `model` -- renaming the concept would teach him a word nobody uses.
-Spelling it out in the filenames is the cheap half of the fix. The warmup's fake is
-`warmup/lib/aiModel.js` for the same reason.
+**One file, `aiModel.js`, the whole way through.** An earlier cut had the warmup ship a fake model
+and then asked Charlie to write a second one called `fakeAiModel.js`. Dave read it and asked why
+there were two, which was the right question: two fakes doing the same job, one existing only so
+the other could be "a bigger version of" it. Now `aiModel.js` sits in the project root, the warmup
+requires it from `../aiModel`, Charlie adds `respond(messages)` to it in Phase 1, and next session
+he replaces its insides with a real Ollama call. The filename never changes.
 
-**Neither file is in the zip.** Charlie writes both, and the README now says so in bold at the top
-of Part 3, because Dave went looking for `fakeAiModel.js` and could not find it. The only code
-handed over is `warmup/`.
+The `Ai` in the name is Dave's, and it earns its keep: "model" alone reads as a database record to
+anyone with a server background, and both senses are about to be in play. The word stays bare in
+prose, because that is what the Ollama world calls it and the API field is literally `model`.
+
+That change also bought a better seam test. The old rule was "the word *fake* must not appear
+outside the fake" -- greppable but shallow. The new one is **"if `chat.js` needs a single line
+changed next session, the seam was wrong"**, which Charlie can check with `git diff` and which is
+the actual property worth having.
 
 Then the AI meaning:
 

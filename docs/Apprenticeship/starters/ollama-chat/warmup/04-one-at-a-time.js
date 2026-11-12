@@ -7,7 +7,7 @@
 // Run it:  node warmup/04-one-at-a-time.js
 
 const { startTimer } = require("./lib/sleep");
-const { askModel, QUESTIONS } = require("./lib/aiModel");
+const { askModel, QUESTIONS } = require("../aiModel");
 
 async function main() {
   const elapsed = startTimer();

@@ -112,7 +112,7 @@ Go in order. Write your prediction in `warmup/NOTES.md` **before** you run each
 one, then write what actually happened. Being wrong is the point. Leave the wrong
 predictions in.
 
-`warmup/lib/aiModel.js` is a fake AI model that takes a second to think. Look at it
+`aiModel.js` in the project root is a pretend AI model that takes a second to think. Look at it
 now. You are about to write a bigger version of it.
 
 **Don't ask Codex for the answers.** The predictions are the only thing this part
@@ -126,7 +126,7 @@ after each one instead:
 
 ## What a model actually is
 
-You are about to write a file called `fakeAiModel.js`, so you should know what the real
+You are about to grow `aiModel.js` into the heart of your app, so you should know what the real
 thing is. This takes ten minutes and it is not optional.
 
 ### First, a warning about the word
@@ -215,19 +215,21 @@ That last question is the one that matters. You will answer it properly in Part 
 
 Now build the chat app. No network, no install, nothing to download.
 
-**Neither file below is in this zip. You write both of them.** The only code you have been
-given is `warmup/`, and that was practice. This part is yours.
+`aiModel.js` is already in the zip, and the warmup used it. It is a pretend model: ask it
+a question, it thinks for a second, it answers. **You are going to grow that same file into
+the one your app uses**, and then next session replace its insides with a real model.
 
-**1. Create `fakeAiModel.js`** - a bigger version of `warmup/lib/aiModel.js`. It is a stand-in for a
-real model: same job, same shape, none of the billions of numbers. One function:
+One file, the whole way through. That is the point of the design, so do not make a second one.
+
+**1. Add `respond()` to `aiModel.js`.** Leave `askModel()` where it is. The new function:
 
 ```js
 async function respond(messages) { ... }
 ```
 
-It takes **the whole conversation so far** and returns a reply. That is not an accident,
-and it is the answer to question 4 above: the model has no memory, so your program has to
-hand it the entire conversation every single time. Your app is doing the remembering.
+It takes **the whole conversation so far**, not one question. That is not an accident, and
+it is the answer to question 4 above: the model has no memory, so your program has to hand
+it the entire conversation every single time. Your app is doing the remembering.
 
 It should:
 
@@ -240,8 +242,9 @@ It should:
 - throw an error if the last message contains the word `break`, so you have
   something to catch
 
-**2. Create `chat.js`** - the loop. Read a line, send the conversation to the model, print
-the reply, repeat. Commands: `/exit`, `/clear`, `/history`.
+**2. Create `chat.js`** - the loop. This file does not exist yet; you write it. Read a line,
+send the conversation to `respond()`, print the reply, repeat. Commands: `/exit`, `/clear`,
+`/history`.
 
 Keep the conversation as an array of `{ role, content }` objects, where role is
 `"user"` or `"assistant"`. That is the shape the real Ollama API wants, so you may
@@ -252,12 +255,16 @@ went wrong and keep going. It should not crash, and it should not quietly do not
 
 ### The rule that matters
 
-**`chat.js` must not know the model is fake.** If the word "fake" appears anywhere
-outside `fakeAiModel.js`, you did it wrong.
+**`chat.js` must not know or care where answers come from.** It calls `respond()`. It does
+not know whether a real model answered, or a pretend one, or how long either took.
 
-Next session you write `ollamaAiModel.js` with the same `respond(messages)` function,
-change one import line, and the app talks to a real AI. That is the whole reason for
-building it this way, and it is how real software gets tested.
+Here is how you will find out whether you got it right. Next session you will gut
+`aiModel.js` and make it call Ollama for real. **If `chat.js` needs even one line changed,
+the seam was in the wrong place.** You can check it with `git diff`, and that is a real test,
+not an opinion.
+
+Some things that would fail that test: `chat.js` mentioning a timer, or the word "fake", or
+reaching inside the conversation to guess what the model will say.
 
 ### Stretch, if you get there
 
@@ -275,7 +282,7 @@ building it this way, and it is how real software gets tested.
 - [ ] It remembers what you said, and the model tells you how many messages it sees.
 - [ ] `/clear` wipes the history, and you can prove it did.
 - [ ] Typing something with `break` in it doesn't take the program down.
-- [ ] The word "fake" appears in exactly one file.
+- [ ] Nothing in `chat.js` would have to change if the model became real.
 - [ ] `warmup/NOTES.md` is filled in, wrong predictions and all.
 - [ ] You picked the model you want to run next session, and can say why it and not a
       bigger one.
