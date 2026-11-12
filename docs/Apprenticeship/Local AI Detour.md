@@ -75,6 +75,14 @@ asynchrony as Charlie will ever write it. It gets **five fixed links** in the re
 each with a question to answer, about fifteen minutes. The links work because loupe base64-encodes
 the program into `?code=`, so he never has to paste anything.
 
+**It also has no output panel, which makes it look broken.** Dave hit this on 2026-11-12: the page
+shows only Call Stack, Web Apis and Callback Queue, and `console.log` goes to the *browser's* devtools
+console, prefixed `Loupe @ N >`. Confirmed by running L1 in a browser and finding the log in devtools
+with nothing on the page. Anyone predicting print order without F12 open sees nothing and concludes
+the tool is flaky. The README now says to open devtools first, in bold, before the links. It also
+flags the 750ms step delay, the Rerun button, and the Delay slider under the hammer icon, since the
+animation finishes and empties while you are still looking for output.
+
 Everything about `async`/`await` itself moves to `warmup/`. Nothing online does the
 predict-and-check part, which is why it is hand-built. The closest things, if Charlie wants more
 reading: javascript.info's promises chapter (https://javascript.info/async, good, with exercises)
