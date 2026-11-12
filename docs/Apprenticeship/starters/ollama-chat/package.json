@@ -1,0 +1,21 @@
+{
+  "name": "ollama-chat",
+  "version": "1.0.0",
+  "description": "A console chat app for a local AI model, built against a fake one first",
+  "private": true,
+  "scripts": {
+    "chat": "node chat.js",
+    "warmup:01": "node warmup/01-blocking.js",
+    "warmup:02": "node warmup/02-order.js",
+    "warmup:03": "node warmup/03-the-promise.js",
+    "warmup:04": "node warmup/04-one-at-a-time.js",
+    "warmup:05": "node warmup/05-all-at-once.js",
+    "warmup:06": "node warmup/06-the-foreach-trap.js",
+    "warmup:07": "node warmup/07-errors.js",
+    "warmup:08": "node warmup/08-real-network.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "UNLICENSED"
+}

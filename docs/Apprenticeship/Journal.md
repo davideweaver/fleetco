@@ -22,7 +22,7 @@ records the work.
 |---|---|
 | `Cdweave24/shop-tracker` | The training project. [[Shop Tracker Handbook]] |
 | `Cdweave24/test-test` | Week 1 multiple-choice quiz. Finished, kept as a baseline |
-| `Cdweave24/ollama-chat` | Built and ready to hand over, in `repos/ollama-chat`: the loupe links, the warmup, what a model is, and the Phase 1 spec. Not on GitHub: only Charlie can create a repo under his own account, so it goes over as `repos/ollama-chat-starter.zip` on Slack and he creates the repo himself |
+| `Cdweave24/ollama-chat` | Starter built and ready, in `docs/Apprenticeship/starters/ollama-chat`. Not on GitHub: only Charlie can create a repo under his own account, so `starters/ollama-chat.zip` goes over Slack and he creates the repo and makes the first commit |
 | `Cdweave24/quiz-ai` | Not started. [[Local AI Detour]] Project B |
 
 ---
@@ -131,7 +131,8 @@ Not a quiz. These are the places where the answer tells Dave whether the code is
 
 ### Next
 
-1. **`ollama-chat`, Phase 1, as soon as tonight.** Built and tested in `repos/ollama-chat`,
+1. **`ollama-chat`, Phase 1, as soon as tonight.** Built and tested in
+   `docs/Apprenticeship/starters/ollama-chat`,
    waiting to be handed over. The event loop video, then five fixed loupe links, then eight warmup
    programs where the work is predicting the output before running it, then the chat app built
    against a fake model he writes himself. Nothing installed, nothing on the network. Answer key

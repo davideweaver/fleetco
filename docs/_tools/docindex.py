@@ -42,7 +42,7 @@ def frontmatter(path):
 def collect():
     docs = []
     for f in sorted(glob.glob(f"{DOCS}/**/*.md", recursive=True)):
-        if "/_tools/" in f or f == f"{DOCS}/README.md":
+        if "/_tools/" in f or "/starters/" in f or f == f"{DOCS}/README.md":
             continue
         docs.append((f, frontmatter(f)))
     return docs

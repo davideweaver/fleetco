@@ -9,6 +9,10 @@ source: Claude Code, from Dave's session notes of 2026-11-12
 
 ## Overview
 
+**The code lives in `docs/Apprenticeship/starters/`.** `ollama-chat/` is the source of truth,
+`ollama-chat.zip` is what gets sent to Charlie, and `build-zip.sh` rebuilds the zip from the folder
+after any change. Edit the folder, run the script, send the zip.
+
 An interlude in [[Shop Tracker Handbook]], taken after Week 2 and before Week 3. Two small
 projects, each its own repository, neither one part of Shop Tracker:
 
@@ -49,7 +53,7 @@ Project A assumes `async` and `await` are at least familiar, so there is a warmu
 because the warmup's fake model is deliberately the same shape as the one he writes in Phase 1.
 
 **How it gets to him.** Nobody but Charlie can create a repo under his own account, so it goes over
-Slack as `repos/ollama-chat-starter.zip` (no `.git` inside) and **he creates the repo himself** and
+Slack as `starters/ollama-chat.zip` (no `.git` inside) and **he creates the repo himself** and
 makes the first commit. That is Week 1 practice for the third time, and it means the history is his
 from the start rather than inherited.
 
