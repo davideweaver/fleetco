@@ -45,9 +45,13 @@ to feel directly.
 
 Charlie wrote working `await` code in `test-test` and, asked why, said the error told him to.
 Project A assumes `async` and `await` are at least familiar, so there is a warmup first. It lives
-**inside** `ollama-chat` rather than in a repo of its own (`repos/ollama-chat`, ready to hand
-over), because one repo is one assignment, and because the warmup's fake model is deliberately the
-same shape as the one he writes in Phase 1.
+**inside** `ollama-chat` rather than in a repo of its own, because one repo is one assignment, and
+because the warmup's fake model is deliberately the same shape as the one he writes in Phase 1.
+
+**How it gets to him.** Nobody but Charlie can create a repo under his own account, so it goes over
+Slack as `repos/ollama-chat-starter.zip` (no `.git` inside) and **he creates the repo himself** and
+makes the first commit. That is Week 1 practice for the third time, and it means the history is his
+from the start rather than inherited.
 
 **The design.** Nine small programs. Running them is not the work — **writing down what he thinks
 will happen first** is the work. The deliverable is `NOTES.md`, full of predictions, including the
