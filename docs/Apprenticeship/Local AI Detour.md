@@ -128,7 +128,21 @@ model behind the same function** and changes one import.
 
 Charlie has used Codex for weeks and nobody has told him what is behind it. He is about to write
 `fakeModel.js`, which makes this the moment. Ten minutes in the repo README, pitched at someone who
-has never heard the word:
+has never heard the word.
+
+**It opens by separating the two meanings of "model", because they collide here.** Dave read
+`fakeModel.js` as a database record on first encounter, which is the *other* standard meaning and
+the one Shop Tracker uses from Week 6 onward (see [[Domain Model]]). If it caught Dave it will
+catch Charlie, and he meets both senses within a few weeks of each other. The README gives him the
+test: a **data model is a shape** that describes information, an **AI model is a thing that runs**
+and answers. "Add a field to the model" versus "which model are you running". It also points out
+that his `units.json` objects were already a data model, so he has met one without the word.
+
+The name `fakeModel.js` stays, because "model" is what the whole Ollama world calls it — the API
+field is literally `model` — and renaming it to something tidier would teach him a word nobody else
+uses. Better to name the collision than to dodge it.
+
+Then the AI meaning:
 
 - A model is **a file**, full of numbers. Not a program, not a database, not a lookup table.
 - The numbers came from training. Nobody wrote rules.
