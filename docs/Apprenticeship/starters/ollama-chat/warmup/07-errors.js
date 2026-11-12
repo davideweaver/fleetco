@@ -14,7 +14,7 @@
 //            node warmup/07-errors.js c
 //            node warmup/07-errors.js b     <-- run this one last, and watch
 
-const { askModel, QUESTIONS } = require("./lib/model");
+const { askModel, QUESTIONS } = require("./lib/aiModel");
 
 // a - the ordinary case
 async function a() {

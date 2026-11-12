@@ -112,7 +112,7 @@ Go in order. Write your prediction in `warmup/NOTES.md` **before** you run each
 one, then write what actually happened. Being wrong is the point. Leave the wrong
 predictions in.
 
-`warmup/lib/model.js` is a fake AI model that takes a second to think. Look at it
+`warmup/lib/aiModel.js` is a fake AI model that takes a second to think. Look at it
 now. You are about to write a bigger version of it.
 
 **Don't ask Codex for the answers.** The predictions are the only thing this part
@@ -126,7 +126,7 @@ after each one instead:
 
 ## What a model actually is
 
-You are about to write a file called `fakeModel.js`, so you should know what the real
+You are about to write a file called `fakeAiModel.js`, so you should know what the real
 thing is. This takes ten minutes and it is not optional.
 
 ### First, a warning about the word
@@ -215,7 +215,10 @@ That last question is the one that matters. You will answer it properly in Part 
 
 Now build the chat app. No network, no install, nothing to download.
 
-**1. `fakeModel.js`** - a bigger version of `warmup/lib/model.js`. It is a stand-in for a
+**Neither file below is in this zip. You write both of them.** The only code you have been
+given is `warmup/`, and that was practice. This part is yours.
+
+**1. Create `fakeAiModel.js`** - a bigger version of `warmup/lib/aiModel.js`. It is a stand-in for a
 real model: same job, same shape, none of the billions of numbers. One function:
 
 ```js
@@ -237,7 +240,7 @@ It should:
 - throw an error if the last message contains the word `break`, so you have
   something to catch
 
-**2. `chat.js`** - the loop. Read a line, send the conversation to the model, print
+**2. Create `chat.js`** - the loop. Read a line, send the conversation to the model, print
 the reply, repeat. Commands: `/exit`, `/clear`, `/history`.
 
 Keep the conversation as an array of `{ role, content }` objects, where role is
@@ -250,9 +253,9 @@ went wrong and keep going. It should not crash, and it should not quietly do not
 ### The rule that matters
 
 **`chat.js` must not know the model is fake.** If the word "fake" appears anywhere
-outside `fakeModel.js`, you did it wrong.
+outside `fakeAiModel.js`, you did it wrong.
 
-Next session you write `ollamaModel.js` with the same `respond(messages)` function,
+Next session you write `ollamaAiModel.js` with the same `respond(messages)` function,
 change one import line, and the app talks to a real AI. That is the whole reason for
 building it this way, and it is how real software gets tested.
 

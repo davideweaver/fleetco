@@ -1,8 +1,11 @@
 // A pretend AI model. askModel() takes one second to "think", the way a real
 // one would. It is fake, but your code cannot tell, and that is the point.
 //
-// Next session you write the real one. If you build the rest of the app right,
-// nothing except this file has to change.
+// "AI model" here means the thing that answers questions, like llama3.2. Not to
+// be confused with the other kind of model you will meet in a few weeks, which
+// is the shape of a record in a database. See the README.
+//
+// In Part 3 you write a bigger version of this file yourself.
 const { sleep } = require("./sleep");
 
 const ANSWERS = {

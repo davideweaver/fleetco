@@ -16,7 +16,7 @@
 // you have the answer to the last one?
 
 const { startTimer } = require("./lib/sleep");
-const { askModel, QUESTIONS } = require("./lib/model");
+const { askModel, QUESTIONS } = require("./lib/aiModel");
 
 async function main() {
   const elapsed = startTimer();

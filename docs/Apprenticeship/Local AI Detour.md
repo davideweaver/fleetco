@@ -162,20 +162,28 @@ model behind the same function** and changes one import.
 ### What a model is, taught before he writes a fake one
 
 Charlie has used Codex for weeks and nobody has told him what is behind it. He is about to write
-`fakeModel.js`, which makes this the moment. Ten minutes in the repo README, pitched at someone who
+`fakeAiModel.js`, which makes this the moment. Ten minutes in the repo README, pitched at someone who
 has never heard the word.
 
 **It opens by separating the two meanings of "model", because they collide here.** Dave read
-`fakeModel.js` as a database record on first encounter, which is the *other* standard meaning and
+`fakeAiModel.js` as a database record on first encounter, which is the *other* standard meaning and
 the one Shop Tracker uses from Week 6 onward (see [[Domain Model]]). If it caught Dave it will
 catch Charlie, and he meets both senses within a few weeks of each other. The README gives him the
 test: a **data model is a shape** that describes information, an **AI model is a thing that runs**
 and answers. "Add a field to the model" versus "which model are you running". It also points out
 that his `units.json` objects were already a data model, so he has met one without the word.
 
-The name `fakeModel.js` stays, because "model" is what the whole Ollama world calls it — the API
-field is literally `model` — and renaming it to something tidier would teach him a word nobody else
-uses. Better to name the collision than to dodge it.
+The files Charlie writes are **`fakeAiModel.js`** and, next session, **`ollamaAiModel.js`**. Dave
+asked for the `Ai` after going looking for `fakeModel.js` in the zip: the word "model" alone reads
+as a database record to anyone with a server background, and both senses are about to be in play.
+"Model" still appears on its own everywhere else, because that is what the Ollama world calls it
+and the API field is literally `model` -- renaming the concept would teach him a word nobody uses.
+Spelling it out in the filenames is the cheap half of the fix. The warmup's fake is
+`warmup/lib/aiModel.js` for the same reason.
+
+**Neither file is in the zip.** Charlie writes both, and the README now says so in bold at the top
+of Part 3, because Dave went looking for `fakeAiModel.js` and could not find it. The only code
+handed over is `warmup/`.
 
 Then the AI meaning:
 
@@ -200,7 +208,7 @@ conversation every time. The lesson lands because he met the question before he 
 
 ### Phase 1 — the app, with a fake model
 
-`fakeModel.js` exposes one function, `async respond(messages)`, and `chat.js` is built against it:
+`fakeAiModel.js` exposes one function, `async respond(messages)`, and `chat.js` is built against it:
 the readline loop, the conversation array of `{ role, content }` objects, `/exit`, `/clear`,
 `/history`, and error handling. Three things make the fake earn its place:
 
@@ -213,7 +221,7 @@ the readline loop, the conversation array of `{ role, content }` objects, `/exit
 3. **It throws if the last message contains "break"**, so there is an error worth catching.
 
 The checkable rule: **`chat.js` must not know the model is fake.** If the word "fake" appears
-anywhere outside `fakeModel.js`, the seam is not done. That is the same seam as the grader in
+anywhere outside `fakeAiModel.js`, the seam is not done. That is the same seam as the grader in
 Project B, arriving two weeks early, discovered by needing it rather than by being told.
 
 Stretch, both of which only work if the async is right: stream the reply one word at a time with
