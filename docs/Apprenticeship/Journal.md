@@ -22,7 +22,7 @@ records the work.
 |---|---|
 | `Cdweave24/shop-tracker` | The training project. [[Shop Tracker Handbook]] |
 | `Cdweave24/test-test` | Week 1 multiple-choice quiz. Finished, kept as a baseline |
-| `Cdweave24/ollama-chat` | Built and ready to hand over, in `repos/ollama-chat`: the loupe links, the warmup, and the Phase 1 spec. Not yet on GitHub |
+| `Cdweave24/ollama-chat` | Built and ready to hand over, in `repos/ollama-chat`: the loupe links, the warmup, what a model is, and the Phase 1 spec. Not on GitHub — only Charlie can create a repo under his own account, so it goes over as a template or a zip |
 | `Cdweave24/quiz-ai` | Not started. [[Local AI Detour]] Project B |
 
 ---

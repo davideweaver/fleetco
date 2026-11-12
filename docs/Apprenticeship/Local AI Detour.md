@@ -120,6 +120,31 @@ Split into two sessions, and the split is the lesson. **Phase 1 builds the entir
 fake model**, so nothing is installed and nothing is on the network. **Phase 2 writes the real
 model behind the same function** and changes one import.
 
+### What a model is, taught before he writes a fake one
+
+Charlie has used Codex for weeks and nobody has told him what is behind it. He is about to write
+`fakeModel.js`, which makes this the moment. Ten minutes in the repo README, pitched at someone who
+has never heard the word:
+
+- A model is **a file**, full of numbers. Not a program, not a database, not a lookup table.
+- The numbers came from training. Nobody wrote rules.
+- It does **one** thing: given the text so far, guess what comes next, then do it again.
+- "3B" is the parameter count, and the file size is roughly what it needs in memory. Real figures,
+  checked against ollama.com/library on 2026-11-12: `llama3.2:1b` 1.3 GB, `llama3.2:3b` 2.0 GB,
+  `llama3.1:8b` 4.9 GB, `llama3.1:70b` 43 GB, `llama3.1:405b` 243 GB.
+- **Ollama is not the model.** It is the program that loads one and runs it.
+- **The model remembers nothing.** Every request starts from zero.
+- **Codex is a model too**, just bigger and on someone else's computer.
+
+**The homework is a decision, not a reading.** He looks up three models, opens Task Manager to find
+his own RAM and graphics memory, and **picks the model he will pull next session, with a reason**.
+Next session he pulls the one he chose. That turns `ollama pull` from a command he copies into a
+call he made and has to defend.
+
+The fourth question — *if the model remembers nothing, who is doing the remembering?* — is left
+open at the end of the section and answered by Phase 1, where `respond(messages)` takes the whole
+conversation every time. The lesson lands because he met the question before he met the code.
+
 ### Phase 1 — the app, with a fake model
 
 `fakeModel.js` exposes one function, `async respond(messages)`, and `chat.js` is built against it:
@@ -130,7 +155,8 @@ the readline loop, the conversation array of `{ role, content }` objects, `/exit
    variable rather than instant.
 2. **It reports what it can see** — "I can see 5 messages, your last one was 9 words." Conversation
    history is the one genuinely invisible thing in a chat app, and this makes it visible. It is
-   also how `/clear` becomes provable instead of assumed.
+   also how `/clear` becomes provable instead of assumed, and it is the payoff for the question
+   left open above.
 3. **It throws if the last message contains "break"**, so there is an error worth catching.
 
 The checkable rule: **`chat.js` must not know the model is fake.** If the word "fake" appears
