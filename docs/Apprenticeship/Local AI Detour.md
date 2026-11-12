@@ -104,10 +104,22 @@ the trailing `console.log` correctly printing first). It is given as **paste-thi
 link**: the Playground's `?code=` parameter updates as you type but does not restore on a fresh
 load, also checked.
 
-Seven scenes are picked, in an order that lines up with the warmup: `sync-basics`, then `blocking-loop`
-(which is `01-blocking.js`), `settimeout-zero`, `promise-vs-settimeout`, **`async-await`**,
-`promise-all` (which is `04` versus `05`, three seconds versus one), and `fetch-then` (which is
-`08`). All seven return 200, checked.
+**setTimeout is scenery, not a subject.** Dave read the first cut and said the timeouts were
+confusing, that he had never thought of them as part of learning `async`/`await`. He was right
+about half of it, and the half he was right about was two of the seven scenes. `setTimeout(0),
+alone` and `Promise vs setTimeout` are the microtask-versus-task ordering puzzle: a real thing,
+an interview question, and something Charlie will not write once while building this app. They
+are now optional and labelled as trivia, as is the matching stretch block in `warmup/02-order.js`.
+
+Where `setTimeout` earns its keep is as a **stand-in for anything slow** -- you cannot conjure a
+slow thing without a server, and every fake delay in the warmup is a timer underneath. The README
+now says that outright, so the question Dave asked does not have to be asked twice: *when you see
+`setTimeout(fn, 1000)`, read it as "something that takes a second". The lesson is never about the
+timer.*
+
+Five scenes are picked, ordered so each maps to something Charlie will actually do: `sync-basics`, `blocking-loop` (same idea as `01`),
+**`async-await`**, `fetch-then` (the real shape, and what the chat app does), and `promise-all`
+(the `04` versus `05` choice, three seconds versus one). All return 200, checked.
 
 The README quotes the site's own description of `await` splitting a function in two and leaving the
 frame suspended rather than blocked, then restates it plainly: **`await` does not stop your program,

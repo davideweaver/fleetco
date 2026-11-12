@@ -20,9 +20,12 @@ middle();
 console.log("4");
 
 // ---------------------------------------------------------------------------
-// Stretch, once you have the four above figured out. Uncomment and predict again.
-// This one is genuinely tricky and nobody needs it memorized. The question worth
-// answering is the simple one: which of these ran before anything waited?
+// Optional, and genuinely skippable. Uncomment and predict again if you want.
+//
+// This is the "which kind of waiting cuts in line" puzzle. People ask it in job
+// interviews. It will not come up once while you build the chat app, so do not
+// spend your evening on it. The only part that matters is the simple part:
+// everything that did not wait ran before everything that did.
 // ---------------------------------------------------------------------------
 
 // setTimeout(() => console.log("5"), 0);

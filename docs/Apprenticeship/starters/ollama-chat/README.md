@@ -19,13 +19,13 @@ session right, almost nothing else has to change.
 
 Three parts, in order:
 
-1. **The visualizer** - 20 minutes, watch how JavaScript handles waiting.
+1. **The visualizer** - 15 minutes, watch how JavaScript handles waiting.
 2. **`warmup/`** - eight small programs. Predict the output, then run it.
 3. **The app** - the chat loop, built against a fake model you write yourself.
 
 ---
 
-## Part 1: watch how JavaScript waits (20 minutes)
+## Part 1: watch how JavaScript waits (15 minutes)
 
 Watch the video first if you haven't: https://www.youtube.com/watch?v=8aGhZQkoFbQ
 
@@ -45,23 +45,34 @@ Two things to set up before you start:
   "skip the prediction" link. Don't use it. Getting it wrong and finding out why is the
   entire value of the exercise.
 
-### The seven scenes, in order
+### The five scenes, in order
 
 | | Scene | Why it's here |
 |---|---|---|
-| 1 | [One thing at a time](https://jseventloop.tech/play/sync-basics) | The call stack with nothing async at all |
-| 2 | [Blocking the loop](https://jseventloop.tech/play/blocking-loop) | Same idea as `warmup/01`. Being stuck is not the same as waiting |
-| 3 | [setTimeout(0), alone](https://jseventloop.tech/play/settimeout-zero) | You asked for zero. You did not get zero |
-| 4 | [Promise vs setTimeout](https://jseventloop.tech/play/promise-vs-settimeout) | Two things waiting. One cuts the line |
-| 5 | [async/await, unmasked](https://jseventloop.tech/play/async-await) | **The important one.** Read the write-up under the animation twice |
-| 6 | [Promise.all, waiting in parallel](https://jseventloop.tech/play/promise-all) | Same idea as `warmup/04` versus `warmup/05`, three seconds versus one |
-| 7 | [fetch, a real network wait](https://jseventloop.tech/play/fetch-then) | Same idea as `warmup/08`, and what your chat app does all day |
+| 1 | [One thing at a time](https://jseventloop.tech/play/sync-basics) | The call stack, with nothing async at all. The baseline |
+| 2 | [Blocking the loop](https://jseventloop.tech/play/blocking-loop) | Being stuck is not the same as waiting. Same idea as `warmup/01` |
+| 3 | [async/await, unmasked](https://jseventloop.tech/play/async-await) | **The important one.** Read the write-up under the animation twice |
+| 4 | [fetch, a real network wait](https://jseventloop.tech/play/fetch-then) | The real shape of it. This is what your chat app does all day |
+| 5 | [Promise.all, waiting in parallel](https://jseventloop.tech/play/promise-all) | One at a time or all at once. Same choice as `warmup/04` versus `warmup/05` |
 
 Write your prediction and the real answer for each one in `warmup/NOTES.md`.
 
-"Same idea as" is doing real work in that table. These scenes are **not** your warmup files. They
-teach the same point with different code, and you cannot run your warmup files here. Which brings
-us to the thing that will waste your time if nobody warns you.
+### Why there are so many setTimeouts in these
+
+Fair question, and it threw an experienced developer who read this before you.
+
+`setTimeout` is **not** what you are here to learn. You will hardly ever write one. The reason
+it is all over these examples is that the examples need *something slow* to point at, and a
+timer is the only slow thing you can conjure up without a server. It is a stand-in for the real
+slow things: a network request, a database query, a model thinking.
+
+So when you see `setTimeout(fn, 1000)`, read it as "something that takes a second". The lesson is
+never about the timer.
+
+*Optional, and only if you are curious: [setTimeout(0), alone](https://jseventloop.tech/play/settimeout-zero)
+and [Promise vs setTimeout](https://jseventloop.tech/play/promise-vs-settimeout) are about which
+kind of waiting cuts in line ahead of which. It is a real thing, people ask it in job interviews,
+and it will not come up once while you build this app. Skip them unless you want them.*
 
 ### Don't try to run the warmup files on that site
 

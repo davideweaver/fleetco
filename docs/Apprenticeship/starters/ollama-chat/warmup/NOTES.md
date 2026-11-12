@@ -10,11 +10,9 @@ Predictions go in before I run anything. Wrong predictions stay in.
 |---|---|---|---|
 | One thing at a time | | | |
 | Blocking the loop | | | |
-| setTimeout(0), alone | | | |
-| Promise vs setTimeout | | | |
 | async/await, unmasked | | | |
-| Promise.all | | | |
 | fetch | | | |
+| Promise.all | | | |
 
 **In my own words, what does `await` actually do to the function it is in?**
 
