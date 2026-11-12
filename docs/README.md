@@ -2,7 +2,7 @@
 
 # Fleetco docs
 
-61 documents. Generated 2026-11-11.
+63 documents. Generated 2026-11-12.
 
 **Read this first to find out what is true.** Every document carries a `status`:
 
@@ -51,15 +51,17 @@ Regenerate with `python3 docs/_tools/docindex.py`.
 | [Project Brief](Project%20Brief.md) | The engagement in plain terms, and the risks named up front | 2026-10-30 |
 | [Roadmap](Roadmap.md) | Milestones M1-M8, what gates each, what the deliverable is | 2026-11-08 |
 
-## living — 6
+## living — 8
 
 *Current, and expected to keep changing.*
 
 | Doc | What it is | Updated |
 |---|---|---|
 | [After the 12 Weeks](Apprenticeship/After%20the%2012%20Weeks.md) | What happens after the 12-week handbook: service orders, then real Fleetco work | 2026-11-10 |
-| [Apprenticeship Overview](Apprenticeship/Apprenticeship%20Overview.md) | Charlie's paid apprenticeship — the living plan | 2026-11-10 |
-| [Shop Tracker Handbook](Apprenticeship/Shop%20Tracker%20Handbook.md) | Charlie's 12-week developer handbook — building the units part of a small shop app, on Fleetco's stack from week 6 | 2026-11-10 |
+| [Apprenticeship Overview](Apprenticeship/Apprenticeship%20Overview.md) | Charlie's paid apprenticeship — the living plan | 2026-11-12 |
+| [Journal](Apprenticeship/Journal.md) | Dated log of Charlie's apprenticeship — what he built each session, what was reviewed, what is next | 2026-11-12 |
+| [Local AI Detour](Apprenticeship/Local%20AI%20Detour.md) | The interlude between Week 2 and Week 3 — a local Ollama chat app, then a quiz the AI grades | 2026-11-12 |
+| [Shop Tracker Handbook](Apprenticeship/Shop%20Tracker%20Handbook.md) | Charlie's developer handbook — the units part of a small shop app, with an AI interlude after Week 2 and Fleetco's stack from Week 6 | 2026-11-12 |
 | [Design System Backlog](Architecture/Design%20System%20Backlog.md) | Design-system work, ticked off as it lands | 2026-11-05 |
 | [UI Vocabulary](Architecture/UI%20Vocabulary.md) | Component names and shell anatomy. The names here are the code | 2026-11-08 |
 | [V1 Vision and Gaps](Product/V1%20Vision%20and%20Gaps.md) | The working V1 picture and the gap register | 2026-11-08 |

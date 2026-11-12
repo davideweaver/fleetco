@@ -1,8 +1,8 @@
 ---
 status: living
-summary: Charlie's 12-week developer handbook — building the units part of a small shop app, on Fleetco's stack from week 6
+summary: Charlie's developer handbook — the units part of a small shop app, with an AI interlude after Week 2 and Fleetco's stack from Week 6
 created: 2026-11-01
-updated: 2026-11-10
+updated: 2026-11-12
 tags: [fleetco, apprenticeship, charlie, handbook, shop-tracker]
 source: Claude Code, from Dave's planning chat of 2026-10-24. Changed on 2026-11-10 from the Coin Rush game to Shop Tracker, scoped to one part of the app, with the switch to Fleetco's stack at week 6
 ---
@@ -20,8 +20,14 @@ source: Claude Code, from Dave's planning chat of 2026-10-24. Changed on 2026-11
 | **Weeks 1 to 5** | Plain JavaScript, HTML, CSS and Node.js |
 | **Weeks 6 to 12** | Fleetco's stack: TypeScript, NestJS, PostgreSQL, React, Vitest and GitHub Actions |
 
-The principles, working relationship, Codex rules and weekly report template live in
-[[Apprenticeship Overview]]. What follows week 12 is in [[After the 12 Weeks]].
+The principles, working relationship, Codex rules, pay and weekly report template live in
+[[Apprenticeship Overview]]. What follows week 12 is in [[After the 12 Weeks]]. What actually
+happened each session is in [[Journal]].
+
+**There is an interlude after Week 2.** Two small projects built against a model running on your
+own computer, in [[Local AI Detour]]. They are not part of Shop Tracker. They teach HTTP, promises,
+streams and error handling early, on something more interesting than an exercise, and they make
+Week 3 quicker and Week 5 much easier. Take them before Week 3.
 
 **What changed on 2026-11-10.** The first draft built a multiplayer game (Coin Rush) in plain
 JavaScript for all twelve weeks, and left the real frameworks until afterwards. Dave changed two
@@ -135,6 +141,12 @@ is flexible: understanding matters more than finishing a lesson on a particular 
 
 ### Week 1: Set up your development environment
 
+**Done 2026-11-11**, in one three-hour session. Charlie set up the machine, created `shop-tracker`,
+built the units data, replaced `console.table` with his own `printTable`, and added `addUnit.js` to
+save a new unit to `units.json` — more than the assignments asked for. Two things are outstanding
+and become Week 2's first pull requests: the README no longer matches the repository, and there is
+no `package.json`. The review is in [[Journal]].
+
 **Objective.** Understand your tools and run a program from your own computer.
 
 **Learn**
@@ -196,9 +208,13 @@ is flexible: understanding matters more than finishing a lesson on a particular 
 
 **Assignments**
 
-1. Write GitHub issues for the first few things Shop Tracker needs (for example "list units",
-   "add a unit", "show units due for maintenance"). Each issue says what done looks like.
-2. Pick one small issue and create a branch for it.
+1. Write GitHub issues for the problems found in the review of your first session ([[Journal]]):
+   the quiz marks a lowercase `a` wrong, the quiz accepts `E` as an answer, the `shop-tracker`
+   README tells people to run a file that now needs two others, and neither repository has a
+   `package.json`. Each issue says what done looks like. Then add an issue or two for what Shop
+   Tracker needs next ("show units due for maintenance").
+2. Pick one small issue and create a branch for it. Start with the lowercase answer bug: reproduce
+   it first, then fix it.
 3. Implement it and commit.
 4. Open a pull request that links the issue.
 5. Ask your mentor to review it.
@@ -207,10 +223,14 @@ is flexible: understanding matters more than finishing a lesson on a particular 
 
 From here on, every change goes through an issue, a branch and a reviewed pull request.
 
+A commit message says what changed and why, for whoever reads it in a year. It is not the
+instruction you gave the AI. Look at commit `58e04c7` on `shop-tracker` to see the difference.
+
 **Acceptance criteria**
 
 - [ ] You can do the issue-to-pull-request workflow on your own.
 - [ ] You can explain how to recover from a basic merge conflict.
+- [ ] Every commit message on the branch describes the change, not the prompt.
 
 **Codex prompt**
 
@@ -220,11 +240,29 @@ From here on, every change goes through an issue, a branch and a reviewed pull r
 
 ---
 
+## Interlude: local AI
+
+Before Week 3, build the two projects in [[Local AI Detour]]: a console chat app against a local
+Ollama server, and your quiz rebuilt so the model writes the questions and grades answers in the
+user's own words. Two to three weeks.
+
+The reason it comes here rather than later: Weeks 3 to 5 are the weeks where asynchrony, HTTP and
+error handling stop being optional, and it is much easier to learn them when you want the answer
+than when you are told to learn them. Everything in those weeks is in the interlude already, on a
+subject you chose.
+
+---
+
 ## Phase 2: Fundamentals, by hand
 
 ### Week 3: JavaScript fundamentals and small programs
 
 **Objective.** Build confidence writing small programs without a framework, on shop data.
+
+If you have done the interlude, most of this list is behind you: modules, array methods, JSON,
+error handling and `node:test`. Move quickly through those and spend the time you save on the
+maintenance-due calculator and its edge cases, which is the part of this week with real thinking
+in it.
 
 **Learn**
 
@@ -358,6 +396,15 @@ week 4 page to this server, and add a page that lists units.
 
 Keep a list in your notes of everything you had to do by hand: routing, parsing, validation,
 error responses. You'll tick it off in week 7.
+
+You have spent the interlude as a *client* of somebody else's server, which is the best possible
+preparation for writing one: you already know what a client needs, because you were annoyed when
+Ollama did not provide it.
+
+*Stretch:* add `POST /ask`, which takes a question about the units and answers it by passing it to
+your local model, with the unit data included in the prompt. The first time your two worlds meet,
+and the first time you have to think about what happens when the thing your server depends on is
+slow or down.
 
 **Acceptance criteria**
 

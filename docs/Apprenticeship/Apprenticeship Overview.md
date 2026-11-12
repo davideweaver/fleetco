@@ -2,7 +2,7 @@
 status: living
 summary: Charlie's paid apprenticeship — the living plan
 created: 2026-11-01
-updated: 2026-11-10
+updated: 2026-11-12
 tags: [fleetco, apprenticeship, charlie, training, planning]
 source: Claude Code, from Dave's planning chat of 2026-10-24
 ---
@@ -19,17 +19,17 @@ it, using Git properly, working with APIs and databases, and deploying without b
 
 | Document | What it holds |
 |---|---|
-| **This document** | Principles, working relationship, Codex rules, weekly report, status and open decisions |
+| **This document** | Principles, working relationship, Codex rules, pay and hours, weekly report, status and open decisions |
 | [[Shop Tracker Handbook]] | The 12-week, week-by-week handbook Charlie works from |
+| [[Local AI Detour]] | An interlude after Week 2: a local Ollama chat app, then a quiz the AI grades |
 | [[After the 12 Weeks]] | Adding service orders to Shop Tracker, then the first Fleetco tasks |
+| [[Journal]] | What actually happened, session by session |
 
 ## Status and open decisions
 
 **Decided 2026-11-10** (Dave talked it through with Charlie):
 
-- **Start date.** The week of 2026-11-09.
-- **Pay.** $25 an hour, for training time as well as Fleetco work.
-- **Hours.** About 10 a week.
+- **Start date.** The week of 2026-11-09. First session worked 2026-11-11; see [[Journal]].
 - **Training project.** A small shop-management web app, Shop Tracker, instead of the Coin Rush
   game. It uses real entities and realistic data, and teaches everything the game was meant to.
   See [[Shop Tracker Handbook]].
@@ -37,6 +37,19 @@ it, using Git properly, working with APIs and databases, and deploying without b
   (with odometer readings and maintenance schedules). Weeks 1 to 5 are plain JavaScript; from
   week 6 it switches to Fleetco's stack one piece a week: TypeScript, Vitest and CI, NestJS,
   PostgreSQL with Drizzle, then React. Service orders come after week 12.
+
+**Decided 2026-11-12:**
+
+- **An AI interlude after Week 2.** Before Week 3's JavaScript fundamentals, Charlie builds a
+  console chat app against a model running on his own computer with Ollama, then rebuilds his quiz
+  so the model writes the questions and grades free-text answers. It teaches HTTP, promises,
+  streams and error handling on a subject he wants to work on, and it is the groundwork for
+  Fleetco's own agent work. See [[Local AI Detour]]. It adds two to three weeks, so the program is
+  about fourteen weeks, not twelve.
+- **Slack.** Charlie is in Dave's Slack workspace, and it is the normal channel for questions
+  between sessions.
+- **A journal.** Dave writes an entry every day or two in [[Journal]], so there is a record of what
+  was built, what was reviewed and what was decided.
 
 **Still undecided:**
 
@@ -47,9 +60,50 @@ it, using Git properly, working with APIs and databases, and deploying without b
   months).
 - **Deployment architecture.** Week 11 deploys Shop Tracker to a development environment. Where and
   how depends on Fleetco's own hosting decisions (see [[Hosting and Deployment]]).
-- **Hour tracking and payroll.** How hours are recorded, what counts as assigned work versus
-  optional study, and handling payroll and employment correctly for a minor who is still in high
-  school. The rate is settled; these aren't, and pay starts this week.
+- **Payroll and employment.** Handling pay correctly for a minor still in high school: how the
+  money is actually paid, what has to be withheld or reported, and whether anything has to be
+  filed. The rate, the cap and the timesheet are settled; this is not, and pay has already
+  started. The one item on this list with a deadline attached.
+
+## Pay and hours
+
+| | |
+|---|---|
+| **Rate** | $25 an hour, for training time as well as Fleetco work |
+| **Cap** | 10 hours a week, firm — not a target to reach |
+| **Timesheet** | Charlie records his own hours in a Google Sheet, [this one](https://docs.google.com/spreadsheets/d/1RL9jEn0WCF2OH1yFjg_iMRvUemxdXXka4EKMQsBDK7E) |
+
+The sheet is the record for pay. [[Journal]] records the work, not the hours, so the two never
+disagree.
+
+Charlie keeps the timesheet himself, and that is deliberate: tracking your own time honestly,
+including the hour you spent stuck and the hour you spent reading, is part of the job. Dave reviews
+it at the weekly review rather than auditing it.
+
+The cap exists in both directions. It protects school and sports, and it also means a week where
+the handbook moved slowly is not a week to work extra hours. Study, reading documentation and
+getting stuck all count as hours; only fun side projects of Charlie's own don't.
+
+## Pacing
+
+Charlie covered most of Week 1 in one three-hour session. He also uses Codex well enough to go
+considerably faster than that. Neither is a problem by itself, but the risk is obvious: racing
+through the fundamentals to reach the interesting parts, arriving with a repository full of code
+nobody in the house can explain.
+
+The handbook's weeks are milestones, not a schedule, and they can be finished early. What cannot
+be skipped is the understanding. Three rules:
+
+1. **Before a session ends, Charlie explains one thing he submitted that day** — a line, a function,
+   an error he hit — out loud or in writing, without the AI open. Not a test. It is how both of
+   them find out what landed.
+2. **A week is measured by what Charlie can explain, not by what he shipped.** The weekly report
+   below asks for exactly that.
+3. **If Codex produces something Charlie cannot explain, the scope was too big.** Shrink it and do
+   it again. This is already a rule below; it is the one that matters most.
+
+Going faster is allowed, and earns harder work rather than an earlier finish: more edge cases, more
+tests, the stretch goals. Not a shorter program.
 
 ## Principles
 
