@@ -2,7 +2,7 @@
 
 # Fleetco docs
 
-63 documents. Generated 2026-11-12.
+63 documents. Generated 2026-11-13.
 
 **Read this first to find out what is true.** Every document carries a `status`:
 
@@ -25,7 +25,7 @@ Regenerate with `python3 docs/_tools/docindex.py`.
 | Doc | What it is | Updated |
 |---|---|---|
 | [AI Readiness](Architecture/AI%20Readiness.md) | Making the product agent-usable later. Three items are V1 work; the rest is deferred | 2026-11-08 |
-| [AWS Buildout](Architecture/AWS%20Buildout.md) | What to build in AWS, the pipeline, the INFRA cards, and B1-B18 | 2026-11-08 |
+| [AWS Buildout](Architecture/AWS%20Buildout.md) | What to build in AWS, the pipeline, the INFRA cards, and B1-B18 | 2026-11-13 |
 | [Agent Playbooks](Architecture/Agent%20Playbooks.md) | Checklists an agent follows for common jobs | 2026-11-01 |
 | [Architecture Decisions](Architecture/Architecture%20Decisions.md) | ADR log, 001-035. The decision index is at the top | 2026-11-08 |
 | [Auth and Identity](Architecture/Auth%20and%20Identity.md) | Sessions, cookies, memberships, impersonation, SSO path | 2026-10-30 |

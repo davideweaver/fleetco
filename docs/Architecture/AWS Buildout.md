@@ -2,7 +2,7 @@
 status: current
 summary: What to build in AWS, the pipeline, the INFRA cards, and B1-B18
 created: 2026-11-07
-updated: 2026-11-08
+updated: 2026-11-13
 tags: [fleetco, architecture, aws, environments, cicd, terraform, agents, plan]
 source: Dave + Claude Code (Xerro)
 ---
@@ -247,6 +247,47 @@ rot, and the cost is a few minutes of pipeline time.
 
 It also exercises the clone-and-restore path continuously, which is what makes [[Operations]]'
 restore drill a verification rather than a first attempt.
+
+### AWS Emulator — Useful In CI, Not A Substitute For `dev`
+
+**Noted 2026-11-13.** AWS shipped a local [AWS Emulator](https://aws.amazon.com/about-aws/whats-new/2026/11/aws-emulator-now-available/)
+on 2026-11-11, GA and free. It runs on a developer machine or in CI, each copy gets its own port and
+keys, and state is in memory until it stops. Operations it does not implement return
+`501 NotImplemented`, so a test calling one fails immediately rather than silently passing.
+
+**Where it earns its place: CI and local development.** Anything in the application that calls an
+AWS API — S3 for photos and documents, SSM Parameter Store for configuration, the Secrets Manager
+read the Data API needs — currently has to be mocked by hand or pointed at real AWS. The emulator
+gives real API behaviour and, more valuably, **real error codes**, which is the part hand-written
+fakes always get wrong. Error-code handling is a V1 requirement in its own right
+([[AI Readiness]] item 7), so testing it against something that returns AWS's actual errors is worth
+having.
+
+**What it does not do, and why that settles the `dev` question.** The emulator is generated from
+AWS's published API models and
+[matches AWS most closely for *control plane* APIs](https://docs.aws.amazon.com/emulator/latest/userguide/fidelity.html) —
+creating, describing and deleting resources. Fidelity for *data plane* APIs varies by service, and
+**it does not run containers, enforce IAM, or simulate a VPC.**
+
+That is precisely the wrong shape for what `dev` is for. [[Environments]] says `dev` exists to catch
+**"works locally, breaks on Fargate"**: a missing IAM permission, a security group rule, the ALB
+idle timeout killing SSE, an S3 bucket policy. **None of those are control-plane API-shape
+problems.** An emulator that returns a correct `CreateService` response will not run the task, will
+not hold an SSE connection open through a load balancer for an hour, and will not refuse a call that
+a real IAM policy would refuse. So it reduces nothing about the case for a real deployed `dev`.
+
+**One thing worth a cheap experiment, with the result unknown.** The fidelity page says support for
+**Terraform** "varies by service." If `terraform apply` ran usefully against the emulator for
+`modules/network`, `modules/data` and `modules/service`, that would be a CI gate for the
+infrastructure code **before any AWS account exists** — which matters here, because INFRA-001 is
+Cameron's task and blocks every `apply`. Worth one afternoon to find out. If it only half-works,
+drop it: `terraform plan` without credentials already catches syntax and most type errors, and a
+half-trusted gate is worse than none.
+
+**Caveats to carry into any trial:** in-memory state is lost on stop, which is right for CI and
+irritating locally; fidelity scores are published per release, so they have to be checked for the
+services we actually use rather than assumed; and the emulator is verified in `us-west-2` while this
+project is `us-east-1` (B13), which should not matter but is a difference worth knowing about.
 
 ### The Additive-Only Migration Gate
 
